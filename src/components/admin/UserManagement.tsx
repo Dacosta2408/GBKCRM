@@ -1,0 +1,883 @@
+import React, { useState, useMemo } from "react";
+import { 
+  Users, UserPlus, Search, Filter, Edit3, Shield, Key, Eye, 
+  Trash2, ToggleLeft, ToggleRight, Check, X, Mail, Phone, Clock,
+  FileCheck, ShieldAlert, Award, AlertCircle, FileText
+} from "lucide-react";
+import { User, Client } from "../../types";
+
+interface UserManagementProps {
+  userRoster: User[];
+  setUserRoster: React.Dispatch<React.SetStateAction<User[]>>;
+  currentUser: User;
+  clients: Client[];
+  showToast: (msg: string, type?: "success" | "error") => void;
+  logActivity: (action: string, details: string) => void;
+}
+
+export const UserManagement: React.FC<UserManagementProps> = ({
+  userRoster,
+  setUserRoster,
+  currentUser,
+  clients,
+  showToast,
+  logActivity
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Onboard / Recuit staff modal states
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFirst, setNewFirst] = useState("");
+  const [newLast, setNewLast] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newRole, setNewRole] = useState<User["role"]>("Agent");
+  const [newPin, setNewPin] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newFsra, setNewFsra] = useState("");
+  const [newFsraExpiry, setNewFsraExpiry] = useState("");
+  const [newEoCarrier, setNewEoCarrier] = useState("");
+  const [newEoPolicy, setNewEoPolicy] = useState("");
+  const [newEoExpiry, setNewEoExpiry] = useState("");
+
+  // Edit staff modal states
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editFirst, setEditFirst] = useState("");
+  const [editLast, setEditLast] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editRole, setEditRole] = useState<User["role"]>("Agent");
+  const [editPin, setEditPin] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editFsra, setEditFsra] = useState("");
+  const [editFsraExpiry, setEditFsraExpiry] = useState("");
+  const [editEoCarrier, setEditEoCarrier] = useState("");
+  const [editEoPolicy, setEditEoPolicy] = useState("");
+  const [editEoExpiry, setEditEoExpiry] = useState("");
+  const [editStatus, setEditStatus] = useState<"active" | "inactive">("active");
+
+  // Doc / ID review states
+  const [reviewingUser, setReviewingUser] = useState<User | null>(null);
+
+  // Compute dynamic client count assigned per broker
+  const brokerFileCount = useMemo(() => {
+    const counts: Record<string, number> = {};
+    userRoster.forEach(u => { counts[u.id] = 0; });
+    clients.forEach(c => {
+      const ownerName = c.retentionOwner || "";
+      const matched = userRoster.find(u => `${u.first} ${u.last}`.toLowerCase() === ownerName.toLowerCase());
+      if (matched) { counts[matched.id]++; }
+    });
+    return counts;
+  }, [clients, userRoster]);
+
+  // Filtered roster
+  const filteredRoster = useMemo(() => {
+    return userRoster.filter(u => {
+      const nameMatch = `${u.first} ${u.last}`.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (u.jobTitle || "").toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const roleMatch = roleFilter === "all" || u.role === roleFilter;
+      const statusMatch = statusFilter === "all" || u.status === statusFilter;
+
+      return nameMatch && roleMatch && statusMatch;
+    });
+  }, [userRoster, searchTerm, roleFilter, statusFilter]);
+
+  // Create User submit handler
+  const handleOnboardUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFirst || !newLast || !newEmail || !newPin) {
+      showToast("First, Last Name, Email and Pin are strictly required.", "error");
+      return;
+    }
+
+    const newUser: User = {
+      id: `u_${Date.now()}`,
+      first: newFirst,
+      last: newLast,
+      email: newEmail,
+      phone: newPhone || "(705) 555-0100",
+      role: newRole,
+      status: "active",
+      pin: newPin,
+      lastLogin: new Date().toISOString(),
+      created: new Date().toISOString().split("T")[0],
+      displayName: `${newFirst} ${newLast}`,
+      jobTitle: newTitle || newRole,
+      fsraNum: newFsra,
+      fsraExpiry: newFsraExpiry,
+      eoInsurer: newEoCarrier,
+      eoPolicy: newEoPolicy,
+      eoExpiry: newEoExpiry,
+      docsStatus: newFsra ? "pending" : "missing"
+    };
+
+    const updated = [...userRoster, newUser];
+    setUserRoster(updated);
+    logActivity("Onboarded Staff Member", `${newUser.first} ${newUser.last} assigned role of ${newUser.role}`);
+    showToast(`Onboarded ${newUser.first} successfully!`, "success");
+
+    // Reset states
+    setNewFirst(""); setNewLast(""); setNewEmail(""); setNewPhone(""); setNewPin(""); setNewTitle("");
+    setNewFsra(""); setNewFsraExpiry(""); setNewEoCarrier(""); setNewEoPolicy(""); setNewEoExpiry("");
+    setShowAddModal(false);
+  };
+
+  // Edit User load
+  const loadEditUser = (user: User) => {
+    setEditingUser(user);
+    setEditFirst(user.first);
+    setEditLast(user.last);
+    setEditEmail(user.email);
+    setEditPhone(user.phone || "");
+    setEditRole(user.role);
+    setEditPin(user.pin || "");
+    setEditTitle(user.jobTitle || user.role);
+    setEditFsra(user.fsraNum || "");
+    setEditFsraExpiry(user.fsraExpiry || "");
+    setEditEoCarrier(user.eoInsurer || "");
+    setEditEoPolicy(user.eoPolicy || "");
+    setEditEoExpiry(user.eoExpiry || "");
+    setEditStatus(user.status);
+  };
+
+  // Submit edit
+  const handleEditUserSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    const updatedUser: User = {
+      ...editingUser,
+      first: editFirst,
+      last: editLast,
+      email: editEmail,
+      phone: editPhone,
+      role: editRole,
+      pin: editPin,
+      jobTitle: editTitle,
+      fsraNum: editFsra,
+      fsraExpiry: editFsraExpiry,
+      eoInsurer: editEoCarrier,
+      eoPolicy: editEoPolicy,
+      eoExpiry: editEoExpiry,
+      status: editStatus,
+      displayName: `${editFirst} ${editLast}`,
+      docsStatus: editFsra ? (editingUser.docsStatus === "verified" ? "verified" : "pending") : "missing"
+    };
+
+    const updated = userRoster.map(u => u.id === editingUser.id ? updatedUser : u);
+    setUserRoster(updated);
+    logActivity("Edited Staff Member", `${updatedUser.first} ${updatedUser.last} updated by administrative operator.`);
+    showToast(`User parameters saved for ${updatedUser.first}.`, "success");
+    setEditingUser(null);
+  };
+
+  // Inline toggle user status
+  const handleToggleStatus = (u: User) => {
+    if (u.id === currentUser.id) {
+      showToast("Compliance Rule: You cannot deactivate your own master credentials.", "error");
+      return;
+    }
+
+    const nextStatus = u.status === "active" ? "inactive" : "active";
+    const updatedUser = { ...u, status: nextStatus as "active" | "inactive" };
+    const updated = userRoster.map(r => r.id === u.id ? updatedUser : r);
+    setUserRoster(updated);
+    logActivity(
+      nextStatus === "active" ? "Activated User" : "Deactivated User", 
+      `${u.first} ${u.last} has been toggled to ${nextStatus}`
+    );
+    showToast(`${u.first} ${u.last} is now ${nextStatus.toUpperCase()}`, "success");
+  };
+
+  // Force random PIN reset
+  const handleResetPin = (u: User) => {
+    const randomPin = Math.floor(1000 + Math.random() * 9000).toString();
+    const updatedUser = { ...u, pin: randomPin };
+    const updated = userRoster.map(r => r.id === u.id ? updatedUser : r);
+    setUserRoster(updated);
+    logActivity("Admin PIN Reset Triggered", `Generated random security PIN entry for broker ${u.first} ${u.last}`);
+    showToast(`New security PIN for ${u.first} is: ${randomPin}`, "success");
+  };
+
+  // Compliance Doc Verify approval
+  const handleVerifyDocs = (u: User, approve: boolean) => {
+    const updatedUser = { ...u, docsStatus: approve ? "verified" : "missing" };
+    const updated = userRoster.map(r => r.id === u.id ? updatedUser : r);
+    setUserRoster(updated);
+    logActivity(
+      approve ? "Approved Broker ID" : "Rejected Broker ID",
+      `${u.first} ${u.last} compliance credentials state updated to ${updatedUser.docsStatus}`
+    );
+    showToast(approve ? "Documents marked verified" : "Documents rejected", "success");
+    setReviewingUser(null);
+  };
+
+  return (
+    <div className="space-y-6" id="user-management-panel">
+      
+      {/* Search and Filters Header bar */}
+      <div className="bg-[#121216] border border-white/5 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          {/* Search box */}
+          <div className="bg-[#181820] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[#b5a642]/30 transition-all">
+            <Search className="w-3.5 h-3.5 text-white/30" />
+            <input 
+              type="text" 
+              placeholder="Search by name, email, role..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-transparent text-xs text-white placeholder-white/30 outline-none w-full"
+            />
+          </div>
+
+          {/* Role Filter */}
+          <select 
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+          >
+            <option value="all">All Roles</option>
+            <option value="Owner / Master Admin">Owner / Master Admin</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="IT / Developer">IT / Developer</option>
+            <option value="Senior Broker">Senior Broker</option>
+            <option value="Agent">Agent</option>
+          </select>
+
+          {/* Status Filter */}
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        {/* Onboard recruiting button */}
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-bold uppercase px-4 py-2 rounded-lg flex items-center gap-1.5 shrink-0 transition-all"
+        >
+          <UserPlus className="w-4 h-4 stroke-[2.5]" /> Onboard Broker Staff
+        </button>
+      </div>
+
+      {/* Roster Main Table grid layout */}
+      <div className="bg-[#111115] border border-white/5 rounded-xl overflow-x-auto shadow-md" id="roster-table-container">
+        <table className="w-full text-left border-collapse min-w-[800px]">
+          <thead>
+            <tr className="border-b border-white/5 bg-[#141419] text-[10px] text-white/40 uppercase font-black tracking-wider select-none">
+              <th className="px-5 py-3">Broker Profile</th>
+              <th className="px-5 py-3">System Access Role</th>
+              <th className="px-5 py-3">Compliance Documents</th>
+              <th className="px-5 py-3">Roster Load Status</th>
+              <th className="px-5 py-3">Account Security PIN</th>
+              <th className="px-5 py-3 text-right">Administrative Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-xs">
+            {filteredRoster.map((user) => {
+              const fileCount = brokerFileCount[user.id] || 0;
+              const hasDocs = user.fsraNum || user.eoInsurer;
+              const isSelf = user.id === currentUser.id;
+
+              return (
+                <tr key={user.id} className="hover:bg-white/[0.01] transition-all">
+                  
+                  {/* Avatar & Profile */}
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      {user.photo ? (
+                        <img 
+                          src={user.photo} 
+                          alt={user.first} 
+                          referrerPolicy="no-referrer"
+                          className="w-9 h-9 rounded-full object-cover border border-[#b5a642]/40" 
+                        />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-[#b5a642]/10 border border-[#b5a642]/30 flex items-center justify-center text-xs font-bold text-[#b5a642] uppercase">
+                          {user.first[0]}{user.last[0]}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-bold text-[#eeeef2] flex items-center gap-1.5">
+                          {user.first} {user.last}
+                          {isSelf && (
+                            <span className="text-[8px] bg-[#b5a642]/15 text-[#b5a642] font-mono px-1.5 py-0.5 rounded uppercase border border-[#b5a642]/25">
+                              You
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-white/40 leading-normal font-semibold">
+                          {user.jobTitle || user.role} • {user.email}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Access Role */}
+                  <td className="px-5 py-4">
+                    <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border ${
+                      user.role.includes("Owner") || user.role.includes("Super Admin") || user.role.includes("IT")
+                        ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        : "bg-[#6fa3b8]/15 text-[#6fa3b8] border-[#6fa3b8]/20"
+                    }`}>
+                      {user.role}
+                    </span>
+                  </td>
+
+                  {/* Compliance documents ID status */}
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      {hasDocs ? (
+                        <button
+                          onClick={() => setReviewingUser(user)}
+                          className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border transition-all ${
+                            user.docsStatus === "verified"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          }`}
+                        >
+                          <Eye className="w-3 h-3" /> 
+                          {user.docsStatus === "verified" ? "Verified" : "Pending Verification"}
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border bg-red-500/10 text-red-400 border-red-500/20">
+                          <ShieldAlert className="w-3 h-3 animate-pulse" /> Missing Uploads
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Client roster load status */}
+                  <td className="px-5 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-white/80">{fileCount} Pipeline Files</span>
+                      <span className="text-[10px] text-white/40 font-semibold mt-0.5">Active Files Assigned</span>
+                    </div>
+                  </td>
+
+                  {/* Account PIN */}
+                  <td className="px-5 py-4 font-mono text-[11px] text-[#b5a642] font-black">
+                    •••• <span className="text-white/30 text-[10px] ml-1">({user.pin ? "Defined" : "Not Set"})</span>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-5 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2.5">
+                      
+                      {/* Active Toggle Switch */}
+                      <button
+                        onClick={() => handleToggleStatus(user)}
+                        title={user.status === "active" ? "Deactivate User" : "Activate User"}
+                        className={`transition-all ${user.status === "active" ? "text-emerald-400" : "text-white/20"}`}
+                      >
+                        {user.status === "active" ? (
+                          <ToggleRight className="w-6.5 h-6.5 stroke-[1.5]" />
+                        ) : (
+                          <ToggleLeft className="w-6.5 h-6.5 stroke-[1.5]" />
+                        )}
+                      </button>
+
+                      {/* Reset Pin */}
+                      <button
+                        onClick={() => handleResetPin(user)}
+                        title="Generate Random Pin Tokens"
+                        className="p-1 hover:bg-white/5 rounded border border-transparent hover:border-white/5 text-white/40 hover:text-[#b5a642] transition-all"
+                      >
+                        <Key className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Edit Details */}
+                      <button
+                        onClick={() => loadEditUser(user)}
+                        title="Edit Broker Fields"
+                        className="p-1 hover:bg-white/5 rounded border border-transparent hover:border-white/5 text-white/40 hover:text-white transition-all"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+
+                    </div>
+                  </td>
+
+                </tr>
+              );
+            })}
+
+            {filteredRoster.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-5 py-12 text-center text-white/30">
+                  <Users className="w-10 h-10 mx-auto mb-2 stroke-1" />
+                  <p className="italic">No brokers matched the search parameters.</p>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ─── ONBOARD RECRUIT MODAL ─── */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="onboard-modal-form">
+            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-4 h-4 text-[#b5a642]" />
+                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Onboard New Broker Staff Member</h3>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="text-white/40 hover:text-white">✕</button>
+            </div>
+
+            <form onSubmit={handleOnboardUser} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">First Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newFirst}
+                    onChange={(e) => setNewFirst(e.target.value)}
+                    placeholder="David"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Last Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newLast}
+                    onChange={(e) => setNewLast(e.target.value)}
+                    placeholder="Acosta"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Email Address</label>
+                  <input 
+                    type="email" 
+                    required
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="vdacosta@gbkfinancial.ca"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="(705) 555-0100"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Role Group</label>
+                  <select
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value as User["role"])}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none cursor-pointer"
+                  >
+                    <option value="Agent">Agent / Broker</option>
+                    <option value="Senior Broker">Senior Broker</option>
+                    <option value="IT / Developer">IT / Developer</option>
+                    <option value="Super Admin">Super Admin</option>
+                    <option value="Owner / Master Admin">Owner / Master Admin</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Security PIN (4 digits)</label>
+                  <input 
+                    type="password" 
+                    required
+                    maxLength={4}
+                    value={newPin}
+                    onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
+                    placeholder="1234"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30 font-mono tracking-widest"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Job Title</label>
+                  <input 
+                    type="text" 
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="Mortgage Underwriter"
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                  />
+                </div>
+              </div>
+
+              {/* Compliance documents credentials subheaders */}
+              <div className="border-t border-white/5 pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] mb-3">Ontario Compliance Registrations</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">FSRA Licence Number</label>
+                    <input 
+                      type="text" 
+                      value={newFsra}
+                      onChange={(e) => setNewFsra(e.target.value)}
+                      placeholder="M1900XXXX"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Licence Expiry Date</label>
+                    <input 
+                      type="date" 
+                      value={newFsraExpiry}
+                      onChange={(e) => setNewFsraExpiry(e.target.value)}
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                  <div className="sm:col-span-1">
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Insurer</label>
+                    <input 
+                      type="text" 
+                      value={newEoCarrier}
+                      onChange={(e) => setNewEoCarrier(e.target.value)}
+                      placeholder="Trisura"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Policy Number</label>
+                    <input 
+                      type="text" 
+                      value={newEoPolicy}
+                      onChange={(e) => setNewEoPolicy(e.target.value)}
+                      placeholder="EO-88992-XX"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Policy Expiry</label>
+                    <input 
+                      type="date" 
+                      value={newEoExpiry}
+                      onChange={(e) => setNewEoExpiry(e.target.value)}
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/5 border border-white/5 p-3.5 rounded-lg text-[11px] text-white/50 leading-relaxed">
+                🚨 <span className="text-white font-bold">Onboarding Consent:</span> Newly created staff credentials must be shared with the broker directly. PIN codes are stored in local secure memory nodes.
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 border border-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase px-5 py-2 rounded-lg transition-all"
+                >
+                  Commit Onboarding
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── EDIT USER MODAL ─── */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="edit-user-modal">
+            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-[#6fa3b8]" />
+                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Modify Broker Credentials: {editingUser.first} {editingUser.last}</h3>
+              </div>
+              <button onClick={() => setEditingUser(null)} className="text-white/40 hover:text-white">✕</button>
+            </div>
+
+            <form onSubmit={handleEditUserSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">First Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editFirst}
+                    onChange={(e) => setEditFirst(e.target.value)}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Last Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editLast}
+                    onChange={(e) => setEditLast(e.target.value)}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Email Address</label>
+                  <input 
+                    type="email" 
+                    required
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Role Group</label>
+                  <select
+                    value={editRole}
+                    onChange={(e) => setEditRole(e.target.value as User["role"])}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none cursor-pointer"
+                  >
+                    <option value="Agent">Agent / Broker</option>
+                    <option value="Senior Broker">Senior Broker</option>
+                    <option value="IT / Developer">IT / Developer</option>
+                    <option value="Super Admin">Super Admin</option>
+                    <option value="Owner / Master Admin">Owner / Master Admin</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Security PIN (4 digits)</label>
+                  <input 
+                    type="password" 
+                    required
+                    maxLength={4}
+                    value={editPin}
+                    onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ""))}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30 font-mono tracking-widest"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Job Title</label>
+                  <input 
+                    type="text" 
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                  />
+                </div>
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">System Status Flag</label>
+                <div className="flex items-center gap-4 bg-[#14141a] p-2 rounded-lg border border-white/5">
+                  <label className="flex items-center gap-2 text-xs text-[#eeeef2] cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="status"
+                      checked={editStatus === "active"}
+                      onChange={() => setEditStatus("active")}
+                      className="text-[#6fa3b8]"
+                    />
+                    <span>Active Broker Node</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-[#eeeef2] cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="status"
+                      checked={editStatus === "inactive"}
+                      onChange={() => setEditStatus("inactive")}
+                      className="text-red-500"
+                    />
+                    <span className="text-red-400 font-bold">Inactive / Suspended</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Compliance documents credentials subheaders */}
+              <div className="border-t border-white/5 pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[#6fa3b8] mb-3">Ontario Compliance Registrations</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">FSRA Licence Number</label>
+                    <input 
+                      type="text" 
+                      value={editFsra}
+                      onChange={(e) => setEditFsra(e.target.value)}
+                      placeholder="M1900XXXX"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Licence Expiry Date</label>
+                    <input 
+                      type="date" 
+                      value={editFsraExpiry}
+                      onChange={(e) => setEditFsraExpiry(e.target.value)}
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
+                  <div className="sm:col-span-1">
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Insurer</label>
+                    <input 
+                      type="text" 
+                      value={editEoCarrier}
+                      onChange={(e) => setEditEoCarrier(e.target.value)}
+                      placeholder="Trisura"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Policy Number</label>
+                    <input 
+                      type="text" 
+                      value={editEoPolicy}
+                      onChange={(e) => setEditEoPolicy(e.target.value)}
+                      placeholder="EO-88992-XX"
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Policy Expiry</label>
+                    <input 
+                      type="date" 
+                      value={editEoExpiry}
+                      onChange={(e) => setEditEoExpiry(e.target.value)}
+                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 border border-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="bg-[#6fa3b8] hover:bg-[#598ca1] text-black text-xs font-black uppercase px-5 py-2 rounded-lg transition-all"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── COMPLIANCE ID REVIEW POPUP ─── */}
+      {reviewingUser && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden text-left" id="review-modal">
+            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-[#b5a642]" />
+                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Verify Broker Registrations: {reviewingUser.first}</h3>
+              </div>
+              <button onClick={() => setReviewingUser(null)} className="text-white/40 hover:text-white">✕</button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Document Info Cards */}
+              <div className="bg-[#15151b] border border-white/5 p-4 rounded-xl space-y-3.5">
+                <div className="flex gap-2.5">
+                  <FileText className="w-5 h-5 text-[#b5a642] shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-wider">FSRA Licencing Dossier</p>
+                    <p className="text-xs font-bold text-[#eeeef2] mt-0.5">Licence No: {reviewingUser.fsraNum || "Not Entered"}</p>
+                    <p className="text-[10px] text-white/50">Expiry: {reviewingUser.fsraExpiry || "None"}</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/5 pt-3.5 flex gap-2.5">
+                  <Shield className="w-5 h-5 text-[#6fa3b8] shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-wider">Errors &amp; Omissions Liability Policy</p>
+                    <p className="text-xs font-bold text-[#eeeef2] mt-0.5">Insurer: {reviewingUser.eoInsurer || "Not Entered"}</p>
+                    <p className="text-[10px] text-white/50">Policy: {reviewingUser.eoPolicy || "None"}</p>
+                    <p className="text-[10px] text-white/50">Expiry: {reviewingUser.eoExpiry || "None"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Simulated ID Attachment View */}
+              <div className="bg-[#0b0b0e] border border-white/5 rounded-xl h-44 flex flex-col items-center justify-center text-center p-4">
+                <FileCheck className="w-8 h-8 text-[#b5a642] mb-2 animate-bounce" />
+                <span className="text-xs font-bold text-white/80 uppercase">FSRA_LICENCE_PROOF_M19.PDF</span>
+                <span className="text-[10px] text-white/30 font-semibold mt-1">Uploaded securely on {reviewingUser.created}</span>
+                <button 
+                  onClick={() => showToast("Opening simulated secure PDF attachment...", "success")}
+                  className="text-[9px] text-[#b5a642] font-black uppercase mt-3 tracking-widest hover:underline"
+                >
+                  View Original Dossier Document
+                </button>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+                <button 
+                  type="button" 
+                  onClick={() => handleVerifyDocs(reviewingUser, false)}
+                  className="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-[10px] font-black uppercase transition-all"
+                >
+                  Reject &amp; Force Re-upload
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => handleVerifyDocs(reviewingUser, true)}
+                  className="px-4 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase transition-all"
+                >
+                  Approve Credentials
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};

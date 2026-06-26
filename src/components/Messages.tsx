@@ -1,0 +1,1172 @@
+import React, { useState, useMemo, useEffect } from "react";
+import { 
+  Send, FileText, Bookmark, Users, HelpCircle, Search, 
+  X, Pin, Plus, AlertCircle, CheckCircle, Check, ArrowRight, 
+  Trash2, Bell, Tag, Link2, Paperclip, Phone, MoreHorizontal,
+  ChevronRight, Sparkles, Smile, ShieldAlert, BadgeInfo, Calendar, UserPlus, Eye
+} from "lucide-react";
+import { Client, Task } from "../types";
+
+interface Message {
+  id: string;
+  senderId: string;
+  author: string;
+  initials: string;
+  role: string;
+  text: string;
+  time: string;
+  date: string;
+  clientTag?: string;
+  clientId?: string;
+  priority?: "urgent" | "blocked" | "lender_pending" | "client_pending" | "compliance" | "normal";
+  pinned?: boolean;
+  attachments?: { name: string; size: string; type: string }[];
+  mentions?: string[];
+  readBy?: string[];
+}
+
+interface MessagesProps {
+  messages: Record<string, any[]>;
+  setMessages: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
+  clients: Client[];
+  currentUser: any;
+  activeChannel: string;
+  setActiveChannel: (ch: string) => void;
+  linkedChatClientId: string | null;
+  setLinkedChatClientId: (id: string | null) => void;
+  onOpenClient: (id: string) => void;
+  tasks?: Task[];
+  setTasks?: React.Dispatch<React.SetStateAction<Task[]>>;
+  showToast?: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
+}
+
+// Pre-defined list of operational channels with topics and specific seeds
+export const OPERATIONAL_CHANNELS = [
+  { id: "general", label: "general-ops", topic: "Cross-functional pipeline status & general broker inquiries", privacy: "public", icon: "📢" },
+  { id: "brokers", label: "brokers-dealflow", topic: "Scotiabank, TD, MCAP rate programs, turnarounds & underwriter escalations", privacy: "public", icon: "🏦" },
+  { id: "admin", label: "admin-docs-processing", topic: "Paystubs verification, bank statement compliance & packaging schedules", privacy: "internal", icon: "📝" },
+  { id: "compliance", label: "compliance-final-review", topic: "Pre-fund file auditing, interest rate disclosures & regulatory guidelines", privacy: "restricted", icon: "⚖️" },
+  { id: "funding-desk", label: "funding-coordination", topic: "Solicitor instructions, closing disbursements & funded status reports", privacy: "public", icon: "💰" },
+  { id: "renewals", label: "client-retention-loans", topic: "Dynamic 120-day rate renewal tracker and mortgage maturity targets", privacy: "public", icon: "🔄" },
+  { id: "urgent-files", label: "critical-stuck-deals", topic: "Deal blocking logs, escalation routes & appraisal shortfalls", privacy: "public", icon: "🚨" }
+];
+
+// Seeded Teammates for Direct Messages with precise roles & live availability indicators
+export const TEAM_ROSTER = [
+  { id: "dm_wayne", name: "Wayne MacLeod", role: "BDM / Senior Broker", status: "busy", statusLabel: "In Lender Call 📞", color: "bg-red-400" },
+  { id: "dm_jeff", name: "Jeff Brown", role: "Admin Assistant", status: "online", statusLabel: "Processing paystubs 🟢", color: "bg-emerald-500" },
+  { id: "dm_sarah", name: "Sarah Chen", role: "Compliance Auditor", status: "away", statusLabel: "Reviewing files 🟡", color: "bg-amber-500" },
+  { id: "dm_tim", name: "Tim Brown", role: "Broker Principal", status: "offline", statusLabel: "Offline ⚪", color: "bg-slate-500" }
+];
+
+// Escalation Flag UI Schemes
+export const ESCALATION_FLAGS = {
+  normal: { label: "Normal Update", color: "text-slate-400 border-white/5 bg-transparent", icon: null },
+  urgent: { label: "🚨 Urgent Escalation", color: "text-red-400 border-red-500/20 bg-red-500/5", icon: "🌋" },
+  blocked: { label: "🛑 Deal Blocked", color: "text-rose-400 border-rose-500/20 bg-rose-500/5", icon: "🛑" },
+  lender_pending: { label: "🏦 Lender Pending", color: "text-cyan-400 border-cyan-500/20 bg-cyan-500/5", icon: "🏦" },
+  client_pending: { label: "📝 Client Pending", color: "text-amber-400 border-amber-500/20 bg-amber-500/5", icon: "📝" },
+  compliance: { label: "⚖️ Compliance Concern", color: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5", icon: "⚖️" }
+};
+
+export const Messages: React.FC<MessagesProps> = ({
+  messages,
+  setMessages,
+  clients,
+  currentUser,
+  activeChannel,
+  setActiveChannel,
+  linkedChatClientId,
+  setLinkedChatClientId,
+  onOpenClient,
+  tasks,
+  setTasks,
+  showToast
+}) => {
+  // Input composer & searching controls
+  const [msgInputText, setMsgInputText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEscalationFilter, setSelectedEscalationFilter] = useState<string>("all");
+  const [selectedClientSearch, setSelectedClientSearch] = useState<string>("");
+  const [showClientLinkDropdown, setShowClientLinkDropdown] = useState(false);
+  const [clientDropdownSearch, setClientDropdownSearch] = useState("");
+  const [msgPriority, setMsgPriority] = useState<"urgent" | "blocked" | "lender_pending" | "client_pending" | "compliance" | "normal">("normal");
+
+  // Mock document drafts attached to composer
+  const [attachedFiles, setAttachedFiles] = useState<{ name: string; size: string; type: string }[]>([]);
+  const [showAttachPresets, setShowAttachPresets] = useState(false);
+
+  // Unread Trackers simulated dynamically in state
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>(() => {
+    return {
+      "compliance": 2,
+      "urgent-files": 3,
+      "dm_wayne": 1,
+      "funding-desk": 1
+    };
+  });
+
+  // Task conversion wizard sidebar modal
+  const [isTaskWizardOpen, setIsTaskWizardOpen] = useState(false);
+  const [wizardDraftTask, setWizardDraftTask] = useState<{
+    title: string;
+    notes: string;
+    priority: "high" | "medium" | "low" | "urgent";
+    category: string;
+    clientId: string;
+    dueDate: string;
+    assignedTo: string;
+  } | null>(null);
+
+  // Pins Panel toggle
+  const [showPinsPanel, setShowPinsPanel] = useState(false);
+
+  // Sync out unread counter when user opens a channel
+  useEffect(() => {
+    if (unreadCounts[activeChannel]) {
+      setUnreadCounts(prev => ({
+        ...prev,
+        [activeChannel]: 0
+      }));
+    }
+  }, [activeChannel, unreadCounts]);
+
+  const currentChannelDetails = useMemo(() => {
+    const ch = OPERATIONAL_CHANNELS.find(c => c.id === activeChannel);
+    if (ch) return { name: `#${ch.label}`, subTitle: ch.topic, privacy: ch.privacy, isChannel: true, icon: ch.icon };
+
+    const dm = TEAM_ROSTER.find(t => t.id === activeChannel);
+    if (dm) return { name: dm.name, subTitle: `${dm.role} · ${dm.statusLabel}`, privacy: "direct-message", isChannel: false, icon: "👤" };
+
+    return { name: `#${activeChannel}`, subTitle: "GBK Team Conversation", privacy: "public", isChannel: true, icon: "💬" };
+  }, [activeChannel]);
+
+  // Sanitize message objects to match full operational model
+  const rawChannelMessages = useMemo(() => {
+    const list = messages[activeChannel] || [];
+    return list.map((m: any, idx) => ({
+      id: m.id || `m_seeded_${activeChannel}_${idx}`,
+      senderId: m.senderId || "staff_other",
+      author: m.author || "Teammate",
+      initials: m.initials || m.author?.slice(0, 2).toUpperCase() || "TM",
+      role: m.role || (m.author === "Tim Brown" ? "Broker Principal" : m.author === "Wayne MacLeod" ? "BDM" : m.author === "Jeff Brown" ? "Assistant" : "Mortgage Agent"),
+      text: m.text || "",
+      time: m.time || "10:00 AM",
+      date: m.date || "Today",
+      clientTag: m.clientTag || undefined,
+      clientId: m.clientId || (m.clientTag ? clients.find(c => m.clientTag.includes(c.last))?.id : undefined),
+      priority: m.priority || "normal",
+      pinned: m.pinned || false,
+      attachments: m.attachments || [],
+      mentions: m.mentions || [],
+      readBy: m.readBy || ["TB", "WM", "JM"]
+    }));
+  }, [messages, activeChannel, clients]);
+
+  // Dynamic filter lists
+  const filteredMessages = useMemo(() => {
+    return rawChannelMessages.filter(m => {
+      const textMatches = searchQuery === "" || m.text.toLowerCase().includes(searchQuery.toLowerCase()) || m.author.toLowerCase().includes(searchQuery.toLowerCase());
+      const priorityMatches = selectedEscalationFilter === "all" || m.priority === selectedEscalationFilter;
+      const clientMatches = selectedClientSearch === "" || m.clientId === selectedClientSearch;
+      return textMatches && priorityMatches && clientMatches;
+    });
+  }, [rawChannelMessages, searchQuery, selectedEscalationFilter, selectedClientSearch]);
+
+  const pinnedChannelMessages = useMemo(() => {
+    return rawChannelMessages.filter(m => m.pinned);
+  }, [rawChannelMessages]);
+
+  // Helper template string inserts
+  const handleInsertTemplate = (type: string) => {
+    const templates: Record<string, { body: string; priority: any }> = {
+      "follow-up": {
+        body: "Checking in on the outstanding documents. I have sent an automated reminder to the borrower to secure their signed commitment summary and updated paystubs.",
+        priority: "client_pending"
+      },
+      "lender-update": {
+        body: "🏦 TD came back on the submission! Turnaround details: CONDITIONAL COMMITMENT issued. Turnaround under active review at funding desk.",
+        priority: "lender_pending"
+      },
+      "doc-checklist": {
+        body: "Missing Checklist Audited: Paystubs and tax NOA are verified. We are awaiting 90-day bank history records for matching validation before direct dispatch.",
+        priority: "client_pending"
+      },
+      "blocked-file": {
+        body: "🛑 FILE BLOCKED: Underwriting reported appraisal shortfall. Appraisal came in at $40K below purchase valuation. Need to re-evaluate capital source options with the team.",
+        priority: "blocked"
+      },
+      "compliance-pass": {
+        body: "⚖️ Compliance checks are completely clear. All anti-money-laundering audits, broker disclosures, and client IDs align with standards. This file is cleared for pre-funding release.",
+        priority: "compliance"
+      },
+      "closing-funded": {
+        body: "💰 TRANSACTION FUNDED! Confirmation package has flown to solicitor list, commission schedules are drawn, and first post-close follow-up sequence is queued in retention loop.",
+        priority: "normal"
+      }
+    };
+
+    const target = templates[type];
+    if (target) {
+      setMsgInputText(target.body);
+      setMsgPriority(target.priority);
+      if (showToast) {
+        showToast(`Template inserted: ${type.replace("-", " ")}`, "success", "📋");
+      }
+    }
+  };
+
+  // Attach Preset Helper
+  const handleAttachPresetAction = (fileName: string, mime: string, size: string) => {
+    setAttachedFiles(prev => {
+      if (prev.some(f => f.name === fileName)) return prev;
+      return [...prev, { name: fileName, size, type: mime }];
+    });
+    setShowAttachPresets(false);
+  };
+
+  // Primary messaging dispatch
+  const handleSendMessage = () => {
+    if (!msgInputText.trim() && attachedFiles.length === 0) return;
+
+    const authorName = currentUser.first + " " + currentUser.last;
+    const authorInitials = (currentUser.first[0] + currentUser.last[0]).toUpperCase();
+    const now = new Date();
+
+    const selectedClient = clients.find(c => c.id === linkedChatClientId);
+
+    const newMsg: Message = {
+      id: "m_user_" + Date.now(),
+      senderId: "staff_me",
+      author: authorName,
+      initials: authorInitials,
+      role: "Mortgage Broker (Owner)",
+      text: msgInputText.trim(),
+      time: now.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }),
+      date: "Today",
+      priority: msgPriority,
+      clientTag: selectedClient ? `${selectedClient.last} File` : undefined,
+      clientId: linkedChatClientId || undefined,
+      attachments: attachedFiles,
+      pinned: false,
+      mentions: msgInputText.includes("@") ? extractMentions(msgInputText) : [],
+      readBy: [authorInitials]
+    };
+
+    // Update parent state
+    setMessages(prev => {
+      const updated = {
+        ...prev,
+        [activeChannel]: [...(prev[activeChannel] || []), newMsg]
+      };
+      // Keep localStorage current
+      localStorage.setItem("gbk_messages", JSON.stringify(updated));
+      return updated;
+    });
+
+    // Reset composer state
+    setMsgInputText("");
+    setAttachedFiles([]);
+    setMsgPriority("normal");
+    setLinkedChatClientId(null);
+    if (showToast) {
+      showToast("Ops update successfully dispatched to team!", "success", "📤");
+    }
+  };
+
+  // Extract simple @ prefixes
+  const extractMentions = (text: string) => {
+    const list: string[] = [];
+    const words = text.split(" ");
+    words.forEach(w => {
+      if (w.startsWith("@") && w.length > 2) {
+        list.push(w.slice(1));
+      }
+    });
+    return list;
+  };
+
+  // Pin / Unpin on click toggle
+  const handleTogglePinMessage = (msgId: string) => {
+    setMessages(prev => {
+      const activeList = prev[activeChannel] || [];
+      const updatedList = activeList.map((m: any) => {
+        if (m.id === msgId) {
+          const nextPinned = !m.pinned;
+          if (showToast) {
+            showToast(nextPinned ? "Message pinned to channel banner." : "Message removed from pin boards.", "info", "📌");
+          }
+          return { ...m, pinned: nextPinned };
+        }
+        return m;
+      });
+      const updatedObj = { ...prev, [activeChannel]: updatedList };
+      localStorage.setItem("gbk_messages", JSON.stringify(updatedObj));
+      return updatedObj;
+    });
+  };
+
+  // Delete message safely
+  const handleDeleteMessage = (msgId: string) => {
+    setMessages(prev => {
+      const activeList = prev[activeChannel] || [];
+      const updatedList = activeList.filter((m: any) => m.id !== msgId);
+      const updatedObj = { ...prev, [activeChannel]: updatedList };
+      localStorage.setItem("gbk_messages", JSON.stringify(updatedObj));
+      return updatedObj;
+    });
+  };
+
+  // Convert Message into a structured Task Wizard Workflow
+  const handleOpenTaskWizard = (msg: Message) => {
+    // Guess best Category based on message content or priority
+    let category = "Client Follow-up";
+    if (msg.priority === "blocked" || msg.priority === "urgent") {
+      category = "Underwriting Review";
+    } else if (msg.priority === "lender_pending") {
+      category = "Lender Follow-up";
+    } else if (msg.priority === "client_pending") {
+      category = "Document Collection";
+    } else if (msg.priority === "compliance") {
+      category = "Compliance";
+    }
+
+    // Default assignee selection
+    let assigned = "Jeff Brown"; // assistant defaults
+    if (msg.author !== "You" && msg.author !== (currentUser.first + " " + currentUser.last)) {
+      assigned = msg.author; // assign back to writer
+    }
+
+    setWizardDraftTask({
+      title: msg.text.length > 110 ? msg.text.substring(0, 107) + "..." : msg.text,
+      notes: `Escalated directly from Internal Team Thread [Channel: #${activeChannel}] posted by ${msg.author} (${msg.role}) at ${msg.time}.\n\nOriginal statement: "${msg.text}"`,
+      priority: msg.priority === "urgent" || msg.priority === "blocked" ? "high" : "medium",
+      category,
+      clientId: msg.clientId || "",
+      dueDate: "2026-06-25", // few days ahead
+      assignedTo: assigned
+    });
+
+    setIsTaskWizardOpen(true);
+  };
+
+  const handleCommitWizardTask = () => {
+    if (!wizardDraftTask || !setTasks) return;
+
+    if (!wizardDraftTask.title.trim()) {
+      if (showToast) showToast("Task title cannot be blank.", "error", "⚠️");
+      return;
+    }
+
+    const linkedClient = clients.find(c => c.id === wizardDraftTask.clientId);
+    const taskId = `task_messages_${Date.now()}`;
+
+    const newSystemTask: Task & { category: string; subtasks: any[]; auditLogs: any[]; extendedStatus: string; calendarSync: boolean } = {
+      id: taskId,
+      title: wizardDraftTask.title.trim(),
+      status: "open",
+      extendedStatus: "todo",
+      priority: wizardDraftTask.priority === "urgent" ? "high" : wizardDraftTask.priority as any,
+      category: wizardDraftTask.category,
+      dueDate: wizardDraftTask.dueDate || undefined,
+      clientId: wizardDraftTask.clientId || undefined,
+      clientName: linkedClient ? `${linkedClient.first} ${linkedClient.last}` : undefined,
+      assignedTo: wizardDraftTask.assignedTo,
+      notes: wizardDraftTask.notes,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: currentUser.first + " " + currentUser.last,
+      subtasks: [],
+      calendarSync: true,
+      auditLogs: [
+        { timestamp: new Date().toISOString(), action: `Task generated via Internal Message escalation thread`, user: currentUser.first + " " + currentUser.last }
+      ]
+    };
+
+    // Write to State
+    setTasks(prev => {
+      const updated = [newSystemTask, ...prev];
+      localStorage.setItem("gbk_tasks", JSON.stringify(updated));
+      return updated;
+    });
+
+    if (showToast) {
+      showToast(`Operational Task assigned to ${wizardDraftTask.assignedTo}!`, "success", "⚡");
+    }
+
+    setIsTaskWizardOpen(false);
+    setWizardDraftTask(null);
+  };
+
+  // Dropdown list generation of clients matched with searches
+  const filteredDropdownClients = useMemo(() => {
+    return clients.filter(c => {
+      const terms = clientDropdownSearch.toLowerCase();
+      return terms === "" || 
+        c.first.toLowerCase().includes(terms) || 
+        c.last.toLowerCase().includes(terms) ||
+        (c.lender || "").toLowerCase().includes(terms);
+    });
+  }, [clients, clientDropdownSearch]);
+
+  return (
+    <div className="flex bg-[#0c0c0e] border border-white/5 rounded-2xl overflow-hidden shadow-2xl h-full min-h-0 divide-x divide-white/5 select-none text-left" id="team-messaging-core">
+      
+      {/* ============================================================== */}
+      {/* BAR 1: LEFT NAVIGATION INDEX FOR CHANNELS & MEMBERS (WIDTH 56) */}
+      {/* ============================================================== */}
+      <div className="w-56 shrink-0 flex flex-col h-full bg-[#101014]/45 select-none min-h-0">
+        
+        {/* Workspace Brand Summary */}
+        <div className="p-3.5 border-b border-white/5 bg-[#141418]/50 flex items-center justify-between shrink-0">
+          <div className="min-w-0">
+            <div className="text-[9px] text-[#b5a642] font-black tracking-widest uppercase flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              GBK SECURE HUB
+            </div>
+            <h4 className="text-xs font-black text-white truncate mt-0.5">Ontario Dealflow</h4>
+          </div>
+          <Sparkles className="w-3.5 h-3.5 text-[#b5a642] opacity-80" />
+        </div>
+
+        {/* Categories, Channels & Colleagues Segment */}
+        <div className="flex-1 overflow-y-auto p-2.5 space-y-5">
+          
+          {/* Section A: Team Active Channels */}
+          <div>
+            <div className="px-1.5 text-[9.5px] font-extrabold text-white/35 uppercase tracking-widest mb-1.5 flex items-center justify-between">
+              <span>Operational Channels</span>
+              <span className="text-[8px] font-mono opacity-50 bg-white/5 px-1 rounded">
+                {OPERATIONAL_CHANNELS.length}
+              </span>
+            </div>
+
+            <div className="space-y-0.5">
+              {OPERATIONAL_CHANNELS.map(ch => {
+                const isActive = activeChannel === ch.id;
+                const countBadge = unreadCounts[ch.id] || 0;
+                return (
+                  <button
+                    key={ch.id}
+                    onClick={() => setActiveChannel(ch.id)}
+                    className={`w-full text-left px-2.5 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-all group ${
+                      isActive 
+                        ? "bg-[#b5a642]/10 border border-[#b5a642]/15 text-[#b5a642]" 
+                        : "border border-transparent text-white/50 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm shrink-0">{ch.icon}</span>
+                      <span className="truncate">{ch.label}</span>
+                    </span>
+
+                    {countBadge > 0 && (
+                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse">
+                        {countBadge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section B: Direct Colleagues Roster */}
+          <div>
+            <div className="px-1.5 text-[9.5px] font-extrabold text-white/35 uppercase tracking-widest mb-1.5 flex items-center justify-between">
+              <span>Direct Messages</span>
+              <UserPlus className="w-3 h-3 text-white/20 hover:text-white cursor-pointer transition-colors" />
+            </div>
+
+            <div className="space-y-0.5 animate-fade-in">
+              {TEAM_ROSTER.map(tm => {
+                const isActive = activeChannel === tm.id;
+                const countBadge = unreadCounts[tm.id] || 0;
+                return (
+                  <button
+                    key={tm.id}
+                    onClick={() => setActiveChannel(tm.id)}
+                    className={`w-full text-left px-2.5 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-all ${
+                      isActive 
+                        ? "bg-[#b5a642]/10 border border-[#b5a642]/15 text-[#b5a642]" 
+                        : "border border-transparent text-white/50 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2 min-w-0">
+                      <span className="relative flex-shrink-0">
+                        <span className="w-6 h-6 rounded-lg bg-[#141418] border border-white/5 font-mono text-[9px] flex items-center justify-center text-white/60">
+                          {tm.name.split(" ").map(n => n[0]).join("")}
+                        </span>
+                        <span className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border border-[#0c0c0e] ${tm.color}`} />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="truncate text-white/80">{tm.name}</div>
+                        <div className="text-[8.5px] text-white/30 truncate font-semibold">{tm.role}</div>
+                      </div>
+                    </span>
+
+                    {countBadge > 0 && (
+                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black">
+                        {countBadge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Current User Session Overview */}
+        <div className="p-3 border-t border-white/5 bg-[#141418]/30 flex items-center gap-2.5 shrink-0">
+          <div className="relative">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#b5a642] to-yellow-600 text-black text-xs font-black flex items-center justify-center">
+              {(currentUser.first[0] + currentUser.last[0]).toUpperCase()}
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#0c0c0e] bg-emerald-500" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] font-black text-white/90 truncate leading-tight">{currentUser.first} {currentUser.last}</div>
+            <div className="text-[8.5px] text-white/45 truncate font-semibold uppercase">{currentUser.role || "Mortgage Broker (Owner)"}</div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ============================================================== */}
+      {/* BAR 2: CENTRAL INTERACTIVE CHAT PANEL & FILTERS (WEIGHT FLEX-1) */}
+      {/* ============================================================== */}
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-[#0c0c0e]">
+        
+        {/* Dynamic Channel Header with Search bar utilities & indicators */}
+        <div className="px-4 py-3 border-b border-white/5 bg-[#101014]/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 shrink-0 select-none">
+          
+          <div className="min-w-0 flex items-center gap-2.5">
+            <div className="text-xl shrink-0">{currentChannelDetails.icon}</div>
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-black text-white flex items-center gap-1.5 leading-none">
+                {currentChannelDetails.name}
+                {currentChannelDetails.privacy === "restricted" && (
+                  <span className="text-[8.5px] bg-red-500/10 border border-red-500/15 rounded-md px-1.5 py-0.5 text-red-400 font-extrabold uppercase">Audit Mode</span>
+                )}
+              </h3>
+              <p className="text-[10px] text-white/35 truncate mt-1 leading-none">{currentChannelDetails.subTitle}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            
+            {/* Thread Search queries */}
+            <div className="relative w-full sm:w-40">
+              <input
+                type="text"
+                placeholder="Search thread..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-[#141418] border border-white/5 rounded-xl pl-3 pr-7 py-1.5 text-xs text-white placeholder-white/30 w-full focus:outline-none"
+              />
+              {searchQuery ? (
+                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-2 text-white/30 hover:text-white">
+                  <X className="w-3 h-3" />
+                </button>
+              ) : (
+                <Search className="absolute right-2.5 top-2 text-white/20 w-3 h-3" />
+              )}
+            </div>
+
+            {/* Escalation filter SELECTOR dropdown */}
+            <select
+              value={selectedEscalationFilter}
+              onChange={(e) => setSelectedEscalationFilter(e.target.value)}
+              className="bg-[#141418] border border-white/5 rounded-xl px-2.5 py-1.5 text-[10.5px] text-white/70 focus:outline-none font-bold shrink-0"
+            >
+              <option value="all">🏷️ All Flags</option>
+              <option value="normal">🟢 Normal Updates</option>
+              <option value="urgent">🌋 Urgent Escalations</option>
+              <option value="blocked">🛑 Deal Blocked</option>
+              <option value="lender_pending">🏦 Lender Pending</option>
+              <option value="client_pending">📝 Client Pending</option>
+              <option value="compliance">⚖️ Compliance Audit</option>
+            </select>
+
+            {/* Quick client linking filter */}
+            <select
+              value={selectedClientSearch}
+              onChange={(e) => setSelectedClientSearch(e.target.value)}
+              className="bg-[#141418] border border-white/5 rounded-xl px-2.5 py-1.5 text-[10.5px] text-white/70 focus:outline-none font-bold shrink-0 max-w-[130px]"
+            >
+              <option value="">📎 All Deals</option>
+              {clients.map(c => (
+                <option key={c.id} value={c.id}>{c.last}</option>
+              ))}
+            </select>
+
+            {/* Toggle pins panel button */}
+            {pinnedChannelMessages.length > 0 && (
+              <button
+                onClick={() => setShowPinsPanel(!showPinsPanel)}
+                className={`p-1.5 rounded-xl border flex items-center justify-center gap-1 text-[10.5px] font-black transition-all ${
+                  showPinsPanel 
+                    ? "bg-[#b5a642] text-black border-[#b5a642]" 
+                    : "bg-[#141418] border-white/5 text-[#b5a642] hover:bg-white/5"
+                }`}
+              >
+                <Pin className="w-3 h-3" />
+                <span>Pins ({pinnedChannelMessages.length})</span>
+              </button>
+            )}
+
+          </div>
+
+        </div>
+
+        {/* HIGH-VISIBILITY PINNED MESSAGE COMPONENT DRAWER */}
+        {pinnedChannelMessages.length > 0 && showPinsPanel && (
+          <div className="bg-[#1b1b23] border-b border-[#b5a642]/20 p-3 flex flex-col gap-2 select-none animate-slide-down">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-[#b5a642] font-black uppercase tracking-widest flex items-center gap-1.5">
+                <Pin className="w-3 h-3 animate-bounce" />
+                Pinned Operational Directives ({pinnedChannelMessages.length})
+              </span>
+              <button onClick={() => setShowPinsPanel(false)} className="text-white/40 hover:text-white">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            
+            <div className="max-h-28 overflow-y-auto space-y-2 pr-1">
+              {pinnedChannelMessages.map(pm => (
+                <div key={pm.id} className="bg-[#0c0c0e]/60 border border-white/5 p-2 rounded-xl text-left flex items-start justify-between gap-3 text-xs">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-[10px] text-white/40">
+                      <b className="text-white/60">{pm.author}</b> · {pm.time}
+                    </div>
+                    <p className="text-white/90 mt-1 italic font-medium">"{pm.text}"</p>
+                  </div>
+                  <button 
+                    onClick={() => handleTogglePinMessage(pm.id)}
+                    className="text-white/30 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider shrink-0"
+                  >
+                    Unpin
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Message Thread Canvas List Stream */}
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#0c0c0e]">
+          {filteredMessages.length > 0 ? (
+            filteredMessages.map((msg, index) => {
+              const isCurrentUserVal = msg.senderId === "staff_me" || msg.author.includes(currentUser.first);
+              const priorityUI = ESCALATION_FLAGS[msg.priority || "normal"];
+
+              // highlight if is current user name being tagged e.g., @David
+              const isMentioned = msg.text.includes(`@${currentUser.first}`) || msg.text.includes("@brokers") || msg.mentions?.some(m => m.toLowerCase().includes(currentUser.first.toLowerCase()));
+
+              return (
+                <div 
+                  key={msg.id}
+                  className={`flex gap-3 max-w-[85%] group select-none transition-all ${
+                    isCurrentUserVal ? "self-end flex-row-reverse" : "self-start"
+                  }`}
+                  id={`msg_${msg.id}`}
+                >
+                  {/* Sender Symbol / Avatar */}
+                  <div className="relative shrink-0">
+                    <div className={`w-8 h-8 rounded-xl font-bold flex items-center justify-center text-[11px] border shadow-md select-none ${
+                      isCurrentUserVal 
+                        ? "bg-[#b5a642]/20 border-[#b5a642]/30 text-[#b5a642]" 
+                        : "bg-[#141418] border-white/5 text-white/70"
+                    }`}>
+                      {msg.initials}
+                    </div>
+                    {msg.priority !== "normal" && (
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 border border-[#0c0c0e] flex items-center justify-center font-black text-[7px] text-white">
+                        !
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Message details box */}
+                  <div className="min-w-0">
+                    
+                    {/* Metadata Header line */}
+                    <div className={`flex items-center gap-2 mb-1 text-[10px] ${isCurrentUserVal ? "justify-end" : ""}`}>
+                      <span className="font-extrabold text-white/80">{msg.author}</span>
+                      <span className="px-1.5 py-0.2 bg-white/5 text-white/35 rounded-md scale-95 font-semibold text-[8px] tracking-wider uppercase">
+                        {msg.role}
+                      </span>
+                      <span className="text-white/30 font-semibold">{msg.time}</span>
+                    </div>
+
+                    {/* Content Speech block with gradient borders for mentions */}
+                    <div className={`p-3 rounded-2xl text-[11.5px] leading-relaxed relative ${
+                      isMentioned 
+                        ? "bg-[#b5a642]/10 border border-[#b5a642]/40 rounded-tl-none ring-1 ring-[#b5a642]/50 shadow-[0_0_15px_rgba(181,166,66,0.1)]"
+                        : isCurrentUserVal 
+                          ? "bg-[#b5a642]/15 text-[#eeeef2] border border-[#b5a642]/25 rounded-tr-none" 
+                          : "bg-[#101014] text-white/90 border border-white/5 rounded-tl-none shadow-md"
+                    }`}>
+                      
+                      {/* Priority Warning Header */}
+                      {msg.priority && msg.priority !== "normal" && (
+                        <div className={`text-[9px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1 ${priorityUI.color.split(" ")[0]}`}>
+                          <span>{priorityUI.label}</span>
+                        </div>
+                      )}
+
+                      {/* Actual Narrative text */}
+                      <p className="whitespace-pre-wrap selection:bg-[#b5a642]/40 selection:text-white">{msg.text}</p>
+
+                      {/* Render mock document links attached */}
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div className="mt-3 space-y-1 pt-2.5 border-t border-white/5">
+                          <div className="text-[8.5px] uppercase font-black tracking-widest text-[#b5a642] mb-1.5">Attached Deal Documents</div>
+                          {msg.attachments.map((at, of) => (
+                            <div key={of} className="flex items-center justify-between p-1.5 bg-black/40 border border-white/5 rounded-xl text-left">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                                <div className="min-w-0">
+                                  <div className="text-[10px] text-white/90 font-bold truncate">{at.name}</div>
+                                  <div className="text-[8.5px] text-white/35">{at.size} · PDF</div>
+                                </div>
+                              </div>
+                              <Eye className="w-3.5 h-3.5 text-white/3 w-3 h-3 ml-2 hover:text-white cursor-pointer opacity-50 hover:opacity-100 transition-opacity" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Tied Client File Action Bar tag */}
+                      {msg.clientTag && (
+                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between">
+                          <button 
+                            onClick={() => {
+                              if (msg.clientId) onOpenClient(msg.clientId);
+                            }}
+                            className="px-2 py-1 text-[9.5px] bg-white/5 hover:bg-white/10 rounded-lg font-black text-[#b5a642] flex items-center gap-1.5 transition-colors border border-[#b5a642]/10"
+                          >
+                            <Link2 className="w-3 h-3 text-[#b5a642]" /> 
+                            <span>File Active: {msg.clientTag}</span>
+                          </button>
+                        </div>
+                      )}
+
+                    </div>
+
+                    {/* Operational Action Controls on hover layer */}
+                    <div className={`flex items-center gap-2.5 mt-1 opacity-50 hover:opacity-100 transition-opacity justify-end ${
+                      isCurrentUserVal ? "flex-row-reverse" : "flex-row"
+                    }`}>
+                      {/* Convert to task is very important */}
+                      {setTasks && (
+                        <button
+                          onClick={() => handleOpenTaskWizard(msg)}
+                          className="text-[9.5px] bg-[#b5a642]/10 hover:bg-[#b5a642] hover:text-black border border-[#b5a642]/20 px-2 py-0.5 rounded-md text-[#b5a642] font-black transition-all flex items-center gap-1"
+                          title="Generate a CRM Task from this discussion comment"
+                        >
+                          ⚡ Convert to Task
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleTogglePinMessage(msg.id)}
+                        className={`text-[9px] font-bold uppercase transition-colors hover:text-[#b5a642] ${msg.pinned ? "text-[#b5a642]" : "text-white/40"}`}
+                      >
+                        {msg.pinned ? "Unpin 📌" : "Pin 📌"}
+                      </button>
+
+                      {isCurrentUserVal && (
+                        <button
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          className="text-[9px] text-white/40 hover:text-rose-500 font-bold uppercase transition-colors"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="my-auto text-center p-12">
+              <Users className="w-10 h-10 text-white/10 mx-auto mb-2" />
+              <div className="text-xs font-black text-white/50 uppercase tracking-widest">No matching comments</div>
+              <p className="text-[10.5px] text-[#eeeef2]/35 mt-1 max-w-xs mx-auto">
+                No pipeline updates found matching criteria inside channel. Discard constraints to review full thread history.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Composer Entry Area & Templates */}
+        <div className="p-4 border-t border-white/5 shrink-0 bg-[#101014]/65">
+          
+          {/* Active Preset Files or Links Indicators */}
+          {(linkedChatClientId || attachedFiles.length > 0) && (
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              
+              {/* Linked client block */}
+              {linkedChatClientId && (
+                <div className="bg-[#b5a642]/10 border border-[#b5a642]/30 px-3 py-1.5 rounded-xl text-xs flex items-center gap-2 text-[#b5a642] select-none">
+                  <Link2 className="w-3.5 h-3.5 text-[#b5a642]" />
+                  <span>Linked deal tie: <b>{clients.find(x => x.id === linkedChatClientId)?.first} {clients.find(x => x.id === linkedChatClientId)?.last}</b></span>
+                  <button onClick={() => setLinkedChatClientId(null)} className="text-[#b5a642] hover:text-white font-bold ml-1.5">✕</button>
+                </div>
+              )}
+
+              {/* Attachments listing */}
+              {attachedFiles.map((fi, idx) => (
+                <div key={idx} className="bg-blue-500/10 border border-blue-500/20 px-2.5 py-1.5 rounded-xl text-[10.5px] flex items-center gap-2 text-blue-300">
+                  <Paperclip className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="font-bold truncate max-w-[120px]">{fi.name}</span>
+                  <button 
+                    onClick={() => setAttachedFiles(p => p.filter((_, o) => o !== idx))} 
+                    className="text-blue-300 hover:text-white font-bold ml-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+            </div>
+          )}
+
+          {/* Composer Main Input Box Layout */}
+          <div className="flex gap-2.5 items-end">
+            
+            {/* Input wrap */}
+            <div className="flex-grow flex flex-col bg-[#141418] border border-white/5 rounded-2xl px-3 py-2 text-left">
+              
+              {/* Top Selector tags */}
+              <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-2 select-none">
+                
+                {/* Level Priority / Urgency marker select */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[9.5px] text-white/30 font-black uppercase tracking-wider">Escalation Tag:</span>
+                  <select
+                    value={msgPriority}
+                    onChange={(e) => setMsgPriority(e.target.value as any)}
+                    className="bg-transparent border-none text-[10px] text-[#b5a642] font-black focus:outline-none cursor-pointer outline-none"
+                  >
+                    <option value="normal">🟢 Normal Alert</option>
+                    <option value="urgent">🚨 Urgent Escalation</option>
+                    <option value="blocked">🛑 Deal Blocked</option>
+                    <option value="lender_pending">🏦 Lender Pending</option>
+                    <option value="client_pending">📝 Client Pending</option>
+                    <option value="compliance">⚖️ Compliance Audit</option>
+                  </select>
+                </div>
+
+                {/* Live Client dropdown links selection */}
+                <div className="relative select-none">
+                  <button 
+                    onClick={() => setShowClientLinkDropdown(!showClientLinkDropdown)}
+                    className="text-[9.5px] text-white/40 hover:text-white flex items-center gap-1 font-bold"
+                  >
+                    <Link2 className="w-3 h-3 text-[#b5a642]" /> 
+                    {linkedChatClientId ? "Linked ☑" : "Link Client File"}
+                  </button>
+
+                  {showClientLinkDropdown && (
+                    <div className="absolute bottom-full right-0 mb-3 bg-[#1c1c22] border border-white/10 rounded-2xl p-2.5 max-h-56 overflow-y-auto w-60 z-30 shadow-2xl">
+                      <div className="text-[9.5px] uppercase font-black text-white/30 mb-2">Deal Portfolios</div>
+                      <input
+                        type="text"
+                        placeholder="Search borrowers..."
+                        value={clientDropdownSearch}
+                        onChange={(e) => setClientDropdownSearch(e.target.value)}
+                        className="bg-[#0c0c0e] border border-white/5 rounded-lg px-2 py-1 text-[10.5px] text-white w-full mb-2 focus:outline-none placeholder-white/20"
+                      />
+                      <div className="space-y-0.5">
+                        <button
+                          onClick={() => {
+                            setLinkedChatClientId(null);
+                            setShowClientLinkDropdown(false);
+                          }}
+                          className="w-full text-left p-1.5 hover:bg-white/5 text-[10.5px] text-white/45 rounded font-semibold italic"
+                        >
+                          -- Clear linked files --
+                        </button>
+                        {filteredDropdownClients.map(c => (
+                          <div 
+                            key={c.id} 
+                            onClick={() => {
+                              setLinkedChatClientId(c.id);
+                              setShowClientLinkDropdown(false);
+                            }}
+                            className="p-1.5 hover:bg-white/5 text-xs text-white/80 hover:text-white rounded-lg cursor-pointer truncate font-bold flex items-center justify-between"
+                          >
+                            <span>{c.first} {c.last}</span>
+                            <span className="text-[8.5px] bg-[#b5a642]/10 text-[#b5a642] px-1 rounded font-mono scale-90">{c.lender || "Prime"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Textarea Narrative */}
+              <textarea 
+                value={msgInputText}
+                onChange={(e) => setMsgInputText(e.target.value)}
+                placeholder={`Message in ${currentChannelDetails.name}... (Standard @mentions supported)`}
+                rows={2}
+                className="bg-transparent border-none text-xs text-[#eeeef2] focus:outline-none w-full outline-none resize-none py-1 h-11"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+              />
+
+            </div>
+
+            {/* Submit Arrow button */}
+            <button 
+              onClick={handleSendMessage}
+              className="p-3.5 bg-[#b5a642] hover:bg-[#9a8c38] text-black font-semibold rounded-2xl transition-all shadow-md flex items-center justify-center shrink-0 h-10 w-10 disabled:opacity-40"
+              disabled={!msgInputText.trim() && attachedFiles.length === 0}
+            >
+              <Send className="w-4 h-4 text-black" />
+            </button>
+          </div>
+
+          {/* Quick Operational templates & mock file preset selector lines */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 select-none border-t border-white/5 pt-3">
+            
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[9px] text-[#b5a642] font-black uppercase tracking-widest mr-1.5">Insert Template:</span>
+              <button 
+                onClick={() => handleInsertTemplate("follow-up")}
+                className="px-2.5 py-1.5 rounded-lg bg-[#141418] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+              >
+                📋 Client Follow-Up
+              </button>
+              <button 
+                onClick={() => handleInsertTemplate("lender-update")}
+                className="px-2.5 py-1.5 rounded-lg bg-[#141418] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+              >
+                🏦 Lender Notice
+              </button>
+              <button 
+                onClick={() => handleInsertTemplate("doc-checklist")}
+                className="px-2.5 py-1.5 rounded-lg bg-[#141418] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+              >
+                📝 Docs Collector
+              </button>
+              <button 
+                onClick={() => handleInsertTemplate("blocked-file")}
+                className="px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-black border border-red-500/10 transition-all"
+              >
+                🛑 Deal Blocked
+              </button>
+              <button 
+                onClick={() => handleInsertTemplate("compliance-pass")}
+                className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/10 transition-all"
+              >
+                ⚖️ Audit Pass
+              </button>
+            </div>
+
+            {/* Quick local attachments */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowAttachPresets(!showAttachPresets)}
+                className="px-2.5 py-1.5 rounded-lg bg-[#141418] hover:bg-white/5 text-[#8e95a3] text-[10px] font-extrabold border border-white/5 transition-all flex items-center gap-1"
+              >
+                <Paperclip className="w-3.5 h-3.5" />
+                <span>Attach Doc</span>
+              </button>
+
+              {showAttachPresets && (
+                <div className="absolute bottom-full right-0 mb-2 bg-[#1b1b22] border border-white/10 rounded-2xl p-1.5 w-60 z-30 shadow-2xl">
+                  <div className="text-[9.5px] uppercase font-black text-white/35 px-2 py-1 select-none">Simulate Brokerage Files</div>
+                  {[
+                    { name: "signed_commitment_summary.pdf", type: "application/pdf", size: "340 KB" },
+                    { name: "employment_verification_letter.pdf", type: "application/pdf", size: "1.1 MB" },
+                    { name: "bank_history_90_days.pdf", type: "application/pdf", size: "4.2 MB" },
+                    { name: "property_appraisal_barrie.pdf", type: "application/pdf", size: "3.5 MB" }
+                  ].map((pr, id) => (
+                    <button
+                      key={id}
+                      onClick={() => handleAttachPresetAction(pr.name, pr.type, pr.size)}
+                      className="w-full text-left p-2 hover:bg-white/5 text-[11px] font-semibold rounded-lg truncate text-white/70 hover:text-white flex items-center justify-between gap-2"
+                    >
+                      <span className="truncate">{pr.name}</span>
+                      <span className="text-[9px] text-[#b5a642] shrink-0">{pr.size}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ============================================================== */}
+      {/* COLUMN 3: BIDIRECTIONAL MESSAGING-TASK CONVERSION WIZARD SIDEBAR */}
+      {/* ============================================================== */}
+      {isTaskWizardOpen && wizardDraftTask && (
+        <div className="w-80 shrink-0 bg-[#101014] p-4 flex flex-col h-full min-h-0 border-l border-white/5 select-none animate-slide-left">
+          
+          <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+            <div>
+              <div className="text-[10px] text-[#b5a642] font-black uppercase tracking-widest flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-yellow-500 animate-spin" />
+                Tasking Pipeline Engine
+              </div>
+              <h3 className="text-xs font-black text-white mt-1">Message Escalation Wizard</h3>
+            </div>
+            <button 
+              onClick={() => {
+                setIsTaskWizardOpen(false);
+                setWizardDraftTask(null);
+              }}
+              className="text-white/40 hover:text-white p-1 rounded-lg"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <p className="text-[10.5px] text-white/40 leading-relaxed mb-4">
+            Convert custom brokerage discussions instantly into a tracked operational milestone for file accountability.
+          </p>
+
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+            
+            {/* Task title input */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Action Milestone Description</label>
+              <textarea
+                value={wizardDraftTask.title}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, title: e.target.value })}
+                className="w-full bg-[#1b1b20] border border-white/5 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-semibold"
+                rows={2}
+              />
+            </div>
+
+            {/* CRM Client target */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Client File Context</label>
+              <select
+                value={wizardDraftTask.clientId}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, clientId: e.target.value })}
+                className="w-full bg-[#1b1b20] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold"
+              >
+                <option value="">-- No active client tie --</option>
+                {clients.map(c => (
+                  <option key={c.id} value={c.id}>{c.first} {c.last}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Task Category */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Organizational Category</label>
+              <select
+                value={wizardDraftTask.category}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, category: e.target.value })}
+                className="w-full bg-[#1b1b20] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold"
+              >
+                <option value="Client Follow-up">Client Follow-up</option>
+                <option value="Document Collection">Document Collection</option>
+                <option value="Lender Follow-up">Lender Follow-up</option>
+                <option value="Underwriting Review">Underwriting Review</option>
+                <option value="Compliance">Compliance Check</option>
+                <option value="Appointment">Scheduling</option>
+                <option value="Internal Admin">Internal Admin</option>
+                <option value="Renewal">Renewal Tracker</option>
+                <option value="Retention">Retention Outreach</option>
+              </select>
+            </div>
+
+            {/* Assigned person */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Assign Responsibility</label>
+              <select
+                value={wizardDraftTask.assignedTo}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, assignedTo: e.target.value })}
+                className="w-full bg-[#1b1b20] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold"
+              >
+                <option value="David Acosta">David Acosta (Me)</option>
+                <option value="Jeff Brown">Jeff Brown (Admin Assistant)</option>
+                <option value="Wayne MacLeod">Wayne MacLeod (Senior Broker)</option>
+                <option value="Sarah Chen">Sarah Chen (Compliance Auditor)</option>
+                <option value="Tim Brown">Tim Brown (Broker Principal)</option>
+              </select>
+            </div>
+
+            {/* Risk priority level */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Risk Level Urgency</label>
+              <div className="grid grid-cols-4 gap-1.5">
+                {(["urgent", "high", "medium", "low"] as const).map(prio => {
+                  const isSelect = wizardDraftTask.priority === prio;
+                  return (
+                    <button
+                      key={prio}
+                      type="button"
+                      onClick={() => setWizardDraftTask({ ...wizardDraftTask, priority: prio })}
+                      className={`py-1.5 text-[10px] font-black uppercase rounded-lg border transition-all ${
+                        isSelect 
+                          ? "bg-[#b5a642] border-[#b5a642] text-black" 
+                          : "bg-[#1b1b20] border-white/5 text-white/45 hover:text-white"
+                      }`}
+                    >
+                      {prio}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Scheduling DueDate */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Schedules Due Date</label>
+              <input
+                type="date"
+                value={wizardDraftTask.dueDate}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, dueDate: e.target.value })}
+                className="w-full bg-[#1b1b20] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold"
+              />
+            </div>
+
+            {/* Custom Notes */}
+            <div>
+              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Internal Trail Context Notes</label>
+              <textarea
+                value={wizardDraftTask.notes}
+                onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, notes: e.target.value })}
+                className="w-full bg-[#141418] border border-white/5 rounded-xl p-2.5 text-[11px] text-white/50 focus:outline-none focus:border-[#b5a642]/10 leading-relaxed font-semibold h-24"
+              />
+            </div>
+
+          </div>
+
+          <div className="border-t border-white/5 pt-3 mt-3 shrink-0">
+            <button
+              onClick={handleCommitWizardTask}
+              className="w-full py-2.5 bg-[#b5a642] hover:bg-[#aa9b38] text-black font-extrabold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg select-none"
+            >
+              <span>Add to Workflow Pipeline</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  );
+};

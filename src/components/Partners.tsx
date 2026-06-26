@@ -1,0 +1,595 @@
+import React, { useState, useMemo, useEffect } from "react";
+import { 
+  Users, Plus, MapPin, Award, CheckCircle, Search, Filter, ShieldAlert,
+  ArrowRight, Mail, Phone, ExternalLink, Calendar, Star, LayoutDashboard, Database, RefreshCw, ArrowUpDown
+} from "lucide-react";
+import { Partner, Client, Task, User, PartnerTimelineEntry } from "../types";
+
+// Import modular sub-components
+import { 
+  PARTNER_CATEGORIES, 
+  PARTNER_STATUSES, 
+  ONTARIO_REGIONS, 
+  ExtendedPartner, 
+  SEED_PARTNERS 
+} from "./partners/constants";
+import { PartnerList } from "./partners/PartnerList";
+import { PartnerDetail } from "./partners/PartnerDetail";
+import { PartnerModal } from "./partners/PartnerModal";
+
+interface PartnersProps {
+  partners: Partner[];
+  setPartners: React.Dispatch<React.SetStateAction<Partner[]>>;
+  clients: Client[];
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  currentUser: User;
+  userRoster: User[];
+  showToast: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
+  onOpenComposeEmail?: (to: string, subject: string, body: string) => void;
+}
+
+export const Partners: React.FC<PartnersProps> = ({
+  partners,
+  setPartners,
+  clients,
+  tasks,
+  setTasks,
+  currentUser,
+  userRoster = [],
+  showToast,
+  onOpenComposeEmail
+}) => {
+  // 1. Search and Filter States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedStatus, setSelectedStatus] = useState<string>("All");
+  const [selectedCity, setSelectedCity] = useState<string>("All");
+  const [preferredOnly, setPreferredOnly] = useState<boolean>(false);
+
+  // 2. Sorting States (alphabetically by default)
+  const [sortBy, setSortBy] = useState<"name" | "company" | "health" | "added">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // 3. Selection State
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+
+  // 4. Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPartner, setEditingPartner] = useState<ExtendedPartner | null>(null);
+
+  // 5. More menu open state
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  // Versioned Seeding: Populate with rich simulated partners if previously unseeded
+  useEffect(() => {
+    const hasSeeded = localStorage.getItem("gbk_partners_v2_seeded");
+    if (!hasSeeded) {
+      setPartners(SEED_PARTNERS);
+      localStorage.setItem("gbk_partners", JSON.stringify(SEED_PARTNERS));
+      localStorage.setItem("gbk_partners_v2_seeded", "true");
+      if (SEED_PARTNERS.length > 0) {
+        setSelectedPartnerId(SEED_PARTNERS[0].id);
+      }
+      showToast("Registered premium Ontario mortgage partner network.", "success");
+    } else if (partners.length > 0 && !selectedPartnerId) {
+      setSelectedPartnerId(partners[0].id);
+    }
+  }, [partners, setPartners, selectedPartnerId, showToast]);
+
+  // Reset Filters Helper
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("All");
+    setSelectedStatus("All");
+    setSelectedCity("All");
+    setPreferredOnly(false);
+    setSortBy("name");
+    setSortOrder("asc");
+    showToast("Search filters restored to default.", "info");
+  };
+
+  // Filter & Sort Logic (Separated into a clean selector as required)
+  const filteredAndSortedPartners = useMemo(() => {
+    let result = [...partners] as ExtendedPartner[];
+
+    // Apply Search Term Matcher (covers name, company, email, phone, city, or specialty)
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      result = result.filter(p => {
+        const nameMatch = `${p.first} ${p.last}`.toLowerCase().includes(term);
+        const companyMatch = (p.company || "").toLowerCase().includes(term);
+        const categoryMatch = (p.type || "").toLowerCase().includes(term);
+        const emailMatch = (p.email || "").toLowerCase().includes(term);
+        const phoneMatch = (p.phone || "").toLowerCase().includes(term);
+        const cityMatch = (p.city || p.address || "").toLowerCase().includes(term);
+        const specialtyMatch = (p.referralTags || []).some(t => t.toLowerCase().includes(term)) || 
+                             (p.notes || "").toLowerCase().includes(term) ||
+                             (p.role || "").toLowerCase().includes(term);
+        
+        return nameMatch || companyMatch || categoryMatch || emailMatch || phoneMatch || cityMatch || specialtyMatch;
+      });
+    }
+
+    // Apply Dropdown Filters
+    if (selectedCategory !== "All") {
+      result = result.filter(p => p.type === selectedCategory);
+    }
+
+    if (selectedStatus !== "All") {
+      result = result.filter(p => p.status === selectedStatus);
+    }
+
+    if (selectedCity !== "All") {
+      result = result.filter(p => p.city === selectedCity);
+    }
+
+    if (preferredOnly) {
+      result = result.filter(p => p.isPreferred || p.status === "Preferred");
+    }
+
+    // Apply Sorting Controls
+    result.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "name") {
+        const nameA = `${a.first} ${a.last}`.toLowerCase();
+        const nameB = `${b.first} ${b.last}`.toLowerCase();
+        comparison = nameA.localeCompare(nameB);
+      } else if (sortBy === "company") {
+        const compA = (a.company || "").toLowerCase();
+        const compB = (b.company || "").toLowerCase();
+        comparison = compA.localeCompare(compB);
+      } else if (sortBy === "health") {
+        comparison = (a.healthScore || 0) - (b.healthScore || 0);
+      } else if (sortBy === "added") {
+        const dateA = new Date(a.addedAt || 0).getTime();
+        const dateB = new Date(b.addedAt || 0).getTime();
+        comparison = dateA - dateB;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+
+    return result;
+  }, [partners, searchTerm, selectedCategory, selectedStatus, selectedCity, preferredOnly, sortBy, sortOrder]);
+
+  // Lookup selected partner with fallback to the first matched entry
+  const selectedPartner = useMemo(() => {
+    const found = partners.find(p => p.id === selectedPartnerId) as ExtendedPartner | undefined;
+    return found || (filteredAndSortedPartners[0] as ExtendedPartner | undefined) || null;
+  }, [partners, selectedPartnerId, filteredAndSortedPartners]);
+
+  // Overall Statistics Panel Calculations
+  const metricsSummary = useMemo(() => {
+    const totalCount = partners.length;
+    const preferredCount = partners.filter(p => p.isPreferred || p.status === "Preferred").length;
+    const activeCount = partners.filter(p => p.status === "Active").length;
+    const averageHealth = totalCount > 0 
+      ? Math.round(partners.reduce((sum, p) => sum + (p.healthScore || 85), 0) / totalCount)
+      : 85;
+
+    // Estimate total leads passed from these partners
+    const totalReferredClients = clients.filter(c => c.referredBy).length;
+
+    return {
+      totalCount,
+      preferredCount,
+      activeCount,
+      averageHealth,
+      totalReferredClients
+    };
+  }, [partners, clients]);
+
+  // Toggle Preferred Flag directly
+  const handleTogglePreferred = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPartners(prev => prev.map(p => {
+      if (p.id === id) {
+        const ext = p as ExtendedPartner;
+        const currentPreferred = ext.isPreferred || ext.status === "Preferred";
+        const nextPreferred = !currentPreferred;
+        return {
+          ...ext,
+          isPreferred: nextPreferred,
+          status: nextPreferred ? "Preferred" : "Active"
+        };
+      }
+      return p;
+    }));
+    showToast("Preferred partner flag updated.", "success");
+  };
+
+  // Remove Partner Record
+  const handleDeletePartner = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setPartners(prev => prev.filter(p => p.id !== id));
+    if (selectedPartnerId === id) {
+      setSelectedPartnerId(null);
+    }
+    showToast("Partner removed from internal directories.", "info");
+  };
+
+  // Trigger modal in Edit mode
+  const handleEditPartner = (partner: ExtendedPartner, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setEditingPartner(partner);
+    setIsModalOpen(true);
+  };
+
+  // Trigger modal in Add mode
+  const handleAddPartner = () => {
+    setEditingPartner(null);
+    setIsModalOpen(true);
+  };
+
+  // Save changes from Modal form (combines add and edit safely)
+  const handleSavePartner = (updates: Partial<ExtendedPartner>) => {
+    if (updates.id) {
+      // Edit mode
+      setPartners(prev => prev.map(p => {
+        if (p.id === updates.id) {
+          return {
+            ...p,
+            ...updates,
+            // Sync status if isPreferred was updated
+            status: updates.isPreferred ? "Preferred" : (updates.status === "Preferred" ? "Active" : updates.status)
+          };
+        }
+        return p;
+      }));
+      showToast(`Partner profile updated.`, "success");
+    } else {
+      // Add mode
+      const partnerId = `part_${Date.now()}`;
+      const newPartner: ExtendedPartner = {
+        id: partnerId,
+        first: updates.first || "",
+        last: updates.last || "",
+        company: updates.company,
+        type: updates.type || "Lawyers",
+        role: updates.role,
+        phone: updates.phone,
+        email: updates.email,
+        website: updates.website,
+        address: updates.address,
+        city: updates.city || "Barrie",
+        assignedOwner: updates.assignedOwner || `${currentUser.first} ${currentUser.last}`,
+        status: updates.isPreferred ? "Preferred" : (updates.status || "Active") as any,
+        isPreferred: updates.isPreferred || updates.status === "Preferred",
+        notes: updates.notes,
+        healthScore: updates.healthScore ?? 85,
+        referralTags: updates.referralTags || [],
+        addedAt: new Date().toISOString(),
+        addedBy: `${currentUser.first} ${currentUser.last}`,
+        timeline: [
+          {
+            id: `t_log_init_${Date.now()}`,
+            date: new Date().toISOString().split("T")[0],
+            type: "note",
+            text: `Partner profile registered under category [${updates.type}] by ${currentUser.first} ${currentUser.last}.`,
+            author: `${currentUser.first} ${currentUser.last}`
+          }
+        ]
+      };
+      setPartners(prev => [newPartner, ...prev]);
+      setSelectedPartnerId(partnerId);
+      showToast("Strategic partner onboarded successfully.", "success");
+    }
+    setIsModalOpen(false);
+  };
+
+  // Append Timeline Logging Note
+  const handleAddTimelineEntry = (id: string, entry: PartnerTimelineEntry) => {
+    setPartners(prev => prev.map(p => {
+      if (p.id === id) {
+        const ext = p as ExtendedPartner;
+        const currentTimeline = ext.timeline || [];
+        return {
+          ...ext,
+          timeline: [entry, ...currentTimeline].sort((a, b) => b.date.localeCompare(a.date)),
+          lastTouchDate: entry.date
+        };
+      }
+      return p;
+    }));
+  };
+
+  // Append related follow up task
+  const handleAddRelatedTask = (title: string, dueDate: string, priority: 'high' | 'medium' | 'low') => {
+    const newTask: Task = {
+      id: `task_${Date.now()}`,
+      title,
+      status: "open",
+      priority,
+      dueDate,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: `${currentUser.first} ${currentUser.last}`,
+      assignedTo: `${currentUser.first} ${currentUser.last}`
+    };
+
+    setTasks(prev => [newTask, ...prev]);
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-[#0a0a0d] text-[#eeeef2] overflow-hidden select-none" id="partner-network-workspace">
+      
+      {/* Main Grid View */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        
+        {/* Header Ribbon & Control Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#b5a642]" /> GBK Professional Partner Network
+            </h1>
+            <p className="text-[10px] text-white/40 font-semibold mt-0.5">
+              Browse, filter, coordinate, and review active lawyers, appraisers, realtors, and inspectors
+            </p>
+          </div>
+
+          <button
+            onClick={handleAddPartner}
+            className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4 stroke-[3]" /> Add Strategic Partner
+          </button>
+        </div>
+
+        {/* 1. Category Tab Navigation Bar */}
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-white/5 pb-2" id="partner-category-tabs">
+          {[
+            { id: "All", label: "All Partners" },
+            { id: "Lawyers", label: "Lawyers" },
+            { id: "Realtors", label: "Realtors" },
+            { id: "Appraisers", label: "Appraisers" },
+            { id: "Home Inspectors", label: "Home Inspectors" },
+            { id: "Insurance Brokers", label: "Insurance Brokers" },
+            { id: "Financial Advisors", label: "Financial Advisors" }
+          ].map((tab) => {
+            const isActive = selectedCategory === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setSelectedCategory(tab.id);
+                  setMoreOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border ${
+                  isActive
+                    ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 shadow-sm shadow-[#b5a642]/5 font-bold"
+                    : "bg-[#111115]/80 border-white/5 text-[#8e95a3] hover:text-white hover:bg-[#16161c]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+          
+          {/* More Categories Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border ${
+                [
+                  "Accountants",
+                  "Contractors / Renovation",
+                  "Mortgage Agents / Brokers",
+                  "Private Lenders",
+                  "B Lenders",
+                  "Credit / Debt Specialists"
+                ].includes(selectedCategory)
+                  ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 font-bold"
+                  : "bg-[#111115]/80 border-white/5 text-[#8e95a3] hover:text-white hover:bg-[#16161c]"
+              }`}
+            >
+              <span>
+                {[
+                  "Accountants",
+                  "Contractors / Renovation",
+                  "Mortgage Agents / Brokers",
+                  "Private Lenders",
+                  "B Lenders",
+                  "Credit / Debt Specialists"
+                ].includes(selectedCategory) 
+                  ? `More: ${selectedCategory}` 
+                  : "More Categories"}
+              </span>
+              <span className="text-[8px] opacity-60">▼</span>
+            </button>
+            
+            {moreOpen && (
+              <div className="absolute left-0 mt-1.5 w-56 bg-[#16161c] border border-white/10 rounded-xl shadow-xl z-50 py-1.5">
+                {[
+                  "Accountants",
+                  "Contractors / Renovation",
+                  "Mortgage Agents / Brokers",
+                  "Private Lenders",
+                  "B Lenders",
+                  "Credit / Debt Specialists"
+                ].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setMoreOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-white/5 ${
+                      selectedCategory === cat ? "text-[#b5a642] font-bold" : "text-white/70 hover:text-white"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 2. Compact Search and Filtering Controls */}
+        <div className="flex flex-col lg:flex-row items-center gap-3 bg-[#111115]/40 border border-white/5 rounded-xl p-3" id="partner-compact-filter-bar">
+          {/* Search Input */}
+          <div className="relative flex-1 w-full">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name, company, email, or keyword..."
+              className="w-full bg-[#16161c] border border-white/5 rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#b5a642]/30 transition-all font-medium"
+            />
+            <Search className="h-3.5 w-3.5 text-white/30 absolute left-3 top-2.5" />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-2.5 text-white/40 hover:text-white text-xs font-bold"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Filters Row */}
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto shrink-0 justify-start lg:justify-end">
+            {/* Status Dropdown */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+            >
+              <option value="All">All Statuses</option>
+              {PARTNER_STATUSES.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            {/* City Dropdown */}
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+            >
+              <option value="All">All Cities</option>
+              {ONTARIO_REGIONS.map(region => (
+                <option key={region} value={region}>{region}</option>
+              ))}
+            </select>
+
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+            >
+              <option value="name">Sort: Name</option>
+              <option value="company">Sort: Company</option>
+              <option value="health">Sort: Health</option>
+              <option value="added">Sort: Added</option>
+            </select>
+
+            {/* Sort Order Toggle */}
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-[#eeeef2] hover:border-[#b5a642]/20 transition-all"
+              title="Toggle Sort Order"
+            >
+              <ArrowUpDown className="w-3.5 h-3.5 text-[#b5a642]" />
+            </button>
+
+            {/* Preferred Only Button */}
+            <button
+              onClick={() => setPreferredOnly(!preferredOnly)}
+              className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
+                preferredOnly
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/30 font-bold"
+                  : "bg-[#16161c] border-white/5 text-[#8e95a3] hover:text-white"
+              }`}
+            >
+              <Star className={`w-3 h-3 ${preferredOnly ? "fill-current" : ""}`} />
+              <span>Preferred</span>
+            </button>
+
+            {/* Reset Filter Button */}
+            {(searchTerm || selectedCategory !== "All" || selectedStatus !== "All" || selectedCity !== "All" || preferredOnly) && (
+              <button
+                onClick={handleResetFilters}
+                className="px-3 py-2 rounded-lg text-xs font-semibold text-white/40 hover:text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/10 transition-all flex items-center gap-1"
+                title="Reset Filters"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Results Section */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center px-1">
+            <span className="text-[10px] font-black uppercase text-white/30 tracking-wider">
+              Directory Results ({filteredAndSortedPartners.length} Found)
+            </span>
+            <span className="text-[10px] text-white/30 italic">Click row to inspect full dossier</span>
+          </div>
+          
+          <PartnerList
+            partners={filteredAndSortedPartners}
+            selectedPartnerId={selectedPartner?.id || null}
+            onSelectPartner={setSelectedPartnerId}
+            onTogglePreferred={handleTogglePreferred}
+            onDeletePartner={handleDeletePartner}
+            onEditPartner={handleEditPartner}
+            onQuickEmail={(email) => {
+              if (onOpenComposeEmail) {
+                onOpenComposeEmail(email, "Mortgage Market Update", "");
+              } else {
+                window.open(`mailto:${email}`);
+              }
+            }}
+          />
+        </div>
+
+        {/* 3. Detailed Dossier View (Active Partner Workspace Detail panel) */}
+        {selectedPartner && (
+          <div className="space-y-3.5 pt-4 border-t border-white/5 animate-slideUp">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-[10px] font-black uppercase text-[#b5a642] tracking-wider">
+                🔬 Active Partner Dossier Workspace
+              </span>
+              <span className="text-[10px] text-white/30 font-semibold uppercase">
+                ID: {selectedPartner.id}
+              </span>
+            </div>
+
+            <PartnerDetail
+              partner={selectedPartner}
+              userRoster={userRoster}
+              currentUser={currentUser}
+              onUpdatePartnerField={(id, updates) => {
+                setPartners(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+                showToast("Dossier intelligence synchronized.", "success");
+              }}
+              onDeletePartner={handleDeletePartner}
+              onEditPartner={handleEditPartner}
+              onAddTimelineEntry={handleAddTimelineEntry}
+              onAddRelatedTask={handleAddRelatedTask}
+              onOpenComposeEmail={onOpenComposeEmail}
+              showToast={showToast}
+            />
+          </div>
+        )}
+
+      </div>
+
+      {/* 4. Add/Edit Dialog form overlay */}
+      <PartnerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSavePartner={handleSavePartner}
+        editingPartner={editingPartner}
+        userRoster={userRoster}
+        currentUser={currentUser}
+      />
+
+    </div>
+  );
+};

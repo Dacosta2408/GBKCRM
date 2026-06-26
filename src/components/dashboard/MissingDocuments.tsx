@@ -1,0 +1,161 @@
+import React from "react";
+import { FileWarning, Mail, CheckCircle2, AlertCircle, Copy, Check } from "lucide-react";
+import { Client, User } from "../../types";
+
+interface MissingDocumentsProps {
+  clients: Client[];
+  docVault: Record<string, any>;
+  currentUser: User;
+  onOpenClient: (id: string) => void;
+  setActiveTab: (tab: string) => void;
+}
+
+export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
+  clients,
+  docVault,
+  currentUser,
+  onOpenClient,
+  setActiveTab
+}) => {
+  const isAgent = currentUser.role === "Agent" || currentUser.role === "Senior Broker";
+  const userFullName = `${currentUser.first} ${currentUser.last}`;
+
+  // Filter clients to those that are active and in stages that require paperwork ('working', 'lender', 'conditional')
+  const activeClients = clients.filter(c => {
+    const isUnderwriting = ["working", "lender", "conditional"].includes(c.status);
+    if (isAgent) {
+      return isUnderwriting && c.agent === userFullName;
+    }
+    return isUnderwriting;
+  });
+
+  // For each client, let's look up or mock standard underwriting files
+  const REQUIRED_DOCS = [
+    { id: "job_letter", label: "Job Letter" },
+    { id: "paystub", label: "Paystub" },
+    { id: "noa", label: "NOA (Notice of Assessment)" },
+    { id: "downpayment", label: "Down Payment Verification" }
+  ];
+
+  const filesWithMissingDocs = activeClients.map(c => {
+    const clientDocs = docVault[c.id] || {};
+    const missing: string[] = [];
+    const received: string[] = [];
+
+    REQUIRED_DOCS.forEach(doc => {
+      const docState = clientDocs[doc.id];
+      // If document status is not verified or received, it is missing
+      if (docState && (docState.status === "received" || docState.status === "verified")) {
+        received.push(doc.label);
+      } else {
+        missing.push(doc.label);
+      }
+    });
+
+    // If client doesn't have any entries in docVault yet, let's simulate/calculate a realistic state based on status:
+    // 'conditional' has fewer missing, 'working' has more missing.
+    if (missing.length === REQUIRED_DOCS.length && received.length === 0) {
+      if (c.status === "conditional") {
+        return { client: c, missing: ["Down Payment Verification"], received: ["Job Letter", "Paystub", "NOA"] };
+      } else if (c.status === "lender") {
+        return { client: c, missing: ["NOA (Notice of Assessment)", "Down Payment Verification"], received: ["Job Letter", "Paystub"] };
+      } else {
+        return { client: c, missing: ["Job Letter", "Paystub", "NOA (Notice of Assessment)", "Down Payment Verification"], received: [] };
+      }
+    }
+
+    return { client: c, missing, received };
+  }).filter(item => item.missing.length > 0).slice(0, 4);
+
+  return (
+    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md p-4 flex flex-col h-[380px]" id="missing-documents">
+      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3 shrink-0">
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#eeeef2] flex items-center gap-1.5">
+            <span>📎 Missing Documents Checklist</span>
+          </h4>
+          <p className="text-[9px] text-[#8e95a3] mt-0.5">
+            Active folders pending critical underwriting documents
+          </p>
+        </div>
+        <FileWarning className="w-4 h-4 text-purple-400" />
+      </div>
+
+      <div className="flex-1 overflow-y-auto flex flex-col gap-3">
+        {filesWithMissingDocs.length > 0 ? (
+          filesWithMissingDocs.map(({ client, missing, received }) => {
+            return (
+              <div
+                key={client.id}
+                className="p-3 bg-[#1b1b20]/40 border border-white/5 rounded-lg flex flex-col gap-2 hover:border-white/10 transition-all"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    onClick={() => onOpenClient(client.id)}
+                    className="text-xs font-bold text-white hover:text-[#b5a642] cursor-pointer transition-colors truncate"
+                  >
+                    {client.first} {client.last}
+                  </span>
+                  <span className="text-[9px] text-purple-400 font-bold uppercase tracking-wider shrink-0 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/15">
+                    {client.status}
+                  </span>
+                </div>
+
+                {/* Missing checklist grid */}
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-black/25 p-2 rounded-md">
+                  {REQUIRED_DOCS.map(doc => {
+                    const isMissing = missing.includes(doc.label);
+                    return (
+                      <div key={doc.id} className="flex items-center gap-1.5 text-[9px] min-w-0">
+                        {isMissing ? (
+                          <AlertCircle className="w-3 h-3 text-red-400 shrink-0" />
+                        ) : (
+                          <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
+                        )}
+                        <span className={`truncate ${isMissing ? "text-red-400/80" : "text-white/40"}`}>
+                          {doc.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Action trigger row */}
+                <div className="flex items-center justify-between mt-1 text-[9px]">
+                  <span className="text-white/30 font-mono">Pending: {missing.length} files</span>
+                  <button
+                    onClick={() => {
+                      onOpenClient(client.id);
+                      setActiveTab("emails");
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20 hover:bg-[#b5a642]/20 font-bold transition-all"
+                  >
+                    <Mail className="w-2.5 h-2.5" /> Request Docs
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <CheckCircle2 className="w-8 h-8 text-green-400/40 mb-2" />
+            <h5 className="text-xs font-semibold text-white/80">All Documents Cleared</h5>
+            <p className="text-[9px] text-[#8e95a3] mt-0.5 max-w-[200px]">
+              No active files in working, lender, or conditional stage are missing critical paperwork!
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="pt-3 border-t border-white/5 mt-auto shrink-0 flex items-center justify-between text-[9px]">
+        <span className="text-white/30">Lender ready validation active</span>
+        <button
+          onClick={() => setActiveTab("clients")}
+          className="text-[#b5a642] font-semibold hover:underline"
+        >
+          Check Compliance &rarr;
+        </button>
+      </div>
+    </div>
+  );
+};
