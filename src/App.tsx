@@ -5,7 +5,7 @@ import {
   ShieldCheck, FileText, Key, LogOut, Lock, Search, ChevronDown, Settings as SettingsIcon, 
   Trash2, Copy, Send, Plus, CheckCircle2, AlertTriangle, 
   Clock, Award, Globe, FileSpreadsheet, Share2, Sparkles, Filter, 
-  MailOpen, RefreshCw, Phone, MessageCircle
+  MailOpen, RefreshCw, Phone, MessageCircle, HardDrive
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -18,6 +18,7 @@ import { Dashboard } from "./components/Dashboard";
 import { ClientsList } from "./components/ClientsList";
 import { Calculators } from "./components/Calculators";
 import { AIIntake } from "./components/AIIntake";
+import { AIAssistantCenter } from "./components/AIAssistantCenter";
 import { ApplicationIntake } from "./components/ApplicationIntake";
 import { Messages } from "./components/Messages";
 import { EmailView } from "./components/EmailView";
@@ -34,6 +35,8 @@ import { FileReadiness } from "./components/FileReadiness";
 import { Settings } from "./components/Settings";
 import { MortgageChecklist } from "./components/MortgageChecklist";
 import { MortgageActivityTracker } from "./components/MortgageActivityTracker";
+import { ApplicationDetailsForm } from "./components/ApplicationDetailsForm";
+import { ZDrivePanel } from "./components/ZDrivePanel";
 import { logActivityEvent } from "./lib/activityEngine";
 import { CHECKLIST_RULES, STATUS_STYLING } from "./components/document/constants";
 
@@ -378,6 +381,9 @@ export default function App() {
 
   // Modals Inputs
   const [newClientOpen, setNewClientOpen] = useState<boolean>(false);
+  const [zDriveOpen, setZDriveOpen] = useState<boolean>(false);
+  const [intakePreloadedText, setIntakePreloadedText] = useState<string>("");
+  const [intakePreloadedFileName, setIntakePreloadedFileName] = useState<string>("");
   const [taskModalOpen, setTaskModalOpen] = useState<boolean>(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [calEventModalOpen, setCalEventModalOpen] = useState<boolean>(false);
@@ -1125,6 +1131,16 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                 className="bg-transparent border-none text-[11px] text-[#eeeef2] focus:outline-none w-full"
               />
             </div>
+
+            {/* Z Drive Button */}
+            <button 
+              onClick={() => setZDriveOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#141418] text-[#5d9bb1] border border-[#5d9bb1]/30 hover:bg-[#5d9bb1]/10 transition-all shrink-0 cursor-pointer"
+              id="header-z-drive-btn"
+            >
+              <HardDrive className="w-3.5 h-3.5" /> Z Drive
+            </button>
+
             <button 
               onClick={() => setNewClientOpen(true)}
               className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#b5a642] text-black hover:bg-[#9a8c38] transition-all shrink-0"
@@ -1274,7 +1290,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
               onOpenClient={openClient}
               onAddClient={() => setNewClientOpen(true)}
               onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
-              onOpenAIIntake={() => setAiIntakeOpen(true)}
+              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
               onAddTask={() => setActiveTab("tasks")}
               onAddPartner={() => setActiveTab("partners")}
               onAddEvent={() => setCalEventModalOpen(true)}
@@ -1286,17 +1302,19 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
             />
           )}
 
-          {activeTab === "clients" && (
+           {activeTab === "clients" && (
             <ClientsList 
               clients={clients}
               lenders={lenders}
               onOpenClient={openClient}
               onAddClient={() => setNewClientOpen(true)}
-              onOpenAIIntake={() => setAiIntakeOpen(true)}
+              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
               onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
               viewMode={clientViewMode}
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
+              searchQuery={globalSearchSearch}
+              onSearchQueryChange={setGlobalSearchSearch}
             />
           )}
 
@@ -1306,11 +1324,13 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
               lenders={lenders}
               onOpenClient={openClient}
               onAddClient={() => setNewClientOpen(true)}
-              onOpenAIIntake={() => setAiIntakeOpen(true)}
+              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
               onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
               viewMode="pipeline"
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
+              searchQuery={globalSearchSearch}
+              onSearchQueryChange={setGlobalSearchSearch}
             />
           )}
 
@@ -1373,56 +1393,28 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
           )}
 
           {activeTab === "ai" && (
-            <div className="flex h-full gap-5">
-              {/* Chat proxy */}
-              <div className="flex-1 bg-[#141418] border border-white/5 rounded-xl flex flex-col h-full shadow-md overflow-hidden">
-                <div className="p-4 border-b border-white/5 bg-[#1b1b20]/25 flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#b5a642] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 fill-current" /> GBK Mortgage Advisor ✦
-                  </h3>
-                  <select 
-                    value={aiClientId}
-                    onChange={(e) => {
-                      setAiClientId(e.target.value);
-                      const c = clients.find(x => x.id === e.target.value);
-                      setAiSelectedClient(c || null);
-                    }}
-                    className="bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-[#eeeef2]"
-                  >
-                    <option value="">General advice (No selected client)</option>
-                    {clients.map(c => <option key={c.id} value={c.id}>{c.first} {c.last}</option>)}
-                  </select>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-                  {aiHistory.map((m, idx) => (
-                    <div key={idx} className={`p-3 rounded-xl text-xs max-w-[80%] leading-relaxed ${m.role === "user" ? "self-end bg-[#b5a642]/10 border border-[#b5a642]/20 text-white rounded-br-none" : "self-start bg-[#1b1b20] border border-white/5 text-white/90 rounded-bl-none"}`}>
-                      {m.content}
-                    </div>
-                  ))}
-                  {aiLoading && (
-                    <div className="self-start p-3 rounded-xl bg-[#1b1b20] text-xs text-[#8e95a3]/50 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#b5a642] animate-bounce"></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#b5a642] animate-bounce delay-75"></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#b5a642] animate-bounce delay-150"></span>
-                      Thinking...
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-3 border-t border-white/5 bg-[#1b1b20]/10 flex gap-2">
-                  <input 
-                    type="text"
-                    value={aiInputText}
-                    onChange={(e) => setAiInputText(e.target.value)}
-                    placeholder="Ask about CMHC limits, qualifying GDS/TDS, or request draft emails..."
-                    onKeyDown={(e) => { if (e.key === "Enter") runGeneralAIChat(); }}
-                    className="flex-grow bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
-                  />
-                  <button onClick={runGeneralAIChat} className="px-4 py-2 bg-[#b5a642] text-black rounded-lg text-xs font-bold hover:bg-[#9a8c38]">Send</button>
-                </div>
-              </div>
-            </div>
+            <AIAssistantCenter 
+              clients={clients}
+              currentUser={currentUser}
+              docVault={docVault}
+              tasks={tasks}
+              onAddTask={(newTask) => {
+                const addedTask: Task = {
+                  ...newTask,
+                  id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  createdBy: `${currentUser.first} ${currentUser.last}`
+                };
+                setTasks(prev => {
+                  const updated = [...prev, addedTask];
+                  localStorage.setItem("gbk_tasks", JSON.stringify(updated));
+                  return updated;
+                });
+              }}
+              onUpdateClient={handleUpdateClient}
+              showToast={showToast}
+            />
           )}
 
           {activeTab === "messages" && (
@@ -1607,33 +1599,55 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
         </main>
       </div>
 
-      {/* ✦ AI Intake Form Overlay ✦ */}
-      {aiIntakeOpen && (
-        <AIIntake 
-          appLocked={appLocked}
-          aiIntakeText={aiIntakeText}
-          setAiIntakeText={setAiIntakeText}
-          aiIntakeLoading={aiIntakeLoading}
-          onTriggerAIIntakeExtract={triggerAIIntakeExtract}
-          aiIntakeFields={aiIntakeFields}
-          setAiIntakeFields={setAiIntakeFields}
-          highlightedAiFields={highlightedAiFields}
-          onSubmitAIIntake={handleSaveAIIntake}
-          onClose={() => setAiIntakeOpen(false)}
-          agentNames={getAgentNames()}
-          apiKeySet={!!settings.apiKey}
-        />
-      )}
-
       {/* ✦ New Client Intake / PDF Application Intake Overlay ✦ */}
       {applicationIntakeOpen && (
         <ApplicationIntake
+          mode="ai"
+          preloadedText={intakePreloadedText}
+          preloadedFileName={intakePreloadedFileName}
+          onClearPreloaded={() => {
+            setIntakePreloadedText("");
+            setIntakePreloadedFileName("");
+          }}
           currentUser={currentUser}
           clients={clients}
           onClose={() => setApplicationIntakeOpen(false)}
           onCreateClient={handleCreateClientFromIntake}
           agentNames={getAgentNames()}
           apiKeySet={!!settings.apiKey}
+          showToast={showToast}
+        />
+      )}
+
+      {/* ✦ Manual Client Intake Form Modal Overlay ✦ */}
+      {newClientOpen && (
+        <ApplicationIntake
+          mode="manual"
+          currentUser={currentUser}
+          clients={clients}
+          onClose={() => setNewClientOpen(false)}
+          onCreateClient={(newClient) => {
+            setClients(prev => [newClient, ...prev]);
+            logActivity("Created new file manually", `${newClient.first} ${newClient.last}`);
+            showToast("Manual client file created successfully!", "success");
+          }}
+          agentNames={getAgentNames()}
+          apiKeySet={!!settings.apiKey}
+          showToast={showToast}
+        />
+      )}
+
+      {/* ✦ Z Drive Panel Overlay ✦ */}
+      {zDriveOpen && (
+        <ZDrivePanel
+          isOpen={zDriveOpen}
+          onClose={() => setZDriveOpen(false)}
+          onSendToIntake={(content, name) => {
+            setIntakePreloadedText(content);
+            setIntakePreloadedFileName(name);
+            setApplicationIntakeOpen(true);
+            setZDriveOpen(false);
+          }}
           showToast={showToast}
         />
       )}
@@ -1667,12 +1681,26 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                     <p className="text-[10px] text-[#8e95a3]">{currentClient.type || "Purchase File"}</p>
                   </div>
                 </div>
-                <button onClick={closeDetail} className="text-white/40 hover:text-white p-1.5 rounded-lg bg-white/5 hover:bg-white/10">✕</button>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-[#141418] border border-white/10 px-2.5 py-1 rounded-lg">
+                    <span className="text-[9px] text-[#8e95a3] uppercase font-black tracking-wider">File Stage:</span>
+                    <select
+                      value={currentClient.status}
+                      onChange={(e) => handleUpdateClientStatus(currentClient.id, e.target.value)}
+                      className="bg-transparent border-none text-[10px] font-extrabold uppercase text-[#b5a642] focus:outline-none cursor-pointer"
+                    >
+                      {["lead", "open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
+                        <option key={st} value={st} className="bg-[#141418] text-white font-bold uppercase">{st}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button onClick={closeDetail} className="text-white/40 hover:text-white p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">✕</button>
+                </div>
               </div>
 
               {/* TABS SELECT */}
               <div className="flex border-b border-white/5 text-xs bg-[#1b1b20]/10 py-1 select-none overflow-x-auto shrink-0">
-                {["Overview", "Mortgage Details", "Financials", "Documents", "Checklist", "Notes", "Activity", "AI Analysis"].map(tab => (
+                {["Overview", "Application Details", "Documents", "Checklist", "Notes", "Activity", "AI Analysis"].map(tab => (
                   <button
                     key={tab}
                     onClick={() => setDetailTab(tab.toLowerCase())}
@@ -1733,206 +1761,24 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                   </div>
                 )}
 
-                {/* 2. MORTGAGE DETAILS TAB (INTERACTIVE SAVING FORM) */}
-                {detailTab === "mortgage details" && (
-                  <form 
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const fd = new FormData(e.currentTarget);
-                      const updatedClient = {
-                        ...currentClient,
-                        type: fd.get("type") as string,
-                        propval: fd.get("propval") as string,
-                        mtgamt: fd.get("mtgamt") as string,
-                        lender: fd.get("lender") as string,
-                        agent: fd.get("agent") as string,
-                        appData: {
-                          ...(currentClient.appData || {}),
-                          interestRate: fd.get("interestRate") as string,
-                          amortization: fd.get("amortization") as string,
-                          tenure: fd.get("tenure") as string,
-                          maturityDate: fd.get("maturityDate") as string,
-                          referredBy: fd.get("referredBy") as string,
-                        },
-                        updatedAt: new Date().toISOString()
-                      };
-                      handleUpdateClient(updatedClient);
-                      showToast("Mortgage parameters saved successfully!", "success", "🏠");
-                    }}
-                    className="flex flex-col gap-4 text-xs"
-                  >
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Mortgage Goal</label>
-                        <select 
-                          name="type" 
-                          defaultValue={currentClient.type || "purchase"}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        >
-                          <option value="purchase">Purchase</option>
-                          <option value="refinance">Refinance</option>
-                          <option value="renewal">Renewal</option>
-                          <option value="heloc">HELOC</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Property Value ($)</label>
-                        <input 
-                          type="number" 
-                          name="propval" 
-                          defaultValue={currentClient.propval || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                          placeholder="e.g. 650000"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Loan Amount ($)</label>
-                        <input 
-                          type="number" 
-                          name="mtgamt" 
-                          defaultValue={currentClient.mtgamt || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                          placeholder="e.g. 520000"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Interest Rate</label>
-                        <input 
-                          type="text" 
-                          name="interestRate" 
-                          defaultValue={currentClient.appData?.interestRate || currentClient.rate || "3.99%"}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                          placeholder="e.g. 3.89%"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Amortization (Years)</label>
-                        <select 
-                          name="amortization" 
-                          defaultValue={currentClient.appData?.amortization || "25"}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        >
-                          <option value="15">15 Years</option>
-                          <option value="20">20 Years</option>
-                          <option value="25">25 Years</option>
-                          <option value="30">30 Years</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Occupancy Type</label>
-                        <select 
-                          name="tenure" 
-                          defaultValue={currentClient.appData?.tenure || "owner-occupied"}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        >
-                          <option value="owner-occupied">Owner Occupied</option>
-                          <option value="rental">Rental / Investment</option>
-                          <option value="second-home">Second Home</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Maturity Date</label>
-                        <input 
-                          type="date" 
-                          name="maturityDate" 
-                          defaultValue={currentClient.appData?.maturityDate || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Referred By</label>
-                        <input 
-                          type="text" 
-                          name="referredBy" 
-                          defaultValue={currentClient.appData?.referredBy || currentClient.referredBy || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                          placeholder="Broker network, etc."
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Lender Partner</label>
-                        <select 
-                          name="lender" 
-                          defaultValue={currentClient.lender || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        >
-                          <option value="">No submission</option>
-                          {lenders.map(l => (
-                            <option key={l.name} value={l.name}>{l.name}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-[10px] uppercase font-bold tracking-wide text-white/40">Assigned Broker</label>
-                        <select 
-                          name="agent" 
-                          defaultValue={currentClient.agent || ""}
-                          className="w-full bg-[#1b1b20] border border-white/5 text-xs rounded-lg p-2 font-semibold text-white focus:outline-none focus:border-[#b5a642]"
-                        >
-                          <option value="">Unassigned</option>
-                          {getAgentNames().map(name => (
-                            <option key={name} value={name}>{name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <button 
-                      type="submit"
-                      className="w-full bg-[#b5a642] text-black font-black uppercase tracking-widest text-[10px] py-3 rounded-lg hover:bg-[#9a8c38] transition-colors mt-3"
-                    >
-                      ✓ Save Mortgage Parameters
-                    </button>
-                  </form>
-                )}
-
-                {/* 3. FINANCIALS TAB */}
-                {detailTab === "financials" && (
-                  <div className="flex flex-col gap-4">
-                    <div className="p-4 bg-[#1b1b20] border border-white/5 rounded-xl flex flex-col gap-1">
-                      <div className="text-[10px] text-white/40 uppercase tracking-wide font-black">Loan To Value (LTV)</div>
-                      <div className="text-2xl font-bold text-[#b5a642]">
-                        {pn(currentClient.propval) > 0 ? `${(pn(currentClient.mtgamt) / pn(currentClient.propval) * 100).toFixed(1)}%` : "N/A"}
-                      </div>
-                      <div className="text-[10px] text-[#8e95a3] mt-1">
-                        Value: {fd(pn(currentClient.propval))} | Loan: {fd(pn(currentClient.mtgamt))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-white/40 uppercase font-black">Primary Income</div>
-                        <div className="text-sm font-bold text-white mt-1">{currentClient.income ? fd(pn(currentClient.income)) : "—"}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-white/40 uppercase font-black">Joint/Co Income</div>
-                        <div className="text-sm font-bold text-white mt-1">{currentClient.coIncome ? fd(pn(currentClient.coIncome)) : "—"}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-white/40 uppercase font-black">Total Debts / Month</div>
-                        <div className="text-sm font-bold text-white mt-1">{currentClient.debts ? fd(pn(currentClient.debts)) : "—"}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-white/40 uppercase font-black">Condo Fees / Month</div>
-                        <div className="text-sm font-bold text-white mt-1">{currentClient.condo ? fd(pn(currentClient.condo)) : "—"}</div>
-                      </div>
-                    </div>
-                  </div>
+                {/* 2. APPLICATION DETAILS TAB (INTERACTIVE SAVING FORM) */}
+                {detailTab === "application details" && (
+                  <ApplicationDetailsForm 
+                    key={currentClient.id}
+                    client={currentClient}
+                    currentUser={currentUser}
+                    onUpdateClient={handleUpdateClient}
+                    agentNames={getAgentNames()}
+                    lenders={lenders}
+                    showToast={showToast}
+                  />
                 )}
 
                 {/* 4. DOCUMENTS VAULT TAB */}
                 {detailTab === "documents" && (
                   <div className="flex flex-col gap-4 h-full min-h-[400px]">
                     <DocumentManager 
+                      key={currentClient.id}
                       clients={clients}
                       currentUser={currentUser}
                       docVault={docVault}
@@ -1949,6 +1795,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                 {/* 5. CHECKLIST STATUS MANAGER TAB */}
                 {detailTab === "checklist" && (
                   <MortgageChecklist
+                    key={currentClient.id}
                     client={currentClient}
                     currentUser={currentUser}
                     docVault={docVault}
@@ -1961,6 +1808,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                 {/* 6. INTERNAL NOTES TAB */}
                 {detailTab === "notes" && (
                   <MortgageActivityTracker
+                    key={currentClient.id}
                     client={currentClient}
                     currentUser={currentUser}
                     onUpdateClient={handleUpdateClient}
@@ -1973,6 +1821,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                 {/* 7. ACTIVITY AUDIT TIMELINE TAB */}
                 {detailTab === "activity" && (
                   <MortgageActivityTracker
+                    key={currentClient.id}
                     client={currentClient}
                     currentUser={currentUser}
                     onUpdateClient={handleUpdateClient}

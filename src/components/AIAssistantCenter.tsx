@@ -1,0 +1,1124 @@
+import React, { useState, useEffect, useMemo } from "react";
+import { 
+  Sparkles, Clipboard, Check, RefreshCw, Send, FileText, Mail, 
+  FileCheck, CheckSquare, Plus, AlertCircle, User, CheckCircle2, 
+  Trash2, Landmark, History, MessageSquare, ChevronRight, HelpCircle,
+  FileSpreadsheet, ShieldAlert, ArrowRight, CornerDownRight
+} from "lucide-react";
+import { Client, Task, User as CRMUser } from "../types";
+import { getNotesForClient, saveNotesForClient, logActivityEvent, FileNote } from "../lib/activityEngine";
+import { generateChecklistForClient, evaluateChecklistReadiness } from "../lib/checklistEngine";
+
+interface AIAssistantCenterProps {
+  clients: Client[];
+  currentUser: CRMUser;
+  docVault: Record<string, any>;
+  tasks: Task[];
+  onAddTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt" | "createdBy">) => void;
+  onUpdateClient: (updated: Client) => void;
+  showToast: (msg: string, type?: "success" | "error" | "info", icon?: string) => void;
+}
+
+interface AIHistoryItem {
+  id: string;
+  clientId: string;
+  clientName: string;
+  toolName: string;
+  timestamp: string;
+  prompt: string;
+  response: string;
+}
+
+export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
+  clients,
+  currentUser,
+  docVault,
+  tasks,
+  onAddTask,
+  onUpdateClient,
+  showToast
+}) => {
+  // Main states
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [aiInput, setAiInput] = useState<string>("");
+  const [aiOutput, setAiOutput] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [activeTool, setActiveTool] = useState<string>("summary");
+  
+  // Custom Raw Ingest text state for Intake Summary Tool
+  const [rawIntakeText, setRawIntakeText] = useState<string>("");
+
+  // Extracted tasks state from Task Builder tool
+  const [extractedTasks, setExtractedTasks] = useState<Array<{ title: string; priority: "high" | "medium" | "low"; notes: string }>>([]);
+
+  // AI results history stored locally
+  const [history, setHistory] = useState<AIHistoryItem[]>(() => {
+    const saved = localStorage.getItem("gbk_ai_assistance_history");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [copied, setCopied] = useState<boolean>(false);
+
+  // Auto-select the first client if none selected
+  useEffect(() => {
+    if (!selectedClientId && clients.length > 0) {
+      setSelectedClientId(clients[0].id);
+    }
+  }, [clients, selectedClientId]);
+
+  // Selected client memo
+  const currentClient = useMemo(() => {
+    return clients.find(c => c.id === selectedClientId) || null;
+  }, [clients, selectedClientId]);
+
+  // Save history helper
+  const saveHistory = (newHistory: AIHistoryItem[]) => {
+    setHistory(newHistory);
+    localStorage.setItem("gbk_ai_assistance_history", JSON.stringify(newHistory));
+  };
+
+  // Clear history
+  const handleClearHistory = () => {
+    saveHistory([]);
+    showToast("AI history cleared.", "info");
+  };
+
+  // Helper to format currency
+  const formatCurrency = (val: string | number | undefined) => {
+    if (!val) return "$0";
+    const num = typeof val === "string" ? parseFloat(val.replace(/[^0-9.-]+/g, "")) : val;
+    return isNaN(num) ? "$0" : `$${num.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  };
+
+  // Calculate quick metrics for the active client
+  const clientMetrics = useMemo(() => {
+    if (!currentClient) return null;
+    const incomeVal = Number(currentClient.income || 0);
+    const coIncomeVal = Number(currentClient.coIncome || 0);
+    const combinedIncome = incomeVal + coIncomeVal;
+    
+    const mtgAmt = Number(currentClient.mtgamt || 0);
+    const propVal = Number(currentClient.propval || 0);
+    const ltv = propVal > 0 ? (mtgAmt / propVal) * 100 : 0;
+
+    return {
+      combinedIncome,
+      ltv: Math.round(ltv),
+    };
+  }, [currentClient]);
+
+  // Generate dynamic client notes and document status text for AI context
+  const getClientContextString = (client: Client): string => {
+    const clientDocs = docVault[client.id] || {};
+    const docsSummary = Object.keys(clientDocs)
+      .map(key => {
+        const d = clientDocs[key];
+        return `- ${d.label || key}: status is "${d.status || 'unknown'}"`;
+      })
+      .join("\n");
+
+    const notes = getNotesForClient(client);
+    const notesSummary = notes.slice(0, 5).map(n => `[${n.type.toUpperCase()} by ${n.author} at ${new Date(n.timestamp).toLocaleDateString()}]: ${n.content}`).join("\n");
+
+    return `
+Client Profile Name: ${client.first} ${client.last}
+Co-Applicant: ${client.co || "None"}
+Status/Stage: ${client.status.toUpperCase()}
+Subject Property Address: ${client.addr || "Not specified"}
+Property Value: ${formatCurrency(client.propval)}
+Mortgage Requested: ${formatCurrency(client.mtgamt)}
+Combined Income: ${formatCurrency(clientMetrics?.combinedIncome)}/year
+Primary Employer/Tenure: ${client.emptype || "Not fully specified"}
+Credit Score (Beacon): ${client.beacon || "Not provided"}
+Monthly Debts: ${formatCurrency(client.debts)}
+Property Taxes: ${formatCurrency(client.tax)}/yr
+
+CURRENT DOCUMENT STATUS IN VAULT:
+${docsSummary || "No documents uploaded yet."}
+
+RECENT TEAM NOTES ON THE FILE:
+${notesSummary || "No notes logged yet."}
+`;
+  };
+
+  // TRIGGER AI WORKFLOW
+  const triggerAITool = async (toolKey: string, payloadOverride?: string) => {
+    if (!currentClient && toolKey !== "intake_raw") {
+      showToast("Please select a client file first.", "error");
+      return;
+    }
+
+    setLoading(true);
+    setAiOutput("");
+    setExtractedTasks([]);
+    setActiveTool(toolKey);
+
+    const clientName = currentClient ? `${currentClient.first} ${currentClient.last}` : "General System Context";
+    const clientContext = currentClient ? getClientContextString(currentClient) : "";
+
+    let prompt = "";
+    let systemInstruction = "You are a senior Canadian mortgage broker, underwriter, and expert systems companion at GBK Financial (Ontario, Canada). ";
+
+    // Role-based adaptations
+    if (currentUser.role.toLowerCase().includes("broker") || currentUser.role.toLowerCase().includes("agent")) {
+      systemInstruction += "Focus highly on saving broker time, creating polite client drafting, highlighting next sales steps, pre-approval hold timelines, and conversion triggers.";
+    } else {
+      systemInstruction += "Focus strictly on compliance audit, GDS/TDS stress test verification, alt-lender policy exceptions, file credit risk, and manager-level brief oversight.";
+    }
+
+    switch (toolKey) {
+      case "summary":
+        prompt = `Perform a comprehensive, professional mortgage file underwrite and file summary. Break the analysis into these precise sections with professional headers:
+1. UNDERWRITING PROFILE: Elegantly list Loan-to-Value (LTV), credit risk tier, and estimated GDS/TDS compliance.
+2. FILE KEY STRENGTHS: Bullet points detailing the strongest qualifying aspects (income stability, beacon, etc).
+3. POTENTIAL RISKS & BLOCKED RATIOS: Bullet points outlining any issues with down payment verification, tenure, property type, or high ratios.
+4. MATCHING LENDER tier WORKFLOW: Recommendation of Lender Category (A-Lender e.g., MCAP/TD; Alt-A/B-Lender e.g., Equitable Bank; or Private/Equity) with an explanation of why.
+5. RECOMMENDATION NOTES: Concise underwriter checklist summary.`;
+        break;
+
+      case "missing_docs":
+        prompt = `Compare the client's file stage (${currentClient?.status}), their employment type (${currentClient?.emptype || "salary"}), and vault document status.
+Generate a structured, professional report titled: "REQUISITION LIST & FILE COMPLETENESS AUDIT".
+- List of Approved/Received Documents (explain briefly why they are acceptable).
+- List of OUTSTANDING / MISSING Documents (specifically tailored to their profile - e.g., if self-employed, demand 2-years of NOAs/T1 Generals; if salaried, demand Letter of Employment and pay stubs; if purchasing, demand MLS listing & Agreement of Purchase and Sale).
+- Explain exactly why each outstanding document is critical to clear downstream lender conditions.`;
+        break;
+
+      case "follow_up":
+        const subTemplate = payloadOverride || "outstanding_docs";
+        if (subTemplate === "outstanding_docs") {
+          prompt = `Draft a personalized, highly professional client email requesting outstanding/missing mortgage application documents. 
+Include placeholders or direct mentions of missing files (referencing pay stubs, Letter of Employment, down payment bank statements, etc).
+Keep the tone helpful, reassuring, yet urgent to keep the file moving.
+Use Canadian terminology, mention OSFI guidelines or stress test validation, and make it easy to read with neat bullet points.`;
+        } else if (subTemplate === "borderline_tds") {
+          prompt = `Draft a polite, expert mortgage advisory email to the client counseling them on borderline debt service (GDS/TDS) ratios.
+Explain what GDS/TDS is simply. Explain how paying off a small balance (e.g. credit cards, car loans) will significantly increase their qualifying loan limit or shift them into a lower interest rate A-Lender product.
+Provide a clear, strategic recommendation table.`;
+        } else {
+          prompt = `Draft a beautiful client status update email. Let them know the underwriting team has reviewed their file status as [${currentClient?.status.toUpperCase()}] and outline the upcoming milestone, explaining what happens next in the Canadian mortgage process (e.g., appraisal, commitment signing, legal instructions).`;
+        }
+        break;
+
+      case "partner_comm":
+        const partnerType = payloadOverride || "lender";
+        if (partnerType === "lender") {
+          prompt = `Draft a formal submission summary email to a Canadian monoline or institutional underwriter (e.g. First National, MCAP, TD, RMG) pitching this file.
+Clearly outline the client strength narrative (e.g. strong professional tenure, high net-worth, clear explanation of any credit blemishes), request specific rate-hold validation, and justify why this file fits their core underwriting guidelines.`;
+        } else if (partnerType === "realtor") {
+          prompt = `Draft a professional status update email to the client's Realtor. 
+Keep client personal financial details completely confidential, but confidently reassure them of the file's progress (e.g. financing condition is on track, pre-approval is solid, or we are finalizing monoline approval). Let them know we are working to clear conditions quickly to support their timeline.`;
+        } else {
+          prompt = `Draft a clear communication email to the closing Solicitor/Lawyer. Request their progress on title transfer verification, confirm where closing documentation will be directed, and outline the estimated funding date.`;
+        }
+        break;
+
+      case "tasks":
+        prompt = `Analyze the team notes and client financial profile. You must generate 3 specific, highly actionable task objects for the broker workflow.
+Format your entire output strictly as a JSON array of objects. Do not wrap in markdown \`\`\`json blocks or backticks. Only return raw JSON.
+Each object must have exactly these keys:
+- "title": a clear, action-oriented task name (under 50 characters)
+- "priority": must be "high", "medium", or "low"
+- "notes": details on why this task is critical based on the notes or profile
+
+Example:
+[
+  {"title": "Request 12-month Rent History", "priority": "high", "notes": "Required to prove strong repayment behavior for Alt-A workflow."},
+  {"title": "Order Appraisal Report", "priority": "medium", "notes": "Subject property in rural zone requires localized appraisal verification."}
+]`;
+        break;
+
+      case "intake_raw":
+        const textToDigest = payloadOverride || rawIntakeText;
+        if (!textToDigest.trim()) {
+          showToast("Please enter some raw application or email intake text first.", "error");
+          setLoading(false);
+          return;
+        }
+        prompt = `Analyze this raw mortgage application form text, email inquiries, or broker notes and compile a highly structured INTAKE DIGEST.
+Extract applicant names, estimated incomes, credit feedback, mortgage requested, property address, and highlight immediate logical red flags or next actions.
+Text to analyze:
+${textToDigest}`;
+        break;
+
+      case "recommender":
+        prompt = `Perform a predictive audit of this file's current status [${currentClient?.status.toUpperCase()}] and potential roadblocks.
+Provide exactly 3 strategic "Next Best Action" recommendations tailored for the broker.
+For example, if the LTV is > 80%, recommend CMHC high-ratio guidelines. If Credit is under 600, recommend alternative monoline or private match. If the file is still a "Lead", suggest immediate initial follow-up templates.
+Make recommendations punchy with bold headers and action timelines.`;
+        break;
+
+      case "custom":
+        if (!aiInput.trim()) {
+          showToast("Please enter a custom question or command.", "error");
+          setLoading(false);
+          return;
+        }
+        prompt = aiInput;
+        break;
+
+      default:
+        prompt = "Provide a general summary of this client file.";
+    }
+
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: prompt,
+          history: [],
+          clientContext: clientContext
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to contact Gemini");
+
+      const reply = data.reply || "";
+
+      // Check if this was the task builder tool
+      if (toolKey === "tasks") {
+        try {
+          // Attempt to parse clean JSON or clean it of JSON backticks if present
+          let cleanJson = reply.trim();
+          if (cleanJson.startsWith("```")) {
+            cleanJson = cleanJson.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+          }
+          const parsed = JSON.parse(cleanJson);
+          if (Array.isArray(parsed)) {
+            setExtractedTasks(parsed);
+            setAiOutput("### AI Extracted Tasks successfully!\nBelow are the suggested items extracted from notes and file analysis. Review and click '+' to add them directly to your CRM checklist.");
+          } else {
+            setAiOutput(reply);
+          }
+        } catch (jsonErr) {
+          // Fallback to text output if JSON parsing failed
+          setAiOutput(reply);
+        }
+      } else {
+        setAiOutput(reply);
+      }
+
+      // Save to local history
+      const newHistoryItem: AIHistoryItem = {
+        id: `ai_${Date.now()}`,
+        clientId: currentClient ? currentClient.id : "general",
+        clientName: clientName,
+        toolName: getToolLabel(toolKey, payloadOverride),
+        timestamp: new Date().toISOString(),
+        prompt: prompt.substring(0, 100),
+        response: reply
+      };
+
+      const updatedHistory = [newHistoryItem, ...history].slice(0, 30);
+      saveHistory(updatedHistory);
+      logActivityEvent({
+        clientId: currentClient ? currentClient.id : "general",
+        clientName: clientName,
+        eventType: "communication_logged",
+        user: `${currentUser.first} ${currentUser.last}`,
+        timestamp: new Date().toISOString(),
+        description: `Generated AI assistance output: "${newHistoryItem.toolName}"`
+      });
+
+      showToast("AI suggestion generated!", "success", "✦");
+    } catch (err: any) {
+      console.error(err);
+      setAiOutput(`⚠️ Error: ${err.message}\nPlease make sure your server is running and the Gemini API key is configured correctly.`);
+      showToast(err.message, "error", "⚠️");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Label helper
+  const getToolLabel = (key: string, payload?: string): string => {
+    switch (key) {
+      case "summary": return "Underwriting File Summary";
+      case "missing_docs": return "Missing Documents Requisition";
+      case "follow_up": return `Follow-Up Email (${payload || "General"})`;
+      case "partner_comm": return `Partner Email (${payload || "General"})`;
+      case "tasks": return "AI Task Builder";
+      case "intake_raw": return "Raw Ingestion Summary";
+      case "recommender": return "Next Step Strategy Recommender";
+      case "custom": return "Custom Copilot Prompt";
+      default: return "AI Advisor Query";
+    }
+  };
+
+  // COPY OUTPUT TO CLIPBOARD
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(aiOutput);
+    setCopied(true);
+    showToast("Copied to clipboard!", "success");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // SAVE AS CLIENT INTERNAL FILE NOTE
+  const handleSaveToClientNotes = () => {
+    if (!currentClient) {
+      showToast("No selected client to save notes to.", "error");
+      return;
+    }
+
+    const currentNotes = getNotesForClient(currentClient);
+    const newNote: FileNote = {
+      id: `note_ai_${Date.now()}`,
+      clientId: currentClient.id,
+      author: `✦ GBK AI Copilot`,
+      timestamp: new Date().toISOString(),
+      type: "underwriting",
+      content: `AI WORKFLOW OUTPUT [${getToolLabel(activeTool)}]:\n\n${aiOutput}`,
+      tags: ["ai-generated", activeTool]
+    };
+
+    const updated = [newNote, ...currentNotes];
+    saveNotesForClient(currentClient.id, updated);
+    
+    // Trigger update on client to refresh CRM wide timestamps
+    onUpdateClient({
+      ...currentClient,
+      updatedAt: new Date().toISOString()
+    });
+
+    logActivityEvent({
+      clientId: currentClient.id,
+      clientName: `${currentClient.first} ${currentClient.last}`,
+      eventType: "note_added",
+      user: `${currentUser.first} ${currentUser.last}`,
+      timestamp: new Date().toISOString(),
+      description: `Saved AI-generated underwriting brief to internal file notes.`
+    });
+
+    showToast("Saved directly to Client's File Notes!", "success", "💾");
+  };
+
+  // ADD EXTRACTED TASK TO CRM LIST
+  const handleAddExtractedTask = (title: string, priority: "high" | "medium" | "low", notes: string) => {
+    if (!currentClient) return;
+    
+    onAddTask({
+      title,
+      status: "open",
+      priority,
+      clientId: currentClient.id,
+      clientName: `${currentClient.first} ${currentClient.last}`,
+      notes: `${notes} (Created via GBK AI Workspace)`,
+      dueDate: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().split("T")[0] // default 1 week out
+    });
+
+    setExtractedTasks(prev => prev.filter(t => t.title !== title));
+    showToast(`Task added to CRM: "${title}"`, "success", "✅");
+  };
+
+  // Pre-load raw text area with sample application if empty
+  const loadSampleIntake = () => {
+    setRawIntakeText(`From: VDacosta247@gmail.com
+Subject: Inquiry - New Mortgage Pre-Approval Ontario
+
+Hi GBK team, I'm hoping to get a pre-approval sorted. My name is Vanessa Dacosta, cell is 416-555-8910.
+I'm looking to buy a townhome in Hamilton for around $650,000. I have about $70,000 saved for down payment. 
+I work full-time as an HR Manager at Ontario Tech (making $92,000/year, salaried, been there 4 years). 
+My credit score is pretty good, around 740 according to my bank app. I do have a car lease payment of $420/month and a student loan with a minimum payment of $150/month. 
+Could you please let me know what my max qualifying amount is under the stress test? Thanks!`);
+    showToast("Loaded sample intake application.", "info");
+  };
+
+  // Group quick actions depending on the role
+  const isBroker = currentUser.role.toLowerCase().includes("broker") || currentUser.role.toLowerCase().includes("agent");
+
+  return (
+    <div className="flex flex-col gap-6 h-full pb-10" id="ai-assistance-center">
+      
+      {/* 1. CLEAR PAGE HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[#17171e] to-[#121216] border border-white/5 rounded-xl">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-[#b5a642]/15 text-[#b5a642] rounded-lg">
+              <Sparkles className="w-5 h-5 fill-current animate-pulse" />
+            </div>
+            <h2 className="text-lg font-black uppercase tracking-wider text-white">GBK AI Productivity Workspace</h2>
+          </div>
+          <p className="text-xs text-[#8e95a3] max-w-2xl">
+            A real-time mortgage operations assistant. Instantly generate professional client emails, run monoline underwriters briefs, draft partner updates, extract tasks from notes, and review files.
+          </p>
+        </div>
+        
+        {/* Role-Aware Focus Advisory */}
+        <div className="px-3 py-2 rounded-lg bg-[#b5a642]/5 border border-[#b5a642]/20 flex flex-col gap-0.5 max-w-xs">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#b5a642] flex items-center gap-1">
+            <User className="w-3 h-3" /> Focus Advisory Active
+          </span>
+          <span className="text-[9px] text-[#eeeef2] font-semibold">
+            {isBroker 
+              ? "Broker Mode: Prioritizing follow-ups, client files, and next steps first."
+              : "Admin Mode: Prioritizing qualifiers, file blockers, and monoline emails."
+            }
+          </span>
+        </div>
+      </div>
+
+      {/* 2. MAIN WORKSPACE ROW Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* LEFT COLUMN: CLIENT CONTEXT & QUICK TOOLS (4 COLS) */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* CLIENT CONTEXT PICKER */}
+          <div className="bg-[#141418] border border-white/5 rounded-xl p-4 shadow-lg space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                <Landmark className="w-3.5 h-3.5 text-[#b5a642]" /> 1. Selected Client
+              </h3>
+              <span className="text-[9px] bg-white/5 text-white/40 px-1.5 py-0.5 rounded font-mono">CRM-LINKED</span>
+            </div>
+            
+            <select
+              value={selectedClientId}
+              onChange={(e) => {
+                setSelectedClientId(e.target.value);
+                setAiOutput("");
+                setExtractedTasks([]);
+              }}
+              className="w-full bg-[#1b1b20] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/50 font-semibold"
+            >
+              <option value="">-- General Knowledge Base (No Client) --</option>
+              {clients.map(c => (
+                <option key={c.id} value={c.id}>{c.first} {c.last} ({c.status.toUpperCase()})</option>
+              ))}
+            </select>
+
+            {currentClient ? (
+              <div className="bg-[#121216] border border-white/5 rounded-lg p-3 space-y-3">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="text-xs font-bold text-white block">{currentClient.first} {currentClient.last}</span>
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
+                    currentClient.status === "approved" || currentClient.status === "funded"
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      : currentClient.status === "conditional" || currentClient.status === "working"
+                      ? "bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20"
+                      : "bg-white/5 text-white/50 border border-white/10"
+                  }`}>
+                    {currentClient.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold text-white/70">
+                  <div>
+                    <span className="text-[9px] text-[#8e95a3] block font-normal uppercase">Mortgage Request</span>
+                    {formatCurrency(currentClient.mtgamt)}
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-[#8e95a3] block font-normal uppercase">Combined Income</span>
+                    {formatCurrency(clientMetrics?.combinedIncome)}
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-[#8e95a3] block font-normal uppercase">LTV Ratio</span>
+                    <span className={clientMetrics?.ltv && clientMetrics.ltv > 80 ? "text-amber-400" : "text-white"}>
+                      {clientMetrics?.ltv}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-[#8e95a3] block font-normal uppercase">Beacon Score</span>
+                    <span className={currentClient.beacon && Number(currentClient.beacon) < 620 ? "text-rose-400" : "text-white"}>
+                      {currentClient.beacon || "N/A"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-white/40 pt-1 border-t border-white/5 leading-relaxed font-normal">
+                  <span className="text-[9px] text-[#8e95a3] block uppercase">Property Address</span>
+                  {currentClient.addr || "No property loaded yet."}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-[#121216] border border-white/5 rounded-lg p-3 text-center">
+                <span className="text-xs text-[#8e95a3]">General advice mode. Choose a client file to activate predictive smart contexts.</span>
+              </div>
+            )}
+          </div>
+
+          {/* 3. QUICK AI WORKFLOW LAUNCHERS - Prioritized by User Role */}
+          <div className="bg-[#141418] border border-white/5 rounded-xl p-4 shadow-lg space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5 border-b border-white/5 pb-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#b5a642]" /> 2. Workspace Tools
+            </h3>
+            
+            {/* BROKER-FAVORED TOOLS */}
+            {isBroker ? (
+              <div className="space-y-2">
+                <div className="text-[9px] text-[#b5a642] font-bold uppercase tracking-wider">Broker Top Tools</div>
+                <button 
+                  onClick={() => triggerAITool("summary")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "summary" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#b5a642]" /> File Summary Assistant
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+
+                <button 
+                  onClick={() => triggerAITool("recommender")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "recommender" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4 text-[#b5a642]" /> Next Step Recommender
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+
+                <button 
+                  onClick={() => triggerAITool("follow_up", "outstanding_docs")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "follow_up" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-[#b5a642]" /> Client Follow-Up Drafts
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+              </div>
+            ) : (
+              /* ADMIN/MANAGER-FAVORED TOOLS */
+              <div className="space-y-2">
+                <div className="text-[9px] text-[#b5a642] font-bold uppercase tracking-wider">Manager Top Tools</div>
+                <button 
+                  onClick={() => triggerAITool("missing_docs")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "missing_docs" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-[#b5a642]" /> Missing Documents Helper
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+
+                <button 
+                  onClick={() => triggerAITool("summary")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "summary" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4 text-[#b5a642]" /> Readiness Audit summary
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+
+                <button 
+                  onClick={() => triggerAITool("partner_comm", "lender")}
+                  className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
+                    activeTool === "partner_comm" 
+                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-white" 
+                      : "bg-[#111]/40 border-white/5 hover:border-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Landmark className="w-4 h-4 text-[#b5a642]" /> Underwriter/Partner Drafts
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                </button>
+              </div>
+            )}
+
+            {/* SHARED COMPLEMENTARY TOOLS */}
+            <div className="space-y-2 pt-2 border-t border-white/5">
+              <div className="text-[9px] text-[#8e95a3] font-bold uppercase tracking-wider">Additional Tools</div>
+              
+              {/* If manager show broker tools, if broker show manager tools here */}
+              {!isBroker && (
+                <>
+                  <button 
+                    onClick={() => triggerAITool("recommender")}
+                    className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                      activeTool === "recommender" 
+                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                        : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <CheckSquare className="w-3.5 h-3.5 text-white/50" /> Next Step Recommender
+                    </span>
+                  </button>
+
+                  <button 
+                    onClick={() => triggerAITool("follow_up", "outstanding_docs")}
+                    className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                      activeTool === "follow_up" 
+                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                        : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5 text-white/50" /> Follow-Up Drafts
+                    </span>
+                  </button>
+                </>
+              )}
+
+              {isBroker && (
+                <>
+                  <button 
+                    onClick={() => triggerAITool("missing_docs")}
+                    className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                      activeTool === "missing_docs" 
+                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                        : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <FileCheck className="w-3.5 h-3.5 text-white/50" /> Missing Documents Helper
+                    </span>
+                  </button>
+
+                  <button 
+                    onClick={() => triggerAITool("partner_comm", "lender")}
+                    className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                      activeTool === "partner_comm" 
+                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                        : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Landmark className="w-3.5 h-3.5 text-white/50" /> Partner / Lender Drafts
+                    </span>
+                  </button>
+                </>
+              )}
+
+              {/* Tasks Builder */}
+              <button 
+                onClick={() => triggerAITool("tasks")}
+                className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                  activeTool === "tasks" 
+                    ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                    : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white/50" /> Translate Notes to Tasks
+                </span>
+              </button>
+
+              {/* Application Ingestion summarizer */}
+              <button 
+                onClick={() => {
+                  setActiveTool("intake_raw");
+                  setAiOutput("");
+                }}
+                className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                  activeTool === "intake_raw" 
+                    ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-white" 
+                    : "bg-transparent border-transparent hover:bg-[#111]/40 text-white/60"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Landmark className="w-3.5 h-3.5 text-white/50" /> Website Intake Summarizer
+                </span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: MAIN WORKSPACE CANVAS (8 COLS) */}
+        <div className="lg:col-span-8 flex flex-col gap-6">
+          
+          {/* TOP QUICK ACTION BAR (ROW OF BUTTONS) */}
+          <div className="bg-[#141418] border border-white/5 p-3 rounded-xl shadow-lg flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-black uppercase text-[#8e95a3] px-2">Quick Commands:</span>
+            
+            <button 
+              onClick={() => triggerAITool("summary")}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5 text-[#b5a642]" /> Summarize File
+            </button>
+
+            <button 
+              onClick={() => triggerAITool("missing_docs")}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <FileCheck className="w-3.5 h-3.5 text-[#b5a642]" /> List Missing Docs
+            </button>
+
+            <button 
+              onClick={() => triggerAITool("follow_up", "outstanding_docs")}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <Mail className="w-3.5 h-3.5 text-[#b5a642]" /> Draft Follow-Up
+            </button>
+
+            <button 
+              onClick={() => triggerAITool("partner_comm", "lender")}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <Landmark className="w-3.5 h-3.5 text-[#b5a642]" /> Draft Partner Email
+            </button>
+
+            <button 
+              onClick={() => triggerAITool("tasks")}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <CheckSquare className="w-3.5 h-3.5 text-[#b5a642]" /> Tasks from Notes
+            </button>
+
+            <button 
+              onClick={() => {
+                setActiveTool("intake_raw");
+                setAiOutput("");
+                loadSampleIntake();
+              }}
+              className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/30 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <CornerDownRight className="w-3.5 h-3.5 text-[#b5a642]" /> Summarize Ingest submission
+            </button>
+          </div>
+
+          {/* MAIN CANVAS WORKSPACE SCREEN */}
+          <div className="bg-[#141418] border border-white/5 rounded-xl shadow-lg flex-1 flex flex-col overflow-hidden min-h-[480px]">
+            
+            {/* CANVAS WORKSPACE BAR */}
+            <div className="p-4 border-b border-white/5 bg-[#1b1b20]/40 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#b5a642] animate-pulse" />
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#eeeef2] flex items-center gap-1">
+                  Active Assistant Canvas: <span className="text-[#b5a642] font-black font-mono ml-1">{getToolLabel(activeTool)}</span>
+                </h3>
+              </div>
+              
+              {currentClient && (
+                <span className="text-[10px] text-white/50 font-bold bg-white/5 px-2 py-1 rounded">
+                  Context: {currentClient.first} {currentClient.last}
+                </span>
+              )}
+            </div>
+
+            {/* WORKSPACE PRESET DETAIL SUB-TABS (Only visible on relevant categories) */}
+            {activeTool === "follow_up" && (
+              <div className="px-4 py-2 bg-[#121216]/60 border-b border-white/5 flex gap-2">
+                <span className="text-[10px] text-[#8e95a3] uppercase font-bold self-center mr-2">Email Templates:</span>
+                <button 
+                  onClick={() => triggerAITool("follow_up", "outstanding_docs")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  📄 Missing Docs
+                </button>
+                <button 
+                  onClick={() => triggerAITool("follow_up", "borderline_tds")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  ⚠️ GDS/TDS counseling
+                </button>
+                <button 
+                  onClick={() => triggerAITool("follow_up", "status_update")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  🚀 File Milestone
+                </button>
+              </div>
+            )}
+
+            {activeTool === "partner_comm" && (
+              <div className="px-4 py-2 bg-[#121216]/60 border-b border-white/5 flex gap-2">
+                <span className="text-[10px] text-[#8e95a3] uppercase font-bold self-center mr-2">Partner Templates:</span>
+                <button 
+                  onClick={() => triggerAITool("partner_comm", "lender")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  🏢 Monoline Underwriter Pitch
+                </button>
+                <button 
+                  onClick={() => triggerAITool("partner_comm", "realtor")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  🤝 realtor update
+                </button>
+                <button 
+                  onClick={() => triggerAITool("partner_comm", "lawyer")}
+                  className="px-2.5 py-1 text-[10px] bg-[#1a1a24] hover:bg-[#1f1f2e] border border-white/5 text-white font-bold rounded"
+                >
+                  ⚖️ Solicitor Instructions
+                </button>
+              </div>
+            )}
+
+            {/* SPECIAL SCREEN: INTAKE INGESTION WORKSPACE */}
+            {activeTool === "intake_raw" && !aiOutput && !loading && (
+              <div className="p-5 flex-1 flex flex-col gap-4">
+                <div className="p-3.5 bg-[#b5a642]/5 border border-[#b5a642]/10 rounded-lg flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#b5a642] flex-shrink-0 mt-0.5" />
+                  <div className="text-[11px] leading-relaxed text-white/70">
+                    <span className="text-[#eeeef2] font-bold uppercase block mb-1">Raw website Application / Email-linked Ingestion</span>
+                    Paste unformatted email text, application form notes, or phone intake logs here. GBK AI will digest it into key parameters and output a tidy CRM lead dossier summary.
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col gap-2">
+                  <textarea
+                    rows={10}
+                    value={rawIntakeText}
+                    onChange={(e) => setRawIntakeText(e.target.value)}
+                    placeholder="Paste unformatted lead email, web form submission payload, or underwriter's manual intake text here..."
+                    className="w-full flex-grow bg-[#101014] border border-white/5 rounded-xl p-4 text-xs font-mono text-[#eeeef2] placeholder-white/20 focus:outline-none focus:border-[#b5a642]/50 focus:ring-1 focus:ring-[#b5a642]/30 min-h-[220px]"
+                  />
+                  
+                  <div className="flex items-center justify-between">
+                    <button 
+                      onClick={loadSampleIntake}
+                      className="px-3 py-1.5 text-[10px] bg-[#1b1b20] hover:bg-[#202028] border border-white/5 text-white/60 hover:text-white rounded transition"
+                    >
+                      💡 Load Sample Email Ingest
+                    </button>
+
+                    <button 
+                      onClick={() => triggerAITool("intake_raw", rawIntakeText)}
+                      disabled={!rawIntakeText.trim()}
+                      className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 fill-current" /> Parse Application Digest
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* GENERAL OUTPUT CANVAS (MARKDOWN FORMATTER / RAW TEXT AREA) */}
+            {(aiOutput || loading) && (
+              <div className="flex-grow p-5 overflow-y-auto max-h-[500px]">
+                
+                {loading ? (
+                  <div className="h-full flex flex-col items-center justify-center py-20 gap-4">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-full border border-t-[#b5a642] border-white/5 animate-spin"></div>
+                      <Sparkles className="w-5 h-5 text-[#b5a642] absolute inset-0 m-auto animate-pulse" />
+                    </div>
+                    <div className="space-y-1 text-center">
+                      <span className="text-xs font-black uppercase tracking-wider text-white block">Invoking AI Underwriting Agent</span>
+                      <span className="text-[10px] text-[#8e95a3] block font-mono animate-pulse">Consulting Canadian Monoline Ratios &amp; GDS/TDS Stress Test Guidelines...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Rendered Markdown blocks */}
+                    <div className="prose prose-invert max-w-none text-xs text-white/90 font-semibold leading-relaxed space-y-3 font-sans">
+                      {aiOutput.split("\n").map((line, idx) => {
+                        const trimmed = line.trim();
+                        if (trimmed.startsWith("### ")) {
+                          return <h4 key={idx} className="text-sm font-black text-[#b5a642] uppercase tracking-wider mt-4 border-b border-white/5 pb-1">{trimmed.replace("### ", "")}</h4>;
+                        }
+                        if (trimmed.startsWith("## ")) {
+                          return <h3 key={idx} className="text-base font-black text-[#b5a642] uppercase tracking-wide mt-5 border-b border-white/5 pb-1">{trimmed.replace("## ", "")}</h3>;
+                        }
+                        if (trimmed.startsWith("# ")) {
+                          return <h2 key={idx} className="text-lg font-black text-white uppercase tracking-widest mt-6 pb-2 border-b-2 border-[#b5a642]/30">{trimmed.replace("# ", "")}</h2>;
+                        }
+                        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                          return (
+                            <ul key={idx} className="list-disc list-inside ml-2 text-white/80 space-y-1">
+                              <li>{trimmed.substring(2)}</li>
+                            </ul>
+                          );
+                        }
+                        if (/^\d+\.\s/.test(trimmed)) {
+                          return (
+                            <ol key={idx} className="list-decimal list-inside ml-2 text-[#eeeef2] space-y-1">
+                              <li className="font-bold">{trimmed.replace(/^\d+\.\s/, "")}</li>
+                            </ol>
+                          );
+                        }
+                        if (trimmed === "") {
+                          return <div key={idx} className="h-2" />;
+                        }
+                        return <p key={idx} className="leading-relaxed text-white/80">{line}</p>;
+                      })}
+                    </div>
+
+                    {/* Extracted JSON Tasks list (ONLY FOR TASKS BUILDER KEY) */}
+                    {activeTool === "tasks" && extractedTasks.length > 0 && (
+                      <div className="mt-6 border-t border-white/5 pt-4 space-y-3">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
+                          <CheckSquare className="w-4 h-4 text-[#b5a642]" /> Extracted Actionable Items for CRM Checklist:
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {extractedTasks.map((t, idx) => (
+                            <div key={idx} className="bg-[#121216] border border-white/5 p-3 rounded-lg flex justify-between items-start gap-3">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-[8px] uppercase px-1.5 py-0.5 rounded font-black tracking-widest ${
+                                    t.priority === "high" 
+                                      ? "bg-rose-500/10 text-rose-400" 
+                                      : t.priority === "medium"
+                                      ? "bg-[#b5a642]/10 text-[#b5a642]"
+                                      : "bg-blue-500/10 text-blue-400"
+                                  }`}>
+                                    {t.priority}
+                                  </span>
+                                  <span className="text-xs font-bold text-white">{t.title}</span>
+                                </div>
+                                <p className="text-[10px] text-[#8e95a3] leading-relaxed">{t.notes}</p>
+                              </div>
+                              <button 
+                                onClick={() => handleAddExtractedTask(t.title, t.priority, t.notes)}
+                                className="p-1 bg-[#b5a642]/10 hover:bg-[#b5a642] text-[#b5a642] hover:text-black rounded transition flex-shrink-0"
+                                title="Add to CRM Task List"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* IF NO RESULT AND NOT LOADING, SHOW INTRO PANEL */}
+            {!aiOutput && !loading && activeTool !== "intake_raw" && (
+              <div className="flex-grow p-10 flex flex-col items-center justify-center text-center gap-6">
+                <div className="p-4 bg-[#1b1b20] border border-white/5 rounded-full text-white/30">
+                  <MessageSquare className="w-10 h-10 text-[#b5a642]" />
+                </div>
+                
+                <div className="space-y-2 max-w-md">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider">Workspace Canvas Empty</h4>
+                  <p className="text-xs text-[#8e95a3] leading-relaxed">
+                    Select a client on the left or paste raw text to run mortgage underwriting audits, list missing files, generate custom Monoline emails, or draft follow-up alerts.
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => triggerAITool("summary")}
+                    className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 fill-current" /> Auto-Summarize Active File
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* CANVAS BOTTOM CONTROL ACTION BAR */}
+            {aiOutput && !loading && (
+              <div className="p-3 border-t border-white/5 bg-[#121216] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-[10px] text-[#8e95a3] font-mono">
+                  ✦ Copilot version 3.5-flash | Output ready
+                </span>
+
+                <div className="flex items-center gap-2">
+                  {/* Copy to clipboard */}
+                  <button 
+                    onClick={handleCopyToClipboard}
+                    className="px-3 py-1.5 bg-[#1b1b20] hover:bg-[#202028] border border-white/5 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Clipboard className="w-3.5 h-3.5 text-white/60" />}
+                    {copied ? "Copied" : "Copy Output"}
+                  </button>
+
+                  {/* Save to internal client notes */}
+                  {currentClient && (
+                    <button 
+                      onClick={handleSaveToClientNotes}
+                      className="px-3 py-1.5 bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border border-[#b5a642]/20 text-[#b5a642] text-[11px] font-black rounded-lg transition flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Save to Notes
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* CUSTOM AD-HOC PROMPT COPILOT BOX */}
+          <div className="bg-[#141418] border border-white/5 rounded-xl p-4 shadow-lg space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Ask custom advisory question</h4>
+            
+            <div className="flex gap-2">
+              <input 
+                type="text"
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                placeholder="Ask about CMHC debt service limits, GDS/TDS calculators, or tell the AI to re-write output..."
+                onKeyDown={(e) => { if (e.key === "Enter") triggerAITool("custom"); }}
+                className="flex-grow bg-[#101014] border border-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642]/50"
+              />
+              <button 
+                onClick={() => triggerAITool("custom")}
+                disabled={loading || !aiInput.trim()}
+                className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
+              >
+                <Send className="w-3.5 h-3.5" /> Ask AI
+              </button>
+            </div>
+          </div>
+
+          {/* 4. RECENT INVOCATIONS HISTORY FOOTER */}
+          {history.length > 0 && (
+            <div className="bg-[#141418] border border-white/5 rounded-xl p-4 shadow-lg space-y-3">
+              <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                  <History className="w-3.5 h-3.5 text-[#b5a642]" /> Recent AI Invocations Log
+                </h4>
+                
+                <button 
+                  onClick={handleClearHistory}
+                  className="text-[9px] text-[#rose-400] hover:text-rose-400 uppercase font-bold flex items-center gap-1"
+                >
+                  <Trash2 className="w-3 h-3" /> Clear History
+                </button>
+              </div>
+
+              <div className="max-h-[140px] overflow-y-auto space-y-2 pr-1">
+                {history.map((h) => (
+                  <div 
+                    key={h.id} 
+                    className="p-2 bg-[#1b1b20]/50 hover:bg-[#1b1b20] border border-white/5 rounded-lg text-[10px] flex justify-between items-center gap-3 transition cursor-pointer"
+                    onClick={() => {
+                      setAiOutput(h.response);
+                      setActiveTool("custom");
+                      // Try to restore client
+                      const client = clients.find(c => c.id === h.clientId);
+                      if (client) setSelectedClientId(client.id);
+                      showToast(`Restored: ${h.toolName}`, "info");
+                    }}
+                  >
+                    <div className="space-y-0.5">
+                      <span className="font-bold text-[#eeeef2] block">{h.toolName}</span>
+                      <span className="text-[#8e95a3]">Client: {h.clientName} | {new Date(h.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <ArrowRight className="w-3 h-3 text-[#b5a642] opacity-60" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+};

@@ -15,6 +15,8 @@ interface ClientsListProps {
   viewMode: 'database' | 'pipeline';
   setViewMode: (mode: 'database' | 'pipeline') => void;
   agentNames: string[];
+  searchQuery?: string;
+  onSearchQueryChange?: (q: string) => void;
 }
 
 export const ClientsList: React.FC<ClientsListProps> = ({
@@ -26,11 +28,16 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   onOpenNewClientIntake,
   viewMode,
   setViewMode,
-  agentNames
+  agentNames,
+  searchQuery,
+  onSearchQueryChange
 }) => {
   const [dbFilter, setDbFilter] = useState<string>("all");
   const [agentFilter, setAgentFilter] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
+
+  const activeSearchQuery = searchQuery !== undefined ? searchQuery : localSearchQuery;
+  const handleSearchChange = onSearchQueryChange || setLocalSearchQuery;
 
   const pn = (s: any) => {
     if (!s) return 0;
@@ -68,8 +75,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
     if (agentFilter) {
       list = list.filter(c => c.agent === agentFilter);
     }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    if (activeSearchQuery.trim()) {
+      const q = activeSearchQuery.toLowerCase();
       list = list.filter(c => 
         (c.first + " " + c.last).toLowerCase().includes(q) ||
         (c.email || "").toLowerCase().includes(q) ||
@@ -109,7 +116,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             onClick={() => setViewMode("pipeline")}
             className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === "pipeline" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
           >
-            📊 KanBan stages
+            📊 Stages
           </button>
         </div>
 
@@ -120,8 +127,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             <input 
               type="text" 
               placeholder="Search by name, site, or lender…" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={activeSearchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="bg-transparent border-none text-xs text-[#eeeef2] focus:outline-none w-full"
             />
           </div>

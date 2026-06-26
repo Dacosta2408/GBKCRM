@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Sparkles, HelpCircle, AlertTriangle, Play, FileText, UploadCloud, 
-  CheckCircle2, X, AlertCircle, Plus, Info, ChevronRight, User, Users, 
-  MapPin, Briefcase, DollarSign, Building, Percent, FileCheck, ArrowRight, 
-  ClipboardList, Check, RefreshCw, AlertCircle as WarningIcon
+  Sparkles, FileText, UploadCloud, CheckCircle2, X, AlertCircle, Plus, Info, 
+  ChevronRight, User, Users, MapPin, Briefcase, DollarSign, Building, Percent, 
+  FileCheck, ArrowRight, ClipboardList, Check, RefreshCw, HardDrive, AlertTriangle
 } from "lucide-react";
 import { Client, User as CRMUser } from "../types";
 
 interface ApplicationIntakeProps {
+  mode: "manual" | "ai";
+  preloadedText?: string;
+  preloadedFileName?: string;
+  onClearPreloaded?: () => void;
   currentUser: CRMUser;
   clients: Client[];
   onClose: () => void;
@@ -24,6 +27,10 @@ interface ApplicationIntakeProps {
 }
 
 export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
+  mode,
+  preloadedText = "",
+  preloadedFileName = "",
+  onClearPreloaded,
   currentUser,
   clients,
   onClose,
@@ -34,31 +41,39 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 }) => {
   // --- WORKFLOW PROCESS STEPPER ---
   type WorkflowStepType = "upload" | "review" | "finalize";
-  const [workflowStep, setWorkflowStep] = useState<WorkflowStepType>("upload");
+  const [workflowStep, setWorkflowStep] = useState<WorkflowStepType>(
+    mode === "manual" ? "review" : "upload"
+  );
 
   // --- REVIEW TABS ---
-  type TabType = "applicant" | "co-applicant" | "contact" | "address" | "employment" | "otherIncome" | "property" | "mortgage";
-  const [activeTab, setActiveTab] = useState<TabType>("applicant");
+  type TabType = "personal" | "address" | "employment" | "otherIncome" | "property" | "mortgage" | "submit";
+  const [activeTab, setActiveTab] = useState<TabType>("personal");
 
   // --- EXTRACTION STATES ---
   const [isLoading, setIsLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [fileBase64, setFileBase64] = useState<string | null>(null);
+  const [rawText, setRawText] = useState(preloadedText);
+  const [fileName, setFileName] = useState(preloadedFileName);
+  const [fileSize, setFileSize] = useState(preloadedFileName ? "18 KB" : "");
   const [isDragActive, setIsDragActive] = useState(false);
   
   // Track fields and metadata
   const [fields, setFields] = useState<Record<string, string>>({});
-  const [confidenceScores, setConfidenceScores] = useState<Record<string, 'high' | 'unclear' | 'missing' | 'confirmed'>>({});
   const [intakeNotes, setIntakeNotes] = useState<string>("");
 
-  // Source metadata
-  const [uploadTime, setUploadTime] = useState<string>("");
-  const [fileName, setFileName] = useState<string>("");
-  const [fileSize, setFileSize] = useState<string>("");
-
   // Target Agent & Selected Target Status
-  const [assignedAgent, setAssignedAgent] = useState<string>(currentUser.first + " " + currentUser.last);
+  const [assignedAgent, setAssignedAgent] = useState<string>("");
   const [intakeStatus, setIntakeStatus] = useState<'working' | 'lead'>('working');
+
+  // Load preloaded text from Z-Drive or anywhere
+  useEffect(() => {
+    if (preloadedText) {
+      setRawText(preloadedText);
+    }
+    if (preloadedFileName) {
+      setFileName(preloadedFileName);
+      setFileSize("18 KB");
+    }
+  }, [preloadedText, preloadedFileName]);
 
   // Set default assigned agent on mount
   useEffect(() => {
@@ -67,11 +82,21 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
     }
   }, [currentUser]);
 
-  // --- SAMPLES PAYLOAD FOR EVALUATION AND DEMO ---
+  const handleFieldChange = (key: string, value: string) => {
+    setFields(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handlePillSelect = (key: string, value: string) => {
+    setFields(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleCheckboxToggle = (key: string) => {
+    setFields(prev => ({ ...prev, [key]: prev[key] === "1" ? "" : "1" }));
+  };
+
+  // --- SAMPLES PAYLOAD FOR DEMO ---
   const handleLoadSample = (sampleType: 'barrie' | 'newmarket') => {
     setIsLoading(true);
-    setUploadTime(new Date().toLocaleString());
-    
     setTimeout(() => {
       let samplePayload: Record<string, string> = {};
       let originalFileName = "";
@@ -94,20 +119,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           app_contact: "Email",
           app_dependents: "1",
           
-          // Co-Applicant Personal (empty)
-          co_first: "",
-          co_last: "",
-          co_email: "",
-          co_cell: "",
-          co_dob_m: "",
-          co_dob_d: "",
-          co_dob_y: "",
-          co_marital: "",
-          co_sin: "",
-          co_contact: "",
-          co_dependents: "0",
-
-          // Applicant Address (Rent 2 yrs 6 mos, has previous)
+          // Applicant Address
           app_housing: "Rent",
           app_addr: "182 Bayfield Street",
           app_unit: "Apt 4B",
@@ -116,21 +128,11 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           app_post: "L4M 3B5",
           app_res_yrs: "2",
           app_res_mos: "6",
-
-          // Previous Address
-          app_prev_addr: "450 Yonge Street",
-          app_prev_unit: "",
-          app_prev_city: "Toronto",
-          app_prev_prov: "ON",
-          app_prev_post: "M4Y 1W9",
-          app_prev_yrs: "4",
-          app_prev_mos: "0",
-
+          
           // Applicant Employment
           app_inc_employed: "1",
           app_emp1_name: "Royal Victoria Regional Health Centre",
           app_emp1_addr: "201 Georgian Dr",
-          app_emp1_unit: "Dept of Cardiology",
           app_emp1_city: "Barrie",
           app_emp1_prov: "ON",
           app_emp1_post: "L4M 6M2",
@@ -138,7 +140,6 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           app_emp1_status: "Full Time",
           app_emp1_yrs: "5",
           app_emp1_mos: "2",
-          app_emp1_contract: "",
           app_emp1_title: "Senior Registered Nurse",
           app_emp1_type: "Salary",
           app_emp1_income: "98500",
@@ -151,245 +152,221 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           prop_area: "2100",
           prop_area_unit: "Sq Ft",
           prop_lot: "50",
-          prop_lot_unit: "Acres",
+          prop_lot_unit: "Sq Ft",
           prop_garage_type: "Attached",
           prop_garage_size: "Double",
           prop_heat: "Forced Air Gas",
           prop_water: "Municipal",
           prop_sewage: "Municipal",
           prop_hotwater: "Gas",
-          prop_value: "640000",
-          prop_orig_price: "0",
-          prop_purchase_date: "",
+          prop_value: "620000",
+          prop_orig_price: "410000",
+          prop_purchase_date: "05/12/2019",
           prop_tax_in_mtg: "No",
-          prop_tax: "4200",
+          prop_tax: "3800",
           prop_condo_fees: "0",
 
-          // Mortgage Details
-          mtg1_balance: "0",
-          mtg1_payment: "0",
+          // First Mortgage
+          mtg1_balance: "395000",
+          mtg1_payment: "2450",
           mtg1_freq: "Monthly",
-          mtg1_maturity: "",
+          mtg1_maturity: "10/15/2027",
           mtg1_rate: "4.89",
           mtg1_rate_type: "Fixed",
           mtg1_term_type: "Closed",
-          mtg1_holder: "Scotiabank",
+          mtg1_holder: "TD Bank",
           mtg1_loan_type: "Mortgage",
-          mtg1_orig_amount: "512000",
-          mtg1_number: "",
+          mtg1_orig_amount: "430000",
+          mtg1_number: "TD-4882195",
         };
       } else {
-        originalFileName = "John_Maria_Miller_Newmarket_Refinance.pdf";
-        originalSize = "512 KB";
+        originalFileName = "Michael_Sutton_Newmarket_BFS_Refi.pdf";
+        originalSize = "412 KB";
         samplePayload = {
           // Applicant Personal
-          app_first: "John",
-          app_last: "Miller",
-          app_email: "john.miller@gmail.com",
-          app_cell: "(905) 555-8914",
+          app_first: "Michael",
+          app_last: "Sutton",
+          app_email: "sutton.m@suttonconsulting.ca",
+          app_cell: "(905) 555-8833",
           app_dob_m: "11",
           app_dob_d: "03",
-          app_dob_y: "1975",
+          app_dob_y: "1974",
           app_marital: "Married",
-          app_sin: "402-991-384",
+          app_sin: "400-928-111",
           app_contact: "Phone",
           app_dependents: "2",
 
           // Co-Applicant Personal
-          co_first: "Maria",
-          co_last: "Miller",
-          co_email: "maria.miller@gmail.com",
-          co_cell: "(905) 555-8915",
+          co_first: "Sarah",
+          co_last: "Sutton",
+          co_email: "sarah.sutton@email.com",
+          co_cell: "(905) 555-8834",
           co_dob_m: "04",
           co_dob_d: "25",
-          co_dob_y: "1978",
+          co_dob_y: "1977",
           co_marital: "Married",
-          co_sin: "402-991-881",
+          co_sin: "400-928-112",
           co_contact: "Email",
           co_dependents: "2",
 
-          // Address History
+          // Applicant Address (Owns, no previous)
           app_housing: "Own",
-          app_addr: "74 Laurel Creek Drive",
+          app_addr: "82 Eagle Street",
           app_unit: "",
           app_city: "Newmarket",
           app_prov: "ON",
-          app_post: "L3Y 8K1",
-          app_res_yrs: "6",
-          app_res_mos: "4",
+          app_post: "L3Y 1J4",
+          app_res_yrs: "8",
+          app_res_mos: "0",
 
-          co_housing: "Own",
-          co_addr: "74 Laurel Creek Drive",
-          co_unit: "",
-          co_city: "Newmarket",
-          co_prov: "ON",
-          co_post: "L3Y 8K1",
-          co_res_yrs: "6",
-          co_res_mos: "4",
-
-          // Applicant Employment (Self employed)
+          // Applicant Employment
           app_inc_self: "1",
-          app_self_name: "Miller Craft Carpentry Ltd",
-          app_self_addr: "74 Laurel Creek Drive",
-          app_self_unit: "Unit B",
-          app_self_city: "Newmarket",
-          app_self_prov: "ON",
-          app_self_post: "L3Y 8K1",
-          app_self_tel: "(905) 555-4422",
-          app_self_yrs: "10",
-          app_self_start: "06/2016",
-          app_self_income: "84000",
+          app_self_name: "Sutton Consulting Inc.",
+          app_self_yrs: "6",
+          app_self_start: "02/2020",
+          app_self_income: "142000",
 
-          // Co Applicant Employment (Salaried)
+          // Co-Applicant Employment
           co_inc_employed: "1",
           co_emp1_name: "York Region District School Board",
-          co_emp1_addr: "60 Wellington St W",
           co_emp1_city: "Aurora",
           co_emp1_prov: "ON",
-          co_emp1_post: "L4G 3H2",
-          co_emp1_tel: "(905) 727-3141",
           co_emp1_status: "Full Time",
-          co_emp1_yrs: "8",
-          co_emp1_mos: "6",
-          co_emp1_title: "Elementary School Teacher",
+          co_emp1_yrs: "11",
+          co_emp1_mos: "4",
+          co_emp1_title: "Secondary School Teacher",
           co_emp1_type: "Salary",
-          co_emp1_income: "72500",
+          co_emp1_income: "92000",
 
-          // Other income
-          co_other0_pension: "",
-          co_other0_child: "",
-          co_other0_rental: "Rental Income",
-          co_other0_other: "",
-          co_other0_specify: "Basement Suite rent",
-          co_other0_amount: "1500",
-          co_other0_freq: "Monthly",
-
-          // Property details
-          prop_type: "Semi-Detached",
-          prop_style: "Split Level",
+          // Property Details
+          prop_type: "Detached",
+          prop_style: "Two Storey",
           prop_tenure: "Freehold",
           prop_age: "24",
-          prop_area: "1750",
+          prop_area: "2800",
           prop_area_unit: "Sq Ft",
-          prop_lot: "30",
+          prop_lot: "60",
           prop_lot_unit: "Sq Ft",
           prop_garage_type: "Attached",
-          prop_garage_size: "Single",
+          prop_garage_size: "Double",
           prop_heat: "Forced Air Gas",
           prop_water: "Municipal",
           prop_sewage: "Municipal",
           prop_hotwater: "Gas",
-          prop_value: "820000",
-          prop_orig_price: "410000",
-          prop_purchase_date: "04/12/2018",
-          prop_tax_in_mtg: "Yes",
-          prop_tax: "4500",
+          prop_value: "1150000",
+          prop_orig_price: "680000",
+          prop_purchase_date: "08/14/2016",
+          prop_tax_in_mtg: "No",
+          prop_tax: "5200",
           prop_condo_fees: "0",
 
-          // Mortgage 1
-          mtg1_balance: "318000",
-          mtg1_payment: "1890",
+          // First Mortgage
+          mtg1_balance: "510000",
+          mtg1_payment: "3100",
           mtg1_freq: "Monthly",
-          mtg1_maturity: "10/14/2026",
-          mtg1_rate: "3.24",
+          mtg1_maturity: "04/30/2028",
+          mtg1_rate: "5.19",
           mtg1_rate_type: "Fixed",
           mtg1_term_type: "Closed",
-          mtg1_holder: "TD Canada Trust",
+          mtg1_holder: "Scotiabank",
           mtg1_loan_type: "Mortgage",
-          mtg1_orig_amount: "450000",
-          mtg1_number: "TD-4882195",
+          mtg1_orig_amount: "550000",
+          mtg1_number: "SCO-9921445",
         };
       }
 
       setFileName(originalFileName);
       setFileSize(originalSize);
       setFields(samplePayload);
-      
-      // Auto assign confidence indicators
-      const newConfidence: Record<string, 'high' | 'unclear' | 'missing' | 'confirmed'> = {};
-      Object.keys(samplePayload).forEach(key => {
-        if (!samplePayload[key]) {
-          newConfidence[key] = 'missing';
-        } else if (key.includes("sin") || key.includes("dob") || key.includes("email") || key.includes("cell")) {
-          newConfidence[key] = 'unclear'; // flags SIN, DOB, Email, or Cell for audit confirmation
-        } else {
-          newConfidence[key] = 'high';
-        }
-      });
-      setConfidenceScores(newConfidence);
-      setIntakeNotes("AI successfully matched and pre-aligned values from the official application. Discovered a co-applicant presence in Sample B; calculated debt ratios GDS/TDS dynamically.");
-      
+      setIntakeNotes("AI successfully matched and pre-aligned values from the official application email file format.");
       setIsLoading(false);
       setWorkflowStep("review");
       showToast(`Sample application parsed and extracted successfully!`, "success", "✨");
-    }, 1200);
+    }, 1000);
   };
 
-  // --- REAL PDF PARSER VIA GEMINI ON SERVER ---
-  const handleRealPdfUpload = async (uploadedFile: File) => {
+  // --- REAL PARSER VIA GEMINI ON SERVER ---
+  const handleExtractWithAI = async () => {
+    if (!rawText.trim()) {
+      showToast("Please enter or paste application text before extracting.", "warning");
+      return;
+    }
+
     setIsLoading(true);
-    setFile(uploadedFile);
-    setFileName(uploadedFile.name);
-    setFileSize(`${Math.round(uploadedFile.size / 1024)} KB`);
-    setUploadTime(new Date().toLocaleString());
 
     try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(uploadedFile);
-      reader.onload = async () => {
-        const base64WithHeader = reader.result as string;
-        const base64String = base64WithHeader.split(',')[1];
-        setFileBase64(base64String);
+      if (!apiKeySet) {
+        showToast("Gemini API key is not configured, falling back to simulated extraction...", "warning", "⚙️");
+        handleLoadSample('barrie');
+        return;
+      }
 
-        if (!apiKeySet) {
-          // If no Gemini key is set, show warning and fallback to simulated extraction
-          showToast("Gemini key is missing, simulating intelligent extraction...", "warning", "⚙️");
-          handleLoadSample('barrie');
-          return;
+      const res = await fetch("/api/ai/intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: rawText }) 
+      });
+
+      if (!res.ok) throw new Error("Server extraction failed");
+      const data = await res.json();
+      
+      // Map extracted values
+      const rawFields: Record<string, string> = {};
+      Object.entries(data).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) {
+          rawFields[k] = String(v);
         }
+      });
 
-        try {
-          const res = await fetch("/api/ai/intake", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: `[Simulated Extraction of PDF file: ${uploadedFile.name}]` }) 
-          });
-
-          if (!res.ok) throw new Error("Server extraction failed");
-          const data = await res.json();
-          
-          // Map extracted values
-          const rawFields: Record<string, string> = {};
-          Object.entries(data).forEach(([k, v]) => {
-            if (v !== null && v !== undefined) rawFields[k] = String(v);
-          });
-          
-          setFields(rawFields);
-          
-          // Build confidence states
-          const newConf: Record<string, 'high' | 'unclear' | 'missing' | 'confirmed'> = {};
-          Object.keys(rawFields).forEach(key => {
-            newConf[key] = rawFields[key] ? 'high' : 'missing';
-            if (key.includes("sin") || key.includes("dob")) {
-              newConf[key] = 'unclear';
-            }
-          });
-          setConfidenceScores(newConf);
-          setIntakeNotes(`Successfully extracted parameters from ${uploadedFile.name} using Gemini Pro.`);
-          setWorkflowStep("review");
-          showToast("PDF extracted with AI successfully!", "success", "✓");
-        } catch (err: any) {
-          console.error(err);
-          // Fallback
-          handleLoadSample('barrie');
-        } finally {
-          setIsLoading(false);
+      // Special helper for dates (e.g., birthdate splits "1988-08-14")
+      if (rawFields.app_dob && rawFields.app_dob.includes("-")) {
+        const parts = rawFields.app_dob.split("-");
+        if (parts.length === 3) {
+          rawFields.app_dob_y = parts[0];
+          rawFields.app_dob_m = parts[1];
+          rawFields.app_dob_d = parts[2];
         }
-      };
+      }
+      if (rawFields.co_dob && rawFields.co_dob.includes("-")) {
+        const parts = rawFields.co_dob.split("-");
+        if (parts.length === 3) {
+          rawFields.co_dob_y = parts[0];
+          rawFields.co_dob_m = parts[1];
+          rawFields.co_dob_d = parts[2];
+        }
+      }
+
+      // Map primary address and property values
+      if (rawFields.prop_addr) {
+        rawFields.app_addr = rawFields.prop_addr;
+      }
+
+      setFields(rawFields);
+      setIntakeNotes(`Successfully extracted parameters using Gemini 3.5 Flash.`);
+      setWorkflowStep("review");
+      showToast("Application parsed with Gemini AI successfully!", "success", "✓");
     } catch (err: any) {
-      showToast("Failed to process file.", "error");
+      console.error(err);
+      showToast("Failed to parse application text. Falling back to sample Barrie data...", "error");
+      handleLoadSample('barrie');
+    } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const uFile = e.target.files[0];
+      setFileName(uFile.name);
+      setFileSize(`${Math.round(uFile.size / 1024)} KB`);
+      
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const textContent = evt.target?.result as string;
+        setRawText(textContent || "");
+        showToast(`Loaded ${uFile.name}. Click 'Extract with AI' to parse.`, "info");
+      };
+      reader.readAsText(uFile);
     }
   };
 
@@ -408,1596 +385,1058 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
     e.stopPropagation();
     setIsDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      handleRealPdfUpload(droppedFile);
-    }
-  };
-
-  const handleFieldChange = (key: string, value: string) => {
-    setFields(prev => ({ ...prev, [key]: value }));
-    setConfidenceScores(prev => ({ ...prev, [key]: 'confirmed' }));
-  };
-
-  const toggleConfidence = (key: string) => {
-    setConfidenceScores(prev => {
-      const current = prev[key] || 'high';
-      const next: 'high' | 'unclear' | 'missing' | 'confirmed' = 
-        current === 'high' ? 'unclear' : 
-        current === 'unclear' ? 'confirmed' : 'high';
-      return { ...prev, [key]: next };
-    });
-  };
-
-  // Helper to verify all fields in the active tab at once (AI Quality Assistant Helper!)
-  const handleVerifyActiveTabFields = () => {
-    const keysForTab = getKeysForTab(activeTab);
-    setConfidenceScores(prev => {
-      const updated = { ...prev };
-      keysForTab.forEach(k => {
-        if (fields[k] && updated[k] !== 'confirmed') {
-          updated[k] = 'confirmed';
-        }
-      });
-      return updated;
-    });
-    showToast(`All extracted values in the ${activeTab} section verified successfully!`, "success", "✓");
-  };
-
-  // Helper to retrieve the list of state keys associated with a tab
-  const getKeysForTab = (tab: TabType): string[] => {
-    switch (tab) {
-      case "applicant":
-        return ["app_first", "app_last", "app_dob_m", "app_dob_d", "app_dob_y", "app_marital", "app_sin", "app_dependents"];
-      case "co-applicant":
-        return ["co_first", "co_last", "co_dob_m", "co_dob_d", "co_dob_y", "co_marital", "co_sin", "co_dependents"];
-      case "contact":
-        return ["app_email", "app_cell", "app_home", "app_work", "app_contact", "co_email", "co_cell", "co_home", "co_work", "co_contact"];
-      case "address":
-        return [
-          "app_housing", "app_addr", "app_unit", "app_city", "app_prov", "app_post", "app_res_yrs", "app_res_mos",
-          "app_prev_addr", "app_prev_unit", "app_prev_city", "app_prev_prov", "app_prev_post", "app_prev_yrs", "app_prev_mos",
-          "co_housing", "co_addr", "co_unit", "co_city", "co_prov", "co_post", "co_res_yrs", "co_res_mos"
-        ];
-      case "employment":
-        return [
-          "app_inc_employed", "app_emp1_name", "app_emp1_title", "app_emp1_city", "app_emp1_prov", "app_emp1_tel", "app_emp1_status", "app_emp1_type", "app_emp1_income", "app_emp1_yrs", "app_emp1_mos", "app_emp1_contract",
-          "app_inc_twojobs", "app_emp2_name", "app_emp2_income",
-          "app_inc_self", "app_self_name", "app_self_income", "app_self_yrs", "app_self_start", "app_self_tel",
-          "app_prev_emp_name", "app_prev_emp_income", "app_prev_emp_yrs",
-          "co_inc_employed", "co_emp1_name", "co_emp1_title", "co_emp1_status", "co_emp1_type", "co_emp1_income", "co_emp1_yrs", "co_emp1_mos",
-          "co_inc_self", "co_self_name", "co_self_income", "co_self_yrs", "co_self_start"
-        ];
-      case "otherIncome":
-        return ["app_other0_specify", "app_other0_amount", "app_other0_freq", "app_other1_specify", "app_other1_amount", "app_other1_freq", "co_other0_specify", "co_other0_amount", "co_other0_freq", "co_other1_specify", "co_other1_amount", "co_other1_freq"];
-      case "property":
-        return ["prop_type", "prop_style", "prop_tenure", "prop_age", "prop_area", "prop_area_unit", "prop_garage_type", "prop_garage_size", "prop_heat", "prop_water", "prop_sewage", "prop_addr", "prop_value", "prop_orig_price", "prop_purchase_date", "prop_tax_in_mtg", "prop_tax", "prop_condo_fees"];
-      case "mortgage":
-        return ["mtg1_balance", "mtg1_payment", "mtg1_freq", "mtg1_maturity", "mtg1_rate", "mtg1_rate_type", "mtg1_term_type", "mtg1_holder", "mtg1_loan_type", "mtg1_orig_amount", "mtg1_number", "mtg2_balance", "mtg2_payment", "mtg2_freq", "mtg2_maturity", "mtg2_rate", "mtg2_rate_type", "mtg2_term_type", "mtg2_holder", "mtg2_loan_type", "mtg2_orig_amount", "mtg2_number", "mtg2_purpose"];
-      default:
-        return [];
-    }
-  };
-
-  // Helper to count issues (missing/unclear) per tab for status dots
-  const getTabStatusIcon = (tab: TabType) => {
-    const keys = getKeysForTab(tab);
-    let missingCount = 0;
-    let unclearCount = 0;
-    
-    keys.forEach(k => {
-      const status = confidenceScores[k];
-      if (status === 'missing' && !fields[k]) {
-        // Only count missing if it is a major expected field
-        const criticalFields = ["app_first", "app_last", "app_email", "app_cell", "app_dob_y", "app_addr", "prop_value"];
-        if (criticalFields.includes(k)) missingCount++;
-      } else if (status === 'unclear') {
-        unclearCount++;
-      }
-    });
-
-    if (missingCount > 0) {
-      return <span className="w-2 h-2 rounded-full bg-red-500 block shrink-0" title={`${missingCount} missing required field(s)`} />;
-    }
-    if (unclearCount > 0) {
-      return <span className="w-2 h-2 rounded-full bg-amber-500 block shrink-0 animate-pulse" title={`${unclearCount} field(s) need confirmation`} />;
-    }
-    return <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />;
-  };
-
-  // --- DUPLICATE DETECTION AND SIDE-BY-SIDE INTERACTIVE VIEWER ---
-  const detectDuplicates = () => {
-    const matches: Array<{ client: Client; matchedFields: string[]; reason: string }> = [];
-    const appFirst = (fields.app_first || "").trim().toLowerCase();
-    const appLast = (fields.app_last || "").trim().toLowerCase();
-    const email = (fields.app_email || "").trim().toLowerCase();
-    const phone = (fields.app_cell || "").replace(/\D/g, "");
-
-    clients.forEach(c => {
-      const cFirst = (c.first || "").trim().toLowerCase();
-      const cLast = (c.last || "").trim().toLowerCase();
-      const cEmail = (c.email || "").trim().toLowerCase();
-      const cPhone = (c.cell || "").replace(/\D/g, "");
+      const uFile = e.dataTransfer.files[0];
+      setFileName(uFile.name);
+      setFileSize(`${Math.round(uFile.size / 1024)} KB`);
       
-      const matchedFields: string[] = [];
-      let reason = "";
-
-      if (appFirst && appLast && cFirst === appFirst && cLast === appLast) {
-        matchedFields.push("Name");
-        reason = "First & last name match.";
-      }
-      if (email && cEmail === email) {
-        matchedFields.push("Email");
-        reason = matchedFields.length > 0 ? "First/Last & Email match exactly." : "Email address matches exactly.";
-      }
-      if (phone && cPhone && cPhone === phone) {
-        matchedFields.push("Cell Phone");
-        reason = matchedFields.length > 0 ? "Multiple matches (Name/Email/Phone)." : "Cellular phone matches exactly.";
-      }
-
-      if (matchedFields.length > 0) {
-        matches.push({ client: c, matchedFields, reason });
-      }
-    });
-
-    return matches;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const textContent = evt.target?.result as string;
+        setRawText(textContent || "");
+        showToast(`Dropped ${uFile.name}. Click 'Extract with AI' to parse.`, "info");
+      };
+      reader.readAsText(uFile);
+    }
   };
 
-  const duplicates = detectDuplicates();
+  // --- SUBMIT COMPILATION ---
+  const handleCommissionFile = () => {
+    // Validate primary applicant names & email
+    const first = fields.app_first?.trim();
+    const last = fields.app_last?.trim();
+    const email = fields.app_email?.trim();
 
-  // --- MISSING INFORMATION AUDIT ---
-  const auditMissingInformation = () => {
-    const issues: string[] = [];
-    if (!fields.app_first || !fields.app_last) issues.push("Applicant full name is missing.");
-    if (!fields.app_email) issues.push("Applicant email is missing.");
-    if (!fields.app_cell) issues.push("Applicant cell phone is missing.");
-    if (!fields.app_dob_y) issues.push("Applicant Date of Birth year is missing.");
-    if (!fields.app_addr) issues.push("Applicant current street address is missing.");
-    if (fields.app_res_yrs && Number(fields.app_res_yrs) < 3 && !fields.app_prev_addr) {
-      issues.push("Years at current residency is less than 3, but no previous address is supplied.");
+    if (!first || !last) {
+      showToast("First name and last name are required under Personal tab.", "error");
+      setActiveTab("personal");
+      return;
     }
-    if (fields.app_inc_employed === "1" && !fields.app_emp1_name) issues.push("Primary employer name is missing.");
-    if (fields.app_inc_self === "1" && !fields.app_self_name) issues.push("Self-employment company registry name is missing.");
-    if (!fields.prop_value || Number(fields.prop_value) === 0) issues.push("Property estimated valuation is missing.");
-    if (!fields.mtg1_orig_amount && !fields.mtg1_balance) issues.push("Mortgage financing parameters or request amounts are empty.");
-    
-    return issues;
-  };
-
-  const missingInfoList = auditMissingInformation();
-
-  // --- LIKELY REQUIRED DOCUMENTS list generator (feeds document module!) ---
-  const generateSuggestedDocumentsList = () => {
-    const list: Array<{ id: string; name: string; desc: string; category: string }> = [];
-    
-    list.push({
-      id: "photo_id",
-      name: "Govt Photo ID (Driver's / Passport)",
-      desc: "Primary government-issued photo ID required for AML checks and KYC verification.",
-      category: "Identification"
-    });
-
-    if (fields.co_first) {
-      list.push({
-        id: "co_photo_id",
-        name: "Co-Applicant Govt Photo ID",
-        desc: "Primary photo identification for the co-borrower/joint applicant.",
-        category: "Identification"
-      });
-    }
-
-    if (fields.app_inc_employed === "1") {
-      list.push({
-        id: "paystubs",
-        name: "Stated Job Pay Stubs (last 3)",
-        desc: "Recent 3 consecutive stubs displaying year-to-date (YTD) values and tax deductions.",
-        category: "Income"
-      });
-      list.push({
-        id: "employment_letter",
-        name: "Letter of Employment (Signed/Dated)",
-        desc: "HR letter on company letterhead stating job title, hire date, salary, and guarantee of hours.",
-        category: "Employment"
-      });
-    }
-
-    if (fields.app_inc_self === "1" || fields.co_inc_self === "1") {
-      list.push({
-        id: "business_license",
-        name: "Business License / Articles of Incorporation",
-        desc: "Articles or active business license confirming active company registry and registration tenure.",
-        category: "Employment"
-      });
-      list.push({
-        id: "noa",
-        name: "Notice of Assessment (last 2 years)",
-        desc: "Notice of Assessment statements for the last 2 tax years confirming declared line 15000 and zero tax arrears.",
-        category: "Tax documents"
-      });
-    }
-
-    list.push({
-      id: "bank_statements",
-      name: "90-Day Bank statements ledger",
-      desc: "Unedited 90-day statements tracing down payment source accounts and ruling out unexplained cash deposits.",
-      category: "Banking"
-    });
-
-    list.push({
-      id: "void_cheque",
-      name: "PAD Void Cheque",
-      desc: "Void check or direct deposit PAD form for setting up automated monthly mortgage payment withdrawals.",
-      category: "Banking"
-    });
-
-    const isPurchase = !fields.mtg1_balance || Number(fields.mtg1_balance) === 0;
-    if (isPurchase) {
-      list.push({
-        id: "aps",
-        name: "Agreement of Purchase & Sale (APS)",
-        desc: "Fully executed property purchase contract with all pages and schedules.",
-        category: "Property"
-      });
-    } else {
-      list.push({
-        id: "mortgage_statement",
-        name: "Existing Mortgage Statement",
-        desc: "Most recent annual mortgage statement. Required to verify outstanding balance, interest rate, maturity date, and lender reference.",
-        category: "Mortgage statements"
-      });
-      list.push({
-        id: "property_tax",
-        name: "Recent Property Tax Bill",
-        desc: "Recent property tax statement verifying annual municipal charges and confirming no arrears are outstanding on title.",
-        category: "Tax documents"
-      });
-    }
-
-    return list;
-  };
-
-  const suggestedDocs = generateSuggestedDocumentsList();
-
-  // --- CHECKLIST STARTER LOGIC TASKS generator ---
-  const generateStarterTasksList = () => {
-    const tasksList: Array<{ title: string; priority: 'high' | 'medium' | 'low'; notes: string }> = [];
-
-    // Check critical missing fields
-    if (!fields.app_first || !fields.app_last) {
-      tasksList.push({
-        title: "Request Client Full Name",
-        priority: "high",
-        notes: "The intake form has missing or partial applicant names. Request valid identification to update."
-      });
-    }
-    if (!fields.app_email) {
-      tasksList.push({
-        title: "Request Applicant Email Address",
-        priority: "high",
-        notes: "Primary applicant email is missing. Obtain email address to grant portal access."
-      });
-    }
-    if (!fields.app_cell) {
-      tasksList.push({
-        title: "Request Applicant Cell Phone",
-        priority: "high",
-        notes: "Cell phone number is missing. Essential for SMS MFA and underwriting updates."
-      });
-    }
-    if (!fields.app_dob_y) {
-      tasksList.push({
-        title: "Verify Applicant Date of Birth",
-        priority: "medium",
-        notes: "Verify birth date for credit bureau verification."
-      });
-    }
-    if (!fields.app_addr) {
-      tasksList.push({
-        title: "Request 3-Year Residency History",
-        priority: "medium",
-        notes: "Current street address is missing or partial. Resubmit to broker guidelines."
-      });
-    } else if (fields.app_res_yrs && Number(fields.app_res_yrs) < 3 && !fields.app_prev_addr) {
-      tasksList.push({
-        title: "Gather 3-Year Previous Address History",
-        priority: "high",
-        notes: "Current residency tenure is less than 3 years. Gather previous address to complete historical credit requirements."
-      });
-    }
-
-    // Check employment issues
-    if (fields.app_inc_employed === "1" && !fields.app_emp1_name) {
-      tasksList.push({
-        title: "Obtain Primary Employer Name",
-        priority: "medium",
-        notes: "Applicant is salaried but employer name is empty. Verify employment record."
-      });
-    }
-    if (fields.app_inc_self === "1" && !fields.app_self_name) {
-      tasksList.push({
-        title: "Verify Business Registration Details",
-        priority: "medium",
-        notes: "Applicant is self-employed but company name is missing. Run corporate registry search."
-      });
-    }
-
-    // Financial details
-    if (!fields.prop_value || Number(fields.prop_value) === 0) {
-      tasksList.push({
-        title: "Confirm Subject Property Value",
-        priority: "medium",
-        notes: "Estimated property value is empty. Request recent appraisal or search MLS records."
-      });
-    }
-    if (!fields.mtg1_orig_amount && !fields.mtg1_balance) {
-      tasksList.push({
-        title: "Request Requested Mortgage Financing Parameters",
-        priority: "high",
-        notes: "No active mortgage details or request amount was extracted from the application."
-      });
-    }
-
-    // Always add standard setup tasks
-    tasksList.push({
-      title: "Run Initial Bureau Credit Pull (Equifax/TransUnion)",
-      priority: "high",
-      notes: "Pull initial credit file for principal and joint applicants to verify Beacon scores."
-    });
-
-    tasksList.push({
-      title: "Cross-Reference Extracted Fields with Signed Form PDF",
-      priority: "low",
-      notes: "Audit the AI extraction mappings against the original PDF attachment to verify all values."
-    });
-
-    return tasksList;
-  };
-
-  const starterTasks = generateStarterTasksList();
-
-  // --- SUBMIT COMPLETED CLIENT TO CRM ---
-  const handleFinalApprove = (action: 'create' | 'merge') => {
-    if (!fields.app_first || !fields.app_last) {
-      showToast("First Name and Last Name are required to confirm client intake.", "error", "⚠️");
+    if (!email || !email.includes("@")) {
+      showToast("A valid email is required under Personal tab.", "error");
+      setActiveTab("personal");
       return;
     }
 
-    const first = fields.app_first;
-    const last = fields.app_last;
-    const email = fields.app_email || `${first.toLowerCase()}.${last.toLowerCase()}@example.com`;
-    const isPurchase = !fields.mtg1_balance || Number(fields.mtg1_balance) === 0;
-    
+    // Map fields into Client structure
+    const dobString = fields.app_dob_y && fields.app_dob_m && fields.app_dob_d 
+      ? `${fields.app_dob_y}-${fields.app_dob_m}-${fields.app_dob_d}` 
+      : "";
+
     const finalClient: Client = {
-      id: action === 'merge' && duplicates[0] ? duplicates[0].client.id : "c_" + Date.now(),
+      id: "cli_" + Math.random().toString(36).substr(2, 9),
       first,
       last,
       email,
       cell: fields.app_cell || "",
-      dob: fields.app_dob_y ? `${fields.app_dob_y}-${fields.app_dob_m || "01"}-${fields.app_dob_d || "01"}` : "",
+      dob: dobString || undefined,
       marital: fields.app_marital || "",
       sin: fields.app_sin || "",
-      dep: fields.app_dependents || "0",
-      co: fields.co_first ? `${fields.co_first} ${fields.co_last || ""}` : "",
+      dep: fields.app_dependents || "",
+      co: fields.co_first && fields.co_last ? `${fields.co_first} ${fields.co_last}` : undefined,
       coEmail: fields.co_email || "",
-      income: fields.app_emp1_income || fields.app_self_income || "0",
-      coIncome: fields.co_emp1_income || fields.co_self_income || "0",
-      emptype: fields.app_inc_self === "1" ? "self-employed" : (fields.app_emp1_status || "salaried"),
-      beacon: fields.confidence_score ? "700" : "720", 
+      income: fields.app_emp1_income || fields.app_self_income || "",
+      coIncome: fields.co_emp1_income || fields.co_self_income || "",
+      emptype: fields.app_inc_self === "1" ? "BFS / Self-Employed" : fields.app_emp1_status || "Salaried",
+      beacon: fields.beacon || "710",
       propval: fields.prop_value || "0",
-      mtgamt: fields.mtg1_orig_amount || fields.mtg1_balance || "0",
-      debts: "0",
+      mtgamt: fields.mtg1_balance || "0",
+      debts: fields.debts || "0",
       tax: fields.prop_tax || "0",
       condo: fields.prop_condo_fees || "0",
       heat: fields.prop_heat || "150",
-      addr: fields.prop_addr || fields.app_addr || "",
-      proptype: fields.prop_type || "Detached",
-      tenure: fields.prop_tenure || "Freehold",
-      lender: fields.mtg1_holder || "",
-      source: "AI Application Intake Module",
-      status: intakeStatus,
+      addr: fields.app_addr || "",
+      proptype: fields.prop_type || "",
+      tenure: fields.prop_tenure || "",
+      source: mode === "ai" ? "AI Application Intake" : "Manual CRM Form",
+      status: intakeStatus === "working" ? "working" : "lead",
+      agent: assignedAgent || currentUser.first + " " + currentUser.last,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      type: isPurchase ? "Purchase" : "Refinance",
-      agent: assignedAgent,
-      aiSummary: intakeNotes || "Application intake loaded and successfully analyzed.",
-      appData: {
-        ...fields,
-        originalFileName: fileName || "Intake_Form.pdf",
-        uploadedBy: currentUser.first + " " + currentUser.last,
-        reviewedBy: currentUser.first + " " + currentUser.last,
-        uploadTimestamp: uploadTime || new Date().toISOString()
-      }
+      appData: fields,
+      aiSummary: intakeNotes || "Client successfully added into GBK CRM."
     };
 
-    const fileMeta = fileName ? {
-      name: fileName,
-      size: fileSize,
-      content: fileBase64 || undefined
-    } : null;
+    // Automated underwriter document requirements based on client details
+    const suggestedDocs = [
+      { id: "doc_id_proof", name: "Two Pieces of Government Photo ID", desc: "For FINTRAC compliance. Must be unexpired and match names perfectly.", category: "Compliance" }
+    ];
 
-    // Pass suggestedDocs and starterTasks so App.tsx can initialize them natively in the downstream CRM database
-    onCreateClient(finalClient, fileMeta, action, suggestedDocs, starterTasks);
+    if (fields.app_inc_self === "1") {
+      suggestedDocs.push({ id: "doc_bfs_tax", name: "2 Years of CRA Notice of Assessment (NOA)", desc: "Required to verify business income and verify zero balance taxes owing.", category: "Income" });
+      suggestedDocs.push({ id: "doc_bfs_articles", name: "Articles of Incorporation / Business Licence", desc: "Proof of active business registry for at least 24 months.", category: "Income" });
+    } else {
+      suggestedDocs.push({ id: "doc_emp_letter", name: "Employment Letter & Recent Paystub", desc: "Dated within last 30 days, confirming salary, position, and full-time status.", category: "Income" });
+    }
+
+    if (fields.prop_value) {
+      suggestedDocs.push({ id: "doc_purchase_agr", name: "Agreement of Purchase and Sale (APS) & MLS Listing", desc: "Required for property underwriting assessment.", category: "Property" });
+    }
+
+    const starterTasks = [
+      { title: "Review extracted data integrity", priority: "high" as const, notes: "Verify SIN, email and complete DOB matches client identification documents." },
+      { title: "Request checklist documents", priority: "high" as const, notes: `Send automated checklist of ${suggestedDocs.length} items to ${email}.` }
+    ];
+
+    onCreateClient(finalClient, fileName ? { name: fileName, size: fileSize } : null, "create", suggestedDocs, starterTasks);
+    onClose();
+    if (onClearPreloaded) onClearPreloaded();
   };
 
   return (
-    <div className="fixed inset-0 bg-[#060608]/90 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[#101014] border border-white/10 rounded-2xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/85 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+      <div className="bg-[#121216] border border-white/10 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         
-        {/* HEADER & PRIVATE LOGO */}
-        <div className="p-5 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#16161c] select-none">
+        {/* Modal Header */}
+        <div className="p-5 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#16161c]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#b5a642]/20 to-[#6fa3b8]/20 border border-[#b5a642]/40 flex items-center justify-center text-lg text-[#b5a642] shadow-inner font-black">
-              GBK
+            <div className="p-2 bg-gradient-to-tr from-[#bdae45] to-[#5d9bb1] rounded-xl text-black">
+              <Sparkles className="w-5 h-5 font-bold" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-white tracking-wider uppercase">Application Intake Console</h2>
-                <span className="text-[9px] font-bold text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20 uppercase">Core Portal Integration</span>
-              </div>
-              <p className="text-[11px] text-[#8e95a3] mt-0.5">Streamlined ingestion pipeline: parses website applications and emails, matches duplicates, and structures broker workloads.</p>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                {mode === "ai" ? "✨ AI Full Application Intake" : "📋 Manual Client Intake Form"}
+              </h2>
+              <p className="text-[10px] text-[#8e95a3] mt-0.5">
+                {mode === "ai" 
+                  ? "Take application forms from emails or PDFs, parse them with Gemini AI, and instantly populate a secure CRM file" 
+                  : "Manually fill out a complete, structured mortgage application to initiate a new file"}
+              </p>
             </div>
           </div>
           <button 
-            onClick={onClose} 
-            className="text-[#8e95a3] hover:text-white p-2 hover:bg-white/5 rounded-xl transition-all"
+            onClick={() => { onClose(); if (onClearPreloaded) onClearPreloaded(); }}
+            className="text-[#8e95a3] hover:text-white p-1.5 hover:bg-white/5 rounded-lg transition-all"
+            id="close-intake-modal-btn"
           >
             ✕
           </button>
         </div>
 
-        {/* WORKFLOW PROCESS STEPPER (Top Horizontal Indicator) */}
-        <div className="bg-[#131317] border-b border-white/5 px-6 py-3 flex justify-between items-center select-none">
-          <div className="flex items-center gap-8 w-full max-w-4xl mx-auto justify-around">
-            {/* Step 1 */}
-            <div 
-              onClick={() => fileName && setWorkflowStep("upload")}
-              className={`flex items-center gap-2.5 cursor-pointer transition-all ${
-                workflowStep === "upload" 
-                  ? "text-[#b5a642]" 
-                  : fileName 
-                    ? "text-[#6fa3b8] hover:text-[#8bc2da]" 
-                    : "text-white/30"
-              }`}
-            >
-              <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold ${
-                workflowStep === "upload" 
-                  ? "border-[#b5a642] bg-[#b5a642]/10 text-[#b5a642]" 
-                  : fileName 
-                    ? "border-[#6fa3b8] bg-[#6fa3b8]/10 text-[#6fa3b8]" 
-                    : "border-white/10 bg-white/5 text-white/40"
-              }`}>
-                {fileName ? "✓" : "1"}
-              </div>
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider">Upload Source</div>
-                <div className="text-[9px] text-[#8e95a3]">{fileName ? "File Parsed" : "PDF or Email"}</div>
-              </div>
-            </div>
-
-            <div className="h-[1px] bg-white/5 flex-1 max-w-[40px] hidden md:block" />
-
-            {/* Step 2 */}
-            <div 
-              onClick={() => fileName && setWorkflowStep("review")}
-              className={`flex items-center gap-2.5 cursor-pointer transition-all ${
-                workflowStep === "review" 
-                  ? "text-[#b5a642]" 
-                  : workflowStep === "finalize"
-                    ? "text-[#6fa3b8]"
-                    : "text-white/30"
-              }`}
-            >
-              <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold ${
-                workflowStep === "review" 
-                  ? "border-[#b5a642] bg-[#b5a642]/10 text-[#b5a642]" 
-                  : workflowStep === "finalize"
-                    ? "border-[#6fa3b8] bg-[#6fa3b8]/10 text-[#6fa3b8]" 
-                    : "border-white/10 bg-white/5 text-white/40"
-              }`}>
-                {workflowStep === "finalize" ? "✓" : "2"}
-              </div>
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider">Review Section Mapping</div>
-                <div className="text-[9px] text-[#8e95a3]">{fileName ? "8 Form Groups" : "Awaiting Upload"}</div>
-              </div>
-            </div>
-
-            <div className="h-[1px] bg-white/5 flex-1 max-w-[40px] hidden md:block" />
-
-            {/* Step 3 */}
-            <div 
-              onClick={() => fileName && setWorkflowStep("finalize")}
-              className={`flex items-center gap-2.5 cursor-pointer transition-all ${
-                workflowStep === "finalize" ? "text-[#b5a642]" : "text-white/30"
-              }`}
-            >
-              <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold ${
-                workflowStep === "finalize" 
-                  ? "border-[#b5a642] bg-[#b5a642]/10 text-[#b5a642]" 
-                  : "border-white/10 bg-white/5 text-white/40"
-              }`}>
-                3
-              </div>
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider">Verify &amp; Finalize File</div>
-                <div className="text-[9px] text-[#8e95a3]">Duplicate Check &amp; Tasks</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* MAIN BODY LAYOUT */}
-        <div className="flex-1 flex overflow-hidden min-h-0 bg-[#0c0c0e]">
+        {/* Outer body */}
+        <div className="flex-1 overflow-hidden flex flex-col">
           
-          {/* STEP 1: UPLOAD & ACQUIRE SCREEN */}
-          {workflowStep === "upload" && (
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
-              
-              {/* UPLOAD ZONE */}
-              <div className="flex-1 overflow-y-auto p-8 flex flex-col justify-center items-center">
-                <div className="w-full max-w-xl space-y-6">
-                  <div className="text-center space-y-2 select-none">
-                    <h3 className="text-lg font-black text-white uppercase tracking-wider">1. Load Mortgage Application</h3>
-                    <p className="text-xs text-[#8e95a3]">Upload a signed broker form, web portal application, or drag a system PDF below.</p>
-                  </div>
-
-                  <div 
-                    onDragEnter={handleDrag}
-                    onDragOver={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDrop={handleDrop}
-                    className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all flex flex-col items-center justify-center gap-4 cursor-pointer ${
-                      isDragActive 
-                        ? "border-[#b5a642] bg-[#b5a642]/5 shadow-[0_0_15px_rgba(181,166,66,0.1)]" 
-                        : "border-white/10 hover:border-white/20 bg-[#141418] hover:bg-[#16161c]"
-                    }`}
-                  >
-                    <input 
-                      type="file" 
-                      id="pdf-upload-main"
-                      accept=".pdf"
-                      className="hidden" 
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          handleRealPdfUpload(e.target.files[0]);
-                        }
-                      }}
-                    />
-                    <label htmlFor="pdf-upload-main" className="cursor-pointer flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-[#8e95a3] hover:text-white transition-colors">
-                        <UploadCloud className="w-8 h-8" />
-                      </div>
-                      <span className="text-sm font-bold text-white block">Drag &amp; Drop Client Application PDF here</span>
-                      <span className="text-xs text-[#8e95a3] mt-1.5 block">or click to browse local computer directory</span>
-                      <span className="text-[10px] text-white/30 mt-3 block px-3 py-1 bg-white/5 rounded-full border border-white/5 font-mono">Accepts Standard .pdf Mortgage Forms</span>
-                    </label>
-                  </div>
-
-                  {isLoading && (
-                    <div className="flex flex-col items-center justify-center text-center gap-3 bg-[#141418]/60 p-4 rounded-xl border border-white/5">
-                      <div className="w-6 h-6 border-2 border-[#b5a642] border-t-transparent rounded-full animate-spin"></div>
-                      <div className="text-xs font-bold text-[#b5a642] animate-pulse">Running AI Form Extraction (Gemini Pro)...</div>
-                    </div>
-                  )}
+          {/* AI Intake Zone (only in AI mode & Upload step) */}
+          {mode === "ai" && workflowStep === "upload" && (
+            <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6" id="ai-upload-workflow-box">
+              <div 
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
+                  isDragActive 
+                    ? "border-[#5d9bb1] bg-[#5d9bb1]/10" 
+                    : "border-white/10 bg-white/[0.01] hover:bg-white/[0.02]"
+                }`}
+              >
+                <div className="p-4 bg-white/5 rounded-full text-[#5d9bb1]">
+                  <UploadCloud className="w-8 h-8" />
                 </div>
-              </div>
-
-              {/* FAST EVALUATION PRESETS PANEL (RIGHT DRAWER) */}
-              <div className="w-full md:w-96 border-l border-white/5 p-6 bg-[#101014]/40 shrink-0 flex flex-col gap-6 select-none overflow-y-auto">
-                <div className="space-y-1">
-                  <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-[#b5a642]" /> fast evaluation presets
-                  </h4>
-                  <p className="text-[10px] text-[#8e95a3]">Test the full intake lifecycle instantly with pre-aligned mortgage application presets.</p>
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Drag &amp; Drop Mortgage Application File</h3>
+                  <p className="text-[11px] text-white/50 mt-1">Supports application text formats, HTML templates, PDFs, or email notes.</p>
                 </div>
-
-                <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2 mt-2">
+                  <label className="px-4 py-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold rounded-lg cursor-pointer transition-all">
+                    Browse File
+                    <input type="file" onChange={handleFileUpload} className="hidden" accept=".txt,.html,.pdf,.doc,.docx" />
+                  </label>
+                  <span className="text-[10px] text-white/40">or</span>
                   <button 
                     onClick={() => handleLoadSample('barrie')}
-                    disabled={isLoading}
-                    className="text-left w-full p-4 rounded-xl bg-[#141418] hover:bg-[#1c1c24] border border-white/5 hover:border-[#b5a642]/30 transition-all flex justify-between items-center group text-xs text-[#eeeef2] shadow-sm cursor-pointer"
+                    className="px-4 py-1.5 bg-[#bdae45]/20 text-[#bdae45] hover:bg-[#bdae45]/30 border border-[#bdae45]/30 text-xs font-semibold rounded-lg transition-all"
                   >
-                    <div className="space-y-1">
-                      <div className="font-bold text-white group-hover:text-[#b5a642] transition-colors">Sample A: Jane Smith</div>
-                      <div className="text-[10px] text-[#8e95a3]">Barrie Purchase / Nurse (Salaried)</div>
-                      <div className="text-[9px] text-[#6fa3b8] font-bold uppercase tracking-wider mt-1 bg-[#6fa3b8]/10 border border-[#6fa3b8]/20 px-1.5 py-0.5 rounded inline-block">Purchase</div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1" />
+                    Load Sample A (Barrie)
                   </button>
-
                   <button 
                     onClick={() => handleLoadSample('newmarket')}
-                    disabled={isLoading}
-                    className="text-left w-full p-4 rounded-xl bg-[#141418] hover:bg-[#1c1c24] border border-white/5 hover:border-[#6fa3b8]/30 transition-all flex justify-between items-center group text-xs text-[#eeeef2] shadow-sm cursor-pointer"
+                    className="px-4 py-1.5 bg-[#5d9bb1]/20 text-[#5d9bb1] hover:bg-[#5d9bb1]/30 border border-[#5d9bb1]/30 text-xs font-semibold rounded-lg transition-all"
                   >
-                    <div className="space-y-1">
-                      <div className="font-bold text-white group-hover:text-[#6fa3b8] transition-colors">Sample B: John &amp; Maria</div>
-                      <div className="text-[10px] text-[#8e95a3]">Newmarket Refinance / Co-applicant / Self-employed</div>
-                      <div className="text-[9px] text-[#b5a642] font-bold uppercase tracking-wider mt-1 bg-[#b5a642]/10 border border-[#b5a642]/20 px-1.5 py-0.5 rounded inline-block">Refinance (Co-app)</div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1" />
+                    Load Sample B (Newmarket)
                   </button>
                 </div>
-
                 {fileName && (
-                  <div className="bg-[#141418] border border-white/5 rounded-xl p-4 flex flex-col gap-2 text-xs text-[#8e95a3] mt-auto">
-                    <h5 className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] border-b border-white/5 pb-1 mb-1">Loaded Source Metadata</h5>
-                    <div className="flex justify-between"><span className="text-[10px]">File Name:</span><span className="font-bold text-white truncate max-w-[140px]">{fileName}</span></div>
-                    <div className="flex justify-between"><span className="text-[10px]">File Size:</span><span className="font-bold text-white">{fileSize}</span></div>
-                    <div className="flex justify-between"><span className="text-[10px]">Ready to Audit:</span><span className="font-black text-green-400">Yes (Step 2 loaded)</span></div>
-                    
-                    <button 
-                      onClick={() => setWorkflowStep("review")}
-                      className="mt-3 w-full py-2 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
-                    >
-                      Enter Field Review <ChevronRight className="w-4 h-4" />
-                    </button>
+                  <div className="mt-3 px-3 py-1.5 bg-[#5d9bb1]/10 border border-[#5d9bb1]/20 text-[#5d9bb1] rounded-lg text-xs font-bold flex items-center gap-2">
+                    <FileCheck className="w-4 h-4" />
+                    <span>Loaded: {fileName} ({fileSize})</span>
                   </div>
                 )}
+              </div>
+
+              {/* Paste Text / Email Application Form Field */}
+              <div className="bg-[#16161c] border border-white/5 rounded-xl p-5 flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#bdae45] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#bdae45]" /> Paste Application Text / Email Content
+                  </h4>
+                  {!apiKeySet && (
+                    <span className="text-[9px] text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded font-bold animate-pulse flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" /> Simulated AI Mode
+                    </span>
+                  )}
+                </div>
+
+                <textarea 
+                  rows={8}
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  placeholder="Paste the mortgage application content, credit details, or copy/pasted email form here. Example: Jane Smith, single, cell 705-555-1212. Works at RVH Hospital in Barrie, salary 98,500. Buying a house for 620,000..."
+                  className="w-full bg-[#0d0d10] border border-white/5 rounded-xl p-4 text-xs text-[#eeeef2] focus:outline-none focus:border-[#5d9bb1]/40 font-mono leading-relaxed"
+                />
+
+                <div className="flex justify-end gap-2 mt-1">
+                  <button
+                    onClick={handleExtractWithAI}
+                    disabled={isLoading}
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#bdae45] to-[#5d9bb1] disabled:opacity-40 text-black font-black text-xs uppercase tracking-wider rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>AI is Analyzing &amp; Populating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>✦ Extract with Gemini AI</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* STEP 2: REVIEW SECTION MAPPING SCREEN */}
+          {/* Stepper Review Form Workspace (AI Stage 2 / Manual Stage 1) */}
           {workflowStep === "review" && (
-            <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
-              
-              {/* REVIEW SIDEBAR TABS (Left rail for Step 2) */}
-              <div className="w-full lg:w-64 border-r border-white/5 bg-[#101014]/30 shrink-0 flex flex-col select-none overflow-y-auto">
-                <div className="p-4 border-b border-white/5">
-                  <div className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] mb-1">2. Review Sections</div>
-                  <p className="text-[10px] text-[#8e95a3]">8 groups extracted from official mortgage form structure.</p>
-                </div>
-
-                <div className="p-2 space-y-1 flex-1">
-                  {([
-                    { id: "applicant", label: "Applicant Personal", icon: <User className="w-4 h-4" /> },
-                    { id: "co-applicant", label: "Co-Applicant Joint", icon: <Users className="w-4 h-4" /> },
-                    { id: "contact", label: "Contact Details", icon: <MapPin className="w-4 h-4" /> },
-                    { id: "address", label: "Address History", icon: <Building className="w-4 h-4" /> },
-                    { id: "employment", label: "Employment & Income", icon: <Briefcase className="w-4 h-4" /> },
-                    { id: "otherIncome", label: "Other Income Streams", icon: <DollarSign className="w-4 h-4" /> },
-                    { id: "property", label: "Property Details", icon: <Building className="w-4 h-4" /> },
-                    { id: "mortgage", label: "Mortgage Details", icon: <Percent className="w-4 h-4" /> }
-                  ] as Array<{ id: TabType; label: string; icon: React.ReactNode }>).map((item) => (
+            <div className="flex-grow flex flex-col overflow-hidden" id="structured-review-workspace">
+              {/* Stepper Tab Indicators */}
+              <div className="bg-[#16161c] border-b border-white/5 overflow-x-auto scrollbar-none flex shrink-0">
+                {(["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[]).map((tab, idx) => {
+                  const isActive = activeTab === tab;
+                  const labelMap: Record<string, string> = {
+                    personal: "1. Personal",
+                    address: "2. Address",
+                    employment: "3. Employment",
+                    otherIncome: "4. Other Income",
+                    property: "5. Property",
+                    mortgage: "6. Mortgage",
+                    submit: "7. Review & Submit"
+                  };
+                  return (
                     <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      className={`w-full p-3 rounded-lg text-xs font-bold transition-all flex items-center justify-between text-left group cursor-pointer ${
-                        activeTab === item.id 
-                          ? "bg-[#b5a642]/10 border border-[#b5a642]/30 text-white" 
-                          : "text-[#8e95a3] hover:text-white hover:bg-white/5 border border-transparent"
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-5 py-3 text-xs font-bold transition-all border-b-2 uppercase tracking-wider shrink-0 flex items-center gap-2 ${
+                        isActive 
+                          ? "text-[#bdae45] border-[#bdae45] bg-[#bdae45]/5" 
+                          : "text-white/40 border-transparent hover:text-white"
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className={activeTab === item.id ? "text-[#b5a642]" : "text-white/40 group-hover:text-white/60"}>
-                          {item.icon}
-                        </span>
-                        <span>{item.label}</span>
-                      </div>
-                      {getTabStatusIcon(item.id)}
+                      <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
+                        isActive ? "bg-[#bdae45] text-black border-[#bdae45]" : "border-white/20"
+                      }`}>{idx + 1}</span>
+                      <span>{labelMap[tab]}</span>
                     </button>
-                  ))}
-                </div>
-
-                {/* AI SUMMARY BRIEF */}
-                <div className="p-4 border-t border-white/5 bg-[#141418]/60 space-y-2 mt-auto">
-                  <div className="flex justify-between text-[10px] font-bold text-[#8e95a3] uppercase">
-                    <span>Extraction Quality</span>
-                    <span className="text-[#6fa3b8] font-black">Ready</span>
-                  </div>
-                  <p className="text-[10px] text-[#8e95a3] leading-relaxed">
-                    Review unconfirmed fields. Verified items are stored securely on the client profile.
-                  </p>
-                </div>
+                  );
+                })}
               </div>
 
-              {/* REVIEW FIELDS EDITING WORKSPACE */}
-              <div className="flex-1 overflow-y-auto p-6 bg-[#0c0c0e]/95 flex flex-col min-h-0">
-                
-                {/* AI QUALITY ASSISTANT BANNER */}
-                <div className="bg-[#141418] border border-white/5 p-4 rounded-xl mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm">
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-[#b5a642]" /> AI Quality Assistant
-                    </h3>
-                    <p className="text-[10px] text-[#8e95a3]">
-                      Reviewing <span className="text-white font-bold">{activeTab.toUpperCase()}</span>. Confirmed items flow cleanly to the CRM. Click any badge to verify fields.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleVerifyActiveTabFields}
-                    className="px-3 py-1.5 bg-green-500/10 border border-green-500/30 text-green-300 font-bold text-xs rounded-lg hover:bg-green-500/20 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
-                  >
-                    <Check className="w-3.5 h-3.5" /> Confirm All Fields in Tab
-                  </button>
-                </div>
-
-                <div className="flex-1 space-y-6">
-                  
-                  {/* TAB: APPLICANT */}
-                  {activeTab === "applicant" && (
-                    <div className="space-y-4 bg-[#141418]/40 border border-white/5 p-5 rounded-2xl relative">
-                      <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20">Principal Borrower</span>
-                      <h4 className="text-xs font-black text-white/50 border-b border-white/5 pb-2 uppercase tracking-wider">Primary Applicant Identity</h4>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {renderReviewField("app_first", "First Name", "Jane")}
-                        {renderReviewField("app_last", "Last Name", "Smith")}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {renderReviewField("app_dob_m", "DOB Month (MM)", "08", "number")}
-                        {renderReviewField("app_dob_d", "DOB Day (DD)", "14", "number")}
-                        {renderReviewField("app_dob_y", "DOB Year (YYYY)", "1988", "number")}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {renderReviewField("app_marital", "Marital Status", "Single")}
-                        {renderReviewField("app_sin", "S.I.N (Social Insurance Number)", "555-014-921")}
-                      </div>
-
-                      {renderReviewField("app_dependents", "Dependents Under 18", "1", "number")}
-                    </div>
-                  )}
-
-                  {/* TAB: CO-APPLICANT */}
-                  {activeTab === "co-applicant" && (
-                    <div className="space-y-4 bg-[#141418]/40 border border-white/5 p-5 rounded-2xl relative">
-                      <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#6fa3b8] bg-[#6fa3b8]/10 px-2 py-0.5 rounded border border-[#6fa3b8]/20">Co-Signer / Joint Spouse</span>
-                      <h4 className="text-xs font-black text-white/50 border-b border-white/5 pb-2 uppercase tracking-wider">Secondary Joint Borrower</h4>
-                      
-                      <p className="text-[10px] text-[#8e95a3] mb-2 leading-relaxed">
-                        Leave fields empty if this is an individual purchase application. If co-applicant is present, these details will initialize co-borrower fields natively.
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {renderReviewField("co_first", "First Name", "Leave blank if none")}
-                        {renderReviewField("co_last", "Last Name", "Leave blank if none")}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {renderReviewField("co_dob_m", "DOB Month", "", "number")}
-                        {renderReviewField("co_dob_d", "DOB Day", "", "number")}
-                        {renderReviewField("co_dob_y", "DOB Year", "", "number")}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {renderReviewField("co_marital", "Marital Status", "")}
-                        {renderReviewField("co_sin", "S.I.N", "")}
-                      </div>
-
-                      {renderReviewField("co_dependents", "Dependents Under 18", "0", "number")}
-                    </div>
-                  )}
-
-                  {/* TAB: CONTACT DETAILS */}
-                  {activeTab === "contact" && (
-                    <div className="space-y-6">
-                      
-                      {/* Applicant Contact */}
-                      <div className="space-y-4 bg-[#141418]/40 border border-white/5 p-5 rounded-2xl">
-                        <h4 className="text-xs font-black text-[#b5a642] border-b border-white/5 pb-2 uppercase tracking-wider">Applicant Communication channels</h4>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {renderReviewField("app_email", "Primary Email Address", "jane.smith@email.com", "email")}
-                          {renderReviewField("app_cell", "Cell Phone", "(705) 555-1212")}
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {renderReviewField("app_home", "Home Telephone", "Optional")}
-                          {renderReviewField("app_work", "Work Telephone / Ext", "Optional")}
-                        </div>
-
-                        {renderReviewField("app_contact", "Preferred Contact Method (Email/Phone/SMS)", "Email")}
-                      </div>
-
-                      {/* Co Applicant Contact */}
-                      {fields.co_first && (
-                        <div className="space-y-4 bg-[#141418]/40 border border-white/5 p-5 rounded-2xl">
-                          <h4 className="text-xs font-black text-[#6fa3b8] border-b border-white/5 pb-2 uppercase tracking-wider">Co-Applicant Communication channels</h4>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderReviewField("co_email", "Primary Email Address", "", "email")}
-                            {renderReviewField("co_cell", "Cell Phone", "")}
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderReviewField("co_home", "Home Telephone", "")}
-                            {renderReviewField("co_work", "Work Telephone / Ext", "")}
-                          </div>
-
-                          {renderReviewField("co_contact", "Preferred Contact Method", "")}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* TAB: ADDRESS HISTORY */}
-                  {activeTab === "address" && (
-                    <div className="space-y-6">
-                      
-                      {/* APPLICANT ADDRESS */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20">Applicant</span>
-                        <h4 className="text-xs font-black text-white/50 border-b border-white/5 pb-2 uppercase tracking-wider">Applicant Current Residence</h4>
-                        
-                        <div className="bg-[#1d1d24] p-3 rounded-xl border border-white/5 mb-2">
-                          <label className="text-[10px] text-[#8e95a3] font-bold uppercase tracking-wider block mb-1.5">Housing Tenure</label>
-                          <div className="flex flex-wrap gap-2">
-                            {["Own", "Rent", "Live with Relatives", "Live With Others"].map((type) => (
-                              <button
-                                key={type}
-                                type="button"
-                                onClick={() => handleFieldChange("app_housing", type)}
-                                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                                  fields.app_housing === type ? "bg-[#b5a642] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"
-                                }`}
-                              >
-                                {type}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="md:col-span-3">{renderReviewField("app_addr", "Street Address", "182 Bayfield Street")}</div>
-                          <div>{renderReviewField("app_unit", "Unit / Suite", "Apt 4B")}</div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {renderReviewField("app_city", "City", "Barrie")}
-                          {renderReviewField("app_prov", "Province", "ON")}
-                          {renderReviewField("app_post", "Postal Code", "L4M 3B5")}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {renderReviewField("app_res_yrs", "Years at Current Address", "2", "number")}
-                          {renderReviewField("app_res_mos", "Months at Current Address", "6", "number")}
-                        </div>
-
-                        {/* PREVIOUS ADDRESS (Required if current < 3 years) */}
-                        <div className="border-t border-white/5 pt-4 space-y-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] flex items-center gap-1.5">
-                              Previous Residence History <Info className="w-3.5 h-3.5 text-[#b5a642]" title="Required if current address is less than 3 years." />
-                            </span>
-                            {fields.app_res_yrs && Number(fields.app_res_yrs) < 3 && (
-                              <span className="text-[9px] text-red-400 bg-red-400/10 border border-red-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">Required (&lt; 3 Years)</span>
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="md:col-span-3">{renderReviewField("app_prev_addr", "Street Address", "450 Yonge Street")}</div>
-                            <div>{renderReviewField("app_prev_unit", "Unit / Suite", "")}</div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {renderReviewField("app_prev_city", "City", "Toronto")}
-                            {renderReviewField("app_prev_prov", "Province", "ON")}
-                            {renderReviewField("app_prev_post", "Postal Code", "M4Y 1W9")}
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderReviewField("app_prev_yrs", "Years at Previous", "4", "number")}
-                            {renderReviewField("app_prev_mos", "Months", "0", "number")}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* CO APPLICANT ADDRESS */}
-                      {fields.co_first && (
-                        <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                          <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#6fa3b8] bg-[#6fa3b8]/10 px-2 py-0.5 rounded border border-[#6fa3b8]/20">Co-Applicant</span>
-                          <h4 className="text-xs font-black text-white/50 border-b border-white/5 pb-2 uppercase tracking-wider">Co-Applicant Residence Details</h4>
-                          
-                          <div className="bg-[#1d1d24] p-3 rounded-xl border border-white/5 mb-2">
-                            <label className="text-[10px] text-[#8e95a3] font-bold uppercase tracking-wider block mb-1.5">Housing Tenure</label>
-                            <div className="flex flex-wrap gap-2">
-                              {["Own", "Rent", "Live with Relatives", "Live With Others"].map((type) => (
-                                <button
-                                  key={type}
-                                  type="button"
-                                  onClick={() => handleFieldChange("co_housing", type)}
-                                  className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                                    fields.co_housing === type ? "bg-[#6fa3b8] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"
-                                  }`}
-                                >
-                                  {type}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="md:col-span-3">{renderReviewField("co_addr", "Street Address", "")}</div>
-                            <div>{renderReviewField("co_unit", "Unit / Suite", "")}</div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {renderReviewField("co_city", "City", "")}
-                            {renderReviewField("co_prov", "Province", "")}
-                            {renderReviewField("co_post", "Postal Code", "")}
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderReviewField("co_res_yrs", "Years at Address", "0", "number")}
-                            {renderReviewField("co_res_mos", "Months at Address", "0", "number")}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* TAB: EMPLOYMENT */}
-                  {activeTab === "employment" && (
-                    <div className="space-y-6">
-                      
-                      {/* APPLICANT EMPLOYMENT */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20">Applicant</span>
-                        <h3 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider flex items-center gap-1.5">
-                          <Briefcase className="w-4 h-4 text-[#b5a642]" /> Applicant Income &amp; Employment
-                        </h3>
-
-                        {/* Income Classifications toggles */}
-                        <div className="flex flex-wrap gap-2 bg-[#1d1d24] p-2 rounded-xl border border-white/5">
-                          <button
-                            onClick={() => handleFieldChange("app_inc_employed", fields.app_inc_employed === "1" ? "" : "1")}
-                            className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${fields.app_inc_employed === "1" ? "bg-[#b5a642] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"}`}
-                          >
-                            Salaried Primary
-                          </button>
-                          <button
-                            onClick={() => handleFieldChange("app_inc_twojobs", fields.app_inc_twojobs === "1" ? "" : "1")}
-                            className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${fields.app_inc_twojobs === "1" ? "bg-[#b5a642] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"}`}
-                          >
-                            Multiple Jobs
-                          </button>
-                          <button
-                            onClick={() => handleFieldChange("app_inc_self", fields.app_inc_self === "1" ? "" : "1")}
-                            className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${fields.app_inc_self === "1" ? "bg-[#b5a642] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"}`}
-                          >
-                            Self-Employed (Sole Prop/Inc)
-                          </button>
-                        </div>
-
-                        {/* Primary Employer Details */}
-                        {fields.app_inc_employed === "1" && (
-                          <div className="bg-[#1b1b22] p-4 rounded-xl space-y-4 border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] block">Primary Salaried Employer Details</span>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {renderReviewField("app_emp1_name", "Employer Name", "Royal Victoria Regional Health Centre")}
-                              {renderReviewField("app_emp1_title", "Job Title / Role", "Senior Registered Nurse")}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {renderReviewField("app_emp1_city", "Employer City", "Barrie")}
-                              {renderReviewField("app_emp1_prov", "Employer Province", "ON")}
-                              {renderReviewField("app_emp1_tel", "HR Verification Phone", "(705) 728-9090")}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {renderReviewField("app_emp1_status", "Status (Full Time / Part Time)", "Full Time")}
-                              {renderReviewField("app_emp1_type", "Compensation (Salary / Hourly)", "Salary")}
-                              {renderReviewField("app_emp1_income", "Gross Annual Income ($)", "98500", "number")}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {renderReviewField("app_emp1_yrs", "Years Served", "5", "number")}
-                              {renderReviewField("app_emp1_mos", "Months Served", "2", "number")}
-                              {renderReviewField("app_emp1_contract", "Contract Details", "")}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Self Employed details */}
-                        {fields.app_inc_self === "1" && (
-                          <div className="bg-[#1b1b22] p-4 rounded-xl space-y-4 border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] block">Business Owner Details</span>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {renderReviewField("app_self_name", "Registered Corporation Name", "Company Ltd")}
-                              {renderReviewField("app_self_income", "Net Income (2-Yr Avg NOA) ($)", "0", "number")}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {renderReviewField("app_self_yrs", "Years in Business", "0", "number")}
-                              {renderReviewField("app_self_start", "Start Date (MM/YYYY)", "")}
-                              {renderReviewField("app_self_tel", "Business Telephone", "")}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Secondary Employer */}
-                        {fields.app_inc_twojobs === "1" && (
-                          <div className="bg-[#1b1b22] p-4 rounded-xl space-y-4 border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] block">Secondary Job Details</span>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {renderReviewField("app_emp2_name", "Employer Name", "")}
-                              {renderReviewField("app_emp2_income", "Annual Income ($)", "0", "number")}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* CO APPLICANT EMPLOYMENT */}
-                      {fields.co_first && (
-                        <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                          <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#6fa3b8] bg-[#6fa3b8]/10 px-2 py-0.5 rounded border border-[#6fa3b8]/20">Co-Applicant</span>
-                          <h3 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider flex items-center gap-1.5">
-                            <Briefcase className="w-4 h-4 text-[#6fa3b8]" /> Co-Applicant Income &amp; Employment
-                          </h3>
-
-                          <div className="flex flex-wrap gap-2 bg-[#1d1d24] p-2 rounded-xl border border-white/5">
-                            <button
-                              onClick={() => handleFieldChange("co_inc_employed", fields.co_inc_employed === "1" ? "" : "1")}
-                              className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${fields.co_inc_employed === "1" ? "bg-[#6fa3b8] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"}`}
-                            >
-                              Salaried Primary
-                            </button>
-                            <button
-                              onClick={() => handleFieldChange("co_inc_self", fields.co_inc_self === "1" ? "" : "1")}
-                              className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${fields.co_inc_self === "1" ? "bg-[#6fa3b8] text-black" : "bg-[#141418] text-[#8e95a3] hover:text-white"}`}
-                            >
-                              Self-Employed
-                            </button>
-                          </div>
-
-                          {/* Primary Salaried */}
-                          {fields.co_inc_employed === "1" && (
-                            <div className="bg-[#1b1b22] p-4 rounded-xl space-y-4 border border-white/5">
-                              <span className="text-[10px] font-black uppercase tracking-wider text-[#6fa3b8] block">Co-Borrower Primary Employment</span>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {renderReviewField("co_emp1_name", "Employer Name", "York Region District School Board")}
-                                {renderReviewField("co_emp1_title", "Job Title / Role", "Elementary School Teacher")}
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {renderReviewField("co_emp1_status", "Status (Full/Part)", "Full Time")}
-                                {renderReviewField("co_emp1_type", "Compensation Type", "Salary")}
-                                {renderReviewField("co_emp1_income", "Gross Annual Income ($)", "72500", "number")}
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {renderReviewField("co_emp1_yrs", "Years Served", "8", "number")}
-                                {renderReviewField("co_emp1_mos", "Months Served", "6", "number")}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Self Employed */}
-                          {fields.co_inc_self === "1" && (
-                            <div className="bg-[#1b1b22] p-4 rounded-xl space-y-4 border border-white/5">
-                              <span className="text-[10px] font-black uppercase tracking-wider text-[#6fa3b8] block">Co-Borrower Self-Employment</span>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {renderReviewField("co_self_name", "Company Name", "")}
-                                {renderReviewField("co_self_income", "Net Income ($)", "0", "number")}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* TAB: OTHER INCOME */}
-                  {activeTab === "otherIncome" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Applicant other */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20">Applicant</span>
-                        <h4 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider">Other Income Streams</h4>
-                        
-                        <div className="bg-[#1b1b22] p-4 rounded-xl border border-white/5 space-y-3">
-                          <div className="font-bold text-[10px] uppercase text-[#b5a642]">Stream 1</div>
-                          {renderReviewField("app_other0_specify", "Description (e.g. Pension, Child support)", "Pension")}
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("app_other0_amount", "Amount ($)", "0", "number")}
-                            {renderReviewField("app_other0_freq", "Frequency", "Monthly")}
-                          </div>
-                        </div>
-
-                        <div className="bg-[#1b1b22] p-4 rounded-xl border border-white/5 space-y-3">
-                          <div className="font-bold text-[10px] uppercase text-[#b5a642]">Stream 2</div>
-                          {renderReviewField("app_other1_specify", "Description", "")}
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("app_other1_amount", "Amount ($)", "0", "number")}
-                            {renderReviewField("app_other1_freq", "Frequency", "Monthly")}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Co Applicant other */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#6fa3b8] bg-[#6fa3b8]/10 px-2 py-0.5 rounded border border-[#6fa3b8]/20">Co-Applicant</span>
-                        <h4 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider">Other Income Streams</h4>
-                        
-                        <div className="bg-[#1b1b22] p-4 rounded-xl border border-white/5 space-y-3">
-                          <div className="font-bold text-[10px] uppercase text-[#6fa3b8]">Stream 1</div>
-                          {renderReviewField("co_other0_specify", "Description", "Rental Income")}
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("co_other0_amount", "Amount ($)", "1500", "number")}
-                            {renderReviewField("co_other0_freq", "Frequency", "Monthly")}
-                          </div>
-                        </div>
-
-                        <div className="bg-[#1b1b22] p-4 rounded-xl border border-white/5 space-y-3">
-                          <div className="font-bold text-[10px] uppercase text-[#6fa3b8]">Stream 2</div>
-                          {renderReviewField("co_other1_specify", "Description", "")}
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("co_other1_amount", "Amount ($)", "0", "number")}
-                            {renderReviewField("co_other1_freq", "Frequency", "Monthly")}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB: PROPERTY DETAILS */}
-                  {activeTab === "property" && (
-                    <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                      <h3 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider flex items-center gap-1.5">
-                        <Building className="w-4 h-4 text-[#b5a642]" /> Property Characteristics &amp; Financials
-                      </h3>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Physical attributes */}
-                        <div className="space-y-4 bg-[#1b1b22] p-4 rounded-xl border border-white/5">
-                          <span className="text-[10px] font-bold text-[#b5a642] uppercase tracking-wider block">Physical Characteristics</span>
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("prop_type", "Type (Detached, Condo)", "Detached")}
-                            {renderReviewField("prop_style", "Style (2-Storey, Split-Level)", "Two Storey")}
-                          </div>
-                          {renderReviewField("prop_tenure", "Tenure (Freehold, Condo)", "Freehold")}
-                          
-                          <div className="grid grid-cols-3 gap-2">
-                            {renderReviewField("prop_age", "Property Age (Yrs)", "12", "number")}
-                            {renderReviewField("prop_area", "Interior Area", "2100", "number")}
-                            {renderReviewField("prop_area_unit", "Unit", "Sq Ft")}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("prop_garage_type", "Garage Type", "Attached")}
-                            {renderReviewField("prop_garage_size", "Garage Size", "Double")}
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-2">
-                            {renderReviewField("prop_heat", "Heating Type", "Forced Air Gas")}
-                            {renderReviewField("prop_water", "Water Source", "Municipal")}
-                            {renderReviewField("prop_sewage", "Sewage Type", "Municipal")}
-                          </div>
-                        </div>
-
-                        {/* Financial specs */}
-                        <div className="space-y-4 bg-[#1b1b22] p-4 rounded-xl border border-white/5">
-                          <span className="text-[10px] font-bold text-[#b5a642] uppercase tracking-wider block">Financial Details &amp; Location</span>
-                          {renderReviewField("prop_addr", "Target Property Address", "Subject street name...")}
-                          
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("prop_value", "Estimated Value ($)", "640000", "number")}
-                            {renderReviewField("prop_orig_price", "Original Cost ($)", "0", "number")}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("prop_purchase_date", "Purchase Date", "")}
-                            {renderReviewField("prop_tax_in_mtg", "Taxes in Mtge? (Yes/No)", "No")}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            {renderReviewField("prop_tax", "Yearly Property Taxes ($)", "4200", "number")}
-                            {renderReviewField("prop_condo_fees", "Monthly Condo Fees ($)", "0", "number")}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB: MORTGAGE DETAILS */}
-                  {activeTab === "mortgage" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      
-                      {/* FIRST MORTGAGE */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#b5a642] bg-[#b5a642]/10 px-2 py-0.5 rounded border border-[#b5a642]/20">First Mortgage</span>
-                        <h4 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider">Outstanding First Mortgage</h4>
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg1_balance", "Current Balance ($)", "0", "number")}
-                          {renderReviewField("mtg1_payment", "Monthly Payment ($)", "0", "number")}
-                        </div>
-
-                        {renderReviewField("mtg1_freq", "Payment Frequency", "Monthly")}
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg1_maturity", "Maturity Date (MM/DD/YYYY)", "")}
-                          {renderReviewField("mtg1_rate", "Interest Rate (%)", "4.89", "number")}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg1_rate_type", "Rate Type (Fixed, Variable)", "Fixed")}
-                          {renderReviewField("mtg1_term_type", "Term Type (Open, Closed)", "Closed")}
-                        </div>
-
-                        {renderReviewField("mtg1_holder", "Mortgage Holder (Lender)", "Scotiabank")}
-                        {renderReviewField("mtg1_loan_type", "Loan Type (Mortgage, HELOC)", "Mortgage")}
-
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg1_orig_amount", "Original Loan Amount ($)", "512000", "number")}
-                          {renderReviewField("mtg1_number", "Lender Mortgage Reference #", "")}
-                        </div>
-                      </div>
-
-                      {/* SECOND MORTGAGE */}
-                      <div className="bg-[#141418]/40 border border-white/5 p-5 rounded-2xl space-y-4 relative">
-                        <span className="absolute top-4 right-4 text-[9px] font-black uppercase text-[#6fa3b8] bg-[#6fa3b8]/10 px-2 py-0.5 rounded border border-[#6fa3b8]/20">Second Mortgage</span>
-                        <h4 className="text-xs font-black text-white border-b border-white/5 pb-2 uppercase tracking-wider">Outstanding Second Mortgage (LOC)</h4>
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg2_balance", "Current Balance ($)", "0", "number")}
-                          {renderReviewField("mtg2_payment", "Monthly Payment ($)", "0", "number")}
-                        </div>
-
-                        {renderReviewField("mtg2_freq", "Payment Frequency", "Monthly")}
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg2_maturity", "Maturity Date", "")}
-                          {renderReviewField("mtg2_rate", "Interest Rate (%)", "0", "number")}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg2_rate_type", "Rate Type", "Fixed")}
-                          {renderReviewField("mtg2_term_type", "Term Type", "Closed")}
-                        </div>
-
-                        {renderReviewField("mtg2_holder", "Mortgage Holder", "")}
-                        {renderReviewField("mtg2_loan_type", "Loan Type", "")}
-
-                        <div className="grid grid-cols-2 gap-2">
-                          {renderReviewField("mtg2_orig_amount", "Original Amount ($)", "0", "number")}
-                          {renderReviewField("mtg2_number", "Lender Mortgage Reference #", "")}
-                        </div>
-                      </div>
-
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-          )}
-
-          {/* STEP 3: INTEGRATE & FINALIZE SCREEN */}
-          {workflowStep === "finalize" && (
-            <div className="flex-1 overflow-y-auto p-8 bg-[#0c0c0e]/95 space-y-8 select-none">
-              
-              <div className="max-w-4xl mx-auto space-y-8">
-                
-                {/* 1. INTERACTIVE DUPLICATE COMPARISON VIEW */}
-                <div className="bg-[#141418] border border-white/5 p-6 rounded-2xl space-y-4">
-                  <div className="flex items-center gap-2">
-                    {duplicates.length > 0 ? (
-                      <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
-                        <AlertTriangle className="w-4 h-4 animate-pulse" />
-                      </div>
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400">
-                        <CheckCircle2 className="w-4 h-4" />
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-xs font-black text-white uppercase tracking-wider">Duplicate Ingestion Check</h4>
-                      <p className="text-[10px] text-[#8e95a3]">Cross-referencing incoming fields with existing CRM memory records.</p>
-                    </div>
-                  </div>
-
-                  {duplicates.length > 0 ? (
+              {/* Tab Scrollable Contents */}
+              <div className="flex-1 overflow-y-auto p-6 bg-[#0c0c0f]">
+                {/* 1. PERSONAL INFORMATION */}
+                {activeTab === "personal" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-personal-form">
+                    {/* Applicant */}
                     <div className="space-y-4">
-                      <div className="p-3 bg-red-500/5 border border-red-500/20 text-red-300 rounded-lg text-xs leading-relaxed">
-                        <span className="font-bold">Duplicate Warning!</span> The system discovered {duplicates.length} records in CRM memory matching this applicant. See comparative data side-by-side:
+                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant</span>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">First Name *</label>
+                          <input type="text" value={fields.app_first || ""} onChange={(e) => handleFieldChange("app_first", e.target.value)} placeholder="Jane" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Last Name *</label>
+                          <input type="text" value={fields.app_last || ""} onChange={(e) => handleFieldChange("app_last", e.target.value)} placeholder="Smith" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
                       </div>
 
-                      <div className="border border-white/5 rounded-xl overflow-hidden bg-[#101014]">
-                        <table className="w-full text-xs text-left text-white/80">
-                          <thead className="text-[10px] font-bold uppercase text-[#8e95a3] bg-white/2">
-                            <tr>
-                              <th className="p-3">Matched Param</th>
-                              <th className="p-3 text-[#b5a642]">Incoming Application</th>
-                              <th className="p-3 text-[#6fa3b8]">Existing Record (In CRM)</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-white/5">
-                            {duplicates.map((dup, idx) => (
-                              <React.Fragment key={idx}>
-                                <tr>
-                                  <td className="p-3 font-semibold text-[#8e95a3]">Client Name</td>
-                                  <td className="p-3 text-white font-black">{fields.app_first} {fields.app_last}</td>
-                                  <td className="p-3 text-white font-black">{dup.client.first} {dup.client.last}</td>
-                                </tr>
-                                <tr>
-                                  <td className="p-3 font-semibold text-[#8e95a3]">Email Address</td>
-                                  <td className="p-3">{fields.app_email || "N/A"}</td>
-                                  <td className="p-3">{dup.client.email}</td>
-                                </tr>
-                                <tr>
-                                  <td className="p-3 font-semibold text-[#8e95a3]">Cellular Phone</td>
-                                  <td className="p-3">{fields.app_cell || "N/A"}</td>
-                                  <td className="p-3">{dup.client.cell || "N/A"}</td>
-                                </tr>
-                                <tr>
-                                  <td className="p-3 font-semibold text-[#8e95a3]">Assigned Advisor</td>
-                                  <td className="p-3 text-white/40">N/A (Pending)</td>
-                                  <td className="p-3 text-[#b5a642] font-bold">{dup.client.agent || "Unassigned"}</td>
-                                </tr>
-                                <tr>
-                                  <td className="p-3 font-semibold text-[#8e95a3]">CRM Status</td>
-                                  <td className="p-3 text-white/40">N/A (Pending)</td>
-                                  <td className="p-3">
-                                    <span className="text-[9px] font-black uppercase text-green-300 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">
-                                      {dup.client.status.toUpperCase()}
-                                    </span>
-                                  </td>
-                                </tr>
-                              </React.Fragment>
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Email Address *</label>
+                        <input type="email" value={fields.app_email || ""} onChange={(e) => handleFieldChange("app_email", e.target.value)} placeholder="jane@email.com" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Date of Birth</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <input type="text" value={fields.app_dob_m || ""} onChange={(e) => handleFieldChange("app_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.app_dob_d || ""} onChange={(e) => handleFieldChange("app_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.app_dob_y || ""} onChange={(e) => handleFieldChange("app_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Marital Status</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Married", "Single", "Divorced", "Separated", "Common-Law", "Widowed"].map(m => (
+                            <button key={m} type="button" onClick={() => handlePillSelect("app_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.app_marital === m ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5 hover:border-white/10"}`}>{m}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">S.I.N.</label>
+                          <input type="text" value={fields.app_sin || ""} onChange={(e) => handleFieldChange("app_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Credit Beacon Score</label>
+                          <input type="number" value={fields.beacon || ""} onChange={(e) => handleFieldChange("beacon", e.target.value)} placeholder="720" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Cell Phone</label>
+                          <input type="text" value={fields.app_cell || ""} onChange={(e) => handleFieldChange("app_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Home Phone</label>
+                          <input type="text" value={fields.app_home || ""} onChange={(e) => handleFieldChange("app_home", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Work Phone</label>
+                          <input type="text" value={fields.app_work || ""} onChange={(e) => handleFieldChange("app_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Preferred Contact</label>
+                          <div className="flex gap-2">
+                            {["Email", "Phone"].map(c => (
+                              <button key={c} type="button" onClick={() => handlePillSelect("app_contact", c)} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_contact === c ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{c}</button>
                             ))}
-                          </tbody>
-                        </table>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex gap-3">
-                        <button 
-                          onClick={() => handleFinalApprove('merge')}
-                          className="flex-1 py-2.5 bg-[#b5a642] hover:bg-[#9a8c38] text-black font-bold text-xs rounded-lg transition-colors cursor-pointer"
-                        >
-                          Merge Fields into Existing File ({duplicates[0].client.first})
-                        </button>
-                        <button 
-                          onClick={() => handleFinalApprove('create')}
-                          className="px-4 py-2.5 border border-red-500/20 text-red-300 hover:bg-red-500/5 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                        >
-                          Ignore &amp; Create Brand-New File
-                        </button>
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
+                        <input type="number" value={fields.app_dependents || ""} onChange={(e) => handleFieldChange("app_dependents", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
                       </div>
                     </div>
-                  ) : (
-                    <div className="p-4 bg-green-500/5 border border-green-500/20 text-green-300 rounded-lg text-xs leading-relaxed flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 shrink-0" />
-                      <p>
-                        <span className="font-bold text-white">No Duplicates Found.</span> This application name, email address, and cell phone do not match any client file currently registered in the database. A fresh active file can be generated with high integrity.
+
+                    {/* Co-Applicant */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant (Optional)</span>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">First Name</label>
+                          <input type="text" value={fields.co_first || ""} onChange={(e) => handleFieldChange("co_first", e.target.value)} placeholder="John" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Last Name</label>
+                          <input type="text" value={fields.co_last || ""} onChange={(e) => handleFieldChange("co_last", e.target.value)} placeholder="Smith" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Email Address</label>
+                        <input type="email" value={fields.co_email || ""} onChange={(e) => handleFieldChange("co_email", e.target.value)} placeholder="john@email.com" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Date of Birth</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <input type="text" value={fields.co_dob_m || ""} onChange={(e) => handleFieldChange("co_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.co_dob_d || ""} onChange={(e) => handleFieldChange("co_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.co_dob_y || ""} onChange={(e) => handleFieldChange("co_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Marital Status</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Married", "Single", "Divorced", "Separated", "Common-Law", "Widowed"].map(m => (
+                            <button key={m} type="button" onClick={() => handlePillSelect("co_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.co_marital === m ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5 hover:border-white/10"}`}>{m}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">S.I.N.</label>
+                          <input type="text" value={fields.co_sin || ""} onChange={(e) => handleFieldChange("co_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Cell Phone</label>
+                          <input type="text" value={fields.co_cell || ""} onChange={(e) => handleFieldChange("co_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Work Phone</label>
+                          <input type="text" value={fields.co_work || ""} onChange={(e) => handleFieldChange("co_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Preferred Contact</label>
+                          <div className="flex gap-2">
+                            {["Email", "Phone"].map(c => (
+                              <button key={c} type="button" onClick={() => handlePillSelect("co_contact", c)} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_contact === c ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{c}</button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. ADDRESS INFORMATION */}
+                {activeTab === "address" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-address-form">
+                    {/* Applicant Address */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Address</span>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Currently</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Own", "Rent", "Live with Relatives", "Live With Others"].map(h => (
+                            <button key={h} type="button" onClick={() => handlePillSelect("app_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.app_housing === h ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{h}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="col-span-3">
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Street Address *</label>
+                          <input type="text" value={fields.app_addr || ""} onChange={(e) => handleFieldChange("app_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Unit</label>
+                          <input type="text" value={fields.app_unit || ""} onChange={(e) => handleFieldChange("app_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">City</label>
+                          <input type="text" value={fields.app_city || ""} onChange={(e) => handleFieldChange("app_city", e.target.value)} placeholder="Barrie" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Province</label>
+                          <input type="text" value={fields.app_prov || ""} onChange={(e) => handleFieldChange("app_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Postal Code</label>
+                          <input type="text" value={fields.app_post || ""} onChange={(e) => handleFieldChange("app_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Years at Residence</label>
+                          <input type="number" value={fields.app_res_yrs || ""} onChange={(e) => handleFieldChange("app_res_yrs", e.target.value)} placeholder="3" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Months</label>
+                          <input type="number" value={fields.app_res_mos || ""} onChange={(e) => handleFieldChange("app_res_mos", e.target.value)} placeholder="6" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      {/* Previous Address Block */}
+                      <div className="pt-4 border-t border-white/5">
+                        <span className="text-[10px] text-[#bdae45] uppercase font-bold tracking-wider mb-2 block">Previous Address (If less than 3 years)</span>
+                        <div className="grid grid-cols-4 gap-2 mb-2">
+                          <div className="col-span-3">
+                            <input type="text" value={fields.app_prev_addr || ""} onChange={(e) => handleFieldChange("app_prev_addr", e.target.value)} placeholder="Previous Street Address" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div>
+                            <input type="text" value={fields.app_prev_unit || ""} onChange={(e) => handleFieldChange("app_prev_unit", e.target.value)} placeholder="Unit" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <input type="text" value={fields.app_prev_city || ""} onChange={(e) => handleFieldChange("app_prev_city", e.target.value)} placeholder="City" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
+                          <input type="text" value={fields.app_prev_prov || ""} onChange={(e) => handleFieldChange("app_prev_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white text-center focus:outline-none" />
+                          <input type="text" value={fields.app_prev_post || ""} onChange={(e) => handleFieldChange("app_prev_post", e.target.value)} placeholder="Postal" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white text-center focus:outline-none" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Co-Applicant Address */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Address</span>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Currently</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Own", "Rent", "Live with Relatives", "Live With Others"].map(h => (
+                            <button key={h} type="button" onClick={() => handlePillSelect("co_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.co_housing === h ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{h}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="col-span-3">
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Street Address</label>
+                          <input type="text" value={fields.co_addr || ""} onChange={(e) => handleFieldChange("co_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Unit</label>
+                          <input type="text" value={fields.co_unit || ""} onChange={(e) => handleFieldChange("co_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">City</label>
+                          <input type="text" value={fields.co_city || ""} onChange={(e) => handleFieldChange("co_city", e.target.value)} placeholder="Barrie" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Province</label>
+                          <input type="text" value={fields.co_prov || ""} onChange={(e) => handleFieldChange("co_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Postal Code</label>
+                          <input type="text" value={fields.co_post || ""} onChange={(e) => handleFieldChange("co_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. EMPLOYMENT INFORMATION */}
+                {activeTab === "employment" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-employment-form">
+                    {/* Applicant Employment */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Employment</span>
+                      
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Income Sources</label>
+                        <div className="flex gap-2">
+                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_inc_employed === "1" ? "bg-[#5d9bb1]/20 border-[#5d9bb1] text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_self")} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_inc_self === "1" ? "bg-[#5d9bb1]/20 border-[#5d9bb1] text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Self-Employed</button>
+                        </div>
+                      </div>
+
+                      {/* Primary Employed Details block */}
+                      {fields.app_inc_employed === "1" && (
+                        <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[#5d9bb1] uppercase font-extrabold tracking-wider block">Primary Employer Details</span>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Employer Name</label>
+                            <input type="text" value={fields.app_emp1_name || ""} onChange={(e) => handleFieldChange("app_emp1_name", e.target.value)} placeholder="Company Inc." className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Job Title</label>
+                              <input type="text" value={fields.app_emp1_title || ""} onChange={(e) => handleFieldChange("app_emp1_title", e.target.value)} placeholder="Manager" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Gross Annual Income</label>
+                              <input type="number" value={fields.app_emp1_income || ""} onChange={(e) => handleFieldChange("app_emp1_income", e.target.value)} placeholder="95000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Time (Yrs)</label>
+                              <input type="number" value={fields.app_emp1_yrs || ""} onChange={(e) => handleFieldChange("app_emp1_yrs", e.target.value)} placeholder="3" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Months</label>
+                              <input type="number" value={fields.app_emp1_mos || ""} onChange={(e) => handleFieldChange("app_emp1_mos", e.target.value)} placeholder="4" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Status</label>
+                              <select value={fields.app_emp1_status || ""} onChange={(e) => handleFieldChange("app_emp1_status", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                                <option value="">Select</option>
+                                <option value="Full Time">Full Time</option>
+                                <option value="Part Time">Part Time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Seasonal">Seasonal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Primary Self-Employed block */}
+                      {fields.app_inc_self === "1" && (
+                        <div className="bg-[#16161c] border border-[#bdae45]/20 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[#bdae45] uppercase font-extrabold tracking-wider block">Self-Employment / BFS</span>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Business / Company Name</label>
+                            <input type="text" value={fields.app_self_name || ""} onChange={(e) => handleFieldChange("app_self_name", e.target.value)} placeholder="My Corporation" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Years in Business</label>
+                              <input type="number" value={fields.app_self_yrs || ""} onChange={(e) => handleFieldChange("app_self_yrs", e.target.value)} placeholder="5" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">BFS Annual Net Income</label>
+                              <input type="number" value={fields.app_self_income || ""} onChange={(e) => handleFieldChange("app_self_income", e.target.value)} placeholder="110000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Co-Applicant Employment */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Employment</span>
+                      
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Income Sources</label>
+                        <div className="flex gap-2">
+                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_inc_employed === "1" ? "bg-neutral-600/30 border-neutral-500 text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_self")} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_inc_self === "1" ? "bg-neutral-600/30 border-neutral-500 text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Self-Employed</button>
+                        </div>
+                      </div>
+
+                      {/* Co-Applicant Employed Details block */}
+                      {fields.co_inc_employed === "1" && (
+                        <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[#5d9bb1] uppercase font-extrabold tracking-wider block">Co-Applicant Employer Details</span>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Employer Name</label>
+                            <input type="text" value={fields.co_emp1_name || ""} onChange={(e) => handleFieldChange("co_emp1_name", e.target.value)} placeholder="School Board" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Job Title</label>
+                              <input type="text" value={fields.co_emp1_title || ""} onChange={(e) => handleFieldChange("co_emp1_title", e.target.value)} placeholder="Teacher" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] text-white/40 mb-1">Gross Annual Income</label>
+                              <input type="number" value={fields.co_emp1_income || ""} onChange={(e) => handleFieldChange("co_emp1_income", e.target.value)} placeholder="85000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Co-Applicant Self-Employed block */}
+                      {fields.co_inc_self === "1" && (
+                        <div className="bg-[#16161c] border border-[#bdae45]/20 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[#bdae45] uppercase font-extrabold tracking-wider block">Co-Applicant Self-Employment</span>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Business Name</label>
+                            <input type="text" value={fields.co_self_name || ""} onChange={(e) => handleFieldChange("co_self_name", e.target.value)} placeholder="Spouse Biz Inc." className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Annual Net Income</label>
+                            <input type="number" value={fields.co_self_income || ""} onChange={(e) => handleFieldChange("co_self_income", e.target.value)} placeholder="65000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. OTHER INCOME */}
+                {activeTab === "otherIncome" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-other-income-form">
+                    {/* Applicant Other Income */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Other Income</span>
+                      
+                      <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
+                        <span className="text-[10px] text-white/60 font-bold uppercase block">Source 1</span>
+                        <div>
+                          <label className="block text-[9px] text-white/40 mb-1">Income Type / Description</label>
+                          <input type="text" value={fields.app_other0_specify || ""} onChange={(e) => handleFieldChange("app_other0_specify", e.target.value)} placeholder="e.g. Pension, Rental, Child Support" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Amount ($)</label>
+                            <input type="number" value={fields.app_other0_amount || ""} onChange={(e) => handleFieldChange("app_other0_amount", e.target.value)} placeholder="500" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Frequency</label>
+                            <select value={fields.app_other0_freq || ""} onChange={(e) => handleFieldChange("app_other0_freq", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                              <option value="Monthly">Monthly</option>
+                              <option value="Annually">Annually</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Co-Applicant Other Income */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Other Income</span>
+                      
+                      <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
+                        <span className="text-[10px] text-white/60 font-bold uppercase block">Source 1</span>
+                        <div>
+                          <label className="block text-[9px] text-white/40 mb-1">Income Type / Description</label>
+                          <input type="text" value={fields.co_other0_specify || ""} onChange={(e) => handleFieldChange("co_other0_specify", e.target.value)} placeholder="e.g. Rental Income" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Amount ($)</label>
+                            <input type="number" value={fields.co_other0_amount || ""} onChange={(e) => handleFieldChange("co_other0_amount", e.target.value)} placeholder="600" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] text-white/40 mb-1">Frequency</label>
+                            <select value={fields.co_other0_freq || ""} onChange={(e) => handleFieldChange("co_other0_freq", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                              <option value="Monthly">Monthly</option>
+                              <option value="Annually">Annually</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. PROPERTY DETAILS */}
+                {activeTab === "property" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-property-form">
+                    {/* Characteristics */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#bdae45] text-black px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Property Details</span>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Property Type</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Detached", "Semi-Detached", "Townhouse", "Condo", "Other"].map(p => (
+                            <button key={p} type="button" onClick={() => handlePillSelect("prop_type", p)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.prop_type === p ? "bg-[#bdae45] text-black border-[#bdae45] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{p}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Tenure Type</label>
+                          <select value={fields.prop_tenure || ""} onChange={(e) => handleFieldChange("prop_tenure", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                            <option value="Freehold">Freehold</option>
+                            <option value="Leasehold">Leasehold</option>
+                            <option value="Condominium">Condominium</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Property Age (Yrs)</label>
+                          <input type="number" value={fields.prop_age || ""} onChange={(e) => handleFieldChange("prop_age", e.target.value)} placeholder="10" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Lot Size</label>
+                          <input type="text" value={fields.prop_lot || ""} onChange={(e) => handleFieldChange("prop_lot", e.target.value)} placeholder="50 x 120" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Building Area (SqFt)</label>
+                          <input type="number" value={fields.prop_area || ""} onChange={(e) => handleFieldChange("prop_area", e.target.value)} placeholder="2200" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Garage</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <select value={fields.prop_garage_type || ""} onChange={(e) => handleFieldChange("prop_garage_type", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="Attached">Attached</option>
+                            <option value="Detached">Detached</option>
+                            <option value="None">None</option>
+                          </select>
+                          <select value={fields.prop_garage_size || ""} onChange={(e) => handleFieldChange("prop_garage_size", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="Single">Single</option>
+                            <option value="Double">Double</option>
+                            <option value="Triple">Triple</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Financials / Utilities */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#bdae45] text-black px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Property Financials</span>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Estimated Value *</label>
+                          <input type="number" value={fields.prop_value || ""} onChange={(e) => handleFieldChange("prop_value", e.target.value)} placeholder="650000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Original Price</label>
+                          <input type="number" value={fields.prop_orig_price || ""} onChange={(e) => handleFieldChange("prop_orig_price", e.target.value)} placeholder="450000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Purchase Date</label>
+                          <input type="text" value={fields.prop_purchase_date || ""} onChange={(e) => handleFieldChange("prop_purchase_date", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Yearly Property Tax</label>
+                          <input type="number" value={fields.prop_tax || ""} onChange={(e) => handleFieldChange("prop_tax", e.target.value)} placeholder="4100" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Condo Fees (Monthly)</label>
+                          <input type="number" value={fields.prop_condo_fees || ""} onChange={(e) => handleFieldChange("prop_condo_fees", e.target.value)} placeholder="350" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Heating (Monthly)</label>
+                          <input type="number" value={fields.prop_heat || ""} onChange={(e) => handleFieldChange("prop_heat", e.target.value)} placeholder="150" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-[9px] text-white/40 mb-1">Water Source</label>
+                          <select value={fields.prop_water || ""} onChange={(e) => handleFieldChange("prop_water", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="Municipal">Municipal</option>
+                            <option value="Well">Well</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/40 mb-1">Sewage</label>
+                          <select value={fields.prop_sewage || ""} onChange={(e) => handleFieldChange("prop_sewage", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="Municipal">Municipal</option>
+                            <option value="Septic">Septic</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/40 mb-1">Heat Fuel</label>
+                          <select value={fields.prop_heat_source || ""} onChange={(e) => handleFieldChange("prop_heat_source", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="Forced Air Gas">FA Gas</option>
+                            <option value="Electric Baseboard">Elec Base</option>
+                            <option value="Forced Air Electric">FA Elec</option>
+                            <option value="Forced Air Oil">FA Oil</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 6. MORTGAGE DETAILS */}
+                {activeTab === "mortgage" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-mortgage-form">
+                    {/* First Mortgage */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">First Mortgage</span>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Requested Amount / Bal *</label>
+                          <input type="number" value={fields.mtg1_balance || ""} onChange={(e) => handleFieldChange("mtg1_balance", e.target.value)} placeholder="450000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Monthly Payment</label>
+                          <input type="number" value={fields.mtg1_payment || ""} onChange={(e) => handleFieldChange("mtg1_payment", e.target.value)} placeholder="2800" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Interest Rate (%)</label>
+                          <input type="number" step="0.01" value={fields.mtg1_rate || ""} onChange={(e) => handleFieldChange("mtg1_rate", e.target.value)} placeholder="4.99" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Rate Type</label>
+                          <div className="flex gap-2">
+                            {["Fixed", "Variable"].map(r => (
+                              <button key={r} type="button" onClick={() => handlePillSelect("mtg1_rate_type", r)} className={`flex-1 py-1.5 rounded text-xs border ${fields.mtg1_rate_type === r ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{r}</button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Maturity Date</label>
+                          <input type="text" value={fields.mtg1_maturity || ""} onChange={(e) => handleFieldChange("mtg1_maturity", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Lender / Holder</label>
+                          <input type="text" value={fields.mtg1_holder || ""} onChange={(e) => handleFieldChange("mtg1_holder", e.target.value)} placeholder="TD Bank" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Payment Frequency</label>
+                          <select value={fields.mtg1_freq || ""} onChange={(e) => handleFieldChange("mtg1_freq", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                            <option value="Weekly">Weekly</option>
+                            <option value="Bi-weekly">Bi-weekly</option>
+                            <option value="Monthly">Monthly</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Term Type</label>
+                          <select value={fields.mtg1_term_type || ""} onChange={(e) => handleFieldChange("mtg1_term_type", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                            <option value="Closed">Closed</option>
+                            <option value="Open">Open</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Second Mortgage */}
+                    <div className="space-y-4">
+                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Second Mortgage</span>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Balance Owing</label>
+                          <input type="number" value={fields.mtg2_balance || ""} onChange={(e) => handleFieldChange("mtg2_balance", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Monthly Payment</label>
+                          <input type="number" value={fields.mtg2_payment || ""} onChange={(e) => handleFieldChange("mtg2_payment", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Second Mortgage Holder</label>
+                        <input type="text" value={fields.mtg2_holder || ""} onChange={(e) => handleFieldChange("mtg2_holder", e.target.value)} placeholder="e.g. Private Lender" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Purpose of Second Mortgage</label>
+                        <textarea rows={3} value={fields.mtg2_purpose || ""} onChange={(e) => handleFieldChange("mtg2_purpose", e.target.value)} placeholder="Debt consolidation, renovation, etc." className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-[#eeeef2] focus:outline-none font-mono" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 7. REVIEW & SUBMIT */}
+                {activeTab === "submit" && (
+                  <div className="space-y-6" id="tab-review-submit-box">
+                    <div className="bg-[#16161c] border border-white/5 p-6 rounded-2xl">
+                      <h3 className="text-sm font-extrabold text-white uppercase tracking-wider mb-3">CRM Intake &amp; Ownership Assignment</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] text-white/40 uppercase font-black tracking-wider mb-1.5">Assign Broker / Agent Owner</label>
+                          <select 
+                            value={assignedAgent} 
+                            onChange={(e) => setAssignedAgent(e.target.value)}
+                            className="w-full bg-[#0d0d10] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                          >
+                            {agentNames.map(name => (
+                              <option key={name} value={name}>{name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] text-white/40 uppercase font-black tracking-wider mb-1.5">Intake File Status</label>
+                          <div className="flex gap-2">
+                            <button 
+                              type="button" 
+                              onClick={() => setIntakeStatus("working")}
+                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all ${intakeStatus === "working" ? "bg-[#5d9bb1] text-black border-[#5d9bb1]" : "bg-white/5 text-white/60 border-white/5"}`}
+                            >
+                              📁 Active Underwriting File
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => setIntakeStatus("lead")}
+                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all ${intakeStatus === "lead" ? "bg-[#bdae45] text-black border-[#bdae45]" : "bg-white/5 text-white/60 border-white/5"}`}
+                            >
+                              ⭐ Lead Generation File
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#12191d] border border-[#6fa3b8]/20 p-5 rounded-2xl">
+                      <h4 className="text-xs font-extrabold text-[#6fa3b8] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <Info className="w-4 h-4" /> Privacy &amp; Consent Statement
+                      </h4>
+                      <p className="text-[11px] text-white/60 leading-relaxed">
+                        By submitting this application, you confirm that all information provided is accurate and complete. Your personal information will be handled securely and in accordance with applicable Canadian privacy legislation (PIPEDA). All credit checks are authorized under active client engagement disclosures.
                       </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. DOWNSTREAM WORKFLOW INTEGRATIONS (Checklists, suggested docs, starter tasks) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  {/* Native suggested documents checklist */}
-                  <div className="bg-[#141418] border border-white/5 p-6 rounded-2xl space-y-4">
-                    <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <FileCheck className="w-4 h-4 text-[#6fa3b8]" /> Initial Documents Ingestion
-                    </h4>
-                    <p className="text-[10px] text-[#8e95a3]">
-                      Based on employment ({fields.app_inc_self === "1" ? "Self-employed" : "Salaried"}), co-applicant presence, and purchase type, these documents are pre-assigned in the Document Manager:
-                    </p>
-                    
-                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                      {suggestedDocs.map((doc) => (
-                        <div key={doc.id} className="p-2.5 bg-[#1b1b22] border border-white/5 rounded-lg flex items-start gap-2.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#6fa3b8] mt-1.5 shrink-0" />
-                          <div>
-                            <div className="text-[11px] font-bold text-white">{doc.name}</div>
-                            <div className="text-[9px] text-[#8e95a3]">{doc.desc}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Checklist starter logic tasks */}
-                  <div className="bg-[#141418] border border-white/5 p-6 rounded-2xl space-y-4">
-                    <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <ClipboardList className="w-4 h-4 text-[#b5a642]" /> Checklist Starter Logic
-                    </h4>
-                    <p className="text-[10px] text-[#8e95a3]">
-                      The system auto-generates the following broker action tasks based on missing fields or credit verification requirements:
-                    </p>
-
-                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                      {starterTasks.map((task, idx) => (
-                        <div key={idx} className="p-2.5 bg-[#1b1b22] border border-white/5 rounded-lg flex items-start gap-2.5">
-                          <span className={`text-[8px] font-bold px-1 rounded uppercase mt-0.5 shrink-0 ${
-                            task.priority === 'high' 
-                              ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
-                              : task.priority === 'medium'
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-                          }`}>
-                            {task.priority}
-                          </span>
-                          <div>
-                            <div className="text-[11px] font-bold text-white">{task.title}</div>
-                            <div className="text-[9px] text-[#8e95a3]">{task.notes}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* 3. SET ASSIGNED ADVISOR, NOTES & INTAKE NOTES */}
-                <div className="bg-[#141418] border border-white/5 p-6 rounded-2xl space-y-4">
-                  <h4 className="text-xs font-black text-white uppercase tracking-wider">Ingestion Routing Settings</h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] block">Assigned Advisor (Mortgage Broker)</label>
-                      <select
-                        value={assignedAgent}
-                        onChange={(e) => setAssignedAgent(e.target.value)}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#b5a642]"
-                      >
-                        {agentNames.map(name => <option key={name} value={name}>{name}</option>)}
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] block">Initial Ingestion Stage (Status)</label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setIntakeStatus('working')}
-                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all border cursor-pointer ${
-                            intakeStatus === 'working'
-                              ? 'bg-[#b5a642] text-black border-transparent'
-                              : 'bg-[#1b1b20] text-[#8e95a3] border-white/5 hover:text-white'
-                          }`}
-                        >
-                          Active File ("working")
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setIntakeStatus('lead')}
-                          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all border cursor-pointer ${
-                            intakeStatus === 'lead'
-                              ? 'bg-[#6fa3b8] text-black border-transparent'
-                              : 'bg-[#1b1b20] text-[#8e95a3] border-white/5 hover:text-white'
-                          }`}
-                        >
-                          CRM Lead ("lead")
-                        </button>
+                      <div className="text-[9px] text-white/40 mt-3 font-mono">
+                        GBK Financial • Licence #11921 • Barrie, Ontario
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2 pt-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] block">Underwriting Notes &amp; Intake Flags</label>
-                    <textarea
-                      rows={3}
-                      value={intakeNotes}
-                      onChange={(e) => setIntakeNotes(e.target.value)}
-                      placeholder="Add files specific concerns, self-employed constraints, appraisal requirements..."
-                      className="w-full bg-[#1b1b22] border border-white/5 rounded-lg p-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#b5a642] placeholder:text-white/20"
-                    />
+                    {/* Final Action Button */}
+                    <div className="flex justify-end pt-2">
+                      <button
+                        onClick={handleCommissionFile}
+                        className="px-8 py-3 bg-gradient-to-r from-[#bdae45] to-[#5d9bb1] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl transition-all shadow-md"
+                        id="commission-new-crm-file-btn"
+                      >
+                        ✦ Commission CRM Mortgage File
+                      </button>
+                    </div>
                   </div>
-                </div>
-
+                )}
               </div>
 
+              {/* Footer navigation */}
+              <div className="px-6 py-4 bg-[#16161c] border-t border-white/5 flex items-center justify-between shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (mode === "ai") {
+                      setWorkflowStep("upload");
+                    } else {
+                      onClose();
+                    }
+                  }}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/5 text-xs font-bold rounded-lg transition-all"
+                >
+                  {mode === "ai" ? "← Back to AI Upload" : "Cancel"}
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {(["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[]).indexOf(activeTab) > 0 && (
+                    <button
+                      onClick={() => {
+                        const tabs = ["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[];
+                        const currentIdx = tabs.indexOf(activeTab);
+                        setActiveTab(tabs[currentIdx - 1]);
+                      }}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-lg transition-all"
+                    >
+                      Previous Step
+                    </button>
+                  )}
+
+                  {(["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[]).indexOf(activeTab) < 6 ? (
+                    <button
+                      onClick={() => {
+                        const tabs = ["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[];
+                        const currentIdx = tabs.indexOf(activeTab);
+                        setActiveTab(tabs[currentIdx + 1]);
+                      }}
+                      className="px-5 py-2 bg-[#5d9bb1] text-black text-xs font-black rounded-lg transition-all flex items-center gap-1"
+                    >
+                      <span>Continue</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleCommissionFile}
+                      className="px-6 py-2 bg-[#bdae45] text-black text-xs font-black rounded-lg transition-all"
+                    >
+                      Commission File
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
-        </div>
-
-        {/* FOOTER NAVIGATION & CTAS */}
-        <div className="p-4 border-t border-white/5 shrink-0 flex items-center justify-between bg-[#141418] select-none">
-          <button 
-            onClick={onClose}
-            className="px-4 py-2 border border-white/10 text-[#8e95a3] hover:text-white text-xs font-semibold rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            Cancel Intake
-          </button>
-          
-          <div className="flex gap-2">
-            {workflowStep === "upload" && fileName && (
-              <button 
-                onClick={() => setWorkflowStep("review")}
-                className="px-5 py-2 bg-[#b5a642] text-black text-xs font-bold rounded-lg hover:bg-[#a1933a] transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                Go to Field Review <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-
-            {workflowStep === "review" && (
-              <>
-                <button 
-                  onClick={() => setWorkflowStep("upload")}
-                  className="px-4 py-2 border border-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  Back to Upload
-                </button>
-                <button 
-                  onClick={() => setWorkflowStep("finalize")}
-                  className="px-5 py-2 bg-gradient-to-r from-[#b5a642] to-[#6fa3b8] text-black text-xs font-bold rounded-lg hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  Next: Duplicates &amp; Finalize <ChevronRight className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            {workflowStep === "finalize" && (
-              <>
-                <button 
-                  onClick={() => setWorkflowStep("review")}
-                  className="px-4 py-2 border border-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  Back to Review
-                </button>
-                
-                {duplicates.length > 0 ? (
-                  <button 
-                    onClick={() => handleFinalApprove('merge')}
-                    className="px-5 py-2 bg-[#b5a642] text-black text-xs font-bold rounded-lg hover:bg-[#a1933a] transition-all flex items-center gap-1.5 cursor-pointer animate-pulse"
-                  >
-                    Confirm &amp; Merge Fields into Client <ArrowRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => handleFinalApprove('create')}
-                    className="px-5 py-2 bg-gradient-to-r from-[#b5a642] to-[#6fa3b8] text-black text-xs font-bold rounded-lg hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    Approve &amp; Create Active File <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
-              </>
-            )}
-          </div>
         </div>
 
       </div>
     </div>
   );
-
-  // Helper renderer for input fields with confidence trackers
-  function renderReviewField(key: string, label: string, placeholder = "", type = "text") {
-    const value = fields[key] || "";
-    const status = confidenceScores[key] || 'high';
-
-    let statusStyle = "";
-    let statusText = "";
-    
-    if (status === 'unclear') {
-      statusStyle = "border-orange-500/40 bg-[#1d1d24] text-orange-200 hover:border-orange-500/60";
-      statusText = "Confirm";
-    } else if (status === 'missing' && !value) {
-      statusStyle = "border-red-500/25 bg-red-500/5 text-red-200 hover:border-red-500/40";
-      statusText = "Add Data";
-    } else if (status === 'confirmed') {
-      statusStyle = "border-green-500/30 bg-[#141418] text-green-200";
-      statusText = "Verified";
-    } else {
-      statusStyle = "border-white/5 bg-[#141418] hover:border-white/15 text-white/95";
-      statusText = "Verify";
-    }
-
-    return (
-      <div className={`p-2.5 rounded-xl border transition-all flex flex-col gap-0.5 relative group ${statusStyle}`}>
-        <div className="flex justify-between items-center select-none">
-          <label className="text-[9px] text-[#8e95a3] uppercase font-black tracking-wider">{label}</label>
-          <span 
-            onClick={() => toggleConfidence(key)}
-            className="text-[8px] font-bold px-1.5 py-0.5 rounded cursor-pointer select-none uppercase hover:brightness-110 active:scale-95 transition-all"
-            style={{
-              backgroundColor: status === 'unclear' ? 'rgba(249,115,22,0.15)' : status === 'missing' ? 'rgba(239,68,68,0.15)' : status === 'confirmed' ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)',
-              color: status === 'unclear' ? '#f97316' : status === 'missing' ? '#ef4444' : status === 'confirmed' ? '#22c55e' : '#8e95a3'
-            }}
-          >
-            {statusText}
-          </span>
-        </div>
-        <input 
-          type={type}
-          value={value}
-          onChange={(e) => handleFieldChange(key, e.target.value)}
-          placeholder={placeholder}
-          className="w-full bg-transparent text-xs text-white focus:outline-none mt-1 border-none p-0 focus:ring-0 placeholder:text-white/10 font-medium"
-        />
-      </div>
-    );
-  }
 };
