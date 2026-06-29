@@ -17,7 +17,6 @@ import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./components/Dashboard";
 import { ClientsList } from "./components/ClientsList";
 import { Calculators } from "./components/Calculators";
-import { AIIntake } from "./components/AIIntake";
 import { AIAssistantCenter } from "./components/AIAssistantCenter";
 import { ApplicationIntake } from "./components/ApplicationIntake";
 import { Messages } from "./components/Messages";
@@ -30,22 +29,39 @@ import { Reports } from "./components/Reports";
 import { Retention } from "./components/Retention";
 import { Compliance } from "./components/Compliance";
 import { AdminPanel } from "./components/AdminPanel";
-import { DocumentManager } from "./components/DocumentManager";
 import { FileReadiness } from "./components/FileReadiness";
 import { Settings } from "./components/Settings";
-import { MortgageChecklist } from "./components/MortgageChecklist";
-import { MortgageActivityTracker } from "./components/MortgageActivityTracker";
-import { ApplicationDetailsForm } from "./components/ApplicationDetailsForm";
 import { ZDrivePanel } from "./components/ZDrivePanel";
 import { logActivityEvent } from "./lib/activityEngine";
-import { CHECKLIST_RULES, STATUS_STYLING } from "./components/document/constants";
+import { useClients } from "./hooks/useClients";
+import { useTasks } from "./hooks/useTasks";
+import { useCalendar } from "./hooks/useCalendar";
+import { useAI } from "./hooks/useAI";
+import { useAuth } from "./hooks/useAuth";
+import { ClientDetailPanel } from "./components/ClientDetailPanel";
 
 export default function App() {
-  // ─── STATE MANAGEMENT ───
-  const [clients, setClients] = useState<Client[]>(() => {
-    const saved = localStorage.getItem("gbk_clients");
-    return saved ? JSON.parse(saved) : DEFAULT_CLIENTS;
-  });
+  const TAB_LABELS: Record<string, string> = {
+    dashboard: "Dashboard",
+    clients: "Clients",
+    pipeline: "Pipeline",
+    calculators: "Calculators",
+    ai: "AI Assistant Center",
+    messages: "Messages",
+    emails: "Email",
+    lenders: "Lender Sheets",
+    calendar: "Calendar",
+    tasks: "Tasks",
+    partners: "Partners",
+    reports: "Reports",
+    retention: "Client Retention",
+    compliance: "Compliance",
+    file_readiness: "File Readiness",
+    admin: "Admin Panel",
+    settings: "Settings"
+  };
+
+  // ─── REMAINING SHARED STATE ───
   const [lenders, setLenders] = useState<Lender[]>(() => {
     const saved = localStorage.getItem("gbk_lenders");
     return saved ? JSON.parse(saved) : DEFAULT_LENDERS;
@@ -53,140 +69,6 @@ export default function App() {
   const [partners, setPartners] = useState<Partner[]>(() => {
     const saved = localStorage.getItem("gbk_partners");
     return saved ? JSON.parse(saved) : DEFAULT_PARTNERS;
-  });
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem("gbk_tasks");
-    const arr = saved ? JSON.parse(saved) : [];
-    if (!arr.length) {
-      // Seed initial tasks
-      return [
-        { id: "t_1", title: "Follow up with David Martinez regarding teacher salary paystubs", status: "open", priority: "high", dueDate: new Date().toISOString().split("T")[0], clientId: "c_smith", clientName: "David Martinez", assignedTo: "David Acosta", notes: "Lender condition outstanding on loan.", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: "System" },
-        { id: "t_2", title: "Run GDS/TDS stress analysis on Marcus Jackson stated income", status: "open", priority: "medium", dueDate: new Date().toISOString().split("T")[0], clientId: "c_jackson", clientName: "Marcus Jackson", assignedTo: "David Acosta", notes: "Alt-A applicant scenario.", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: "System" }
-      ];
-    }
-    return arr;
-  });
-  const [events, setEvents] = useState<Event[]>(() => {
-    const saved = localStorage.getItem("gbk_events");
-    const initialEvents: Event[] = [];
-    const yearStr = new Date().getFullYear();
-    const monthStr = String(new Date().getMonth() + 1).padStart(2, "0");
-
-    DEFAULT_CLIENTS.forEach(c => {
-      if (c.dob) {
-        const d = new Date(c.dob);
-        initialEvents.push({
-          id: `bd_${c.id}`,
-          title: `🎂 ${c.first} ${c.last}'s Birthday`,
-          date: `${yearStr}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
-          type: "birthday",
-          clientId: c.id,
-          createdBy: "System"
-        });
-      }
-    });
-
-    // Add high-quality mortgage CRM events
-    initialEvents.push(
-      {
-        id: "ev_1",
-        title: "TD BDM Appraisal Review - David Martinez",
-        date: `${yearStr}-${monthStr}-22`,
-        time: "10:00",
-        type: "lender",
-        clientId: "c_smith",
-        notes: "Discuss appraisal valuation on Simcoe property with Sarah Jenkins.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_2",
-        title: "Martinez Commitment Sign-off Call",
-        date: `${yearStr}-${monthStr}-22`,
-        time: "14:00",
-        type: "client",
-        clientId: "c_smith",
-        notes: "Review commitment conditions and collect outstanding paystubs.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_3",
-        title: "RBC Rate Lock Strategy Review",
-        date: `${yearStr}-${monthStr}-23`,
-        time: "11:30",
-        type: "meeting",
-        clientId: "c_chen",
-        notes: "Analyze GDS/TDS ratios and explore 5-year fixed lock options.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_4",
-        title: "Stated Income BFS Underwriting Audit",
-        date: `${yearStr}-${monthStr}-23`,
-        time: "16:00",
-        type: "lender",
-        clientId: "c_chen",
-        notes: "Internal files audit with Wayne on self-employed documentation guidelines.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_5",
-        title: "Sarah Thompson NOA Verification call",
-        date: `${yearStr}-${monthStr}-24`,
-        time: "09:30",
-        type: "client",
-        clientId: "c_thompson",
-        notes: "Verification of Notice of Assessments for Sarah Thompson pre-approval.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_6",
-        title: "First National Escalation Sync",
-        date: `${yearStr}-${monthStr}-24`,
-        time: "13:00",
-        type: "lender",
-        notes: "BDM escalation call regarding underwriting pre-approval exception.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_7",
-        title: "GBK Team Weekly Pipeline Review",
-        date: `${yearStr}-${monthStr}-24`,
-        time: "15:30",
-        type: "meeting",
-        notes: "Brokerage-wide active deals review with Tim Brown and Jamey Brown.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_8",
-        title: "Equity Bank Alt-A BFS Submission",
-        date: `${yearStr}-${monthStr}-25`,
-        time: "11:00",
-        type: "lender",
-        notes: "Submit and pitch stated income file to Equitable Bank.",
-        createdBy: "System"
-      },
-      {
-        id: "ev_9",
-        title: "Henderson Firm Approval Milestone",
-        date: `${yearStr}-${monthStr}-26`,
-        time: "10:00",
-        type: "client",
-        notes: "Closing and firm sign-off celebration with the buyers.",
-        createdBy: "System"
-      }
-    );
-
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (!parsed.some((e: any) => e.id.startsWith("ev_"))) {
-        localStorage.setItem("gbk_events", JSON.stringify(initialEvents));
-        return initialEvents;
-      }
-      return parsed;
-    }
-
-    localStorage.setItem("gbk_events", JSON.stringify(initialEvents));
-    return initialEvents;
   });
   const [messages, setMessages] = useState<Record<string, any[]>>(() => {
     const saved = localStorage.getItem("gbk_messages");
@@ -203,57 +85,10 @@ export default function App() {
 
   const [activeTab, setActiveTab ] = useState<string>("dashboard");
   const [globalSearchSearch, setGlobalSearchSearch] = useState<string>("");
-  const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [detailTab, setDetailTab] = useState<string>("overview");
 
   // Notifications / Toast
   const [toastMessage, setToastMessage] = useState<{ msg: string; icon?: string; type: "success" | "error" } | null>(null);
-
-  // Authentication & Security state
-  const [currentUser, setCurrentUser] = useState<User>(DEFAULT_USERS[0]); // David Acosta (Owner)
-  const [appLocked, setAppLocked] = useState<boolean>(false);
-  const [pinInput, setPinInput] = useState<string>("");
-  const [pinError, setPinError] = useState<string>("");
-  const [userRoster, setUserRoster] = useState<User[]>(() => {
-    const saved = localStorage.getItem("gbk_roster");
-    return saved ? JSON.parse(saved) : DEFAULT_USERS;
-  });
-  const [profileModalOpen, setProfileModalOpen] = useState<boolean>(false);
-  const [profileTab, setProfileTab] = useState<'profile' | 'signup' | 'switch'>('profile');
-  
-  // Active User Email Edit Credentials State
-  const [activeHost, setActiveHost] = useState("");
-  const [activePort, setActivePort] = useState("");
-  const [activeUsername, setActiveUsername] = useState("");
-  const [activePassword, setActivePassword] = useState("");
-
-  // Signup form state
-  const [suFirst, setSuFirst] = useState("");
-  const [suLast, setSuLast] = useState("");
-  const [suEmail, setSuEmail] = useState("");
-  const [suRole, setSuRole] = useState<'Owner / Master Admin' | 'Super Admin' | 'IT / Developer' | 'Senior Broker' | 'Agent'>('Agent');
-  const [suPhone, setSuPhone] = useState("");
-  const [suPin, setSuPin] = useState("");
-  const [suFsra, setSuFsra] = useState("");
-  const [suHost, setSuHost] = useState("imap.gmail.com");
-  const [suPort, setSuPort] = useState("993");
-  const [suPass, setSuPass] = useState("");
-
-  // Switch User Form State
-  const [swTargetId, setSwTargetId] = useState("");
-  const [swPin, setSwPin] = useState("");
-  const [swError, setSwError] = useState("");
-
-  // Synchronize state when the active user switches
-  useEffect(() => {
-    setActiveHost(currentUser.emailHost || "imap.gmail.com");
-    setActivePort(currentUser.emailPort || "993");
-    setActiveUsername(currentUser.emailUsername || currentUser.email);
-    setActivePassword(currentUser.emailPassword || "");
-  }, [currentUser]);
-
-  // Client view sub mode (Directory table vs KanBan columns)
-  const [clientViewMode, setClientViewMode] = useState<'database' | 'pipeline'>("database");
 
   // Audit Logs
   const [auditLogs, setAuditLogs] = useState<any[]>(() => {
@@ -274,8 +109,6 @@ export default function App() {
   const [auditLoggingEnabled, setAuditLogEnabled] = useState<boolean>(() => {
     return localStorage.getItem("gbk_sec_audit") !== "false";
   });
-  const [lockoutTries, setLockoutTries] = useState<number>(3);
-
   // Broadcast Notification Banners
   const [broadcastBanners, setBroadcastBanners] = useState<any[]>(() => {
     const saved = localStorage.getItem("gbk_admin_broadcasts");
@@ -320,54 +153,14 @@ export default function App() {
   const [seY1, setSeY1] = useState<string>("80000");
   const [seY2, setSeY2] = useState<string>("95000");
 
-  // Document Vault Drop Area Highlight state
-  const [isDragOver, setIsDragOver] = useState<boolean>(false);
-
-  // AI Chat & Underwrite states
-  const [aiClientId, setAiClientId] = useState<string>("");
-  const [aiSelectedClient, setAiSelectedClient] = useState<Client | null>(null);
-  const [aiHistory, setAiHistory] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
-  const [aiInputText, setAiInputText] = useState<string>("");
-  const [aiLoading, setAiLoading] = useState<boolean>(false);
-
-  // Application Intake Modal & Quick Extract states
-  const [aiIntakeOpen, setAiIntakeOpen] = useState<boolean>(false);
-  const [applicationIntakeOpen, setApplicationIntakeOpen] = useState<boolean>(false);
-  const [aiIntakeEditingId, setAiIntakeOpenEditId] = useState<string | null>(null);
-  const [aiIntakeText, setAiIntakeText] = useState<string>("");
-  const [aiIntakeLoading, setAiIntakeLoading] = useState<boolean>(false);
-  const [aiIntakeFields, setAiIntakeFields] = useState<Record<string, string>>({});
-  const [highlightedAiFields, setHighlightedAiFields] = useState<string[]>([]);
-
   // Email Compose state
   const [emailComposeOpen, setEmailComposeOpen] = useState<boolean>(false);
   const [compTo, setCompTo] = useState<string>("");
   const [compSubject, setCompSubject] = useState<string>("");
   const [compBody, setCompBody] = useState<string>("");
-  const [compClientLink, setCompClientLink] = useState<string>("");
-  const [compScheduleMode, setCompScheduleMode] = useState<boolean>(false);
-  const [compScheduleTime, setCompScheduleTime] = useState<string>("");
-
-  // Social / Marketing state
-  const [autoTopic, setAutoTopic] = useState<string>("Rate Update");
-  const [autoTone, setAutoTone] = useState<string>("Professional");
-  const [customTopic, setCustomTopic] = useState<string>("");
-  const [platforms, setPlatforms] = useState<Record<string, boolean>>({ facebook: true, instagram: true, linkedin: true });
-  const [postedDraft, setPostedDraft] = useState<string>("");
-  const [isGeneratingPost, setIsGeneratingPost] = useState<boolean>(false);
-
-  // Partner filter / dialog
-  const [partnerFilter, setPartnerFilter] = useState<string>("all");
-  const [partnerModalOpen, setPartnerModalOpen] = useState<boolean>(false);
-  const [editingPartnerId, setEditingPartnerId] = useState<string | null>(null);
-
-  // Local calendar date focus
-  const [calDate, setCalDate] = useState<Date>(new Date());
-  const [calSelectedDate, setCalSelectedDate] = useState<string | null>(fiso(new Date()));
 
   // Active channel in Direct/Announcements chat
   const [activeChannel, setActiveChannel] = useState<string>("general");
-  const [dmLinkClientOpen, setDmLinkClientOpen] = useState<boolean>(false);
   const [linkedChatClientId, setLinkedChatClientId] = useState<string | null>(null);
 
   // Document Vault State Storage
@@ -376,65 +169,193 @@ export default function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
-  // Client retention View focus
-  const [retView, setRetView] = useState<string>("birthdays");
-
   // Modals Inputs
   const [newClientOpen, setNewClientOpen] = useState<boolean>(false);
   const [zDriveOpen, setZDriveOpen] = useState<boolean>(false);
-  const [intakePreloadedText, setIntakePreloadedText] = useState<string>("");
-  const [intakePreloadedFileName, setIntakePreloadedFileName] = useState<string>("");
-  const [taskModalOpen, setTaskModalOpen] = useState<boolean>(false);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [calEventModalOpen, setCalEventModalOpen] = useState<boolean>(false);
-  const [lenderModalOpen, setLenderModalOpen] = useState<boolean>(false);
-  const [userModalOpen, setUserModalOpen] = useState<boolean>(false);
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
   const [headerProfileOpen, setHeaderProfileOpen] = useState<boolean>(false);
 
-  // Active inputs for modals
-  const [fFirst, setFFirst] = useState("");
-  const [fLast, setFLast] = useState("");
-  const [fEmail, setFEmail] = useState("");
-  const [fCell, setFCell] = useState("");
-  const [fDob, setFDob] = useState("");
-  const [fMarital, setFMarital] = useState("");
-  const [fSin, setFSin] = useState("");
-  const [fDep, setFDep] = useState("0");
-  const [fCo, setFCo] = useState("");
-  const [fType, setFType] = useState("Purchase");
-  const [fAgent, setFAgent] = useState("");
-  const [fStatus, setFStatus] = useState("open");
-  const [fLender, setFLender] = useState("");
-  const [fIncome, setFIncome] = useState("");
-  const [fCoIncome, setFCoIncome] = useState("");
-  const [fEmpType, setFEmpType] = useState("");
-  const [fBeacon, setFBeacon] = useState("");
-  const [fPropVal, setFPropVal] = useState("");
-  const [fMtgAmt, setFMtgAmt] = useState("");
-  const [fDebts, setFDebts] = useState("");
-  const [fTax, setFTax] = useState("");
-  const [fCondo, setFCondo] = useState("");
-  const [fHeat, setFHeat] = useState("150");
-  const [fAddr, setFAddr] = useState("");
-  const [fPropType, setFPropType] = useState("");
-  const [fTenure, setFTenure] = useState("");
-  const [fNote, setFNote] = useState("");
+  const [settings, setSettings] = useState({ 
+    apiKey: localStorage.getItem("gbk_apiKey") || "" 
+  });
 
-  // Task lists filter
-  const [taskFilter, setTaskFilter] = useState<string>("all");
+  useEffect(() => { 
+    localStorage.setItem("gbk_apiKey", settings.apiKey); 
+  }, [settings.apiKey]);
+
+  // ─── UTILITIES & HELPER FUNCTIONS ───
+
+  function showToast(msg: string, type: "success" | "error" = "success", icon?: string) {
+    setToastMessage({ msg, type, icon });
+    setTimeout(() => setToastMessage(null), 3500);
+  }
+
+  function logActivity(action: string, target?: string) {
+    if (!auditLoggingEnabled) return;
+    const logItem = {
+      user: currentUser.first + " " + currentUser.last,
+      action,
+      target: target || "",
+      time: new Date().toISOString()
+    };
+    setAuditLogs(prev => [logItem, ...prev.slice(0, 199)]);
+  }
+
+  // ─── HOOK CALLS ───
+  const {
+    currentUser,
+    setCurrentUser,
+    appLocked,
+    setAppLocked,
+    pinInput,
+    setPinInput,
+    pinError,
+    setPinError,
+    userRoster,
+    setUserRoster,
+    lockoutTries,
+    setLockoutTries,
+    lockoutActive,
+    setLockoutActive,
+    profileModalOpen,
+    setProfileModalOpen,
+    profileTab,
+    setProfileTab,
+    activeHost,
+    setActiveHost,
+    activePort,
+    setActivePort,
+    activeUsername,
+    setActiveUsername,
+    activePassword,
+    setActivePassword,
+    suFirst,
+    setSuFirst,
+    suLast,
+    setSuLast,
+    suEmail,
+    setSuEmail,
+    suRole,
+    setSuRole,
+    suPhone,
+    setSuPhone,
+    suPin,
+    setSuPin,
+    suFsra,
+    setSuFsra,
+    suHost,
+    setSuHost,
+    suPort,
+    setSuPort,
+    suPass,
+    setSuPass,
+    swTargetId,
+    setSwTargetId,
+    swPin,
+    setSwPin,
+    swError,
+    setSwError,
+    handleUnlock,
+    isOwner,
+    getAgentNames
+  } = useAuth({ showToast, logActivity });
+
+  const {
+    clients,
+    setClients,
+    currentClient,
+    setCurrentClient,
+    clientViewMode,
+    setClientViewMode,
+    openClient,
+    closeDetail,
+    handleUpdateClient,
+    handleUpdateClientStatus
+  } = useClients({
+    currentUser,
+    logActivity,
+    showToast,
+    setDetailTab,
+    logActivityEvent
+  });
+
+  const {
+    tasks,
+    setTasks,
+    taskFilter,
+    setTaskFilter,
+    taskModalOpen,
+    setTaskModalOpen,
+    editingTaskId,
+    setEditingTaskId
+  } = useTasks({
+    currentUser,
+    showToast
+  });
+
+  const {
+    events,
+    setEvents,
+    calDate,
+    setCalDate,
+    calSelectedDate,
+    setCalSelectedDate,
+    calEventModalOpen,
+    setCalEventModalOpen
+  } = useCalendar();
+
+  const {
+    aiClientId,
+    setAiClientId,
+    aiSelectedClient,
+    setAiSelectedClient,
+    aiHistory,
+    setAiHistory,
+    aiInputText,
+    setAiInputText,
+    aiLoading,
+    setAiLoading,
+    aiIntakeOpen,
+    setAiIntakeOpen,
+    applicationIntakeOpen,
+    setApplicationIntakeOpen,
+    aiIntakeEditingId,
+    setAiIntakeOpenEditId,
+    aiIntakeText,
+    setAiIntakeText,
+    aiIntakeLoading,
+    setAiIntakeLoading,
+    aiIntakeFields,
+    setAiIntakeFields,
+    highlightedAiFields,
+    setHighlightedAiFields,
+    intakePreloadedText,
+    setIntakePreloadedText,
+    intakePreloadedFileName,
+    setIntakePreloadedFileName,
+    runGeneralAIChat,
+    triggerUnderwritingAnalysis,
+    triggerAIIntakeExtract,
+    handleSaveAIIntake,
+    openApplicationIntake,
+    openManualIntake
+  } = useAI({
+    clients,
+    setClients,
+    currentUser,
+    showToast,
+    logActivity,
+    setCurrentClient,
+    setNewClientOpen,
+    currentClient
+  });
 
   // Local storage writing side-effects
-  useEffect(() => { localStorage.setItem("gbk_clients", JSON.stringify(clients)); }, [clients]);
   useEffect(() => { localStorage.setItem("gbk_lenders", JSON.stringify(lenders)); }, [lenders]);
   useEffect(() => { localStorage.setItem("gbk_partners", JSON.stringify(partners)); }, [partners]);
-  useEffect(() => { localStorage.setItem("gbk_tasks", JSON.stringify(tasks)); }, [tasks]);
-  useEffect(() => { localStorage.setItem("gbk_events", JSON.stringify(events)); }, [events]);
   useEffect(() => { localStorage.setItem("gbk_messages", JSON.stringify(messages)); }, [messages]);
   useEffect(() => { localStorage.setItem("gbk_emails", JSON.stringify(emailsState)); }, [emailsState]);
   useEffect(() => { localStorage.setItem("gbk_posts", JSON.stringify(posts)); }, [posts]);
-  useEffect(() => { localStorage.setItem("gbk_roster", JSON.stringify(userRoster)); }, [userRoster]);
   useEffect(() => { localStorage.setItem("gbk_audit_logs", JSON.stringify(auditLogs)); }, [auditLogs]);
   useEffect(() => { localStorage.setItem("gbk_doc_vault", JSON.stringify(docVault)); }, [docVault]);
 
@@ -515,30 +436,9 @@ export default function App() {
     };
   }, [currentUser]);
 
-  // ─── UTILITIES & HELPER FUNCTIONS ───
-  function showToast(msg: string, type: "success" | "error" = "success", icon?: string) {
-    setToastMessage({ msg, type, icon });
-    setTimeout(() => setToastMessage(null), 3500);
-  }
-
-  function logActivity(action: string, target?: string) {
-    if (!auditLoggingEnabled) return;
-    const logItem = {
-      user: currentUser.first + " " + currentUser.last,
-      action,
-      target: target || "",
-      time: new Date().toISOString()
-    };
-    setAuditLogs(prev => [logItem, ...prev.slice(0, 199)]);
-  }
-
   function fd(n: any) {
     if (n === null || n === undefined || isNaN(Number(n))) return "$0";
     return "$" + Math.round(Number(n)).toLocaleString("en-CA");
-  }
-
-  function fiso(d: Date) {
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
 
   function pn(s: any) {
@@ -559,188 +459,6 @@ export default function App() {
     const n = yrs * 12;
     if (r === 0 || pmt <= 0) return 0;
     return pmt * (Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n));
-  }
-
-  const isOwner = () => currentUser.isOwner || currentUser.role === "Owner / Master Admin";
-
-  const getAgentNames = () => userRoster.filter(u => u.status === "active").map(u => u.first + " " + u.last);
-
-  // ─── LOGIN OVERLAY HANDLE ───
-  function handleUnlock() {
-    const match = userRoster.find(u => u.pin === pinInput && u.status === "active");
-    if (match) {
-      setCurrentUser(match);
-      setAppLocked(false);
-      setPinInput("");
-      setPinError("");
-      logActivity("Unlocked Station (" + match.role + ")");
-      showToast("Workstation Unlocked", "success", "🔓");
-    } else {
-      setPinError("Invalid security PIN");
-      setPinInput("");
-    }
-  }
-
-  // ─── AI ASSISTANT FUNCTIONS ───
-  async function runGeneralAIChat() {
-    if (!aiInputText.trim()) return;
-    setAiLoading(true);
-    const userMsg = aiInputText;
-    setAiInputText("");
-
-    const newHistory = [...aiHistory, { role: "user" as const, content: userMsg }];
-    setAiHistory(newHistory);
-
-    try {
-      const clientCtx = aiSelectedClient ? `
-Client: ${aiSelectedClient.first} ${aiSelectedClient.last} ${aiSelectedClient.co ? `& Co-App: ${aiSelectedClient.co}` : ""}
-Property: ${aiSelectedClient.addr || "Not specified"} | Value: ${fd(aiSelectedClient.propval)}
-Income: ${fd(pn(aiSelectedClient.income) + pn(aiSelectedClient.coIncome))}/yr | credit score: ${aiSelectedClient.beacon || "N/A"}
-Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.status}
-` : "";
-
-      const resp = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMsg,
-          history: aiHistory,
-          clientContext: clientCtx
-        })
-      });
-
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Failed to contact Gemini");
-
-      setAiHistory([...newHistory, { role: "assistant", content: data.reply }]);
-      logActivity("Invoked AI general assistant", aiSelectedClient ? aiSelectedClient.first : "General");
-    } catch (err: any) {
-      setAiHistory([...newHistory, { role: "assistant", content: `⚠️ Error: ${err.message}` }]);
-      showToast(err.message, "error", "⚠️");
-    } finally {
-      setAiLoading(false);
-    }
-  }
-
-  async function triggerUnderwritingAnalysis(client: Client) {
-    showToast("Generating AI underwriting assessment...", "success", "✦");
-    try {
-      const resp = await fetch("/api/ai/underwrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientData: client })
-      });
-
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Failed to make underwriting report");
-
-      const updated = clients.map(c => c.id === client.id ? { ...c, aiSummary: data.reply, updatedAt: new Date().toISOString() } : c);
-      setClients(updated);
-      if (currentClient && currentClient.id === client.id) {
-        setCurrentClient({ ...currentClient, aiSummary: data.reply, updatedAt: new Date().toISOString() });
-      }
-      logActivity("Generated AI Underwriting Analysis", client.first + " " + client.last);
-      showToast("Underwriting summary completed!", "success", "✓");
-    } catch (err: any) {
-      showToast(err.message, "error", "⚠️");
-    }
-  }
-
-  async function triggerAIIntakeExtract() {
-    if (!aiIntakeText.trim()) {
-      showToast("Please enter broker notes or application text first.", "error", "⚠️");
-      return;
-    }
-    setAiIntakeLoading(true);
-    try {
-      const resp = await fetch("/api/ai/intake", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: aiIntakeText })
-      });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "AI Intake extract failed");
-
-      const newFields: Record<string, string> = {};
-      const fieldsToHighlight: string[] = [];
-      Object.entries(data).forEach(([key, val]) => {
-        if (val !== null && val !== undefined) {
-          newFields[key] = String(val);
-          fieldsToHighlight.push(key);
-        }
-      });
-
-      setAiIntakeFields(newFields);
-      setHighlightedAiFields(fieldsToHighlight);
-      showToast("Information successfully extracted by AI!", "success", "✦");
-      logActivity("Extracted application data with AI");
-    } catch (err: any) {
-      showToast(err.message, "error", "⚠️");
-    } finally {
-      setAiIntakeLoading(false);
-    }
-  }
-
-  function handleSaveAIIntake(targetStatus: 'lead' | 'open') {
-    const first = aiIntakeFields.app_first || "";
-    const last = aiIntakeFields.app_last || "";
-    const email = aiIntakeFields.app_email || "";
-    const agent = aiIntakeFields.in_agent || currentUser.first + " " + currentUser.last;
-
-    if (!first || !last) {
-      showToast("First Name and Last Name are required to save client.", "error", "⚠️");
-      return;
-    }
-
-    const newId = aiIntakeEditingId || "c_" + Date.now();
-    const finalClient: Client = {
-      id: newId,
-      first,
-      last,
-      email,
-      cell: aiIntakeFields.app_cell || "",
-      dob: aiIntakeFields.app_dob || "",
-      marital: aiIntakeFields.app_marital || "",
-      sin: aiIntakeFields.app_sin || "",
-      dep: aiIntakeFields.app_dependents || "",
-      co: aiIntakeFields.co_first ? `${aiIntakeFields.co_first} ${aiIntakeFields.co_last || ""}` : "",
-      coEmail: aiIntakeFields.co_email || "",
-      income: aiIntakeFields.app_emp1_income || "",
-      coIncome: aiIntakeFields.co_emp1_income || "",
-      emptype: aiIntakeFields.app_emp1_status || "",
-      beacon: aiIntakeFields.beacon || "",
-      propval: aiIntakeFields.prop_value || aiIntakeFields.propval || "",
-      mtgamt: aiIntakeFields.mtg_requested || "",
-      debts: aiIntakeFields.debts || "",
-      tax: aiIntakeFields.prop_tax || "",
-      condo: aiIntakeFields.prop_condo_fees || "",
-      heat: aiIntakeFields.prop_heat || "150",
-      addr: aiIntakeFields.prop_addr || "",
-      proptype: aiIntakeFields.prop_type || "",
-      tenure: aiIntakeFields.prop_tenure || "",
-      lender: aiIntakeFields.mtg1_holder || "",
-      source: "AI Intake Platform",
-      status: targetStatus,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      appData: aiIntakeFields
-    };
-
-    if (aiIntakeEditingId) {
-      setClients(prev => prev.map(c => c.id === aiIntakeEditingId ? finalClient : c));
-      logActivity("Updated client with AI application", first + " " + last);
-      showToast("File successfully upgraded and re-saved!", "success");
-    } else {
-      setClients(prev => [finalClient, ...prev]);
-      logActivity("Created new file via AI Application", first + " " + last);
-      showToast(`New ${targetStatus === "lead" ? "Lead" : "Active File"} created!`, "success");
-    }
-
-    setAiIntakeOpen(false);
-    setAiIntakeOpenEditId(null);
-    setAiIntakeText("");
-    setAiIntakeFields({});
-    setHighlightedAiFields([]);
   }
 
   function handleCreateClientFromIntake(
@@ -898,135 +616,6 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
     setPcAmount("500000");
   }
 
-  // Double click or context opener
-  function openClient(id: string, initialTab?: string) {
-    const target = clients.find(cl => cl.id === id);
-    if (target) {
-      setCurrentClient(target);
-      setDetailTab(initialTab || "overview");
-      logActivity("Viewed client file folder", target.first + " " + target.last);
-    }
-  }
-
-  function closeDetail() {
-    setCurrentClient(null);
-  }
-
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragOver(true);
-  }
-
-  function handleDragLeave() {
-    setIsDragOver(false);
-  }
-
-  function handleDrop(e: React.DragEvent, docId: string) {
-    e.preventDefault();
-    setIsDragOver(false);
-    if (!currentClient) return;
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      // Instant PDF/Image Validation
-      const isAllowed = file.type === "application/pdf" || file.type.startsWith("image/");
-      if (!isAllowed) {
-        showToast("Invalid file format. Only PDF or Images are accepted.", "error", "⚠️");
-        return;
-      }
-
-      // Verify max 12MB limit
-      const twelveMbBytes = 12 * 1024 * 1024;
-      if (file.size > twelveMbBytes) {
-        showToast("File size exceeds 12MB industry threshold.", "error", "⚠️");
-        return;
-      }
-
-      const clientDocs = docVault[currentClient.id] || {};
-      const updatedDocs = {
-        ...clientDocs,
-        [docId]: {
-          status: "received",
-          name: file.name,
-          size: (file.size / (1024 * 1024)).toFixed(2) + " MB",
-          path: `gbk-secured-vault://${currentClient.id}/${docId}/${file.name}`,
-          uploadedAt: new Date().toISOString()
-        }
-      };
-
-      setDocVault(prev => ({
-        ...prev,
-        [currentClient.id]: updatedDocs
-      }));
-
-      logActivity("Uploaded document " + file.name, currentClient.first + " " + currentClient.last);
-      showToast(`${file.name} successfully vaulted & verified!`, "success", "✓");
-    }
-  }
-
-  function updateClientDoc(clientId: string, docId: string, status: string) {
-    const clientDocs = docVault[clientId] || {};
-    const updatedDocs = {
-      ...clientDocs,
-      [docId]: {
-        ...(clientDocs[docId] || {}),
-        status,
-        path: clientDocs[docId]?.path || `Manual state change to ${status}`
-      }
-    };
-    setDocVault(prev => ({
-      ...prev,
-      [clientId]: updatedDocs
-    }));
-    logActivity(`Updated ${docId} doc status to ${status}`, clientId);
-  }
-
-  function bulkCompleteDocs(clientId: string) {
-    const list = ["photo_id", "paystubs", "t4_current", "noa_current", "emp_letter", "bank_chq"];
-    const clientDocs = docVault[clientId] || {};
-    const updatedDocs = { ...clientDocs };
-    list.forEach(id => {
-      updatedDocs[id] = {
-        ...(updatedDocs[id] || {}),
-        status: "received",
-        path: updatedDocs[id]?.path || "Marked as received by Broker"
-      };
-    });
-    setDocVault(prev => ({
-      ...prev,
-      [clientId]: updatedDocs
-    }));
-    logActivity("Bulk marked all docs received", clientId);
-    showToast("All documents marked as received", "success");
-  }
-
-  function handleUpdateClientStatus(id: string, s: any) {
-    const updated = clients.map(c => c.id === id ? { ...c, status: s, updatedAt: new Date().toISOString() } : c);
-    setClients(updated);
-    const updatedCl = updated.find(x => x.id === id);
-    if (updatedCl) {
-      setCurrentClient(updatedCl);
-      logActivityEvent({
-        clientId: id,
-        clientName: `${updatedCl.first} ${updatedCl.last}`,
-        eventType: "stage_change",
-        user: `${currentUser.first} ${currentUser.last}`,
-        timestamp: new Date().toISOString(),
-        description: `Transitioned mortgage file folder stage to [${s.toUpperCase()}]`
-      });
-    }
-    showToast("Status updated successfully!", "success");
-    logActivity("Updated client status", `${updatedCl?.first} ${updatedCl?.last} → ${s}`);
-  }
-
-  function handleUpdateClient(updatedClient: Client) {
-    const updated = clients.map(c => c.id === updatedClient.id ? updatedClient : c);
-    setClients(updated);
-    if (currentClient && currentClient.id === updatedClient.id) {
-      setCurrentClient(updatedClient);
-    }
-  }
-
   function handleOpenComposeWithDetails(to: string, subject: string, body: string) {
     setCompTo(to);
     setCompSubject(subject);
@@ -1062,13 +651,15 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
                 placeholder="••••"
-                className="w-full tracking-widest text-center text-3xl font-mono py-2 bg-[#1b1b20] border border-white/10 rounded-lg text-white mb-4 focus:outline-none focus:border-[#b5a642] focus:ring-1 focus:ring-[#b5a642]"
+                disabled={lockoutActive}
+                className="w-full tracking-widest text-center text-3xl font-mono py-2 bg-[#1b1b20] border border-white/10 rounded-lg text-white mb-4 focus:outline-none focus:border-[#b5a642] focus:ring-1 focus:ring-[#b5a642] disabled:opacity-50 disabled:cursor-not-allowed"
                 onKeyDown={(e) => { if (e.key === "Enter") handleUnlock(); }}
               />
 
               <button 
                 onClick={handleUnlock}
-                className="w-full bg-[#b5a642] text-black font-semibold text-sm py-3 rounded-lg hover:bg-[#9a8c38] transition-all"
+                disabled={lockoutActive}
+                className="w-full bg-[#b5a642] text-black font-semibold text-sm py-3 rounded-lg hover:bg-[#9a8c38] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Unlock Workstation
               </button>
@@ -1115,21 +706,62 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
         
         {/* Top Header */}
         <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 shrink-0 bg-[#111115]/40 select-none">
-          <div className="text-sm font-semibold capitalize text-white/90">{activeTab} Section</div>
+          <div className="text-sm font-semibold text-white/90">{TAB_LABELS[activeTab] || activeTab} Section</div>
           <div className="flex items-center gap-3">
             {/* Quick search input */}
-            <div className="bg-[#141418] border border-white/5 rounded-lg px-2.5 py-1 flex items-center gap-2 w-48 focus-within:w-60 focus-within:border-[#b5a642]/40 transition-all">
-              <Search className="w-3.5 h-3.5 text-[#8e95a3]" />
-              <input 
-                type="text" 
-                placeholder="Quick locate client…" 
-                value={globalSearchSearch}
-                onChange={(e) => {
-                  setGlobalSearchSearch(e.target.value);
-                  setActiveTab("clients");
-                }}
-                className="bg-transparent border-none text-[11px] text-[#eeeef2] focus:outline-none w-full"
-              />
+            <div className="relative">
+              <div className="bg-[#141418] border border-white/5 rounded-lg px-2.5 py-1 flex items-center gap-2 w-48 focus-within:w-60 focus-within:border-[#b5a642]/40 transition-all">
+                <Search className="w-3.5 h-3.5 text-[#8e95a3]" />
+                <input 
+                  type="text" 
+                  placeholder="Quick locate client…" 
+                  value={globalSearchSearch}
+                  onChange={(e) => {
+                    setGlobalSearchSearch(e.target.value);
+                  }}
+                  className="bg-transparent border-none text-[11px] text-[#eeeef2] focus:outline-none w-full"
+                />
+              </div>
+
+              {activeTab !== "clients" && activeTab !== "pipeline" && globalSearchSearch.trim().length > 0 && (
+                <div className="absolute top-full mt-1 right-0 w-60 bg-[#141418] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                  <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-white/40 border-b border-white/5">
+                    Matched Clients
+                  </div>
+                  {(() => {
+                    const matched = clients.filter(c => {
+                      const q = globalSearchSearch.toLowerCase();
+                      return (c.first + " " + c.last).toLowerCase().includes(q) ||
+                             (c.email || "").toLowerCase().includes(q) ||
+                             (c.cell || "").includes(q) ||
+                             (c.addr || "").toLowerCase().includes(q) ||
+                             (c.lender || "").toLowerCase().includes(q);
+                    }).slice(0, 5);
+
+                    if (matched.length > 0) {
+                      return matched.map(c => (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            openClient(c.id);
+                            setGlobalSearchSearch("");
+                          }}
+                          className="w-full text-left px-2.5 py-2 text-xs text-white hover:bg-[#b5a642]/10 hover:text-[#b5a642] transition-colors flex flex-col gap-0.5"
+                        >
+                          <span className="font-bold">{c.first} {c.last}</span>
+                          <span className="text-[10px] text-white/50 capitalize">{c.status} • {c.email || "No email"}</span>
+                        </button>
+                      ));
+                    } else {
+                      return (
+                        <div className="px-2.5 py-2 text-xs text-white/50 italic">
+                          No clients matched
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
+              )}
             </div>
 
             {/* Z Drive Button */}
@@ -1142,7 +774,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
             </button>
 
             <button 
-              onClick={() => setNewClientOpen(true)}
+              onClick={openManualIntake}
               className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#b5a642] text-black hover:bg-[#9a8c38] transition-all shrink-0"
               id="header-new-client-btn"
             >
@@ -1288,9 +920,9 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
               currentUser={currentUser}
               docVault={docVault}
               onOpenClient={openClient}
-              onAddClient={() => setNewClientOpen(true)}
-              onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
-              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
+              onAddClient={openManualIntake}
+              onOpenNewClientIntake={openApplicationIntake}
+              onOpenAIIntake={openApplicationIntake}
               onAddTask={() => setActiveTab("tasks")}
               onAddPartner={() => setActiveTab("partners")}
               onAddEvent={() => setCalEventModalOpen(true)}
@@ -1307,9 +939,9 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
               clients={clients}
               lenders={lenders}
               onOpenClient={openClient}
-              onAddClient={() => setNewClientOpen(true)}
-              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
-              onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
+              onAddClient={openManualIntake}
+              onOpenAIIntake={openApplicationIntake}
+              onOpenNewClientIntake={openApplicationIntake}
               viewMode={clientViewMode}
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
@@ -1323,9 +955,9 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
               clients={clients}
               lenders={lenders}
               onOpenClient={openClient}
-              onAddClient={() => setNewClientOpen(true)}
-              onOpenAIIntake={() => setApplicationIntakeOpen(true)}
-              onOpenNewClientIntake={() => setApplicationIntakeOpen(true)}
+              onAddClient={openManualIntake}
+              onOpenAIIntake={openApplicationIntake}
+              onOpenNewClientIntake={openApplicationIntake}
               viewMode="pipeline"
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
@@ -1645,7 +1277,7 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
           onSendToIntake={(content, name) => {
             setIntakePreloadedText(content);
             setIntakePreloadedFileName(name);
-            setApplicationIntakeOpen(true);
+            openApplicationIntake();
             setZDriveOpen(false);
           }}
           showToast={showToast}
@@ -1653,207 +1285,23 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
       )}
 
       {/* Detail panel slider */}
-      <AnimatePresence>
-        {currentClient && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-30"
-            onClick={closeDetail}
-          >
-            <motion.div 
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 180 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-[#141418] border-l border-white/5 flex flex-col shadow-2xl h-full"
-            >
-              {/* Header */}
-              <div className="p-5 border-b border-white/5 flex justify-between items-start bg-[#1b1b20]/20 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded bg-[#b5a642]/10 border border-[#b5a642]/20 font-bold text-sm text-[#b5a642] flex items-center justify-center">
-                    {currentClient.first[0]}{currentClient.last[0]}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white/95">{currentClient.first} {currentClient.last}</h3>
-                    <p className="text-[10px] text-[#8e95a3]">{currentClient.type || "Purchase File"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-[#141418] border border-white/10 px-2.5 py-1 rounded-lg">
-                    <span className="text-[9px] text-[#8e95a3] uppercase font-black tracking-wider">File Stage:</span>
-                    <select
-                      value={currentClient.status}
-                      onChange={(e) => handleUpdateClientStatus(currentClient.id, e.target.value)}
-                      className="bg-transparent border-none text-[10px] font-extrabold uppercase text-[#b5a642] focus:outline-none cursor-pointer"
-                    >
-                      {["lead", "open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
-                        <option key={st} value={st} className="bg-[#141418] text-white font-bold uppercase">{st}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <button onClick={closeDetail} className="text-white/40 hover:text-white p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">✕</button>
-                </div>
-              </div>
-
-              {/* TABS SELECT */}
-              <div className="flex border-b border-white/5 text-xs bg-[#1b1b20]/10 py-1 select-none overflow-x-auto shrink-0">
-                {["Overview", "Application Details", "Documents", "Checklist", "Notes", "Activity", "AI Analysis"].map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => setDetailTab(tab.toLowerCase())}
-                    className={`px-4 py-2 font-semibold transition-all border-b-2 shrink-0 ${detailTab === tab.toLowerCase() ? "border-[#b5a642] text-[#b5a642]" : "border-transparent text-white/50 hover:text-white"}`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-
-              {/* TAB CONTENT PANEL */}
-              <div className="flex-grow overflow-y-auto p-6 focus:outline-none">
-                
-                {/* 1. OVERVIEW TAB */}
-                {detailTab === "overview" && (
-                  <div className="flex flex-col gap-5">
-                    <div className="p-4 bg-[#1b1b20] border border-white/5 rounded-xl">
-                      <h4 className="text-[10px] uppercase font-bold tracking-wider text-[#b5a642] mb-3">Set Pipeline Stage</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {["open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
-                          <button
-                            key={st}
-                            onClick={() => handleUpdateClientStatus(currentClient.id, st)}
-                            className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded border transition-colors ${currentClient.status === st ? "bg-[#b5a642] text-black border-[#b5a642]" : "bg-transparent text-white/50 border-white/5 hover:bg-white/5"}`}
-                          >
-                            {st}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Borrower Name</div>
-                        <div className="text-xs font-bold text-white mt-0.5">{currentClient.first} {currentClient.last}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Email Address</div>
-                        <div className="text-xs font-bold text-white mt-0.5">{currentClient.email || "—"}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Cell Phone</div>
-                        <div className="text-xs font-bold text-white mt-0.5">{currentClient.cell || "—"}</div>
-                      </div>
-                      <div className="p-3 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Employment Type</div>
-                        <div className="text-xs font-bold text-white mt-0.5 uppercase tracking-wide">{currentClient.emptype || "Salaried"}</div>
-                      </div>
-                      <div className="p-3 bg-white/2 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Assigned Broker</div>
-                        <div className="text-xs font-bold text-white mt-0.5">{currentClient.agent || "Unassigned"}</div>
-                      </div>
-                      <div className="p-3 bg-white/2 bg-[#1b1b20] rounded-xl border border-white/5">
-                        <div className="text-[10px] text-[#8e95a3] uppercase font-semibold">Lender Partner</div>
-                        <div className="text-xs font-bold text-white mt-0.5">{currentClient.lender || "Not submitted"}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. APPLICATION DETAILS TAB (INTERACTIVE SAVING FORM) */}
-                {detailTab === "application details" && (
-                  <ApplicationDetailsForm 
-                    key={currentClient.id}
-                    client={currentClient}
-                    currentUser={currentUser}
-                    onUpdateClient={handleUpdateClient}
-                    agentNames={getAgentNames()}
-                    lenders={lenders}
-                    showToast={showToast}
-                  />
-                )}
-
-                {/* 4. DOCUMENTS VAULT TAB */}
-                {detailTab === "documents" && (
-                  <div className="flex flex-col gap-4 h-full min-h-[400px]">
-                    <DocumentManager 
-                      key={currentClient.id}
-                      clients={clients}
-                      currentUser={currentUser}
-                      docVault={docVault}
-                      setDocVault={setDocVault}
-                      onOpenClient={openClient}
-                      showToast={showToast}
-                      agentNames={getAgentNames()}
-                      isOwnerOrManager={currentUser.role === 'Owner / Master Admin' || currentUser.role === 'Super Admin' || currentUser.role === 'IT / Developer'}
-                      embeddedClientId={currentClient.id}
-                    />
-                  </div>
-                )}
-
-                {/* 5. CHECKLIST STATUS MANAGER TAB */}
-                {detailTab === "checklist" && (
-                  <MortgageChecklist
-                    key={currentClient.id}
-                    client={currentClient}
-                    currentUser={currentUser}
-                    docVault={docVault}
-                    setDocVault={setDocVault}
-                    agentNames={getAgentNames()}
-                    showToast={showToast}
-                  />
-                )}
-
-                {/* 6. INTERNAL NOTES TAB */}
-                {detailTab === "notes" && (
-                  <MortgageActivityTracker
-                    key={currentClient.id}
-                    client={currentClient}
-                    currentUser={currentUser}
-                    onUpdateClient={handleUpdateClient}
-                    agentNames={getAgentNames()}
-                    activeSubTab="notes"
-                    showToast={showToast}
-                  />
-                )}
-
-                {/* 7. ACTIVITY AUDIT TIMELINE TAB */}
-                {detailTab === "activity" && (
-                  <MortgageActivityTracker
-                    key={currentClient.id}
-                    client={currentClient}
-                    currentUser={currentUser}
-                    onUpdateClient={handleUpdateClient}
-                    agentNames={getAgentNames()}
-                    activeSubTab="activity"
-                    showToast={showToast}
-                  />
-                )}
-
-                {/* 8. AI ANALYSIS / DEEP UNDERWRITE TAB */}
-                {detailTab === "ai analysis" && (
-                  <div className="flex flex-col gap-4">
-                    <button 
-                      onClick={() => triggerUnderwritingAnalysis(currentClient)}
-                      className="w-full bg-[#b5a642] text-black font-semibold text-xs py-2.5 rounded-lg hover:bg-[#9a8c38] transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 fill-current" /> Run Deep Underwrite Analysis (Gemini)
-                    </button>
-
-                    <div className="p-4 bg-[#1b1b20] border border-white/5 rounded-xl">
-                      <div className="text-[10px] font-bold text-[#b5a642] uppercase tracking-wider mb-2">Automated Underwriter Notes</div>
-                      <div className="text-xs leading-relaxed text-[#eeeef2] whitespace-pre-wrap font-sans">
-                        {currentClient.aiSummary || "No report generated. Click button above to initiate Gemini analysis."}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ClientDetailPanel
+        currentClient={currentClient}
+        currentUser={currentUser}
+        clients={clients}
+        lenders={lenders}
+        docVault={docVault}
+        setDocVault={setDocVault}
+        detailTab={detailTab}
+        setDetailTab={setDetailTab}
+        closeDetail={closeDetail}
+        openClient={openClient}
+        handleUpdateClient={handleUpdateClient}
+        handleUpdateClientStatus={handleUpdateClientStatus}
+        triggerUnderwritingAnalysis={triggerUnderwritingAnalysis}
+        getAgentNames={getAgentNames}
+        showToast={showToast}
+      />
 
       {/* Settings Modal config */}
       <AnimatePresence>
@@ -2288,14 +1736,3 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
     </div>
   );
 }
-
-// ── Shared local state getters
-const settingsStorageKey = "gbk_apiKey";
-const initialSettings = { apiKey: localStorage.getItem(settingsStorageKey) || "" };
-function setSettings(v: any) {
-  // Mock settings helper
-  if (v.apiKey !== undefined) localStorage.setItem(settingsStorageKey, v.apiKey);
-}
-const settings = {
-  get apiKey() { return localStorage.getItem(settingsStorageKey) || ""; }
-};
