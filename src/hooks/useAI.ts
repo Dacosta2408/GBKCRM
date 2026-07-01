@@ -39,6 +39,8 @@ export function useAI({
   const [aiHistory, setAiHistory] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [aiInputText, setAiInputText] = useState<string>("");
   const [aiLoading, setAiLoading] = useState<boolean>(false);
+  const [underwritingLoading, setUnderwritingLoading] = useState<boolean>(false);
+  const [underwritingError, setUnderwritingError] = useState<string | null>(null);
 
   // ─── APPLICATION INTAKE MODAL & QUICK EXTRACT STATES ───
   const [aiIntakeOpen, setAiIntakeOpen] = useState<boolean>(false);
@@ -93,6 +95,8 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
   }
 
   async function triggerUnderwritingAnalysis(client: Client) {
+    setUnderwritingLoading(true);
+    setUnderwritingError(null);
     showToast("Generating AI underwriting assessment...", "success", "✦");
     try {
       const resp = await fetch("/api/ai/underwrite", {
@@ -112,7 +116,10 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
       logActivity("Generated AI Underwriting Analysis", client.first + " " + client.last);
       showToast("Underwriting summary completed!", "success", "✓");
     } catch (err: any) {
+      setUnderwritingError(err.message || "Failed to contact Gemini");
       showToast(err.message, "error", "⚠️");
+    } finally {
+      setUnderwritingLoading(false);
     }
   }
 
@@ -254,6 +261,8 @@ Mortgage Requested: ${fd(aiSelectedClient.mtgamt)} | Status: ${aiSelectedClient.
     setIntakePreloadedFileName,
     runGeneralAIChat,
     triggerUnderwritingAnalysis,
+    underwritingLoading,
+    underwritingError,
     triggerAIIntakeExtract,
     handleSaveAIIntake,
     openApplicationIntake,

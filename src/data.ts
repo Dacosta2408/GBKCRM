@@ -168,7 +168,7 @@ export const DEFAULT_MESSAGES: Record<string, any[]> = {
   ]
 };
 
-export const DEFAULT_EMAILS: { inbox: Email[]; sent: Email[]; scheduled: Email[] } = {
+export const DEFAULT_EMAILS: { inbox: Email[]; sent: Email[]; scheduled: Email[]; queued: Email[] } = {
   inbox: [
     {
       id: 'ie1',
@@ -208,7 +208,8 @@ export const DEFAULT_EMAILS: { inbox: Email[]; sent: Email[]; scheduled: Email[]
     }
   ],
   sent: [],
-  scheduled: []
+  scheduled: [],
+  queued: []
 };
 
 export const DEFAULT_CLIENTS: Client[] = [

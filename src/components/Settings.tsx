@@ -6,6 +6,8 @@ import {
   Lock, Laptop, Smartphone, Eye, EyeOff, ShieldAlert, Check, HelpCircle
 } from "lucide-react";
 import { User, Client } from "../types";
+import { encryptValue, decryptValue } from "../lib/cryptoUtils";
+import { hashPin } from "../hooks/useAuth";
 
 interface SettingsProps {
   currentUser: User;
@@ -169,19 +171,31 @@ export const Settings: React.FC<SettingsProps> = ({
   const [mfaCode, setMfaCode] = useState("");
   const [mfaSuccess, setMfaSuccess] = useState(false);
 
-  const handleSaveSecurity = () => {
+  const handleSaveSecurity = async () => {
     if (userPin.length < 4 || isNaN(Number(userPin))) {
       showToast("Access PIN must be a 4-digit number.", "error");
       return;
     }
 
-    const updatedUser: User = {
+    const pinHash = await hashPin(userPin, currentUser.id);
+    const encryptedPin = await encryptValue(userPin, userPin);
+    const encryptedEmailPassword = currentUser.emailPassword ? await encryptValue(currentUser.emailPassword, userPin) : undefined;
+
+    const updatedUserForRoster: User = {
+      ...currentUser,
+      pin: encryptedPin,
+      pinHash,
+      emailPassword: encryptedEmailPassword
+    };
+
+    const decryptedUser: User = {
       ...currentUser,
       pin: userPin
     };
-    setCurrentUser(updatedUser);
 
-    const updatedRoster = userRoster.map(u => u.id === currentUser.id ? updatedUser : u);
+    setCurrentUser(decryptedUser);
+
+    const updatedRoster = userRoster.map(u => u.id === currentUser.id ? updatedUserForRoster : u);
     setUserRoster(updatedRoster);
     localStorage.setItem("gbk_roster", JSON.stringify(updatedRoster));
     localStorage.setItem("gbk_security_pin_sin", requirePinForSin ? "true" : "false");
@@ -267,7 +281,7 @@ export const Settings: React.FC<SettingsProps> = ({
     });
   }, [userRoster, teamSearch]);
 
-  const handleCreateUserSubmit = (e: React.FormEvent) => {
+  const handleCreateUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFirst || !newLast || !newEmail) {
       showToast("First name, last name, and email are mandatory.", "error");
@@ -280,15 +294,21 @@ export const Settings: React.FC<SettingsProps> = ({
       return;
     }
 
+    const targetPin = newPin || "0000";
+    const newUserId = `u_${Date.now()}`;
+    const pinHash = await hashPin(targetPin, newUserId);
+    const encryptedPin = await encryptValue(targetPin, targetPin);
+
     const newUserRecord: User = {
-      id: `u_${Date.now()}`,
+      id: newUserId,
       first: newFirst,
       last: newLast,
       email: newEmail,
       phone: newPhone || undefined,
       role: newRole,
       status: "active",
-      pin: newPin || "0000",
+      pin: encryptedPin,
+      pinHash,
       lastLogin: new Date().toISOString(),
       created: new Date().toISOString().split("T")[0],
       fsraNum: newFsra || undefined,
@@ -333,9 +353,14 @@ export const Settings: React.FC<SettingsProps> = ({
     setEditEoExpiry(user.eoExpiry || "");
   };
 
-  const handleSaveEditUserSubmit = (e: React.FormEvent) => {
+  const handleSaveEditUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
+
+    const targetPin = editPin || "0000";
+    const pinHash = await hashPin(targetPin, editingUser.id);
+    const encryptedPin = await encryptValue(targetPin, targetPin);
+    const encryptedEmailPassword = editingUser.emailPassword ? await encryptValue(editingUser.emailPassword, targetPin) : editingUser.emailPassword;
 
     const updatedRoster = userRoster.map(u => {
       if (u.id === editingUser.id) {
@@ -346,7 +371,9 @@ export const Settings: React.FC<SettingsProps> = ({
           email: editEmail,
           phone: editPhone || undefined,
           role: editRole,
-          pin: editPin,
+          pin: encryptedPin,
+          pinHash,
+          emailPassword: encryptedEmailPassword,
           status: editStatus,
           fsraNum: editFsra || undefined,
           eoInsurer: editEoCarrier || undefined,
@@ -369,7 +396,7 @@ export const Settings: React.FC<SettingsProps> = ({
         email: editEmail,
         phone: editPhone || undefined,
         role: editRole,
-        pin: editPin,
+        pin: targetPin, // in-memory decrypted
         status: editStatus,
         fsraNum: editFsra || undefined,
         eoInsurer: editEoCarrier || undefined,

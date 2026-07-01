@@ -326,12 +326,31 @@ export const LenderSheets: React.FC<LenderSheetsProps> = ({
           {/* Grid of Lenders */}
           <div className="flex-grow overflow-y-auto p-5 select-none">
             {filteredLenders.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-white/5 rounded-xl bg-[#141418]/10">
-                <div className="w-10 h-10 rounded-full bg-[#b5a642]/10 flex items-center justify-center mb-3">
-                  <Globe className="text-[#b5a642]/60 w-5 h-5" />
+              <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-xl bg-[#141418]/10 select-none">
+                <div className="w-12 h-12 rounded-full bg-[#b5a642]/10 flex items-center justify-center mb-4">
+                  <Globe className="text-[#b5a642] w-5 h-5 animate-pulse" />
                 </div>
-                <h3 className="text-xs font-bold text-white/80">No Lenders Found</h3>
-                <p className="text-[10px] text-white/30 max-w-sm mt-1">Try resetting your active tier filter or check your query text.</p>
+                <h3 className="text-xs font-black uppercase text-white tracking-widest">No Lenders Found</h3>
+                <p className="text-[10px] text-white/40 max-w-sm mt-1.5 leading-relaxed font-sans font-semibold">
+                  No active institutional or private lenders match your search parameters. Try resetting your active tier filter or check your query text.
+                </p>
+                <div className="flex items-center justify-center gap-3 mt-5">
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveTier("All");
+                    }}
+                    className="px-3.5 py-1.5 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase rounded-lg transition-all"
+                  >
+                    Clear Search Filters
+                  </button>
+                  <button
+                    onClick={() => handleOpenEditModal()}
+                    className="px-3.5 py-1.5 bg-[#b5a642] text-black hover:bg-[#9a8c38] font-bold text-[10px] uppercase rounded-lg transition-all"
+                  >
+                    Add Custom Lender
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

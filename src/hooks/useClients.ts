@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Client, User } from "../types";
 import { DEFAULT_CLIENTS } from "../data";
+import { checkBridgeHealth, getAllClients, createClient, updateClient, deleteClient } from "../lib/bridgeService";
 
 export interface UseClientsDeps {
   currentUser: User;
@@ -26,7 +27,21 @@ export function useClients({
   const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [clientViewMode, setClientViewMode] = useState<'database' | 'pipeline'>("database");
 
-  // Sync clients state to localstorage
+  // Load clients from bridge server on mount if online
+  useEffect(() => {
+    async function loadInitialClients() {
+      const online = await checkBridgeHealth();
+      if (online) {
+        const bridgeClients = await getAllClients();
+        if (bridgeClients && bridgeClients.length > 0) {
+          setClients(bridgeClients);
+        }
+      }
+    }
+    loadInitialClients();
+  }, []);
+
+  // Sync clients state to localstorage (always written as backup)
   useEffect(() => {
     localStorage.setItem("gbk_clients", JSON.stringify(clients));
   }, [clients]);
@@ -45,7 +60,7 @@ export function useClients({
     setCurrentClient(null);
   }
 
-  function handleUpdateClientStatus(id: string, s: any) {
+  async function handleUpdateClientStatus(id: string, s: any) {
     const updated = clients.map(c => c.id === id ? { ...c, status: s, updatedAt: new Date().toISOString() } : c);
     setClients(updated);
     const updatedCl = updated.find(x => x.id === id);
@@ -59,16 +74,44 @@ export function useClients({
         timestamp: new Date().toISOString(),
         description: `Transitioned mortgage file folder stage to [${s.toUpperCase()}]`
       });
+
+      const online = await checkBridgeHealth();
+      if (online) {
+        await updateClient(id, updatedCl);
+      }
     }
     showToast("Status updated successfully!", "success");
     logActivity("Updated client status", `${updatedCl?.first} ${updatedCl?.last} → ${s}`);
   }
 
-  function handleUpdateClient(updatedClient: Client) {
+  async function handleUpdateClient(updatedClient: Client) {
     const updated = clients.map(c => c.id === updatedClient.id ? updatedClient : c);
     setClients(updated);
     if (currentClient && currentClient.id === updatedClient.id) {
       setCurrentClient(updatedClient);
+    }
+    const online = await checkBridgeHealth();
+    if (online) {
+      await updateClient(updatedClient.id, updatedClient);
+    }
+  }
+
+  async function handleCreateClient(newClient: Client) {
+    setClients(prev => [newClient, ...prev]);
+    const online = await checkBridgeHealth();
+    if (online) {
+      await createClient(newClient);
+    }
+  }
+
+  async function handleDeleteClient(id: string) {
+    setClients(prev => prev.filter(c => c.id !== id));
+    if (currentClient && currentClient.id === id) {
+      setCurrentClient(null);
+    }
+    const online = await checkBridgeHealth();
+    if (online) {
+      await deleteClient(id);
     }
   }
 
@@ -82,6 +125,9 @@ export function useClients({
     openClient,
     closeDetail,
     handleUpdateClient,
-    handleUpdateClientStatus
+    handleUpdateClientStatus,
+    handleCreateClient,
+    handleDeleteClient
   };
 }
+

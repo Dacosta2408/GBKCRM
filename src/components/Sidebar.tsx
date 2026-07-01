@@ -2,9 +2,10 @@ import React from "react";
 import { 
   Users, Layers, BrainCircuit, Calculator, Globe, Calendar, 
   CheckSquare, MessageSquare, Mail, Heart, ShieldCheck, ShieldAlert,
-  Settings, Lock, BarChart3
+  Settings, BarChart3
 } from "lucide-react";
 import { User, Client, Task, Event } from "../types";
+import { motion } from "motion/react";
 
 interface SidebarProps {
   activeTab: string;
@@ -32,138 +33,190 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenProfileManager
 }) => {
   const activeTasksCount = tasks.filter(t => t.status === "open").length;
-  const birthdaysTodayCount = events.filter(e => e.type === "birthday" && e.date === new Date().toISOString().split("T")[0]).length;
+
+  const menuGroups = [
+    {
+      label: "Main",
+      items: [
+        { id: "dashboard", label: "Dashboard", icon: Layers },
+        { 
+          id: "clients", 
+          label: "Client Database", 
+          icon: Users,
+          badge: clients.length 
+        },
+        { 
+          id: "pipeline", 
+          label: "Pipeline Board", 
+          icon: () => (
+            <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          ) 
+        },
+      ]
+    },
+    {
+      label: "Tools & AI",
+      items: [
+        { id: "ai", label: "AI Assistant ✦", icon: BrainCircuit, highlight: true },
+        { id: "calculators", label: "Calculators", icon: Calculator },
+        { id: "lenders", label: "Lender Sheets", icon: Globe },
+      ]
+    },
+    {
+      label: "Team & Comms",
+      items: [
+        { id: "calendar", label: "Calendar", icon: Calendar },
+        { 
+          id: "tasks", 
+          label: "Daily Tasks", 
+          icon: CheckSquare,
+          badge: activeTasksCount 
+        },
+        { id: "messages", label: "Team Channels", icon: MessageSquare },
+        { id: "emails", label: "Email", icon: Mail },
+      ]
+    },
+    {
+      label: "Operations",
+      items: [
+        { id: "retention", label: "CRM Retention", icon: Heart },
+        { 
+          id: "partners", 
+          label: "Partner Network", 
+          icon: () => (
+            <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="18" r="3"/>
+              <circle cx="12" cy="7" r="4"/>
+              <path d="M12 12c-2.3 0-5.3 1.1-6.1 3.5"/>
+            </svg>
+          ) 
+        },
+        { id: "reports", label: "Reports", icon: BarChart3 },
+        { id: "compliance", label: "Compliance", icon: ShieldCheck },
+        { 
+          id: "file_readiness", 
+          label: "File Readiness", 
+          icon: () => (
+            <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="m9 15 2 2 4-4"/>
+            </svg>
+          ) 
+        },
+        // Admin tab condition preserved exactly
+        ...((isOwner || currentUser.role === "Owner / Master Admin" || currentUser.role === "Super Admin" || currentUser.role === "IT / Developer") 
+          ? [{ id: "admin", label: "Admin Panel", icon: ShieldAlert, alert: true }] 
+          : []),
+        { id: "settings", label: "Settings", icon: Settings },
+      ]
+    }
+  ];
 
   return (
-    <aside className="w-56 bg-[#111115] border-r border-white/5 flex flex-col h-full shrink-0 z-40 relative shadow-lg">
-      <div className="p-4 border-b border-white/5 flex flex-col bg-gradient-to-b from-[#b5a642]/10 to-transparent">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold bg-gradient-to-r from-[#b5a642] via-[#eeeef2] to-[#6fa3b8] bg-clip-text text-transparent font-sans">GBK Financial</span>
+    <aside 
+      className="w-56 flex flex-col h-full shrink-0 z-40 relative border-r border-white/5 select-none"
+      style={{ backgroundColor: "#2D3250" }}
+    >
+      {/* Top Header Block - var(--grad-deep) */}
+      <div 
+        className="h-20 flex flex-col justify-center px-4 border-b border-[var(--glass-border)] relative overflow-hidden" 
+        style={{ background: "var(--grad-deep)" }}
+      >
+        <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
+        <div className="flex items-center gap-2 z-10">
+          <svg className="w-5 h-5 text-[#F9B17A] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span className="text-sm font-extrabold text-white tracking-wide">GBK Financial</span>
         </div>
-        <span className="text-[9px] text-[#eeeef2]/30 tracking-[1.5px] uppercase font-semibold mt-1">Ontario Mortgage CRM</span>
+        <span className="text-[9px] text-white/50 tracking-[1.5px] uppercase font-bold mt-1 z-10">Ontario Mortgage CRM</span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-1 select-none">
-        <div className="text-[10px] text-white/20 uppercase tracking-[1.5px] font-bold px-3 py-1">Main</div>
-        <button 
-          onClick={() => setActiveTab("dashboard")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "dashboard" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Layers className="h-4 w-4" /> Dashboard
-        </button>
-        <button 
-          onClick={() => setActiveTab("clients")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all relative ${activeTab === "clients" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Users className="h-4 w-4" /> Client Database
-          <span className="absolute right-3 bg-[#b5a642]/20 text-[#b5a642] text-[9px] font-bold px-2 py-0.5 rounded-full">{clients.length}</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab("pipeline")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "pipeline" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Pipeline Board
-        </button>
+      {/* Nav List Area */}
+      <nav className="flex-1 overflow-y-auto px-2 py-3.5 flex flex-col gap-3 select-none">
+        {menuGroups.map((group, gIdx) => (
+          <div key={gIdx} className="flex flex-col gap-0.5">
+            <div className="text-[10px] text-white/35 uppercase tracking-[1.5px] font-bold px-3 py-1 mb-1">
+              {group.label}
+            </div>
+            {group.items.map((item) => {
+              const isActive = activeTab === item.id;
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200 outline-none ${
+                    isActive 
+                      ? "text-[#F9B17A] font-bold" 
+                      : "text-[#9a9db8] hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {/* Framer motion slide background active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active"
+                      className="absolute inset-0 bg-[#F9B17A]/12 border-l-3 border-[#F9B17A] shadow-[0_0_20px_rgba(249,177,122,0.15)] rounded-lg pointer-events-none"
+                    />
+                  )}
 
-        <div className="text-[10px] text-white/20 uppercase tracking-[1.5px] font-bold px-3 py-1 mt-3">Tools & AI</div>
-        <button 
-          onClick={() => setActiveTab("ai")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all bg-gradient-to-r ${activeTab === "ai" ? "from-[#b5a642]/20 to-[#6fa3b8]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <BrainCircuit className="h-4 w-4 text-[#b5a642]" /> AI Assistant ✦
-        </button>
-        <button 
-          onClick={() => setActiveTab("calculators")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "calculators" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Calculator className="h-4 w-4" /> Calculators
-        </button>
-        <button 
-          onClick={() => setActiveTab("lenders")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "lenders" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Globe className="h-4 w-4" /> Lender Sheets
-        </button>
+                  <span className="flex items-center gap-2.5 z-10">
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors duration-200 ${
+                      isActive 
+                        ? "text-[#F9B17A]" 
+                        : item.highlight 
+                          ? "text-[#F9B17A]" 
+                          : item.alert 
+                            ? "text-red-400" 
+                            : "text-[#676F9D] group-hover:text-white/80"
+                    }`} />
+                    <span className="truncate">{item.label}</span>
+                  </span>
 
-        <div className="text-[10px] text-white/20 uppercase tracking-[1.5px] font-bold px-3 py-1 mt-3">Team & Comms</div>
-        <button 
-          onClick={() => setActiveTab("calendar")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "calendar" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Calendar className="h-4 w-4" /> Calendar
-        </button>
-        <button 
-          onClick={() => setActiveTab("tasks")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all relative ${activeTab === "tasks" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <CheckSquare className="h-4 w-4" /> Daily Tasks
-          {activeTasksCount > 0 && (
-            <span className="absolute right-3 bg-red-500/20 text-red-300 text-[9px] font-bold px-2 py-0.5 rounded-full">{activeTasksCount}</span>
-          )}
-        </button>
-        <button 
-          onClick={() => setActiveTab("messages")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "messages" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <MessageSquare className="h-4 w-4" /> Team Channels
-        </button>
-        <button 
-          onClick={() => setActiveTab("emails")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "emails" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Mail className="h-4 w-4" /> Email
-        </button>
-
-        <div className="text-[10px] text-white/20 uppercase tracking-[1.5px] font-bold px-3 py-1 mt-3">Operations</div>
-        <button 
-          onClick={() => setActiveTab("retention")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "retention" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Heart className="h-4 w-4" /> CRM Retention
-        </button>
-        <button 
-          onClick={() => setActiveTab("partners")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "partners" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2"><circle cx="18" cy="18" r="3"/><circle cx="12" cy="7" r="4"/><path d="M12 12c-2.3 0-5.3 1.1-6.1 3.5"/></svg> Partner Network
-        </button>
-        <button 
-          onClick={() => setActiveTab("reports")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "reports" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <BarChart3 className="h-4 w-4" /> Reports
-        </button>
-        <button 
-          onClick={() => setActiveTab("compliance")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "compliance" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <ShieldCheck className="h-4 w-4" /> Compliance
-        </button>
-        <button 
-          onClick={() => setActiveTab("file_readiness")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "file_readiness" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <svg className="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <path d="m9 15 2 2 4-4"/>
-          </svg> File Readiness
-        </button>
-        {(isOwner || currentUser.role === "Owner / Master Admin" || currentUser.role === "Super Admin" || currentUser.role === "IT / Developer") && (
-          <button 
-            onClick={() => setActiveTab("admin")} 
-            className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "admin" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-          >
-            <ShieldAlert className="h-4 w-4 text-red-400" /> Admin Panel
-          </button>
-        )}
-        <button 
-          onClick={() => setActiveTab("settings")} 
-          className={`flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${activeTab === "settings" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-white/60 hover:bg-white/5"}`}
-        >
-          <Settings className="h-4 w-4" /> Settings
-        </button>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="z-10 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#F9B17A] text-[#12131a] min-w-4 text-center">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </nav>
+
+      {/* Bottom User Area */}
+      <div className="p-3 border-t border-white/5 flex flex-col gap-3 shrink-0">
+        <div 
+          onClick={onOpenProfileManager}
+          className="p-2.5 cursor-pointer rounded-xl transition-all duration-300 glass-card hover:border-[#F9B17A]/40 flex items-center gap-2.5 select-none"
+        >
+          <div 
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0" 
+            style={{ background: "var(--grad-warm)" }}
+          >
+            {currentUser.name ? currentUser.name.split(" ").map(n => n[0]).join("").toUpperCase() : "U"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-black text-white truncate">{currentUser.name || "Broker Profile"}</div>
+            <div className="text-[10px] text-white/40 truncate font-semibold leading-none mt-0.5">{currentUser.role || "Mortgage Broker"}</div>
+          </div>
+        </div>
+
+        {/* Version banner */}
+        <div className="px-1 flex items-center justify-between text-[10px] text-white/30 font-mono font-bold select-none leading-none">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>v{(import.meta as any).env?.VITE_APP_VERSION || "1.0.0"}</span>
+          </div>
+          <span className="px-1 py-0.5 bg-white/5 border border-white/5 rounded text-[8px] font-black tracking-wider uppercase text-white/40">
+            {(import.meta as any).env?.VITE_APP_ENV || "DEV"}
+          </span>
+        </div>
+      </div>
     </aside>
   );
 };

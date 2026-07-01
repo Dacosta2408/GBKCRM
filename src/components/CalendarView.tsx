@@ -925,8 +925,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <div className="flex-1 bg-[#141418]/10 p-4 overflow-y-auto" id="view-timeline-list">
               <h4 className="text-xs font-bold uppercase text-white/45 mb-4 tracking-widest">Active Scheduled Items Ledger</h4>
               {filteredEventsForMonth.length === 0 ? (
-                <div className="text-center py-20 bg-[#141418]/30 rounded-xl border border-dashed border-white/5">
-                  <p className="text-xs text-white/35">No events found matching current category filters.</p>
+                <div className="flex flex-col items-center justify-center py-20 bg-[#141418]/30 rounded-xl border border-dashed border-white/5 text-center">
+                  <CalendarIcon className="w-10 h-10 text-[#b5a642] opacity-60 mb-3" />
+                  <h4 className="text-xs font-black text-white/80 uppercase tracking-widest">No Scheduled Items Found</h4>
+                  <p className="text-[10px] text-white/40 mt-1 max-w-xs font-sans font-semibold">
+                    No events or tasks are scheduled for this month matching the selected filters.
+                  </p>
+                  <button
+                    onClick={() => handleOpenAddModal(new Date().toISOString().split("T")[0])}
+                    className="mt-4 px-4 py-1.5 bg-[#b5a642]/10 border border-[#b5a642]/30 text-[#b5a642] hover:bg-[#b5a642]/20 font-black text-[10px] uppercase rounded-xl flex items-center gap-1.5 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Schedule New Event
+                  </button>
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">

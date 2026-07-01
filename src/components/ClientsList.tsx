@@ -54,11 +54,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
     return "$" + Math.round(val);
   };
 
-  // Stress tests GDS/TDS estimates helper
   const calculateRatios = (c: Client) => {
     const inc = pn(c.income) + pn(c.coIncome);
     const mtg = pn(c.mtgamt);
-    const pmt = mtg ? (mtg * (0.0525 / 12) * Math.pow(1 + 0.0525 / 12, 300)) / (Math.pow(1 + 0.0525 / 12, 300) - 1) : 0; // rough 25yr at 5.25 qualifying
+    const pmt = mtg ? (mtg * (0.0525 / 12) * Math.pow(1 + 0.0525 / 12, 300)) / (Math.pow(1 + 0.0525 / 12, 300) - 1) : 0; 
     const tax = pn(c.tax) / 12;
     const condo = pn(c.condo);
     const heat = pn(c.heat) || 150;
@@ -66,7 +65,6 @@ export const ClientsList: React.FC<ClientsListProps> = ({
     return gds;
   };
 
-  // Filter pipeline or DB clients
   const filterList = () => {
     let list = [...clients];
     if (dbFilter !== "all") {
@@ -91,30 +89,30 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   const filteredClients = filterList();
 
   const STAGES = [
-    { id: "lead", label: "Leads", color: "var(--brand-grey)", style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/25" },
-    { id: "open", label: "New/Open", color: "var(--brand-blue)", style: "bg-blue-500/10 text-blue-400 border-blue-500/25" },
-    { id: "working", label: "Working", color: "#9b8be0", style: "bg-purple-500/10 text-purple-400 border-purple-500/25" },
-    { id: "lender", label: "Submissions", color: "var(--brand-gold-d)", style: "bg-orange-500/10 text-orange-400 border-orange-500/25" },
-    { id: "conditional", label: "Conditional", color: "var(--danger)", style: "bg-red-500/10 text-red-400 border-red-500/25" },
-    { id: "approved", label: "Approved", color: "var(--success)", style: "bg-green-500/10 text-green-400 border-green-500/25" },
-    { id: "funded", label: "Funded", color: "var(--brand-gold)", style: "bg-yellow-500/10 text-[#b5a642] border-[#b5a642]/25" }
+    { id: "lead", label: "Leads", color: "#676F9D", style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/25" },
+    { id: "open", label: "New/Open", color: "#486D83", style: "bg-blue-500/10 text-blue-400 border-blue-500/25" },
+    { id: "working", label: "Working", color: "#8E6076", style: "bg-purple-500/10 text-purple-400 border-purple-500/25" },
+    { id: "lender", label: "Submissions", color: "#F4A384", style: "bg-orange-500/10 text-orange-400 border-orange-500/25" },
+    { id: "conditional", label: "Conditional", color: "#e05c6e", style: "bg-red-500/10 text-red-400 border-red-500/25" },
+    { id: "approved", label: "Approved", color: "#34D399", style: "bg-green-500/10 text-green-400 border-green-500/25" },
+    { id: "funded", label: "Funded", color: "#F9B17A", style: "bg-yellow-500/10 text-[#F9B17A] border-[#F9B17A]/25" }
   ];
 
   return (
-    <div className="flex flex-col gap-5 h-full overflow-hidden">
+    <div className="flex flex-col gap-5 h-full overflow-hidden select-none">
       
       {/* Header bar and sub tabs */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-        <div className="flex bg-[#141418] border border-white/5 rounded-lg p-0.5 select-none self-start">
+        <div className="flex bg-black/25 border border-white/5 rounded-full p-1 select-none self-start backdrop-blur-md">
           <button 
             onClick={() => setViewMode("database")}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === "database" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[#F9B17A] text-[#12131a] shadow-md" : "text-white/60 hover:text-white"}`}
           >
             📋 Directory Table
           </button>
           <button 
             onClick={() => setViewMode("pipeline")}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === "pipeline" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[#F9B17A] text-[#12131a] shadow-md" : "text-white/60 hover:text-white"}`}
           >
             📊 Stages
           </button>
@@ -122,47 +120,70 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
         {/* Global search */}
         <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto">
-          <div className="bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 flex items-center gap-2 w-full sm:w-60 focus-within:border-[#b5a642]/40 transition-all">
-            <Search className="w-3.5 h-3.5 text-[#8e95a3]" />
+          <div 
+            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full"
+            style={{
+              background: "var(--glass-bg)",
+              backdropFilter: "var(--glass-blur)",
+              WebkitBackdropFilter: "var(--glass-blur)",
+              border: "1px solid var(--glass-border)"
+            }}
+          >
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
             <input 
               type="text" 
-              placeholder="Search by name, site, or lender…" 
+              placeholder="Search name, site, or lender…" 
               value={activeSearchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="bg-transparent border-none text-xs text-[#eeeef2] focus:outline-none w-full"
+              className="bg-transparent border-none text-xs text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none w-full font-medium"
             />
           </div>
+
           <button 
             onClick={onOpenNewClientIntake}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#141418] text-[#b5a642] border border-[#b5a642]/30 hover:bg-[#b5a642]/10 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[#486D83]/30 hover:bg-[#486D83]/10 hover:shadow-[0_0_15px_rgba(72,109,131,0.2)] text-[#5d9bb1]"
+            style={{
+              background: "var(--glass-bg)",
+              backdropFilter: "var(--glass-blur)",
+              WebkitBackdropFilter: "var(--glass-blur)"
+            }}
           >
-            ✦ New Client Intake (PDF)
+            ✦ Intake (PDF)
           </button>
+
           <button 
             onClick={onOpenAIIntake}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-[#b5a642] to-[#6fa3b8] text-black hover:opacity-90 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full text-white hover:opacity-90 transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(244,163,132,0.25)]"
+            style={{
+              background: "var(--grad-deep)"
+            }}
           >
-            ✦ AI Application Intake
+            ✦ AI Extraction
           </button>
+
           <button 
             onClick={onAddClient}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#b5a642] text-black hover:bg-[#9a8c38] transition-all"
+            className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-white transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] hover:-translate-y-0.5 active:translate-y-0 duration-200"
+            style={{
+              background: "var(--grad-warm)",
+              borderRadius: "999px"
+            }}
           >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" /> New Client
+            <Plus className="w-3.5 h-3.5 stroke-[3]" /> Add Client
           </button>
         </div>
       </div>
 
       {/* Database Mode View */}
       {viewMode === "database" ? (
-        <div className="flex-1 flex flex-col min-h-0 bg-[#141418] border border-white/5 rounded-xl shadow-md overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 glass-card shadow-md overflow-hidden">
           
           {/* Quick Filters */}
-          <div className="p-3 border-b border-white/5 flex flex-wrap items-center gap-1.5 bg-[#1b1b20]/30 select-none">
-            <span className="text-[10px] text-[#8e95a3] uppercase font-bold px-2 tracking-wider">Status:</span>
+          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[#1b1b20]/20 select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
+            <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-widest pl-2">Filter Stage:</span>
             {[
               { id: "all", label: "All Files" },
-              { id: "lead", label: "🔍 Leads" },
+              { id: "lead", label: "Leads" },
               { id: "open", label: "Open" },
               { id: "working", label: "Working" },
               { id: "lender", label: "At Lender" },
@@ -174,7 +195,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               <button
                 key={f.id}
                 onClick={() => setDbFilter(f.id)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${dbFilter === f.id ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30" : "bg-transparent text-white/50 border-transparent hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${dbFilter === f.id ? "bg-[#F9B17A]/15 text-[#F9B17A] border-[#F9B17A]/40 shadow-sm" : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-white hover:bg-white/5"}`}
               >
                 {f.label}
               </button>
@@ -183,19 +204,19 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             <select 
               value={agentFilter}
               onChange={(e) => setAgentFilter(e.target.value)}
-              className="ml-auto bg-[#1b1b20] border border-white/5 rounded-md px-2 py-1 text-xs text-[#eeeef2] focus:outline-none"
+              className="ml-auto bg-black/25 border border-white/5 rounded-full px-4 py-1 text-xs text-white/80 focus:outline-none cursor-pointer"
             >
-              <option value="">All Advising Agents</option>
-              {agentNames.map(name => <option key={name} value={name}>{name}</option>)}
+              <option value="" className="bg-[#12131a]">All Advising Agents</option>
+              {agentNames.map(name => <option key={name} value={name} className="bg-[#12131a]">{name}</option>)}
             </select>
-            <span className="text-xs text-[#8e95a3] font-medium border-l border-white/5 pl-3 ml-1">{filteredClients.length} clients</span>
+            <span className="text-xs text-[var(--color-text-faint)] font-bold border-l border-white/5 pl-3 ml-1">{filteredClients.length} clients</span>
           </div>
 
           {/* Grid table */}
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/5 bg-[#1b1b20]/25 text-[10px] text-[#8e95a3] uppercase tracking-wider sticky top-0 z-10">
+                <tr className="border-b bg-[#1b1b20]/35 text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
                   <th className="p-3.5 pl-6">Profile</th>
                   <th className="p-3.5">Goal Type</th>
                   <th className="p-3.5">Filing Stage</th>
@@ -208,59 +229,78 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredClients.map((c, i) => {
-                  const avatar = (c.first[0] + c.last[0]).toUpperCase();
-                  const ltv = pn(c.propval) > 0 ? (pn(c.mtgamt) / pn(c.propval) * 100) : 0;
-                  const gds = calculateRatios(c);
+                {filteredClients.length > 0 ? (
+                  filteredClients.map((c, i) => {
+                    const avatar = (c.first[0] + c.last[0]).toUpperCase();
+                    const ltv = pn(c.propval) > 0 ? (pn(c.mtgamt) / pn(c.propval) * 100) : 0;
+                    const gds = calculateRatios(c);
 
-                  return (
-                    <tr 
-                      key={c.id} 
-                      onClick={() => onOpenClient(c.id)}
-                      className="hover:bg-[#1b1b20]/30 transition-colors cursor-pointer group"
-                    >
-                      <td className="p-3.5 pl-6 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#1b1b20] border border-white/10 flex items-center justify-center font-bold text-xs text-[#8e95a3] group-hover:scale-105 transition-transform">
-                          {avatar}
+                    return (
+                      <tr 
+                        key={c.id} 
+                        onClick={() => onOpenClient(c.id)}
+                        className="hover:bg-[#1b1b20]/45 transition-colors cursor-pointer group"
+                      >
+                        <td className="p-3.5 pl-6 flex items-center gap-3">
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[#12131a] group-hover:scale-105 transition-transform"
+                            style={{ background: "var(--grad-soft)" }}
+                          >
+                            {avatar}
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-white group-hover:text-[#F9B17A] transition-colors">{c.first} {c.last}</div>
+                            {c.cell && <div className="text-[10px] text-[var(--color-text-faint)] font-bold">{c.cell}</div>}
+                          </div>
+                        </td>
+                        <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
+                        <td className="p-3.5 text-xs">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                            c.status === "funded" ? "bg-yellow-500/10 text-[#F9B17A] border border-[#F9B17A]/20" :
+                            c.status === "approved" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
+                            c.status === "conditional" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                            c.status === "lender" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" :
+                            "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                          }`}>
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-xs font-mono font-bold text-white">{c.mtgamt ? fd(pn(c.mtgamt)) : "—"}</td>
+                        <td className="p-3.5 text-xs font-mono text-[var(--color-text-muted)] font-bold">
+                          {ltv > 0 ? `${ltv.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="p-3.5 text-xs font-mono font-bold">
+                          <span className={pn(c.beacon) >= 680 ? "text-green-400" : pn(c.beacon) >= 600 ? "text-orange-400" : "text-red-400"}>
+                            {c.beacon || "—"}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-xs font-mono font-bold">
+                          <span className={gds <= 39 && gds > 0 ? "text-green-400" : gds > 39 ? "text-red-400" : "text-white/40"}>
+                            {gds > 0 ? `${gds.toFixed(1)}%` : "—"}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-bold">{c.agent || "Unassigned"}</td>
+                        <td className="p-3.5 text-right text-xs text-[var(--color-text-faint)] font-mono pr-6 font-bold">
+                          {new Date(c.createdAt).toLocaleDateString("en-CA")}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={9} className="p-16 text-center">
+                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto space-y-4">
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+                          <Search className="h-5 w-5 text-[#F9B17A]" />
                         </div>
-                        <div>
-                          <div className="text-xs font-semibold group-hover:text-[#b5a642] transition-colors">{c.first} {c.last}</div>
-                          {c.cell && <div className="text-[10px] text-[#8e95a3]">{c.cell}</div>}
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-black uppercase text-white tracking-widest">No Clients Found</h4>
+                          <p className="text-[10px] text-[var(--color-text-faint)] leading-relaxed font-sans font-semibold">No active client files match your search criteria.</p>
                         </div>
-                      </td>
-                      <td className="p-3.5 text-xs text-[#8e95a3]">{c.type || "Purchase"}</td>
-                      <td className="p-3.5 text-xs">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                          c.status === "funded" ? "bg-yellow-500/10 text-[#b5a642]" :
-                          c.status === "approved" ? "bg-green-500/10 text-green-400" :
-                          c.status === "conditional" ? "bg-red-500/10 text-red-400" :
-                          c.status === "lender" ? "bg-orange-500/10 text-orange-400" :
-                          "bg-blue-500/10 text-blue-400"
-                        }`}>
-                          {c.status}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-xs font-mono font-medium">{c.mtgamt ? fd(pn(c.mtgamt)) : "—"}</td>
-                      <td className="p-3.5 text-xs font-mono text-[#8e95a3]">
-                        {ltv > 0 ? `${ltv.toFixed(0)}%` : "—"}
-                      </td>
-                      <td className="p-3.5 text-xs font-mono">
-                        <span className={pn(c.beacon) >= 680 ? "text-green-400" : pn(c.beacon) >= 600 ? "text-orange-400" : "text-red-400"}>
-                          {c.beacon || "—"}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-xs font-mono">
-                        <span className={gds <= 39 && gds > 0 ? "text-green-400" : gds > 39 ? "text-red-400" : "text-white/40"}>
-                          {gds > 0 ? `${gds.toFixed(1)}%` : "—"}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-xs text-[#8e95a3]">{c.agent || "Unassigned"}</td>
-                      <td className="p-3.5 text-right text-xs text-white/40 font-mono pr-6">
-                        {new Date(c.createdAt).toLocaleDateString("en-CA")}
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -276,20 +316,26 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               return (
                 <div 
                   key={s.id}
-                  className="w-80 h-full flex flex-col bg-[#141418] border border-white/5 rounded-xl max-h-full"
+                  className="w-80 h-full flex flex-col rounded-2xl max-h-full"
+                  style={{
+                    background: "var(--glass-bg)",
+                    border: "1px solid var(--glass-border)",
+                    backdropFilter: "var(--glass-blur)",
+                    WebkitBackdropFilter: "var(--glass-blur)"
+                  }}
                 >
                   {/* Column Header */}
-                  <div className="p-4.5 border-b border-white/5 flex items-center justify-between shrink-0">
+                  <div className="p-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: "var(--color-divider)" }}>
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }}></div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-white/90">{s.label}</h4>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#1b1b20] text-white/40">{colClients.length}</span>
+                      <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 10px ${s.color}` }}></div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-white">{s.label}</h4>
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-black/30 text-[var(--color-text-muted)]">{colClients.length}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-[#8e95a3] font-semibold">{fdShort(colValue)}</span>
+                    <span className="text-xs font-bold font-mono text-[#F9B17A]">{fdShort(colValue)}</span>
                   </div>
 
                   {/* Column Body Cards Area */}
-                  <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2 min-h-0 bg-[#0c0c0e]/30">
+                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-black/5">
                     {colClients.length > 0 ? colClients.map(c => {
                       const initials = (c.first[0] + c.last[0]).toUpperCase();
                       const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
@@ -299,35 +345,41 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3 rounded-lg border bg-[#1b1b20] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer ${isStale ? "border-red-500/20 hover:border-red-500/35" : "border-white/5 hover:border-white/10"}`}
+                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${isStale ? "border-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(224,92,110,0.15)]" : "border-white/5 hover:border-[#F9B17A]/30 hover:shadow-[0_0_15px_rgba(249,177,122,0.1)]"}`}
+                          style={{
+                            background: isStale ? "rgba(122, 80, 99, 0.04)" : "rgba(255, 255, 255, 0.02)"
+                          }}
                         >
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded bg-[#141418] border border-white/5 text-[10px] font-bold flex items-center justify-center text-[#8e95a3]">
+                              <div 
+                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[#12131a]"
+                                style={{ background: "var(--grad-soft)" }}
+                              >
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <h5 className="text-xs font-semibold text-white/90 truncate">{c.first} {c.last}</h5>
-                                <div className="text-[10px] text-white/30 truncate mt-0.5">{c.type || "Purchase"}</div>
+                                <h5 className="text-xs font-bold text-white truncate">{c.first} {c.last}</h5>
+                                <div className="text-[10px] text-[var(--color-text-faint)] font-bold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-[#b5a642] whitespace-nowrap">
+                            <div className="text-xs font-mono font-bold text-[#F9B17A] whitespace-nowrap mt-0.5">
                               {c.mtgamt ? fdShort(pn(c.mtgamt)) : "—"}
                             </div>
                           </div>
 
                           <div className="flex justify-between items-center text-[10px] border-t border-white/5 pt-2 mt-2">
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 text-[#8e95a3] font-medium max-w-[1240px] truncate">
+                            <span className="px-2 py-0.5 rounded-full bg-white/5 text-[var(--color-text-muted)] font-bold text-[9px] max-w-[120px] truncate">
                               👤 {(c.agent || "Unassigned").split(" ")[0]}
                             </span>
-                            <span className={`font-mono font-semibold ${isStale ? "text-red-400" : "text-white/30"}`}>
+                            <span className={`font-mono font-bold uppercase text-[8px] tracking-wider ${isStale ? "text-red-400" : "text-[var(--color-text-faint)]"}`}>
                               {daysStale === 0 ? "today" : `${daysStale}d idle`}
                             </span>
                           </div>
                         </div>
                       );
                     }) : (
-                      <div className="h-24 flex items-center justify-center text-[11px] text-white/20 italic">No files in stage</div>
+                      <div className="h-24 flex items-center justify-center text-[10px] text-white/20 uppercase tracking-widest font-black italic">No Files</div>
                     )}
                   </div>
                 </div>

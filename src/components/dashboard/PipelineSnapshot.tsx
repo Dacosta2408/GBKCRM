@@ -15,7 +15,7 @@ const STAGES = [
   { id: "lender", label: "At Lender", color: "bg-orange-500/10 text-orange-400 border-orange-500/20", progressColor: "bg-orange-500" },
   { id: "conditional", label: "Conditional", color: "bg-red-500/10 text-red-400 border-red-500/20", progressColor: "bg-red-500" },
   { id: "approved", label: "Approved", color: "bg-green-500/10 text-green-400 border-green-500/20", progressColor: "bg-green-500" },
-  { id: "funded", label: "Funded", color: "bg-[#b5a642]/10 text-[#b5a642] border-[#b5a642]/20", progressColor: "bg-[#b5a642]" }
+  { id: "funded", label: "Funded", color: "bg-[#F9B17A]/10 text-[#F9B17A] border-[#F9B17A]/20", progressColor: "bg-[#F9B17A]" }
 ];
 
 export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
@@ -29,7 +29,6 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
 
   const [pipelineMode, setPipelineMode] = useState<"personal" | "team">(isManager ? "team" : "personal");
 
-  // Filter clients based on selection
   const targetClients = pipelineMode === "personal" 
     ? clients.filter(c => c.agent === userFullName) 
     : clients;
@@ -37,7 +36,6 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
   const activeFiles = targetClients.filter(c => c.status !== "closed");
   const totalPipelineVolume = activeFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
 
-  // Formatting utilities
   const fdShort = (n: number) => {
     if (n >= 1000000) return "$" + (n / 1000000).toFixed(1) + "M";
     if (n >= 1000) return "$" + (n / 1000).toFixed(0) + "K";
@@ -48,7 +46,6 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
     return "$" + Math.round(parseFloat(String(n).replace(/[$,\s]/g, "")) || 0).toLocaleString("en-CA");
   };
 
-  // Find highest value deals currently in pipeline
   const highValueDeals = [...activeFiles]
     .filter(c => c.status !== "funded")
     .sort((a, b) => {
@@ -59,48 +56,51 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
     .slice(0, 4);
 
   return (
-    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md p-5 flex flex-col gap-5" id="pipeline-snapshot">
-      {/* Header section with role-based toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-400">
+    <div className="glass-card shadow-md p-5 flex flex-col gap-5 select-none" id="pipeline-snapshot">
+      
+      {/* Header section styled with deep gradient bar */}
+      <div 
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/5"
+        style={{ background: "var(--grad-deep)" }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-white/5 rounded-lg text-white">
             <BarChart3 className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#eeeef2]">Pipeline Progression Hub</h3>
-            <p className="text-[10px] text-[#8e95a3] mt-0.5">
-              Live progression of mortgage files, conversion ratios, and volume distributions
+            <h3 className="text-xs font-black uppercase text-white tracking-wider">Pipeline progression overview</h3>
+            <p className="text-[10px] text-white/60 mt-0.5 font-bold leading-none">
+              Live progression of active broker folders and team volume metrics
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Total volume label */}
+        <div className="flex items-center gap-4">
           <div className="text-right shrink-0">
-            <div className="text-[9px] text-white/30 uppercase tracking-wider font-semibold">Total Stage Volume</div>
-            <div className="text-xs font-bold text-white font-mono">{fd(totalPipelineVolume)}</div>
+            <div className="text-[9px] text-white/55 uppercase tracking-wider font-extrabold leading-none">Total Pipeline Vol</div>
+            <div className="text-xs font-black text-white font-mono mt-1">{fd(totalPipelineVolume)}</div>
           </div>
 
           {isManager && (
-            <div className="bg-[#111115] border border-white/5 rounded-lg p-0.5 flex">
+            <div className="bg-black/25 border border-white/5 rounded-full p-0.5 flex">
               <button
                 onClick={() => setPipelineMode("personal")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all ${pipelineMode === "personal" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer ${pipelineMode === "personal" ? "bg-[#F9B17A] text-[#12131a]" : "text-white/60 hover:text-white"}`}
               >
                 My Volume
               </button>
               <button
                 onClick={() => setPipelineMode("team")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 ${pipelineMode === "team" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer flex items-center gap-1 ${pipelineMode === "team" ? "bg-[#F9B17A] text-[#12131a]" : "text-white/60 hover:text-white"}`}
               >
-                <Users className="w-3 h-3" /> Team Volume
+                <Users className="w-3 h-3" /> Team
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Main Grid: left part (the progress bars / stage visual), right part (top deals checklist) */}
+      {/* Main Grid: left part (the progress bars), right part (top deals checklist) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Stages Visualization (Left 2 cols) */}
@@ -115,22 +115,22 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                 <div 
                   key={s.id}
                   onClick={() => setActiveTab("pipeline")}
-                  className="bg-[#1b1b20]/50 border border-white/5 rounded-xl p-3.5 flex flex-col justify-between hover:border-white/10 hover:bg-[#1b1b20] transition-all cursor-pointer relative overflow-hidden group"
+                  className="glass-card p-3 flex flex-col justify-between hover:border-[#F9B17A]/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden group"
                 >
-                  <div className="flex flex-col gap-1">
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border self-start ${s.color}`}>
+                  <div className="flex flex-col gap-1.5">
+                    <span className={`text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded border self-start ${s.color}`}>
                       {s.label}
                     </span>
-                    <span className="text-xl font-bold mt-2 text-[#eeeef2] group-hover:scale-105 origin-left transition-transform">
+                    <span className="text-xl font-black mt-1 text-white group-hover:text-[#F9B17A] origin-left transition-colors">
                       {stageFiles.length}
                     </span>
                   </div>
                   
-                  <div className="mt-3">
-                    <div className="text-[10px] font-semibold font-mono text-white/80">
+                  <div className="mt-2.5">
+                    <div className="text-[10px] font-bold font-mono text-white/80">
                       {fdShort(stageValue)}
                     </div>
-                    <div className="text-[9px] text-[#8e95a3]/70 mt-0.5">
+                    <div className="text-[9px] text-[var(--color-text-faint)] mt-0.5 font-bold">
                       {percent.toFixed(0)}% of total
                     </div>
                   </div>
@@ -148,33 +148,39 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
           </div>
 
           {/* Simple funnel progression analytics indicator */}
-          <div className="bg-[#1b1b20]/30 border border-white/5 rounded-xl p-3.5 flex items-center justify-between gap-4 text-xs">
+          <div 
+            className="rounded-xl p-3.5 flex items-center justify-between gap-4 text-xs"
+            style={{
+              background: "var(--glass-bg)",
+              border: "1px solid var(--glass-border)"
+            }}
+          >
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-white/80 font-semibold">Active Loan Progression Index:</span>
-              <span className="text-[#8e95a3]">78.4% of intake files successfully cleared lender submission in Q2.</span>
+              <span className="text-white/80 font-bold">Active Loan Progression Index:</span>
+              <span className="text-[var(--color-text-muted)] font-medium">78.4% of intake files successfully cleared lender submission in Q2.</span>
             </div>
             <button 
               onClick={() => setActiveTab("pipeline")}
-              className="text-[10px] font-bold text-[#b5a642] hover:underline whitespace-nowrap"
+              className="text-[10px] font-black text-[#F9B17A] hover:underline uppercase tracking-tight shrink-0"
             >
-              Interactive Pipeline Board &rarr;
+              Pipeline Board &rarr;
             </button>
           </div>
         </div>
 
         {/* High Value Target Deals (Right col) */}
-        <div className="border border-white/5 bg-[#1b1b20]/30 rounded-xl p-4 flex flex-col justify-between gap-3">
+        <div className="glass-card p-4.5 flex flex-col justify-between gap-3">
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#eeeef2] flex items-center gap-1.5">
+            <h4 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
               <span>💎 High-Value Active Targets</span>
             </h4>
-            <p className="text-[9px] text-[#8e95a3] mt-0.5">
-              Top financial files in pipeline progression
+            <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 font-bold">
+              Top financial files currently under progression
             </p>
           </div>
 
-          <div className="flex flex-col gap-2.5 flex-1">
+          <div className="flex flex-col gap-2.5 flex-1 mt-1">
             {highValueDeals.length > 0 ? (
               highValueDeals.map((deal) => {
                 const mtgAmt = parseFloat(String(deal.mtgamt).replace(/[$,\s]/g, "")) || 0;
@@ -182,26 +188,30 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                   <div 
                     key={deal.id}
                     onClick={() => onOpenClient(deal.id)}
-                    className="p-2.5 rounded-lg bg-[#141418] border border-white/5 hover:border-[#b5a642]/20 hover:bg-[#1b1b20]/60 cursor-pointer transition-all flex items-center justify-between gap-2 group"
+                    className="p-2.5 rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-between gap-2 group hover:-translate-y-0.5"
+                    style={{
+                      background: "var(--glass-bg)",
+                      border: "1px solid var(--glass-border)"
+                    }}
                   >
                     <div className="min-w-0">
-                      <div className="text-xs font-bold text-white/90 truncate group-hover:text-[#b5a642] transition-colors">
+                      <div className="text-xs font-black text-white truncate group-hover:text-[#F9B17A] transition-colors">
                         {deal.first} {deal.last}
                       </div>
-                      <div className="text-[9px] text-[#8e95a3] truncate mt-0.5">
-                        {deal.status.toUpperCase()} • {deal.agent || "Unassigned Agent"}
+                      <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-0.5 font-bold uppercase tracking-wider">
+                        {deal.status} • {deal.agent || "Unassigned"}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-xs font-bold text-[#eeeef2] font-mono">{fd(mtgAmt)}</div>
-                      <div className="text-[8px] text-white/30 truncate uppercase tracking-wider">{deal.type || "Purchase"}</div>
+                      <div className="text-xs font-bold text-white font-mono">{fd(mtgAmt)}</div>
+                      <div className="text-[8px] text-white/30 truncate uppercase tracking-wider font-extrabold">{deal.type || "Purchase"}</div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="text-center py-12 text-xs text-[#8e95a3]">
-                No active files above $0 in pipeline.
+              <div className="text-center py-12 text-xs text-[var(--color-text-faint)] italic font-bold">
+                No active files in pipeline
               </div>
             )}
           </div>

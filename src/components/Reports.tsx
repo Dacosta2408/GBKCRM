@@ -5,6 +5,8 @@ import {
   Filter, RefreshCw, AlertTriangle, CheckCircle, PieChart, Info
 } from "lucide-react";
 import { Client, Lender, User, Task, Partner } from "../types";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 interface ReportsProps {
   clients: Client[];
@@ -305,6 +307,159 @@ export const Reports: React.FC<ReportsProps> = ({
     showToast("CSV Intelligence Report downloaded successfully!", "success");
   };
 
+  const handleExportPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Page styling / margins
+      const margin = 14;
+      let currentY = 15;
+
+      // Header Banner
+      doc.setFillColor(20, 20, 24); // Dark background
+      doc.rect(margin, currentY, 182, 32, "F");
+      
+      doc.setTextColor(181, 166, 66); // Golden color
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("GBK EXECUTIVE INTELLIGENCE REPORT", margin + 6, currentY + 12);
+      
+      doc.setTextColor(240, 240, 242);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.text(`Period: ${selectedPeriod.toUpperCase()}  |  Agent Scope: ${activeAgentFilter}`, margin + 6, currentY + 20);
+      doc.text(`Generated: ${new Date().toLocaleString("en-CA")}`, margin + 6, currentY + 25);
+      
+      currentY += 40;
+
+      // 1. KPIs Section
+      doc.setTextColor(20, 20, 24);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("1. CORE KEY PERFORMANCE INDICATORS", margin, currentY);
+      currentY += 5;
+
+      const kpiData = [
+        ["Closed Funded Volume", `$${kpis.fundedVolume.toLocaleString()} CAD`, "Funded Files Count", `${kpis.fundedCount}`],
+        ["Active Pipeline Value", `$${kpis.activeVolume.toLocaleString()} CAD`, "Working Files Count", `${kpis.activeCount}`],
+        ["File Conversion Rate", `${kpis.conversionRate}%`, "Average Deal Size", `$${kpis.avgDealSize.toLocaleString()} CAD`],
+      ];
+
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [["Metric Indicator", "Performance", "Operational Support", "Count"]],
+        body: kpiData,
+        theme: "striped",
+        headStyles: { fillColor: [181, 166, 66], textColor: [20, 20, 24], fontStyle: "bold" },
+        styles: { fontSize: 8.5 },
+        margin: { left: margin, right: margin }
+      });
+
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+
+      // 2. Pipeline Stage Distribution Section
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("2. PIPELINE BALANCE SHEET", margin, currentY);
+      currentY += 5;
+
+      const stageRows = stageDistribution.map(st => [
+        st.stage,
+        `${st.count} files`,
+        `$${st.volume.toLocaleString()} CAD`
+      ]);
+
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [["Pipeline Stage Status", "File Allocations", "Current Volume Value"]],
+        body: stageRows,
+        theme: "grid",
+        headStyles: { fillColor: [30, 30, 36], textColor: [255, 255, 255], fontStyle: "bold" },
+        styles: { fontSize: 8.5 },
+        margin: { left: margin, right: margin }
+      });
+
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+
+      // 3. Agent Performance Section
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("3. AGENT PERFORMANCE SUMMARY", margin, currentY);
+      currentY += 5;
+
+      const agentRows = agentPerformance.map(item => [
+        item.name,
+        item.role,
+        `${item.totalFiles} files`,
+        `${item.fundedCount} files`,
+        `$${item.fundedVolume.toLocaleString()}`,
+        `${item.conversionRate}%`
+      ]);
+
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [["Agent Name", "Designation", "Total", "Funded", "Closed Volume", "Conversion %"]],
+        body: agentRows,
+        theme: "striped",
+        headStyles: { fillColor: [181, 166, 66], textColor: [20, 20, 24], fontStyle: "bold" },
+        styles: { fontSize: 8 },
+        margin: { left: margin, right: margin }
+      });
+
+      // Add a second page for Lender Placement
+      doc.addPage();
+      currentY = 15;
+
+      // 4. Lender Placement Section
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(20, 20, 24);
+      doc.text("4. LENDER PLACEMENT SHARES", margin, currentY);
+      currentY += 5;
+
+      const lenderRows = lenderUsage.map(item => {
+        const totalCrmVolume = lenderUsage.reduce((sum, l) => sum + l.volume, 0) || 1;
+        const placementPct = Math.round((item.volume / totalCrmVolume) * 100);
+        return [
+          item.name,
+          `Tier ${item.tier}`,
+          `${item.count} cases`,
+          `$${item.volume.toLocaleString()} CAD`,
+          `${placementPct}%`
+        ];
+      });
+
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [["Lender Institution", "Lending Class", "Allocated Deals", "Placed Volume", "Placement Share"]],
+        body: lenderRows,
+        theme: "striped",
+        headStyles: { fillColor: [30, 30, 36], textColor: [255, 255, 255], fontStyle: "bold" },
+        styles: { fontSize: 8.5 },
+        margin: { left: margin, right: margin }
+      });
+
+      // Footer signature/disclaimer at the end of page 2
+      currentY = (doc as any).lastAutoTable.finalY + 15;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 100, 100);
+      doc.text("CONFIDENTIALITY & SECURITY COMPLIANCE DISCLOSURE:", margin, currentY);
+      
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7.5);
+      doc.text("This intelligence ledger is generated directly from the GBKCRM active database.", margin, currentY + 4.5);
+      doc.text("All client dossier files, debt analysis, and mortgage allocations remain proprietary corporate data.", margin, currentY + 8);
+      doc.text("Unauthorized external replication, distribution, or transport is strictly prohibited by security policies.", margin, currentY + 11.5);
+
+      doc.save(`gbk_executive_intelligence_report_${selectedPeriod}.pdf`);
+      showToast("PDF Intelligence Report downloaded successfully!", "success");
+    } catch (err: any) {
+      console.error(err);
+      showToast("Failed to generate PDF Report. Please check logs.", "error");
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#0c0c0e] text-[#eeeef2] overflow-hidden" id="reports-module-root">
       
@@ -356,10 +511,17 @@ export const Reports: React.FC<ReportsProps> = ({
             </div>
           )}
 
-          {/* Export Button */}
+          {/* Export Buttons */}
+          <button
+            onClick={handleExportPDF}
+            className="bg-white/5 hover:bg-white/10 border border-white/5 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <FileText className="h-3.5 w-3.5 text-[#b5a642]" /> Export PDF Report
+          </button>
+
           <button
             onClick={handleExportCSV}
-            className="bg-white/5 hover:bg-white/10 border border-white/5 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5"
+            className="bg-white/5 hover:bg-white/10 border border-white/5 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <FileSpreadsheet className="h-3.5 w-3.5 text-[#b5a642]" /> Export CSV
           </button>

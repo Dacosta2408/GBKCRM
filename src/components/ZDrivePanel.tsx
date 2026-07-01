@@ -369,9 +369,26 @@ Assigned Broker: Sarah Jenkins`
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {filteredFiles.length === 0 ? (
-                <div className="py-12 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
-                  <FileText className="w-8 h-8 text-white/10 mx-auto mb-2" />
-                  <p className="text-xs text-white/40 font-sans">No pending files found matching your search.</p>
+                <div className="py-16 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01] select-none">
+                  <FileText className="w-10 h-10 text-[#5d9bb1] opacity-60 mx-auto mb-3" />
+                  <h4 className="text-xs font-black uppercase text-white tracking-widest">No Documents Found</h4>
+                  <p className="text-[10px] text-[#8e95a3] max-w-xs mx-auto mt-1 leading-relaxed font-sans font-semibold">
+                    No files matching your search query are present in this directory view.
+                  </p>
+                  <div className="flex items-center justify-center gap-2.5 mt-5">
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="px-3 py-1.5 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[9px] uppercase rounded-lg transition-all"
+                    >
+                      Clear Search Filter
+                    </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-1.5 bg-[#5d9bb1] text-black hover:bg-[#467c90] font-bold text-[9px] uppercase rounded-lg transition-all"
+                    >
+                      Browse Local Drive
+                    </button>
+                  </div>
                 </div>
               ) : (
                 filteredFiles.map(file => {

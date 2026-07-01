@@ -531,21 +531,45 @@ export const Partners: React.FC<PartnersProps> = ({
             <span className="text-[10px] text-white/30 italic">Click row to inspect full dossier</span>
           </div>
           
-          <PartnerList
-            partners={filteredAndSortedPartners}
-            selectedPartnerId={selectedPartner?.id || null}
-            onSelectPartner={setSelectedPartnerId}
-            onTogglePreferred={handleTogglePreferred}
-            onDeletePartner={handleDeletePartner}
-            onEditPartner={handleEditPartner}
-            onQuickEmail={(email) => {
-              if (onOpenComposeEmail) {
-                onOpenComposeEmail(email, "Mortgage Market Update", "");
-              } else {
-                window.open(`mailto:${email}`);
-              }
-            }}
-          />
+          {filteredAndSortedPartners.length === 0 ? (
+            <div className="bg-[#121216] border border-dashed border-white/5 rounded-xl p-12 text-center" id="empty-partner-results">
+              <MapPin className="h-10 w-10 text-[#b5a642] opacity-60 mx-auto mb-3 stroke-1 animate-pulse" />
+              <h3 className="text-xs font-black text-white uppercase tracking-wider">No Partners Located</h3>
+              <p className="text-[10px] font-sans font-semibold text-white/40 mt-1 max-w-sm mx-auto">
+                No external professional partners match the current search filters or region constraints.
+              </p>
+              <div className="flex items-center justify-center gap-3 mt-5">
+                <button
+                  onClick={handleResetFilters}
+                  className="px-3.5 py-1.5 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase rounded-lg transition-all"
+                >
+                  Clear Filters
+                </button>
+                <button
+                  onClick={handleAddPartner}
+                  className="px-3.5 py-1.5 bg-[#b5a642] text-black hover:bg-[#9a8c38] font-bold text-[10px] uppercase rounded-lg transition-all"
+                >
+                  Add Strategic Partner
+                </button>
+              </div>
+            </div>
+          ) : (
+            <PartnerList
+              partners={filteredAndSortedPartners}
+              selectedPartnerId={selectedPartner?.id || null}
+              onSelectPartner={setSelectedPartnerId}
+              onTogglePreferred={handleTogglePreferred}
+              onDeletePartner={handleDeletePartner}
+              onEditPartner={handleEditPartner}
+              onQuickEmail={(email) => {
+                if (onOpenComposeEmail) {
+                  onOpenComposeEmail(email, "Mortgage Market Update", "");
+                } else {
+                  window.open(`mailto:${email}`);
+                }
+              }}
+            />
+          )}
         </div>
 
         {/* 3. Detailed Dossier View (Active Partner Workspace Detail panel) */}

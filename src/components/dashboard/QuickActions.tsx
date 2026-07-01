@@ -26,48 +26,48 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Create client folder",
       icon: UserPlus,
       onClick: onAddClient,
-      color: "bg-[#b5a642]/10 border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20"
+      iconColor: "text-[#F9B17A]"
     },
     {
       label: "Full Loan Intake",
-      desc: "Detailed application form",
+      desc: "Detailed application",
       icon: FileCheck,
       onClick: onOpenNewClientIntake,
-      color: "bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20"
+      iconColor: "text-blue-400"
     },
     {
       label: "AI Smart Extractor",
-      desc: "Extract from email / PDF",
+      desc: "Extract from PDF / email",
       icon: Search,
       onClick: onOpenAIIntake,
-      color: "bg-purple-500/10 border-purple-500/20 text-purple-400 hover:bg-purple-500/20"
+      iconColor: "text-purple-400"
     },
     {
       label: "Log Task / Action",
       desc: "Add to daily list",
       icon: CheckSquare,
       onClick: onAddTask,
-      color: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+      iconColor: "text-emerald-400"
     },
     {
       label: "Onboard Partner",
-      desc: "Add professional contact",
+      desc: "Professional contact",
       icon: Handshake,
       onClick: onAddPartner,
-      color: "bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500/20"
+      iconColor: "text-orange-400"
     },
     {
       label: "Open Calendar",
       desc: "Book client meeting",
       icon: Calendar,
       onClick: () => setActiveTab("calendar"),
-      color: "bg-slate-400/10 border-slate-400/20 text-slate-300 hover:bg-slate-400/20"
+      iconColor: "text-slate-300"
     }
   ];
 
   return (
-    <div className="flex flex-col gap-2" id="quick-actions-bar">
-      <div className="text-[10px] text-[#8e95a3] uppercase tracking-wider font-semibold">
+    <div className="flex flex-col gap-2 select-none" id="quick-actions-bar">
+      <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-extrabold">
         Quick Action Command Deck
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -77,16 +77,16 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             <button
               key={i}
               onClick={act.onClick}
-              className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm ${act.color}`}
+              className="glass-card flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:border-[#F9B17A]/30 hover:shadow-[0_0_20px_rgba(249,177,122,0.15)] group"
             >
-              <div className="p-2 rounded-lg bg-black/20 shrink-0">
-                <Icon className="w-4 h-4" />
+              <div className="p-2 rounded-lg bg-black/20 shrink-0 group-hover:bg-black/40 transition-colors">
+                <Icon className={`w-4 h-4 ${act.iconColor}`} />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-bold leading-tight truncate">
+                <div className="text-xs font-black text-white truncate leading-tight">
                   {act.label}
                 </div>
-                <div className="text-[9px] text-white/40 truncate mt-0.5">
+                <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-0.5 font-bold">
                   {act.desc}
                 </div>
               </div>

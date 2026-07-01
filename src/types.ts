@@ -177,6 +177,7 @@ export interface User {
   phone?: string;
   photo?: string | null;
   pin?: string;
+  pinHash?: string;
   lastLogin: string;
   created: string;
   isOwner?: boolean;

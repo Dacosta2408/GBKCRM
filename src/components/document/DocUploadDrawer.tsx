@@ -6,6 +6,7 @@ import {
 import { Client } from "../../types";
 import { EnhancedDocState, DocVersion } from "./types";
 import { ISSUE_CHECKBOXES, STATUS_STYLING } from "./constants";
+import { uploadDocument } from "../../lib/bridgeService";
 
 interface DocUploadDrawerProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface DocUploadDrawerProps {
   currentUser: any;
   showToast: (msg: string, type?: "success" | "error" | "info", icon?: string) => void;
   logDocActivity: (clientId: string, clientName: string, docId: string, docName: string, action: string, details: string) => void;
+  bridgeOnline?: boolean;
 }
 
 export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
@@ -32,7 +34,8 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
   setDocVault,
   currentUser,
   showToast,
-  logDocActivity
+  logDocActivity,
+  bridgeOnline = false
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(-1); // -1 means no active upload
@@ -103,13 +106,13 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      startSimulatedUpload(e.dataTransfer.files[0].name, e.dataTransfer.files[0].size);
+      startSimulatedUpload(e.dataTransfer.files[0].name, e.dataTransfer.files[0].size, e.dataTransfer.files[0]);
     }
   };
 
   const handleManualUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      startSimulatedUpload(e.target.files[0].name, e.target.files[0].size);
+      startSimulatedUpload(e.target.files[0].name, e.target.files[0].size, e.target.files[0]);
     }
   };
 
@@ -158,7 +161,7 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
   };
 
   // Simulated Upload with high-fidelity progression
-  const startSimulatedUpload = (name: string, sizeBytes: number) => {
+  const startSimulatedUpload = (name: string, sizeBytes: number, realFile?: File) => {
     const sizeStr = (sizeBytes / (1024 * 1024)).toFixed(2) + " MB";
     setUploadProgress(0);
     setUploadStepMsg("Establishing GBK Secured SSH Session...");
@@ -180,26 +183,41 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
       } else {
         clearInterval(interval);
         setTimeout(() => {
-          finalizeUpload(name, sizeStr);
+          finalizeUpload(name, sizeStr, realFile);
         }, 500);
       }
     }, 450);
   };
 
-  const finalizeUpload = (fName: string, fSize: string) => {
+  const finalizeUpload = async (fName: string, fSize: string, realFile?: File) => {
     const finalName = fileNameOverride || fName;
     const clientDocs = docVault[client.id] || {};
     const existingDoc = clientDocs[docId] || {};
     const currentFiles = existingDoc.files || [];
 
-    const newVersion: DocVersion = {
+    let isSynced = false;
+    if (bridgeOnline) {
+      setUploadStepMsg("Syncing files to Z Drive Network Bridge...");
+      const fileToUpload = realFile || new File(["GBK Secured Document Backup Content"], finalName, { type: "application/pdf" });
+      const success = await uploadDocument(client.id, fileToUpload);
+      if (success) {
+        isSynced = true;
+      } else {
+        showToast("Bridge upload failed, queueing offline...", "info", "🔌");
+      }
+    } else {
+      showToast("Bridge server offline, queueing offline...", "info", "🔌");
+    }
+
+    const newVersion: DocVersion & { syncStatus?: 'synced' | 'pending' } = {
       id: "v-" + Date.now(),
       fileName: finalName,
       fileSize: fSize,
       uploadedAt: new Date().toISOString(),
       uploadedBy: `${currentUser.first} ${currentUser.last}`,
-      notes: reviewNote || "Direct secure upload.",
-      path: `gbk-secured-vault://${client.id}/${docId}/${finalName}`
+      notes: reviewNote || (isSynced ? "Direct secure upload synced to bridge." : "Offline queued upload."),
+      path: `gbk-secured-vault://${client.id}/${docId}/${finalName}`,
+      syncStatus: isSynced ? "synced" : "pending"
     };
 
     const updatedFiles = [...currentFiles, newVersion];
@@ -220,7 +238,9 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
           date: new Date().toISOString(),
           user: `${currentUser.first} ${currentUser.last}`,
           status: isFirst ? "received" : (existingDoc.status || "received"),
-          notes: `Uploaded version ${updatedFiles.length}: ${finalName}`
+          notes: isSynced 
+            ? `Uploaded version ${updatedFiles.length}: ${finalName} (Synced to Bridge)`
+            : `Uploaded version ${updatedFiles.length}: ${finalName} (Pending Sync)`
         }
       ]
     };
@@ -239,7 +259,9 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
       docId,
       docLabel,
       "uploaded",
-      `Successfully vaulted new version: ${finalName} (Size: ${fSize}, v${updatedFiles.length})`
+      isSynced
+        ? `Successfully vaulted & synced new version: ${finalName} (Size: ${fSize}, v${updatedFiles.length})`
+        : `Successfully queued offline new version: ${finalName} (Size: ${fSize}, v${updatedFiles.length})`
     );
 
     // Simulated OCR extraction

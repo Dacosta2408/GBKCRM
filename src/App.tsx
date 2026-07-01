@@ -5,9 +5,11 @@ import {
   ShieldCheck, FileText, Key, LogOut, Lock, Search, ChevronDown, Settings as SettingsIcon, 
   Trash2, Copy, Send, Plus, CheckCircle2, AlertTriangle, 
   Clock, Award, Globe, FileSpreadsheet, Share2, Sparkles, Filter, 
-  MailOpen, RefreshCw, Phone, MessageCircle, HardDrive
+  MailOpen, RefreshCw, Phone, MessageCircle, HardDrive, Sun, Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { encryptValue, decryptValue } from "./lib/cryptoUtils";
+import { hashPin } from "./hooks/useAuth";
 import { 
   DEFAULT_CLIENTS, DEFAULT_LENDERS, DEFAULT_USERS, DEFAULT_MESSAGES, 
   DEFAULT_EMAILS, DEFAULT_TEMPLATES, DEFAULT_PARTNERS 
@@ -38,7 +40,10 @@ import { useTasks } from "./hooks/useTasks";
 import { useCalendar } from "./hooks/useCalendar";
 import { useAI } from "./hooks/useAI";
 import { useAuth } from "./hooks/useAuth";
+import { useCalculators } from "./hooks/useCalculators";
+import { fd, pn, cPmt, pToAmt } from "./lib/formatters";
 import { ClientDetailPanel } from "./components/ClientDetailPanel";
+import { checkBridgeHealth, getBridgeVersion } from "./lib/bridgeService";
 
 export default function App() {
   const TAB_LABELS: Record<string, string> = {
@@ -74,9 +79,18 @@ export default function App() {
     const saved = localStorage.getItem("gbk_messages");
     return saved ? JSON.parse(saved) : DEFAULT_MESSAGES;
   });
-  const [emailsState, setEmailsState] = useState<{ inbox: Email[]; sent: Email[]; scheduled: Email[] }>(() => {
+  const [emailsState, setEmailsState] = useState<{ inbox: Email[]; sent: Email[]; scheduled: Email[]; queued: Email[] }>(() => {
     const saved = localStorage.getItem("gbk_emails");
-    return saved ? JSON.parse(saved) : DEFAULT_EMAILS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.queued) parsed.queued = [];
+        return parsed;
+      } catch (e) {
+        return DEFAULT_EMAILS;
+      }
+    }
+    return DEFAULT_EMAILS;
   });
   const [posts, setPosts] = useState<Post[]>(() => {
     const saved = localStorage.getItem("gbk_posts");
@@ -84,8 +98,41 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab ] = useState<string>("dashboard");
-  const [globalSearchSearch, setGlobalSearchSearch] = useState<string>("");
+  const [globalSearch, setGlobalSearch] = useState<string>("");
   const [detailTab, setDetailTab] = useState<string>("overview");
+
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  // Z Drive Bridge online state
+  const [bridgeOnline, setBridgeOnline] = useState<boolean>(false);
+  const [bridgeVersion, setBridgeVersion] = useState<string | null>(null);
+  const [versionMismatch, setVersionMismatch] = useState<boolean>(false);
+
+  // Monitor bridge server connectivity
+  useEffect(() => {
+    async function checkHealth() {
+      const isOnline = await checkBridgeHealth();
+      setBridgeOnline(isOnline);
+      if (isOnline) {
+        const verInfo = await getBridgeVersion();
+        if (verInfo) {
+          setBridgeVersion(verInfo.version);
+          const appVer = (import.meta as any).env?.VITE_APP_VERSION || "1.0.0";
+          setVersionMismatch(verInfo.version !== appVer);
+        }
+      } else {
+        setBridgeVersion(null);
+        setVersionMismatch(false);
+      }
+    }
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Notifications / Toast
   const [toastMessage, setToastMessage] = useState<{ msg: string; icon?: string; type: "success" | "error" } | null>(null);
@@ -120,38 +167,7 @@ export default function App() {
     if (saved) {
       setBroadcastBanners(JSON.parse(saved));
     }
-  }, [activeTab]);
-
-  // Calculator linked client state
-  const [calcClientId, setCalcClientId] = useState<string>("");
-  const [stIncome, setStIncome] = useState<string>("");
-  const [stCoIncome, setStCoIncome] = useState<string>("");
-  const [stDebts, setStDebts] = useState<string>("");
-  const [stCondo, setStCondo] = useState<string>("");
-  const [stTax, setStTax] = useState<string>("4800");
-  const [stHeat, setStHeat] = useState<string>("150");
-  const [stRate, setStRate] = useState<string>("4.79");
-  const [stAmortization, setStAmortization] = useState<string>("25");
-
-  // Payment Calculator state
-  const [pcAmount, setPcAmount] = useState<string>("500000");
-  const [pcRate, setPcRate] = useState<string>("4.79");
-  const [pcAm, setPcAm] = useState<string>("25");
-  const [pcFreq, setPcFreq] = useState<string>("monthly");
-
-  // GDS / TDS state
-  const [gcIncome, setGcIncome] = useState<string>("120000");
-  const [gcPmt, setGcPmt] = useState<string>("2000");
-  const [gcTax, setGcTax] = useState<string>("400");
-  const [gcHeat, setGcHeat] = useState<string>("150");
-  const [gcCondo, setGcCondo] = useState<string>("0");
-  const [gcDebts, setGcDebts] = useState<string>("500");
-
-  // Hourly / SE state
-  const [hrRate, setHrRate] = useState<string>("25.00");
-  const [hrHrs, setHrHrs] = useState<string>("40");
-  const [seY1, setSeY1] = useState<string>("80000");
-  const [seY2, setSeY2] = useState<string>("95000");
+  }, []);
 
   // Email Compose state
   const [emailComposeOpen, setEmailComposeOpen] = useState<boolean>(false);
@@ -190,13 +206,21 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3500);
   }
 
+  const sessionIdRef = useRef<string>("");
+  if (!sessionIdRef.current) {
+    sessionIdRef.current = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+  }
+
   function logActivity(action: string, target?: string) {
     if (!auditLoggingEnabled) return;
     const logItem = {
       user: currentUser.first + " " + currentUser.last,
       action,
       target: target || "",
-      time: new Date().toISOString()
+      time: new Date().toISOString(),
+      ipAddress: "localhost",
+      sessionId: sessionIdRef.current,
+      tabContext: activeTab
     };
     setAuditLogs(prev => [logItem, ...prev.slice(0, 199)]);
   }
@@ -270,7 +294,9 @@ export default function App() {
     openClient,
     closeDetail,
     handleUpdateClient,
-    handleUpdateClientStatus
+    handleUpdateClientStatus,
+    handleCreateClient,
+    handleDeleteClient
   } = useClients({
     currentUser,
     logActivity,
@@ -335,6 +361,8 @@ export default function App() {
     setIntakePreloadedFileName,
     runGeneralAIChat,
     triggerUnderwritingAnalysis,
+    underwritingLoading,
+    underwritingError,
     triggerAIIntakeExtract,
     handleSaveAIIntake,
     openApplicationIntake,
@@ -349,6 +377,57 @@ export default function App() {
     setNewClientOpen,
     currentClient
   });
+
+  const {
+    calcClientId,
+    setCalcClientId,
+    stIncome,
+    setStIncome,
+    stCoIncome,
+    setStCoIncome,
+    stDebts,
+    setStDebts,
+    stCondo,
+    setStCondo,
+    stTax,
+    setStTax,
+    stHeat,
+    setStHeat,
+    stRate,
+    setStRate,
+    stAmortization,
+    setStAmortization,
+    pcAmount,
+    setPcAmount,
+    pcRate,
+    setPcRate,
+    pcAm,
+    setPcAm,
+    pcFreq,
+    setPcFreq,
+    gcIncome,
+    setGcIncome,
+    gcPmt,
+    setGcPmt,
+    gcTax,
+    setGcTax,
+    gcHeat,
+    setGcHeat,
+    gcCondo,
+    setGcCondo,
+    gcDebts,
+    setGcDebts,
+    hrRate,
+    setHrRate,
+    hrHrs,
+    setHrHrs,
+    seY1,
+    setSeY1,
+    seY2,
+    setSeY2,
+    handleLoadClientToCalc,
+    handleClearCalcClient
+  } = useCalculators({ clients });
 
   // Local storage writing side-effects
   useEffect(() => { localStorage.setItem("gbk_lenders", JSON.stringify(lenders)); }, [lenders]);
@@ -369,6 +448,11 @@ export default function App() {
         setAppLocked(true);
       }
     }, autoLockMinutes * 60 * 1000);
+  };
+
+  const handleTabChange = (tab: string) => {
+    resetIdleTimer();
+    setActiveTab(tab);
   };
 
   useEffect(() => {
@@ -436,30 +520,7 @@ export default function App() {
     };
   }, [currentUser]);
 
-  function fd(n: any) {
-    if (n === null || n === undefined || isNaN(Number(n))) return "$0";
-    return "$" + Math.round(Number(n)).toLocaleString("en-CA");
-  }
 
-  function pn(s: any) {
-    if (!s) return 0;
-    return parseFloat(String(s).replace(/[$,\s]/g, "")) || 0;
-  }
-
-  function cPmt(P: number, rPct: number, yrs: number) {
-    if (!P || !rPct || !yrs) return 0;
-    const r = rPct / 100 / 12;
-    const n = yrs * 12;
-    if (r === 0) return P / n;
-    return P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-  }
-
-  function pToAmt(pmt: number, rPct: number, yrs: number) {
-    const r = rPct / 100 / 12;
-    const n = yrs * 12;
-    if (r === 0 || pmt <= 0) return 0;
-    return pmt * (Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n));
-  }
 
   function handleCreateClientFromIntake(
     finalClient: Client, 
@@ -469,11 +530,11 @@ export default function App() {
     starterTasks?: Array<{ title: string; priority: 'high' | 'medium' | 'low'; notes: string }>
   ) {
     if (alertAction === 'merge') {
-      setClients(prev => prev.map(c => c.id === finalClient.id ? { ...finalClient, id: c.id, status: c.status } : c));
+      handleUpdateClient({ ...finalClient, id: finalClient.id });
       logActivity("Merged Intake application fields into existing client", finalClient.first + " " + finalClient.last);
       showToast("Data successfully merged into existing client record!", "success");
     } else {
-      setClients(prev => [finalClient, ...prev]);
+      handleCreateClient(finalClient);
       logActivity("Created new file via Application Intake PDF", finalClient.first + " " + finalClient.last);
       showToast("Active mortgage file created successfully!", "success");
     }
@@ -576,45 +637,7 @@ export default function App() {
     setApplicationIntakeOpen(false);
   }
 
-  // Load client parameters into the GDS stress tools
-  function handleLoadClientToCalc(id: string) {
-    const c = clients.find(x => x.id === id);
-    if (!c) return;
-    setStIncome(String(c.income || ""));
-    setStCoIncome(String(c.coIncome || ""));
-    setStDebts(String(c.debts || ""));
-    setStCondo(String(c.condo || ""));
-    setStTax(c.tax ? String(pn(c.tax)) : "4800");
-    setStHeat(c.heat ? String(c.heat) : "150");
-    setGcIncome(String(pn(c.income) + pn(c.coIncome)));
-    
-    const mtg = pn(c.mtgamt);
-    if (mtg > 0) {
-      setGcPmt(String(Math.round(cPmt(mtg, 4.79, 25))));
-      setPcAmount(String(mtg));
-    }
-    setGcTax(c.tax ? String(Math.round(pn(c.tax) / 12)) : "400");
-    setGcHeat(c.heat ? String(c.heat) : "150");
-    setGcCondo(c.condo ? String(c.condo) : "0");
-    setGcDebts(c.debts ? String(c.debts) : "500");
-  }
 
-  function handleClearCalcClient() {
-    setCalcClientId("");
-    setStIncome("");
-    setStCoIncome("");
-    setStDebts("");
-    setStCondo("");
-    setStTax("4800");
-    setStHeat("150");
-    setGcIncome("120000");
-    setGcPmt("2000");
-    setGcTax("400");
-    setGcHeat("150");
-    setGcCondo("0");
-    setGcDebts("500");
-    setPcAmount("500000");
-  }
 
   function handleOpenComposeWithDetails(to: string, subject: string, body: string) {
     setCompTo(to);
@@ -634,16 +657,28 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#0c0c0e]/95 backdrop-blur-md z-50 flex items-center justify-center flex-col gap-6"
+            className="fixed inset-0 z-50 flex items-center justify-center flex-col gap-6"
+            style={{
+              background: "radial-gradient(circle at center, #1F2232 0%, #0c0c0e 100%)"
+            }}
           >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,177,122,0.08)_0%,transparent_60%)] animate-pulse pointer-events-none" />
             <motion.div 
-              initial={{ scale: 0.9, y: 15 }}
+              initial={{ scale: 0.92, y: 15 }}
               animate={{ scale: 1, y: 0 }}
-              className="bg-[#141418] border border-white/5 rounded-2xl p-8 w-80 text-center shadow-2xl relative"
+              className="border rounded-2xl p-8 w-80 text-center shadow-2xl relative"
+              style={{
+                background: "rgba(18, 19, 26, 0.75)",
+                borderColor: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)"
+              }}
             >
-              <div className="text-4xl mb-3">🛡️</div>
-              <h3 className="text-lg font-semibold mb-1">Session Inactive</h3>
-              <p className="text-xs text-[#8e95a3] mb-6">Enter security PIN to resume</p>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "var(--grad-soft)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <Lock className="w-6 h-6 text-[#12131a]" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-white mb-1">Workstation Locked</h3>
+              <p className="text-[10px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider mb-6">Enter 4-digit security PIN to resume</p>
               
               <input 
                 type="password" 
@@ -652,20 +687,21 @@ export default function App() {
                 onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
                 placeholder="••••"
                 disabled={lockoutActive}
-                className="w-full tracking-widest text-center text-3xl font-mono py-2 bg-[#1b1b20] border border-white/10 rounded-lg text-white mb-4 focus:outline-none focus:border-[#b5a642] focus:ring-1 focus:ring-[#b5a642] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full tracking-widest text-center text-3xl font-mono py-2.5 bg-black/30 border border-white/5 rounded-xl text-[#F9B17A] mb-4 focus:outline-none focus:border-[#F9B17A] focus:ring-1 focus:ring-[#F9B17A] disabled:opacity-50 disabled:cursor-not-allowed font-black"
                 onKeyDown={(e) => { if (e.key === "Enter") handleUnlock(); }}
               />
 
               <button 
                 onClick={handleUnlock}
                 disabled={lockoutActive}
-                className="w-full bg-[#b5a642] text-black font-semibold text-sm py-3 rounded-lg hover:bg-[#9a8c38] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-[#12131a] font-black uppercase tracking-wider text-[11px] py-3.5 rounded-xl hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.3)]"
+                style={{ background: "var(--grad-warm)" }}
               >
                 Unlock Workstation
               </button>
 
               {pinError && (
-                <div className="text-xs text-red-400 mt-3">{pinError}</div>
+                <div className="text-xs text-red-400 mt-4 font-bold uppercase tracking-wide">{pinError}</div>
               )}
             </motion.div>
           </motion.div>
@@ -679,10 +715,17 @@ export default function App() {
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl border max-w-sm shadow-xl bg-[#1b1b20] ${toastMessage.type === "error" ? "border-red-500/30 text-red-300" : "border-[#b5a642]/30 text-[#eeeef2]"}`}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl border max-w-sm shadow-xl"
+            style={{
+              background: "var(--glass-bg)",
+              borderColor: toastMessage.type === "error" ? "rgba(224,92,110,0.3)" : "rgba(249,177,122,0.3)",
+              backdropFilter: "var(--glass-blur)",
+              WebkitBackdropFilter: "var(--glass-blur)",
+              boxShadow: toastMessage.type === "error" ? "0 4px 20px rgba(224,92,110,0.15)" : "0 4px 20px rgba(249,177,122,0.15)"
+            }}
           >
-            <span className="text-lg">{toastMessage.icon || "✓"}</span>
-            <span className="text-xs font-medium">{toastMessage.msg}</span>
+            <div className="text-base select-none shrink-0">{toastMessage.icon || "✓"}</div>
+            <span className="text-[11px] font-bold text-white leading-tight">{toastMessage.msg}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -690,7 +733,7 @@ export default function App() {
       {/* ─── Sidebar Navigation Panel ─── */}
       <Sidebar 
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         currentUser={currentUser}
         clients={clients}
         tasks={tasks}
@@ -704,33 +747,59 @@ export default function App() {
       {/* Main Workspace */}
       <div className="flex-1 flex flex-col h-full min-w-0 bg-[#0c0c0e]">
         
+        {/* Version Mismatch Banner */}
+        {versionMismatch && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2 flex items-center gap-2 text-xs text-amber-300 font-medium select-none shrink-0">
+            <span>⚠️</span>
+            <span>
+              Version mismatch detected. Bridge server is running <strong>v{bridgeVersion}</strong> but the app is <strong>v{(import.meta as any).env?.VITE_APP_VERSION || "1.0.0"}</strong>. Please restart the bridge server.
+            </span>
+          </div>
+        )}
+        
         {/* Top Header */}
-        <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 shrink-0 bg-[#111115]/40 select-none">
-          <div className="text-sm font-semibold text-white/90">{TAB_LABELS[activeTab] || activeTab} Section</div>
+        <header 
+          className="h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
+          style={{
+            background: "rgba(18, 19, 26, 0.8)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderBottom: "1px solid var(--color-divider)"
+          }}
+        >
+          <div className="text-sm font-semibold text-[var(--color-text)] tracking-tight">{TAB_LABELS[activeTab] || activeTab} Section</div>
           <div className="flex items-center gap-3">
             {/* Quick search input */}
             <div className="relative">
-              <div className="bg-[#141418] border border-white/5 rounded-lg px-2.5 py-1 flex items-center gap-2 w-48 focus-within:w-60 focus-within:border-[#b5a642]/40 transition-all">
-                <Search className="w-3.5 h-3.5 text-[#8e95a3]" />
+              <div 
+                className="px-3.5 py-1.5 flex items-center gap-2 w-48 focus-within:w-64 transition-all duration-300 rounded-full"
+                style={{
+                  background: "var(--glass-bg)",
+                  backdropFilter: "var(--glass-blur)",
+                  WebkitBackdropFilter: "var(--glass-blur)",
+                  border: "1px solid var(--glass-border)"
+                }}
+              >
+                <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                 <input 
                   type="text" 
                   placeholder="Quick locate client…" 
-                  value={globalSearchSearch}
+                  value={globalSearch}
                   onChange={(e) => {
-                    setGlobalSearchSearch(e.target.value);
+                    setGlobalSearch(e.target.value);
                   }}
-                  className="bg-transparent border-none text-[11px] text-[#eeeef2] focus:outline-none w-full"
+                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none w-full font-medium"
                 />
               </div>
 
-              {activeTab !== "clients" && activeTab !== "pipeline" && globalSearchSearch.trim().length > 0 && (
+              {activeTab !== "clients" && activeTab !== "pipeline" && globalSearch.trim().length > 0 && (
                 <div className="absolute top-full mt-1 right-0 w-60 bg-[#141418] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden py-1">
                   <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-white/40 border-b border-white/5">
                     Matched Clients
                   </div>
                   {(() => {
                     const matched = clients.filter(c => {
-                      const q = globalSearchSearch.toLowerCase();
+                      const q = globalSearch.toLowerCase();
                       return (c.first + " " + c.last).toLowerCase().includes(q) ||
                              (c.email || "").toLowerCase().includes(q) ||
                              (c.cell || "").includes(q) ||
@@ -744,7 +813,7 @@ export default function App() {
                           key={c.id}
                           onClick={() => {
                             openClient(c.id);
-                            setGlobalSearchSearch("");
+                            setGlobalSearch("");
                           }}
                           className="w-full text-left px-2.5 py-2 text-xs text-white hover:bg-[#b5a642]/10 hover:text-[#b5a642] transition-colors flex flex-col gap-0.5"
                         >
@@ -764,21 +833,56 @@ export default function App() {
               )}
             </div>
 
-            {/* Z Drive Button */}
-            <button 
-              onClick={() => setZDriveOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#141418] text-[#5d9bb1] border border-[#5d9bb1]/30 hover:bg-[#5d9bb1]/10 transition-all shrink-0 cursor-pointer"
-              id="header-z-drive-btn"
-            >
-              <HardDrive className="w-3.5 h-3.5" /> Z Drive
-            </button>
+            {/* Z Drive Button with Online Indicator */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button 
+                onClick={() => setZDriveOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_15px_rgba(72,109,131,0.25)] hover:border-[#486D83]"
+                style={{
+                  background: "var(--glass-bg)",
+                  backdropFilter: "var(--glass-blur)",
+                  WebkitBackdropFilter: "var(--glass-blur)",
+                  border: "1px solid var(--glass-border)",
+                  color: "var(--color-text-muted)"
+                }}
+                id="header-z-drive-btn"
+              >
+                <HardDrive className="w-3.5 h-3.5" /> Z Drive
+              </button>
+              {bridgeOnline && (
+                <div className="flex items-center" title="Z Drive Online">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 animate-pulse"></span>
+                  </span>
+                </div>
+              )}
+            </div>
 
+            {/* New Client Button */}
             <button 
               onClick={openManualIntake}
-              className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#b5a642] text-black hover:bg-[#9a8c38] transition-all shrink-0"
+              className="flex items-center gap-1 px-4 py-1.5 text-[11px] font-extrabold text-white transition-all shrink-0 hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] duration-200 active:scale-95 cursor-pointer"
+              style={{
+                background: "var(--grad-warm)",
+                borderRadius: "10px"
+              }}
               id="header-new-client-btn"
             >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" /> New Client
+              <Plus className="w-3.5 h-3.5 stroke-[3]" /> New Client
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => setTheme(prev => prev === "dark" ? "light" : "dark")}
+              className="p-1.5 rounded-full hover:bg-white/5 transition-all cursor-pointer text-[var(--color-text-muted)] hover:text-white shrink-0"
+              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-[#F9B17A]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#7A5063]" />
+              )}
             </button>
 
             {/* Vertical Divider */}
@@ -788,7 +892,13 @@ export default function App() {
             <div className="relative shrink-0" id="header-profile-dropdown-container">
               <button
                 onClick={() => setHeaderProfileOpen(!headerProfileOpen)}
-                className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-[#141418] border border-white/5 hover:border-white/10 active:bg-white/[0.02] hover:bg-white/[0.01] transition-all cursor-pointer text-left select-none"
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer text-left select-none"
+                style={{
+                  background: "var(--glass-bg)",
+                  backdropFilter: "var(--glass-blur)",
+                  WebkitBackdropFilter: "var(--glass-blur)",
+                  border: "1px solid var(--glass-border)"
+                }}
                 id="header-profile-button"
               >
                 {currentUser.photo ? (
@@ -796,22 +906,25 @@ export default function App() {
                     src={currentUser.photo}
                     alt="Profile"
                     referrerPolicy="no-referrer"
-                    className="w-6 h-6 rounded-full object-cover border border-[#b5a642]/30"
+                    className="w-5.5 h-5.5 rounded-full object-cover border border-[#F9B17A]/30"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#b5a642]/20 border border-[#b5a642]/40 flex items-center justify-center font-bold text-[10px] text-[#b5a642]">
+                  <div 
+                    className="w-5.5 h-5.5 rounded-full flex items-center justify-center font-bold text-[9px] text-[#12131a] shrink-0"
+                    style={{ background: "var(--grad-warm)" }}
+                  >
                     {currentUser.first[0]}{currentUser.last[0]}
                   </div>
                 )}
                 <div className="hidden md:block">
-                  <div className="text-[11px] font-semibold text-[#eeeef2] leading-tight">
+                  <div className="text-[10px] font-black text-white leading-tight">
                     {currentUser.displayName || `${currentUser.first} ${currentUser.last}`}
                   </div>
-                  <div className="text-[9px] text-white/40 leading-none">
+                  <div className="text-[8px] text-white/40 leading-none font-bold uppercase tracking-wider">
                     {currentUser.role}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-[#8e95a3] shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-white/50 shrink-0" />
               </button>
 
               {/* Dropdown Menu */}
@@ -875,39 +988,63 @@ export default function App() {
           </div>
         </header>
 
-        {/* Active System Broadcast Banners */}
-        {broadcastBanners.filter(b => b.active).map((banner) => (
+        {/* Persistent Z Drive Offline Banner */}
+        {!bridgeOnline && (
           <div 
-            key={banner.id} 
-            className={`px-6 py-2.5 text-xs flex items-center justify-between gap-4 border-b shrink-0 font-medium select-none ${
-              banner.type === "critical" 
-                ? "bg-red-500/10 border-red-500/15 text-red-300" 
-                : banner.type === "warning"
-                ? "bg-amber-500/10 border-amber-500/15 text-amber-300"
-                : "bg-emerald-500/10 border-emerald-500/15 text-emerald-300"
-            }`}
+            className="px-6 py-2.5 text-[10px] flex items-center gap-2.5 text-[#e05c6e] font-bold uppercase tracking-wider select-none shrink-0 border-b animate-pulse"
+            style={{
+              background: "rgba(224,92,110,0.06)",
+              borderColor: "rgba(224,92,110,0.15)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)"
+            }}
           >
-            <div className="flex items-center gap-2 truncate">
-              {banner.type === "critical" ? (
-                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-              )}
-              <span className="truncate">
-                <strong className="uppercase mr-1.5 font-bold">[{banner.type} broadcast]:</strong>
-                {banner.message}
-              </span>
-            </div>
-            <button 
-              onClick={() => {
-                setBroadcastBanners(prev => prev.map(b => b.id === banner.id ? { ...b, active: false } : b));
-              }}
-              className="text-white/40 hover:text-white shrink-0 font-bold px-1.5 py-0.5 hover:bg-white/5 rounded transition-all"
-            >
-              ✕ Dismiss
-            </button>
+            <span>🔌</span>
+            <span>Z Drive Offline — Working from local browser sandbox storage. Changes will automatically sync upon reconnecting the bridge.</span>
           </div>
-        ))}
+        )}
+
+        {/* Active System Broadcast Banners */}
+        {broadcastBanners.filter(b => b.active).map((banner) => {
+          const isCritical = banner.type === "critical";
+          const isWarning = banner.type === "warning";
+          const colorClass = isCritical ? "text-[#e05c6e]" : isWarning ? "text-[#F4A384]" : "text-[#34D399]";
+          const bgVal = isCritical ? "rgba(224,92,110,0.06)" : isWarning ? "rgba(244,163,132,0.06)" : "rgba(52,211,153,0.06)";
+          const borderVal = isCritical ? "rgba(224,92,110,0.15)" : isWarning ? "rgba(244,163,132,0.15)" : "rgba(52,211,153,0.15)";
+          
+          return (
+            <div 
+              key={banner.id} 
+              className="px-6 py-2.5 text-[10px] flex items-center justify-between gap-4 border-b shrink-0 font-bold uppercase tracking-wider select-none"
+              style={{
+                background: bgVal,
+                borderColor: borderVal,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)"
+              }}
+            >
+              <div className={`flex items-center gap-2 truncate ${colorClass}`}>
+                {isCritical ? (
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                )}
+                <span className="truncate">
+                  <strong className="mr-1.5 font-black">[{banner.type} broadcast]:</strong>
+                  <span className="text-white normal-case font-semibold">{banner.message}</span>
+                </span>
+              </div>
+              <button 
+                onClick={() => {
+                  setBroadcastBanners(prev => prev.map(b => b.id === banner.id ? { ...b, active: false } : b));
+                }}
+                className="text-white/40 hover:text-white shrink-0 font-black px-2 py-1 bg-white/5 hover:bg-white/10 rounded-full transition-all text-[8px] tracking-widest cursor-pointer border border-white/5"
+              >
+                ✕ Dismiss
+              </button>
+            </div>
+          );
+        })}
 
         {/* Tab content viewer area */}
         <main className="flex-1 overflow-hidden p-6">
@@ -945,8 +1082,8 @@ export default function App() {
               viewMode={clientViewMode}
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
-              searchQuery={globalSearchSearch}
-              onSearchQueryChange={setGlobalSearchSearch}
+              searchQuery={globalSearch}
+              onSearchQueryChange={setGlobalSearch}
             />
           )}
 
@@ -961,8 +1098,8 @@ export default function App() {
               viewMode="pipeline"
               setViewMode={setClientViewMode}
               agentNames={getAgentNames()}
-              searchQuery={globalSearchSearch}
-              onSearchQueryChange={setGlobalSearchSearch}
+              searchQuery={globalSearch}
+              onSearchQueryChange={setGlobalSearch}
             />
           )}
 
@@ -1084,6 +1221,7 @@ export default function App() {
               logActivity={logActivity}
               docVault={docVault}
               setDocVault={setDocVault}
+              bridgeOnline={bridgeOnline}
             />
           )}
 
@@ -1214,6 +1352,11 @@ export default function App() {
               setAuditLogEnabled={setAuditLogEnabled}
               onLockApp={() => setAppLocked(true)}
               showToast={showToast}
+              lenders={lenders}
+              settings={settings}
+              bridgeOnline={bridgeOnline}
+              versionMismatch={versionMismatch}
+              bridgeVersion={bridgeVersion}
             />
           )}
 
@@ -1259,7 +1402,7 @@ export default function App() {
           clients={clients}
           onClose={() => setNewClientOpen(false)}
           onCreateClient={(newClient) => {
-            setClients(prev => [newClient, ...prev]);
+            handleCreateClient(newClient);
             logActivity("Created new file manually", `${newClient.first} ${newClient.last}`);
             showToast("Manual client file created successfully!", "success");
           }}
@@ -1298,22 +1441,34 @@ export default function App() {
         openClient={openClient}
         handleUpdateClient={handleUpdateClient}
         handleUpdateClientStatus={handleUpdateClientStatus}
+        handleDeleteClient={handleDeleteClient}
         triggerUnderwritingAnalysis={triggerUnderwritingAnalysis}
+        underwritingLoading={underwritingLoading}
+        underwritingError={underwritingError}
         getAgentNames={getAgentNames}
         showToast={showToast}
+        bridgeOnline={bridgeOnline}
       />
 
       {/* Settings Modal config */}
       <AnimatePresence>
         {settingsModalOpen && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-[#141418] border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative">
-              <button onClick={() => setSettingsModalOpen(false)} className="absolute right-4 top-4 text-[#8e95a3] hover:text-white">✕</button>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">CRM Configuration</h3>
+            <div 
+              className="border rounded-2xl w-full max-w-sm p-6 shadow-2xl relative"
+              style={{
+                background: "rgba(18, 19, 26, 0.85)",
+                borderColor: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)"
+              }}
+            >
+              <button onClick={() => setSettingsModalOpen(false)} className="absolute right-4 top-4 text-white/50 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer">✕</button>
+              <h3 className="text-[10px] font-black text-white uppercase tracking-widest mb-4 border-b pb-2" style={{ borderColor: "var(--color-divider)" }}>CRM Configuration</h3>
               
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Interactive Advisor Name</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Interactive Advisor Name</label>
                   <input 
                     type="text" 
                     value={currentUser.first + " " + currentUser.last}
@@ -1321,12 +1476,12 @@ export default function App() {
                       const parts = e.target.value.split(" ");
                       setCurrentUser(prev => ({ ...prev, first: parts[0] || "", last: parts.slice(1).join(" ") }));
                     }}
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                    className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Gemini API Key</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Gemini API Key</label>
                   <input 
                     type="password" 
                     value={settings.apiKey || ""}
@@ -1336,9 +1491,9 @@ export default function App() {
                       localStorage.setItem("gbk_apiKey", apiVal);
                     }}
                     placeholder="sk-ant-api03-..."
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                   />
-                  <span className="text-[9px] text-[#8e95a3] mt-1 block">Stored locally inside browser sandbox cache. Allows instant AI reports.</span>
+                  <span className="text-[9px] text-[var(--color-text-faint)] font-bold mt-1.5 block leading-normal">Stored locally inside browser sandbox cache. Allows instant AI reports.</span>
                 </div>
 
                 <button 
@@ -1346,7 +1501,8 @@ export default function App() {
                     setSettingsModalOpen(false);
                     showToast("Configuration safely saved!", "success");
                   }}
-                  className="w-full mt-2 bg-[#b5a642] text-black font-semibold text-xs py-2.5 rounded-lg hover:bg-[#9a8c38] transition-all"
+                  className="w-full mt-2 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                  style={{ background: "var(--grad-warm)" }}
                 >
                   Save and Dismiss
                 </button>
@@ -1360,106 +1516,118 @@ export default function App() {
       <AnimatePresence>
         {profileModalOpen && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-[#141418] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col">
+            <div 
+              className="border rounded-2xl w-full max-w-md p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col scrollbar-thin"
+              style={{
+                background: "rgba(18, 19, 26, 0.85)",
+                borderColor: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)"
+              }}
+            >
               <button 
                 onClick={() => setProfileModalOpen(false)} 
-                className="absolute right-4 top-4 text-[#8e95a3] hover:text-white text-sm"
+                className="absolute right-4 top-4 text-white/50 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer text-sm"
               >
                 ✕
               </button>
               
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-2 pb-1 border-b border-white/5">
-                Broker Account & credentials
+              <h3 className="text-[10px] font-black text-white uppercase tracking-widest mb-4 pb-2 border-b" style={{ borderColor: "var(--color-divider)" }}>
+                Broker Account & Credentials
               </h3>
               
               {/* Tabs */}
-              <div className="flex border-b border-white/5 mb-4 shrink-0">
-                <button 
-                  onClick={() => setProfileTab('profile')} 
-                  className={`flex-1 pb-2 text-[10px] uppercase font-bold tracking-wider text-center border-b-2 transition-colors ${profileTab === 'profile' ? 'border-[#b5a642] text-[#b5a642]' : 'border-transparent text-white/40 hover:text-white'}`}
-                >
-                  Active sync
-                </button>
-                <button 
-                  onClick={() => setProfileTab('signup')} 
-                  className={`flex-1 pb-2 text-[10px] uppercase font-bold tracking-wider text-center border-b-2 transition-colors ${profileTab === 'signup' ? 'border-[#b5a642] text-[#b5a642]' : 'border-transparent text-white/40 hover:text-white'}`}
-                >
-                  Sign Up
-                </button>
-                <button 
-                  onClick={() => {
-                    setProfileTab('switch');
-                    setSwError("");
-                    setSwPin("");
-                  }} 
-                  className={`flex-1 pb-2 text-[10px] uppercase font-bold tracking-wider text-center border-b-2 transition-colors ${profileTab === 'switch' ? 'border-[#b5a642] text-[#b5a642]' : 'border-transparent text-white/40 hover:text-white'}`}
-                >
-                  Switch Broker
-                </button>
+              <div className="flex border-b mb-5 shrink-0" style={{ borderColor: "var(--color-divider)" }}>
+                {[
+                  { id: 'profile', label: 'Active Sync' },
+                  { id: 'signup', label: 'Sign Up' },
+                  { id: 'switch', label: 'Switch Broker' }
+                ].map(tab => {
+                  const isSelected = profileTab === tab.id;
+                  return (
+                    <button 
+                      key={tab.id}
+                      onClick={() => {
+                        setProfileTab(tab.id as any);
+                        if (tab.id === 'switch') {
+                          setSwError("");
+                          setSwPin("");
+                        }
+                      }} 
+                      className={`flex-1 pb-2.5 text-[9px] uppercase font-black tracking-widest text-center border-b-2 transition-colors cursor-pointer ${
+                        isSelected 
+                          ? 'border-[#F9B17A] text-[#F9B17A]' 
+                          : 'border-transparent text-white/40 hover:text-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* TAB CONTENT: PROFILE SYNC EDIT */}
               {profileTab === 'profile' && (
-                <div className="flex flex-col gap-3">
-                  <div className="bg-[#1b1b20] p-3 rounded-lg border border-white/5">
-                    <div className="text-xs font-bold text-white mb-0.5">{currentUser.first} {currentUser.last}</div>
-                    <div className="text-[10px] text-[#b5a642] font-semibold mb-2">{currentUser.role}</div>
-                    <div className="text-[10px] text-white/50 flex flex-col gap-0.5 font-mono">
+                <div className="flex flex-col gap-4">
+                  <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                    <div className="text-xs font-black text-white mb-0.5">{currentUser.first} {currentUser.last}</div>
+                    <div className="text-[10px] text-[#F9B17A] font-extrabold uppercase tracking-wider mb-2">{currentUser.role}</div>
+                    <div className="text-[10px] text-[var(--color-text-muted)] flex flex-col gap-1 font-mono font-bold leading-relaxed">
                       <span>Email: {currentUser.email}</span>
                       {currentUser.phone && <span>Phone: {currentUser.phone}</span>}
                       {currentUser.fsraNum && <span>Licence FSRA: {currentUser.fsraNum}</span>}
                     </div>
                   </div>
 
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-white/40 mt-1">Workspace Credentials Settings</span>
+                  <span className="text-[8px] uppercase font-black tracking-widest text-[var(--color-text-faint)] mt-1">Workspace Credentials Settings</span>
                   
-                  <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-col gap-3">
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Incoming IMAP/SMTP Username</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Incoming IMAP/SMTP Username</label>
                       <input 
                         type="text" 
                         placeholder="e.g. email@gbkfinancial.ca"
                         value={activeUsername}
                         onChange={(e) => setActiveUsername(e.target.value)}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Email App Password</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Email App Password</label>
                       <input 
                         type="password" 
                         placeholder="••••••••••••••••"
                         value={activePassword}
                         onChange={(e) => setActivePassword(e.target.value)}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Server Host</label>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Server Host</label>
                         <input 
                           type="text" 
                           placeholder="e.g. imap.gmail.com"
                           value={activeHost}
                           onChange={(e) => setActiveHost(e.target.value)}
-                          className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono"
+                          className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
                         />
                       </div>
                       <div>
-                        <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Server Port (SSL/TLS)</label>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Server Port</label>
                         <input 
                           type="text" 
                           placeholder="993"
                           value={activePort}
                           onChange={(e) => setActivePort(e.target.value)}
-                          className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono"
+                          className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
                         />
                       </div>
                     </div>
 
-                    <div className="flex gap-2 mt-2 border-t border-white/5 pt-3">
+                    <div className="flex gap-3 mt-3 border-t pt-4" style={{ borderColor: "var(--color-divider)" }}>
                       <button 
                         onClick={() => {
                           const updatedUser = {
@@ -1478,30 +1646,47 @@ export default function App() {
                           showToast("Workspace credentials disconnected successfully.", "success", "🔓");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 text-red-400 font-bold text-[10px] py-2 rounded-lg transition-all"
+                        className="flex-1 bg-red-600/10 hover:bg-red-600/25 border border-red-500/25 text-red-400 font-bold text-[10px] py-3 rounded-xl transition-all cursor-pointer"
                       >
                         Disconnect Sync
                       </button>
                       <button 
-                        onClick={() => {
-                          const updatedUser = {
+                        onClick={async () => {
+                          const plainPin = currentUser.pin;
+                          const encryptedPassword = activePassword ? await encryptValue(activePassword, plainPin) : "";
+                          const encryptedPin = await encryptValue(plainPin, plainPin);
+                          const pinHash = await hashPin(plainPin, currentUser.id);
+ 
+                          const updatedUserForRoster = {
+                            ...currentUser,
+                            emailHost: activeHost,
+                            emailPort: activePort,
+                            emailUsername: activeUsername,
+                            emailPassword: encryptedPassword,
+                            pin: encryptedPin,
+                            pinHash
+                          };
+ 
+                          const updatedUserInMemory = {
                             ...currentUser,
                             emailHost: activeHost,
                             emailPort: activePort,
                             emailUsername: activeUsername,
                             emailPassword: activePassword
                           };
-                          setCurrentUser(updatedUser);
-                          const updatedRoster = userRoster.map(u => u.id === currentUser.id ? updatedUser : u);
+ 
+                          setCurrentUser(updatedUserInMemory);
+                          const updatedRoster = userRoster.map(u => u.id === currentUser.id ? updatedUserForRoster : u);
                           setUserRoster(updatedRoster);
                           localStorage.setItem("gbk_roster", JSON.stringify(updatedRoster));
                           logActivity(`Configured custom email credentials`, currentUser.email);
                           showToast("Workspace Credentials Sync Enabled!", "success", "🔐");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 bg-[#b5a642] hover:bg-[#9a8c38] text-black font-bold text-[10px] py-2 rounded-lg transition-all"
+                        className="flex-1 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                        style={{ background: "var(--grad-warm)" }}
                       >
-                        ✓ Save & Sync Workspace
+                        ✓ Save & Sync
                       </button>
                     </div>
                   </div>
@@ -1511,13 +1696,17 @@ export default function App() {
               {/* TAB CONTENT: SIGN UP */}
               {profileTab === 'signup' && (
                 <form 
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault();
                     if (!suFirst || !suLast || !suEmail || !suPin) {
                       showToast("Please fill out First Name, Last Name, Email, and PIN.", "error");
                       return;
                     }
                     const newUserId = `u_${Date.now()}`;
+                    const pinHash = await hashPin(suPin, newUserId);
+                    const encryptedPin = await encryptValue(suPin, suPin);
+                    const encryptedEmailPassword = suPass ? await encryptValue(suPass, suPin) : undefined;
+ 
                     const newUserRecord: User = {
                       id: newUserId,
                       first: suFirst,
@@ -1526,19 +1715,26 @@ export default function App() {
                       role: suRole,
                       status: 'active',
                       phone: suPhone || undefined,
-                      pin: suPin,
+                      pin: encryptedPin,
+                      pinHash,
                       lastLogin: new Date().toISOString(),
                       created: new Date().toISOString().split("T")[0],
                       fsraNum: suFsra || undefined,
                       emailHost: suHost,
                       emailPort: suPort,
                       emailUsername: suEmail,
-                      emailPassword: suPass || undefined
+                      emailPassword: encryptedEmailPassword
                     };
                     const newRoster = [...userRoster, newUserRecord];
                     setUserRoster(newRoster);
                     localStorage.setItem("gbk_roster", JSON.stringify(newRoster));
-                    setCurrentUser(newUserRecord);
+                    
+                    const decryptedUserRecord: User = {
+                      ...newUserRecord,
+                      pin: suPin,
+                      emailPassword: suPass || undefined
+                    };
+                    setCurrentUser(decryptedUserRecord);
                     setProfileModalOpen(false);
                     setSuFirst("");
                     setSuLast("");
@@ -1550,74 +1746,74 @@ export default function App() {
                     logActivity(`Signed up new Broker account: ${newUserRecord.first} ${newUserRecord.last}`, newUserRecord.email);
                     showToast(`Welcome aboard, ${newUserRecord.first}! Signed up successfully!`, "success", "🌟");
                   }} 
-                  className="flex flex-col gap-2.5"
+                  className="flex flex-col gap-3"
                 >
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">First Name</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">First Name</label>
                       <input 
                         type="text" 
                         value={suFirst}
                         onChange={(e) => setSuFirst(e.target.value)}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Last Name</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Last Name</label>
                       <input 
                         type="text" 
                         value={suLast}
                         onChange={(e) => setSuLast(e.target.value)}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                         required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Business Email</label>
+                    <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Business Email</label>
                     <input 
                       type="email" 
                       value={suEmail}
                       onChange={(e) => setSuEmail(e.target.value)}
                       placeholder="e.g. agent@gbkfinancial.ca"
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                       required
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Security PIN (4 Digits)</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Security PIN (4 Digits)</label>
                       <input 
                         type="password" 
                         maxLength={4}
                         value={suPin}
                         onChange={(e) => setSuPin(e.target.value.replace(/\D/g, ""))}
                         placeholder="••••"
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white text-center tracking-widest font-mono focus:outline-none"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white text-center tracking-widest font-mono focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">FSRA Licence #</label>
+                      <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">FSRA Licence #</label>
                       <input 
                         type="text" 
                         value={suFsra}
                         onChange={(e) => setSuFsra(e.target.value)}
                         placeholder="e.g. M230045"
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Operational Role</label>
+                    <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1.5">Operational Role</label>
                     <select 
                       value={suRole}
                       onChange={(e) => setSuRole(e.target.value as any)}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded p-1.5 text-xs text-white focus:outline-none"
+                      className="w-full bg-black/20 border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-bold cursor-pointer"
                     >
                       <option value="Agent">🏡 Licensed Mortgage Agent</option>
                       <option value="Senior Broker">🥇 Senior Broker Consultant</option>
@@ -1626,27 +1822,28 @@ export default function App() {
                     </select>
                   </div>
 
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-white/40 mt-1">Optional GSuite Email host Sync</span>
-                  <div className="grid grid-cols-2 gap-2">
+                  <span className="text-[8px] uppercase font-black tracking-widest text-[var(--color-text-faint)] mt-1.5">Optional GSuite Email host Sync</span>
+                  <div className="grid grid-cols-2 gap-3">
                     <input 
                       type="text" 
                       placeholder="imap.gmail.com"
                       value={suHost}
                       onChange={(e) => setSuHost(e.target.value)}
-                      className="w-full bg-[#1b1b20]/60 border border-white/5 rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
                     />
                     <input 
                       type="password" 
                       placeholder="Gmail App Password"
                       value={suPass}
                       onChange={(e) => setSuPass(e.target.value)}
-                      className="w-full bg-[#1b1b20]/60 border border-white/5 rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
                     />
                   </div>
 
                   <button 
                     type="submit"
-                    className="w-full mt-2 bg-[#b5a642] text-black font-bold text-xs py-2.5 rounded-lg hover:bg-[#9a8c38] transition-all"
+                    className="w-full mt-2 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                    style={{ background: "var(--grad-warm)" }}
                   >
                     Register and Login as Agent
                   </button>
@@ -1656,7 +1853,7 @@ export default function App() {
               {/* TAB CONTENT: SWITCH ACTIVE USER */}
               {profileTab === 'switch' && (
                 <div className="flex flex-col gap-3">
-                  <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 pr-1">
+                  <div className="max-h-56 overflow-y-auto flex flex-col gap-1.5 pr-1 scrollbar-thin">
                     {userRoster.map(u => (
                       <button
                         key={u.id}
@@ -1666,28 +1863,47 @@ export default function App() {
                           setSwPin("");
                           setSwError("");
                         }}
-                        className={`p-2.5 rounded-lg border text-left flex items-center justify-between transition-all ${swTargetId === u.id ? 'border-[#b5a642] bg-[#b5a642]/5' : 'border-white/5 bg-[#1b1b20]/30 hover:bg-[#1b1b20]/60'}`}
+                        className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+                          swTargetId === u.id 
+                            ? 'border-[#F9B17A] bg-[#F9B17A]/5' 
+                            : 'border-white/5 bg-white/[0.01] hover:bg-white/5'
+                        }`}
                       >
                         <div>
-                          <div className={`text-xs font-semibold ${swTargetId === u.id ? 'text-[#b5a642]' : 'text-white'}`}>{u.first} {u.last}</div>
-                          <div className="text-[9px] text-[#8e95a3]">{u.role}</div>
+                          <div className={`text-xs font-black ${swTargetId === u.id ? 'text-[#F9B17A]' : 'text-white'}`}>{u.first} {u.last}</div>
+                          <div className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider mt-0.5">{u.role}</div>
                         </div>
-                        <div className="text-[10px] text-white/30 truncate font-mono max-w-[140px]">{u.email}</div>
+                        <div className="text-[10px] text-white/30 truncate font-mono max-w-[140px] font-bold">{u.email}</div>
                       </button>
                     ))}
                   </div>
 
                   {swTargetId && (
                     <form 
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         e.preventDefault();
                         const match = userRoster.find(u => u.id === swTargetId);
                         if (!match) {
                           setSwError("Target user profile not found");
                           return;
                         }
-                        if (match.pin === swPin) {
-                          setCurrentUser(match);
+
+                        let pinMatches = false;
+                        if (match.pinHash) {
+                          const hashed = await hashPin(swPin, match.id);
+                          pinMatches = (match.pinHash === hashed);
+                        } else {
+                          pinMatches = (match.pin === swPin);
+                        }
+
+                        if (pinMatches) {
+                          const decryptedEmailPassword = match.emailPassword ? await decryptValue(match.emailPassword, swPin) : undefined;
+                          const decryptedUser: User = {
+                            ...match,
+                            pin: swPin,
+                            emailPassword: decryptedEmailPassword || undefined
+                          };
+                          setCurrentUser(decryptedUser);
                           setProfileModalOpen(false);
                           setSwTargetId("");
                           setSwPin("");
@@ -1699,30 +1915,31 @@ export default function App() {
                           setSwPin("");
                         }
                       }} 
-                      className="mt-2 border-t border-white/5 pt-3 flex flex-col gap-2"
+                      className="mt-2 border-t pt-4 flex flex-col gap-2.5"
+                      style={{ borderColor: "var(--color-divider)" }}
                     >
-                      <div className="text-[10px] text-white/60 mb-1">Enter your 4-digit Security PIN to switch:</div>
+                      <div className="text-[10px] text-white/60 mb-1 font-bold">Enter your 4-digit Security PIN to switch:</div>
                       
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         <input 
                           type="password"
                           maxLength={4}
                           value={swPin}
                           onChange={(e) => setSwPin(e.target.value.replace(/\D/g, ""))}
                           placeholder="••••"
-                          className="w-32 bg-[#1b1b20] border border-white/10 rounded px-2 text-center text-sm font-mono tracking-widest text-[#b5a642] focus:outline-none"
+                          className="w-32 bg-black/20 border border-white/10 rounded-xl px-4 text-center text-sm font-mono font-black tracking-widest text-[#F9B17A] focus:outline-none focus:border-[#F9B17A]/40"
                           required
                         />
                         <button 
                           type="submit"
-                          className="flex-1 bg-white/10 hover:bg-white/15 border border-white/10 text-white font-bold text-[10px] py-1.5 rounded"
+                          className="flex-1 bg-[#F9B17A]/10 hover:bg-[#F9B17A]/15 border border-[#F9B17A]/25 text-[#F9B17A] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl transition-all cursor-pointer"
                         >
                           Confirm Switch
                         </button>
                       </div>
 
                       {swError && (
-                        <span className="text-[10px] text-red-400 mt-1">{swError}</span>
+                        <span className="text-[10px] text-red-400 mt-1 font-bold uppercase tracking-wider">{swError}</span>
                       )}
                     </form>
                   )}

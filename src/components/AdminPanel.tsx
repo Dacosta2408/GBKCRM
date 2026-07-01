@@ -6,7 +6,7 @@ import {
   Info, Mail, Phone, Calendar, UserCheck, AlertCircle, FileSpreadsheet, LockKeyhole,
   Terminal, Bell, LayoutDashboard, Volume2
 } from "lucide-react";
-import { User, Client, Task } from "../types";
+import { User, Client, Task, Lender } from "../types";
 
 // Import modular sub-panels
 import { AdminOverview } from "./admin/AdminOverview";
@@ -16,6 +16,7 @@ import { SecurityView } from "./admin/SecurityView";
 import { BackupRecoveryPanel } from "./BackupRecoveryPanel";
 import { AuditLogsView } from "./admin/AuditLogsView";
 import { SystemAlerts } from "./admin/SystemAlerts";
+import { DeploymentPanel } from "./admin/DeploymentPanel";
 
 interface AdminPanelProps {
   userRoster: User[];
@@ -34,9 +35,14 @@ interface AdminPanelProps {
   setAuditLogEnabled: (val: boolean) => void;
   onLockApp: () => void;
   showToast: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
+  lenders?: Lender[];
+  settings?: any;
+  bridgeOnline?: boolean;
+  versionMismatch?: boolean;
+  bridgeVersion?: string | null;
 }
 
-type AdminTab = "overview" | "users" | "permissions" | "security" | "backup" | "audit" | "alerts";
+type AdminTab = "overview" | "users" | "permissions" | "security" | "backup" | "audit" | "alerts" | "deployment";
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   userRoster,
@@ -54,7 +60,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   auditLoggingEnabled,
   setAuditLogEnabled,
   onLockApp,
-  showToast
+  showToast,
+  lenders = [],
+  settings = { apiKey: "" },
+  bridgeOnline = false,
+  versionMismatch = false,
+  bridgeVersion = null
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
 
@@ -140,6 +151,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     alerts: {
       title: "Global System Notice Broadcaster",
       desc: "Broadcast, manage, and dispatch active notice banners to all broker workstation workspaces."
+    },
+    deployment: {
+      title: "Deployment & Production Readiness",
+      desc: "Audit your CRM's status, check local bridge connectivity, and migrate local database cache arrays to the network Z Drive."
     }
   };
 
@@ -244,6 +259,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <Database className="w-4 h-4 shrink-0" /> Backups &amp; Recovery
                 </button>
 
+                {/* Deployment Readiness (Owner / Master Admin only) */}
+                {(currentUser.role === "Owner / Master Admin" || currentUser.isOwner) && (
+                  <button
+                    onClick={() => setActiveTab("deployment")}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
+                      activeTab === "deployment" 
+                        ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <ShieldCheck className="w-4 h-4 shrink-0 text-[#b5a642]" /> Deployment Readiness
+                  </button>
+                )}
+
                 {/* 6. Audit Logs */}
                 <button
                   onClick={() => setActiveTab("audit")}
@@ -299,6 +328,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <option value="permissions">Clearance Matrix</option>
                 <option value="security">Security Policy</option>
                 <option value="backup">Database Backup</option>
+                {(currentUser.role === "Owner / Master Admin" || currentUser.isOwner) && (
+                  <option value="deployment">Deployment Readiness</option>
+                )}
                 <option value="audit">Audit Trajectory</option>
                 <option value="alerts">Notice Broadcast</option>
               </select>
@@ -361,6 +393,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 clients={clients}
                 showToast={(msg, type) => showToast(msg, type as any)}
                 onRefreshCRMData={() => showToast("CRM database arrays refreshed successfully.", "success")}
+              />
+            )}
+
+            {activeTab === "deployment" && (
+              <DeploymentPanel 
+                userRoster={userRoster}
+                currentUser={currentUser}
+                clients={clients}
+                tasks={tasks}
+                auditLogs={auditLogs}
+                sessionAutoLock={sessionAutoLock}
+                auditLoggingEnabled={auditLoggingEnabled}
+                lenders={lenders}
+                settings={settings}
+                bridgeOnline={bridgeOnline}
+                versionMismatch={versionMismatch}
+                bridgeVersion={bridgeVersion}
+                showToast={showToast}
               />
             )}
 

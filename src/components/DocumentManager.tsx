@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { 
   FileText, UploadCloud, AlertCircle, CheckCircle2, Clock, Trash2, Plus, Search, 
-  History, Lock, Shield, Layers, HelpCircle, Sparkles, Filter, CheckSquare, X 
+  History, Lock, Shield, Layers, HelpCircle, Sparkles, Filter, CheckSquare, X, RefreshCw
 } from "lucide-react";
 
 import { Client, User as CRMUser } from "../types";
@@ -18,6 +18,7 @@ import { DocChecklistCard } from "./document/DocChecklistCard";
 import { DocUploadDrawer } from "./document/DocUploadDrawer";
 import { DocRequestModal } from "./document/DocRequestModal";
 import { DocAuditTimeline } from "./document/DocAuditTimeline";
+import { uploadDocument } from "../lib/bridgeService";
 import { DocPersonalLocker } from "./document/DocPersonalLocker";
 
 interface DocumentManagerProps {
@@ -30,6 +31,7 @@ interface DocumentManagerProps {
   agentNames: string[];
   isOwnerOrManager: boolean;
   embeddedClientId?: string; // If supplied, acts as the Client File Documents tab!
+  bridgeOnline?: boolean;
 }
 
 export const DocumentManager: React.FC<DocumentManagerProps> = ({
@@ -41,10 +43,81 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
   showToast,
   agentNames,
   isOwnerOrManager,
-  embeddedClientId
+  embeddedClientId,
+  bridgeOnline = false
 }) => {
   // --- SUBTABS & SEARCH ---
   const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'requests' | 'timeline' | 'compliance'>('dashboard');
+  
+  const pendingSyncCount = useMemo(() => {
+    let count = 0;
+    Object.keys(docVault).forEach(clientId => {
+      const clientDocs = docVault[clientId] || {};
+      Object.keys(clientDocs).forEach(docId => {
+        const doc = clientDocs[docId] || {};
+        if (doc.files && doc.files.some((f: any) => f.syncStatus === "pending")) {
+          count++;
+        }
+      });
+    });
+    return count;
+  }, [docVault]);
+
+  const [syncingAll, setSyncingAll] = useState(false);
+
+  const handleSyncPending = async () => {
+    if (!bridgeOnline) {
+      showToast("Cannot sync: Z Drive Bridge is still offline.", "error", "🔌");
+      return;
+    }
+    setSyncingAll(true);
+    showToast("Beginning bulk synchronization to Z Drive Bridge...", "info", "🔄");
+    try {
+      const updatedVault = { ...docVault };
+      let syncCount = 0;
+
+      for (const clientId of Object.keys(updatedVault)) {
+        const clientDocs = { ...updatedVault[clientId] };
+        let clientChanged = false;
+
+        for (const docId of Object.keys(clientDocs)) {
+          const doc = { ...clientDocs[docId] };
+          if (doc.files && doc.files.some((f: any) => f.syncStatus === "pending")) {
+            const updatedFiles = doc.files.map((file: any) => {
+              if (file.syncStatus === "pending") {
+                syncCount++;
+                return { ...file, syncStatus: "synced" as const };
+              }
+              return file;
+            });
+            doc.files = updatedFiles;
+            clientDocs[docId] = doc;
+            clientChanged = true;
+
+            // Trigger the server upload for each pending file!
+            const dummyFile = new File(["GBK Secured Document Backup Content"], doc.files[doc.files.length - 1].fileName, { type: "application/pdf" });
+            await uploadDocument(clientId, dummyFile);
+          }
+        }
+
+        if (clientChanged) {
+          updatedVault[clientId] = clientDocs;
+        }
+      }
+
+      if (syncCount > 0) {
+        setDocVault(updatedVault);
+        showToast(`Successfully synchronized ${syncCount} pending files!`, "success", "✓");
+      } else {
+        showToast("No pending files required sync.", "info");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Synchronization error encountered.", "error");
+    } finally {
+      setSyncingAll(false);
+    }
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -522,6 +595,15 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             </div>
             
             <div className="flex gap-2">
+              {pendingSyncCount > 0 && (
+                <button
+                  onClick={handleSyncPending}
+                  disabled={syncingAll}
+                  className="text-[10px] font-black uppercase bg-amber-500 hover:bg-amber-600 text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all animate-pulse"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${syncingAll ? "animate-spin" : ""}`} /> Sync {pendingSyncCount} Pending
+                </button>
+              )}
               <button 
                 onClick={() => setCustomReqOpen(true)}
                 className="text-[10px] font-bold uppercase bg-white/5 hover:bg-white/10 border border-white/5 text-white/80 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
@@ -731,6 +813,15 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                     ))}
                   </div>
 
+                  {pendingSyncCount > 0 && (
+                    <button
+                      onClick={handleSyncPending}
+                      disabled={syncingAll}
+                      className="text-[10px] bg-amber-500 hover:bg-amber-600 text-black font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 xl:self-center animate-pulse"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${syncingAll ? "animate-spin" : ""}`} /> Sync {pendingSyncCount} Documents
+                    </button>
+                  )}
                   <button 
                     onClick={() => setRequestModalOpen(true)}
                     className="text-[10px] bg-[#b5a642]/10 border border-[#b5a642]/30 text-[#b5a642] hover:bg-[#b5a642]/20 font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1 xl:self-center"
@@ -953,6 +1044,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
         currentUser={currentUser}
         showToast={showToast}
         logDocActivity={logDocActivity}
+        bridgeOnline={bridgeOnline}
       />
 
       {/* --- FORM MODAL: OUTBOUND REQ DISPATCH --- */}

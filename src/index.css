@@ -1,12 +1,114 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+:root {
+  --color-bg:              #12131a;
+  --color-surface:         #1a1b24;
+  --color-surface-2:       #1f2030;
+  --color-sidebar:         #2D3250;
+  --color-panel:           #424769;
+  --color-muted:           #676F9D;
+  --color-accent:          #F9B17A;
+  --color-accent-hover:    #e89a60;
+  --color-text:            #eeeef5;
+  --color-text-muted:      #9a9db8;
+  --color-text-faint:      #5a5d7a;
+  --color-border:          rgba(103, 111, 157, 0.15);
+  --color-divider:         rgba(103, 111, 157, 0.10);
+  --grad-deep:             linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
+  --grad-warm:             linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
+  --grad-soft:             linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
+  --glass-bg:              rgba(66, 71, 105, 0.45);
+  --glass-border:          rgba(103, 111, 157, 0.25);
+  --glass-blur:            blur(12px);
+  --shadow-glow-accent:    0 0 20px rgba(249, 177, 122, 0.15);
+  --shadow-panel:          0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-card:           0 2px 12px rgba(0, 0, 0, 0.3);
+  --radius-card:           14px;
+  --radius-panel:          18px;
+  --radius-input:          10px;
+  --transition-smooth:     all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --color-bg:              #FAEFE9;
+  --color-surface:         #fff8f4;
+  --color-surface-2:       #ffffff;
+  --color-sidebar:         #2D3250; /* Fixed brand color as specified in instructions */
+  --color-panel:           #f0e8e0;
+  --color-muted:           #7A5063;
+  --color-accent:          #F9B17A;
+  --color-accent-hover:    #e89a60;
+  --color-text:            #1e1b2e;
+  --color-text-muted:      #6b5b6e;
+  --color-text-faint:      #a8929a;
+  --color-border:          rgba(122, 80, 99, 0.12);
+  --color-divider:         rgba(122, 80, 99, 0.08);
+  --glass-bg:              rgba(255, 248, 244, 0.7);
+  --glass-border:          rgba(122, 80, 99, 0.15);
+  --shadow-panel:          0 8px 32px rgba(45, 50, 80, 0.1);
+  --shadow-card:           0 2px 12px rgba(45, 50, 80, 0.08);
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Custom variables mapped to Tailwind colors/utilities */
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-sidebar: var(--color-sidebar);
+  --color-panel: var(--color-panel);
+  --color-muted: var(--color-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-faint: var(--color-text-faint);
+  --color-border-custom: var(--color-border);
+  --color-divider-custom: var(--color-divider);
 }
 
-/* Custom scrollbars for full fidelity scroll container UI */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  transition: var(--transition-smooth);
+}
+
+/* Custom classes for Glass and Panel items */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+}
+
+.panel-card {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  transition: var(--transition-smooth);
+}
+
+.accent-glow {
+  box-shadow: var(--shadow-glow-accent);
+  border-color: rgba(249, 177, 122, 0.3);
+}
+
+.gradient-text-accent {
+  background: var(--grad-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -15,10 +117,24 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgb(212, 175, 55, 0.15);
+  background: rgba(103, 111, 157, 0.25);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(212, 175, 55, 0.4);
+  background: var(--color-accent);
 }
 
+@keyframes slow-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+.lock-bg-pulse {
+  animation: slow-pulse 4s ease-in-out infinite;
+}

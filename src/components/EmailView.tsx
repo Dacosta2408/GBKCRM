@@ -6,10 +6,11 @@ import {
   FileCheck, ShieldAlert, Sparkles, MessageSquare, LogOut, CheckSquare
 } from "lucide-react";
 import { Email, EmailTemplate, Client, Task, Event } from "../types";
+import { sendEmail } from "../lib/bridgeService";
 
 interface EmailViewProps {
-  emailsState: { inbox: Email[]; sent: Email[]; scheduled: Email[] };
-  setEmailsState: React.Dispatch<React.SetStateAction<{ inbox: Email[]; sent: Email[]; scheduled: Email[] }>>;
+  emailsState: { inbox: Email[]; sent: Email[]; scheduled: Email[]; queued: Email[] };
+  setEmailsState: React.Dispatch<React.SetStateAction<{ inbox: Email[]; sent: Email[]; scheduled: Email[]; queued: Email[] }>>;
   templates: EmailTemplate[];
   currentUser: any;
   onOpenCompose?: (templateId?: string) => void;
@@ -166,7 +167,8 @@ export const EmailView: React.FC<EmailViewProps> = ({
   onOpenClient,
   logActivity,
   docVault = {},
-  setDocVault
+  setDocVault,
+  bridgeOnline = false
 }) => {
   // ── AUTH & SECTIONS STATES ──
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -282,6 +284,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
       if (activeFolder === "inbox") return emailsState.inbox;
       if (activeFolder === "sent") return emailsState.sent;
       if (activeFolder === "scheduled") return emailsState.scheduled;
+      if (activeFolder === "queued") return emailsState.queued || [];
       if (activeFolder === "drafts") return draftsList;
       if (activeFolder === "archived") return archivedList;
       return [];
@@ -298,6 +301,8 @@ export const EmailView: React.FC<EmailViewProps> = ({
         return emailsState.sent.filter(e => e.fromEmail === mailboxScope);
       } else if (activeFolder === "scheduled") {
         return emailsState.scheduled.filter(e => e.fromEmail === mailboxScope);
+      } else if (activeFolder === "queued") {
+        return (emailsState.queued || []).filter(e => e.fromEmail === mailboxScope);
       }
       return [];
     }
@@ -588,8 +593,55 @@ export const EmailView: React.FC<EmailViewProps> = ({
     }
   }, [selectedClientLink, composeSubject]);
 
+  const handleRetrySend = async (email: Email) => {
+    if (!bridgeOnline) {
+      showToast("Cannot retry send: Z Drive Bridge is currently offline.", "error");
+      return;
+    }
+
+    const host = currentUser?.emailHost || "smtp.gmail.com";
+    const port = currentUser?.emailPort || "587";
+    const username = currentUser?.emailUsername || currentUser?.email || "";
+    const password = currentUser?.emailPassword || "";
+
+    showToast("Retrying email dispatch via SMTP...", "info");
+    const success = await sendEmail({
+      to: email.toEmail || "",
+      subject: email.subject || "",
+      body: email.body || "",
+      fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
+      fromEmail: email.fromEmail || loginEmail,
+      host,
+      port,
+      username,
+      password
+    });
+
+    if (success) {
+      setEmailsState(prev => ({
+        ...prev,
+        queued: (prev.queued || []).filter(item => item.id !== email.id),
+        sent: [
+          { 
+            ...email, 
+            id: "mail_" + Date.now(), 
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            date: "Today" 
+          }, 
+          ...prev.sent
+        ]
+      }));
+
+      showToast("Email dispatched successfully on SMTP retry!", "success");
+      setSelectedEmail(null);
+      if (logActivity) logActivity(`Dispatched queued email via SMTP retry`, email.subject);
+    } else {
+      showToast("Retry failed. Check SMTP settings or bridge server status.", "error");
+    }
+  };
+
   // EXECUTE DISPATCH EMAIL
-  const handleSendComposeCommit = (e: React.FormEvent) => {
+  const handleSendComposeCommit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!composeToEmail || !composeSubject || !composeBody) {
       showToast("Please fill in Recipient, Subject, and Content body block.", "error");
@@ -599,7 +651,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
     const newEmailId = "mail_" + Date.now();
     const newMailRecord: Email = {
       id: newEmailId,
-      from: "David Acosta",
+      from: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
       fromEmail: mailboxScope === "personal" ? loginEmail : mailboxScope,
       to: composeTo || composeToEmail,
       toEmail: composeToEmail,
@@ -627,36 +679,67 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
       showToast(`Campaign queue created! Sending at ${scheduleSendTime.replace("T", " ")}`, "success", "⏰");
       if (logActivity) logActivity(`Scheduled automated outreach email queue`, composeSubject);
+      setIsComposeOpen(false);
     } else {
-      // Send instantly, store to sent folder
-      setEmailsState(prev => ({
-        ...prev,
-        sent: [newMailRecord, ...prev.sent]
-      }));
+      if (bridgeOnline) {
+        const host = currentUser?.emailHost || "smtp.gmail.com";
+        const port = currentUser?.emailPort || "587";
+        const username = currentUser?.emailUsername || currentUser?.email || "";
+        const password = currentUser?.emailPassword || "";
 
-      // AUTO-LOG OPT-IN Option: Automatically add email contents to Client Dossier Note immediately on outbound
-      if (selectedClientLink && setClients) {
-        setClients(prev => prev.map(c => {
-          if (c.id === selectedClientLink) {
-            const currentSummary = c.aiSummary || "";
-            const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser.first} ${currentUser.last} via ${mailboxScope === "personal" ? loginEmail : mailboxScope}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
-            return {
-              ...c,
-              aiSummary: `${currentSummary}${formattedLog}`,
-              updatedAt: new Date().toISOString()
-            };
+        showToast("Sending email via secure SMTP...", "info");
+        const success = await sendEmail({
+          to: composeToEmail,
+          subject: composeSubject,
+          body: composeBody,
+          fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
+          fromEmail: mailboxScope === "personal" ? loginEmail : mailboxScope,
+          host,
+          port,
+          username,
+          password
+        });
+
+        if (success) {
+          setEmailsState(prev => ({
+            ...prev,
+            sent: [newMailRecord, ...prev.sent]
+          }));
+
+          // AUTO-LOG OPT-IN Option: Automatically add email contents to Client Dossier Note immediately on outbound
+          if (selectedClientLink && setClients) {
+            setClients(prev => prev.map(c => {
+              if (c.id === selectedClientLink) {
+                const currentSummary = c.aiSummary || "";
+                const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser.first} ${currentUser.last} via ${mailboxScope === "personal" ? loginEmail : mailboxScope}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
+                return {
+                  ...c,
+                  aiSummary: `${currentSummary}${formattedLog}`,
+                  updatedAt: new Date().toISOString()
+                };
+              }
+              return c;
+            }));
+            showToast(`Dispatched! Message logged to ${composeTo}'s CRM Dossier file!`, "success", "🚀");
+          } else {
+            showToast("Email dispatched successfully!", "success", "🚀");
           }
-          return c;
-        }));
-        showToast(`Dispatched! Message logged to ${composeTo}'s CRM Dossier file!`, "success", "🚀");
+
+          if (logActivity) logActivity(`Dispatched outbound email template`, composeSubject);
+          setIsComposeOpen(false);
+        } else {
+          showToast("Failed to send email via SMTP. Check SMTP configurations or connection.", "error");
+        }
       } else {
-        showToast("Email dispatched successfully!", "success", "🚀");
+        const queuedMail = { ...newMailRecord, id: "q_" + Date.now() };
+        setEmailsState(prev => ({
+          ...prev,
+          queued: [queuedMail, ...(prev.queued || [])]
+        }));
+        showToast("Bridge server offline — email queued for when connection is restored", "warning");
+        setIsComposeOpen(false);
       }
-
-      if (logActivity) logActivity(`Dispatched outbound email template`, composeSubject);
     }
-
-    setIsComposeOpen(false);
   };
 
   // DELETE OR ARCHIVE EMAIL
@@ -797,6 +880,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
             { id: "drafts", label: "Draft Notebooks", count: getMailboxEmails().filter(e => activeFolder === "drafts").length, icon: FileText },
             { id: "sent", label: "Sent Mailbox", count: 0, icon: Send },
             { id: "scheduled", label: "Scheduled Queues", count: getMailboxEmails().filter(e => e.scheduledFor).length, icon: Clock },
+            { id: "queued", label: "Queued (Offline)", count: (emailsState.queued || []).length, icon: AlertCircle },
             { id: "archived", label: "Archive Secure", count: 0, icon: Lock }
           ].map(f => {
             const Icon = f.icon;
@@ -976,19 +1060,30 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <button 
-                    onClick={() => handleComposeWithTemplate()}
-                    className="px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 rounded text-[10px] font-bold text-red-400 flex items-center gap-1"
-                  >
-                    <Reply className="w-3 h-3" /> Reply
-                  </button>
-                  <button 
-                    onClick={(e) => handleArchiveEmail(e, selectedEmail)}
-                    className="px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded text-[10px] font-bold text-white/60 hover:text-white flex items-center gap-1"
-                    title="Archive communication log"
-                  >
-                    <Trash2 className="w-3 h-3" /> Archive
-                  </button>
+                  {activeFolder === "queued" ? (
+                    <button 
+                      onClick={() => handleRetrySend(selectedEmail)}
+                      className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 border border-emerald-500/20 rounded text-[10px] font-bold text-white flex items-center gap-1 cursor-pointer"
+                    >
+                      <RefreshCw className="w-3 h-3" /> Retry Send
+                    </button>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => handleComposeWithTemplate()}
+                        className="px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 rounded text-[10px] font-bold text-red-400 flex items-center gap-1"
+                      >
+                        <Reply className="w-3 h-3" /> Reply
+                      </button>
+                      <button 
+                        onClick={(e) => handleArchiveEmail(e, selectedEmail)}
+                        className="px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded text-[10px] font-bold text-white/60 hover:text-white flex items-center gap-1"
+                        title="Archive communication log"
+                      >
+                        <Trash2 className="w-3 h-3" /> Archive
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

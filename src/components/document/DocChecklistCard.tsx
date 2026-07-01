@@ -87,6 +87,12 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
               v{doc.files.length} Secure Vaulted
             </span>
           )}
+
+          {doc.files && doc.files.some((f: any) => f.syncStatus === "pending") && (
+            <span className="bg-amber-500/10 text-amber-500 border border-amber-500/25 text-[8px] font-black uppercase px-1.5 py-0.5 rounded animate-pulse">
+              Sync Pending
+            </span>
+          )}
         </div>
 
         <p className="text-[10px] text-white/40 leading-relaxed max-w-2xl">

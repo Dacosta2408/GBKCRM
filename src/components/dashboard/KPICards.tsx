@@ -23,7 +23,6 @@ export const KPICards: React.FC<KPICardsProps> = ({
   const isAgent = currentUser.role === "Agent" || currentUser.role === "Senior Broker";
   const userFullName = `${currentUser.first} ${currentUser.last}`;
 
-  // Filter clients based on role for personal vs team metrics
   const myClients = isAgent ? clients.filter(c => c.agent === userFullName) : clients;
   const activeFiles = myClients.filter(c => c.status !== "closed" && c.status !== "funded");
   const newLeads = myClients.filter(c => c.status === "lead" || c.status === "open");
@@ -31,8 +30,6 @@ export const KPICards: React.FC<KPICardsProps> = ({
   const approvedFiles = myClients.filter(c => c.status === "approved");
   const fundedFiles = myClients.filter(c => c.status === "funded");
 
-  // Calculate pending documents from docVault
-  // Total number of documents across relevant clients with status 'required', 'requested', or 'pending'
   let pendingDocsCount = 0;
   const targetClients = isAgent ? myClients : clients;
   targetClients.forEach(c => {
@@ -44,24 +41,20 @@ export const KPICards: React.FC<KPICardsProps> = ({
     });
   });
 
-  // If pendingDocsCount is 0, let's provide a realistic baseline based on client statuses (e.g., active files usually have missing documents)
   if (pendingDocsCount === 0) {
     pendingDocsCount = targetClients.filter(c => ["working", "lender", "conditional"].includes(c.status)).length * 2;
   }
 
-  // Calculate overdue tasks
   const myTasks = isAgent ? tasks.filter(t => t.assignedTo === userFullName) : tasks;
   const nowStr = new Date().toISOString().split("T")[0];
   const overdueTasks = myTasks.filter(t => t.status === "open" && t.dueDate && t.dueDate < nowStr);
 
-  // Formatting utility
   const fdShort = (n: number) => {
     if (n >= 1000000) return "$" + (n / 1000000).toFixed(1) + "M";
     if (n >= 1000) return "$" + (n / 1000).toFixed(0) + "K";
     return "$" + n;
   };
 
-  // Pipeline volumes
   const pipelineValue = activeFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
   const fundedValue = fundedFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
 
@@ -70,37 +63,19 @@ export const KPICards: React.FC<KPICardsProps> = ({
       id: "active",
       title: isAgent ? "My Active Files" : "Active Pipeline",
       value: activeFiles.length,
-      sub: `${fdShort(pipelineValue)} in progression`,
+      sub: `${fdShort(pipelineValue)} in progress`,
       icon: FolderOpen,
-      color: "text-blue-400 border-blue-500/10 hover:border-blue-500/30",
+      isPrimary: true,
       tab: "pipeline"
     },
     {
       id: "leads",
-      title: "New Leads / Intake",
+      title: "New Leads",
       value: newLeads.length,
       sub: `${newLeads.filter(c => c.status === "lead").length} unassigned leads`,
       icon: UserCheck,
-      color: "text-[#b5a642] border-[#b5a642]/10 hover:border-[#b5a642]/30",
+      isPrimary: true,
       tab: "clients"
-    },
-    {
-      id: "docs",
-      title: "Pending Documents",
-      value: pendingDocsCount,
-      sub: "Awaiting borrower upload",
-      icon: FileText,
-      color: "text-purple-400 border-purple-500/10 hover:border-purple-500/30",
-      tab: "clients"
-    },
-    {
-      id: "tasks",
-      title: "Overdue Tasks",
-      value: overdueTasks.length,
-      sub: overdueTasks.length > 0 ? "Requires immediate action" : "All tasks on schedule",
-      icon: AlertTriangle,
-      color: overdueTasks.length > 0 ? "text-red-400 border-red-500/10 hover:border-red-500/30" : "text-gray-400 border-white/5",
-      tab: "tasks"
     },
     {
       id: "conditional",
@@ -108,54 +83,81 @@ export const KPICards: React.FC<KPICardsProps> = ({
       value: conditionalFiles.length,
       sub: "Clearing outstanding conditions",
       icon: HelpCircle,
-      color: "text-orange-400 border-orange-500/10 hover:border-orange-500/30",
+      isPrimary: true,
       tab: "pipeline"
+    },
+    {
+      id: "docs",
+      title: "Pending Docs",
+      value: pendingDocsCount,
+      sub: "Awaiting upload",
+      icon: FileText,
+      isPrimary: false,
+      tab: "clients"
+    },
+    {
+      id: "tasks",
+      title: "Overdue Tasks",
+      value: overdueTasks.length,
+      sub: overdueTasks.length > 0 ? "Action required" : "On schedule",
+      icon: AlertTriangle,
+      isPrimary: false,
+      tab: "tasks",
+      alert: overdueTasks.length > 0
     },
     {
       id: "approved",
       title: "Fully Approved",
       value: approvedFiles.length,
-      sub: "Awaiting lawyer instruction",
+      sub: "Awaiting instructions",
       icon: ShieldCheck,
-      color: "text-green-400 border-green-500/10 hover:border-green-500/30",
+      isPrimary: false,
       tab: "pipeline"
     },
     {
       id: "funded",
-      title: "Funded This Month",
+      title: "Funded Monthly",
       value: fundedFiles.length,
-      sub: `Closed volume: ${fdShort(fundedValue)}`,
+      sub: `Vol: ${fdShort(fundedValue)}`,
       icon: DollarSign,
-      color: "text-emerald-500 border-emerald-500/10 hover:border-emerald-500/30",
+      isPrimary: false,
       tab: "pipeline"
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3" id="kpi-summary-row">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 select-none" id="kpi-summary-row">
       {cards.map((card) => {
         const Icon = card.icon;
         return (
           <div
             key={card.id}
             onClick={() => setActiveTab(card.tab)}
-            className={`bg-[#141418] border rounded-xl p-3.5 flex flex-col justify-between cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-md ${card.color}`}
+            className="glass-card relative overflow-hidden pt-5 pb-3 px-3 flex flex-col justify-between cursor-pointer group hover:-translate-y-1 hover:border-[#F9B17A]/30 active:translate-y-0"
           >
+            {/* Top Border Color Strip */}
+            <div 
+              className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl"
+              style={{ background: card.alert ? "linear-gradient(135deg, #e05c6e 0%, #7A5063 100%)" : card.isPrimary ? "var(--grad-warm)" : "var(--grad-deep)" }}
+            />
+
             <div className="flex items-center justify-between gap-1">
-              <span className="text-[10px] text-[#8e95a3] font-semibold uppercase tracking-wider truncate">
+              <span className="text-[10px] text-[var(--color-text-muted)] font-black uppercase tracking-wider truncate">
                 {card.title}
               </span>
-              <Icon className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${card.alert ? 'text-red-400' : 'text-[#676F9D]'}`} />
             </div>
+
             <div className="mt-2.5 flex items-baseline justify-between">
-              <span className="text-xl font-bold tracking-tight text-[#eeeef2]">
+              <span className="text-2xl font-black tracking-tight" style={{ color: "var(--color-accent)" }}>
                 {card.value}
               </span>
-              <span className="text-[10px] text-white/30 hover:text-white/60 transition-colors">
-                <ArrowUpRight className="w-3 h-3" />
+              <span className="text-[10px] text-white/20 group-hover:text-white/50 transition-colors">
+                <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <div className="text-[9px] text-[#8e95a3]/70 truncate mt-1">
+
+            <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-1 font-bold">
               {card.sub}
             </div>
           </div>
