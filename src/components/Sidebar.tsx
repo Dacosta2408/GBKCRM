@@ -106,7 +106,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           ) 
         },
-        // Admin tab condition preserved exactly
         ...((isOwner || currentUser.role === "Owner / Master Admin" || currentUser.role === "Super Admin" || currentUser.role === "IT / Developer") 
           ? [{ id: "admin", label: "Admin Panel", icon: ShieldAlert, alert: true }] 
           : []),
@@ -116,32 +115,69 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside 
-      className="w-56 flex flex-col h-full shrink-0 z-40 relative border-r border-white/5 select-none"
-      style={{ backgroundColor: "#2D3250" }}
+    <aside
+      className="w-56 flex flex-col h-full shrink-0 z-40 relative select-none"
+      style={{
+        background: "var(--grad-sidebar)",
+        boxShadow: "var(--shadow-sidebar)",
+        borderRight: "1px solid var(--color-sidebar-border)"
+      }}
     >
-      {/* Top Header Block - linear-gradient */}
-      <div 
-        className="h-20 flex flex-col justify-center px-4 border-b border-[var(--glass-border)] relative overflow-hidden" 
-        style={{ background: "linear-gradient(135deg, #486D83 0%, #4A2C3F 100%)" }}
+      {/* ── Header Block ── */}
+      <div
+        className="h-20 flex flex-col justify-center px-4 relative overflow-hidden shrink-0"
+        style={{
+          background: "var(--grad-sidebar-header)",
+          borderBottom: "1px solid var(--color-sidebar-border)"
+        }}
       >
-        <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-        <div className="flex items-center gap-2 z-10">
-          <svg className="w-5 h-5 text-[#F9B17A] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-          <span className="text-sm font-extrabold text-white tracking-wide">GBK Financial</span>
+        {/* Subtle inner glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at 20% 50%, rgba(200,146,42,0.08) 0%, transparent 70%)"
+          }}
+        />
+
+        <div className="flex items-center gap-2.5 z-10">
+          {/* Shield logo mark */}
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+            style={{
+              background: "var(--grad-accent)",
+              boxShadow: "0 2px 8px rgba(200,146,42,0.35)"
+            }}
+          >
+            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-extrabold text-white tracking-wide leading-tight">
+              GBK Financial
+            </span>
+            <span
+              className="text-[9px] font-bold tracking-[1.5px] uppercase leading-tight mt-0.5"
+              style={{ color: "var(--color-text-sidebar-muted)" }}
+            >
+              Ontario Mortgage CRM
+            </span>
+          </div>
         </div>
-        <span className="text-[9px] text-white/50 tracking-[1.5px] uppercase font-bold mt-1 z-10">Ontario Mortgage CRM</span>
       </div>
 
-      {/* Nav List Area */}
+      {/* ── Nav List ── */}
       <nav className="flex-1 overflow-y-auto px-2 py-3.5 flex flex-col gap-3 select-none">
         {menuGroups.map((group, gIdx) => (
           <div key={gIdx} className="flex flex-col gap-0.5">
-            <div className="text-[10px] text-white/35 uppercase tracking-[1.5px] font-bold px-3 py-1 mb-1">
+            {/* Group label */}
+            <div
+              className="text-[10px] uppercase tracking-[1.5px] font-bold px-3 py-1 mb-1"
+              style={{ color: "var(--color-text-sidebar-muted)" }}
+            >
               {group.label}
             </div>
+
             {group.items.map((item) => {
               const isActive = activeTab === item.id;
               const Icon = item.icon;
@@ -149,35 +185,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200 outline-none cursor-pointer ${
-                    isActive 
-                      ? "text-[var(--color-accent)] font-bold" 
-                      : "text-[var(--color-text-muted)] hover:text-white hover:bg-[rgba(103,111,157,0.15)]"
-                  }`}
+                  className="group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg outline-none cursor-pointer w-full text-left"
+                  style={{
+                    color: isActive
+                      ? "var(--color-accent)"
+                      : "var(--color-text-sidebar)",
+                    fontWeight: isActive ? 700 : 600,
+                    transition: "var(--transition-fast)"
+                  }}
+                  onMouseEnter={e => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = "var(--color-sidebar-hover)";
+                      (e.currentTarget as HTMLElement).style.color = "#FFFFFF";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = "transparent";
+                      (e.currentTarget as HTMLElement).style.color = "var(--color-text-sidebar)";
+                    }
+                  }}
                 >
-                  {/* Framer motion slide background active indicator */}
+                  {/* Active slide indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-active"
-                      className="absolute inset-0 bg-[rgba(249,177,122,0.12)] border-l-2 border-[var(--color-accent)] rounded-lg pointer-events-none"
+                      className="absolute inset-0 rounded-lg pointer-events-none"
+                      style={{
+                        background: "var(--color-sidebar-active)",
+                        borderLeft: "2px solid var(--color-accent)"
+                      }}
                     />
                   )}
 
                   <span className="flex items-center gap-2.5 z-10">
-                    <Icon className={`h-4 w-4 shrink-0 transition-colors duration-200 ${
-                      isActive 
-                        ? "text-[#F9B17A]" 
-                        : item.highlight 
-                          ? "text-[#F9B17A]" 
-                          : item.alert 
-                            ? "text-red-400" 
-                            : "text-[#676F9D] group-hover:text-white/80"
-                    }`} />
+                    <Icon
+                      className="h-4 w-4 shrink-0"
+                      style={{
+                        color: isActive
+                          ? "var(--color-accent)"
+                          : item.highlight
+                            ? "var(--color-accent)"
+                            : item.alert
+                              ? "var(--color-error)"
+                              : "var(--color-text-sidebar-muted)",
+                        transition: "var(--transition-fast)"
+                      }}
+                    />
                     <span className="truncate">{item.label}</span>
                   </span>
 
+                  {/* Badge */}
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="z-10 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#F9B17A] text-[#12131a] min-w-4 text-center">
+                    <span
+                      className="z-10 text-[9px] font-black px-1.5 py-0.5 rounded-full min-w-4 text-center"
+                      style={{
+                        background: "var(--color-accent)",
+                        color: "var(--color-text-inverse)"
+                      }}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -188,31 +254,75 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </nav>
 
-      {/* Bottom User Area */}
-      <div className="p-3 border-t border-[var(--color-divider)] flex flex-col gap-3 shrink-0">
-        <div 
+      {/* ── Bottom User Area ── */}
+      <div
+        className="p-3 flex flex-col gap-3 shrink-0"
+        style={{ borderTop: "1px solid var(--color-sidebar-border)" }}
+      >
+        {/* Profile card */}
+        <div
           onClick={onOpenProfileManager}
-          className="p-2.5 cursor-pointer rounded-xl transition-all duration-300 glass-card hover:border-[#F9B17A]/40 flex items-center gap-2.5 select-none"
+          className="p-2.5 cursor-pointer rounded-xl flex items-center gap-2.5 select-none"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid var(--color-sidebar-border)",
+            transition: "var(--transition-smooth)"
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = "rgba(200,146,42,0.10)";
+            (e.currentTarget as HTMLElement).style.borderColor = "var(--color-accent-border)";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+            (e.currentTarget as HTMLElement).style.borderColor = "var(--color-sidebar-border)";
+          }}
         >
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0" 
-            style={{ background: "var(--grad-warm)" }}
+          {/* Avatar */}
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0"
+            style={{
+              background: "var(--grad-accent)",
+              boxShadow: "0 2px 6px rgba(200,146,42,0.30)"
+            }}
           >
-            {currentUser.name ? currentUser.name.split(" ").map(n => n[0]).join("").toUpperCase() : "U"}
+            {currentUser.name
+              ? currentUser.name.split(" ").map(n => n[0]).join("").toUpperCase()
+              : "U"}
           </div>
+
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-black text-white truncate">{currentUser.name || "Broker Profile"}</div>
-            <div className="text-[10px] text-white/40 truncate font-semibold leading-none mt-0.5">{currentUser.role || "Mortgage Broker"}</div>
+            <div
+              className="text-xs font-black truncate"
+              style={{ color: "#FFFFFF" }}
+            >
+              {currentUser.name || "Broker Profile"}
+            </div>
+            <div
+              className="text-[10px] truncate font-semibold leading-none mt-0.5"
+              style={{ color: "var(--color-text-sidebar-muted)" }}
+            >
+              {currentUser.role || "Mortgage Broker"}
+            </div>
           </div>
         </div>
 
         {/* Version banner */}
-        <div className="px-1 flex items-center justify-between text-[10px] text-white/30 font-mono font-bold select-none leading-none">
+        <div
+          className="px-1 flex items-center justify-between font-mono font-bold select-none leading-none"
+          style={{ fontSize: "10px", color: "rgba(200,216,232,0.25)" }}
+        >
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>v{(import.meta as any).env?.VITE_APP_VERSION || "1.0.0"}</span>
           </div>
-          <span className="px-1 py-0.5 bg-white/5 border border-[var(--color-border)] rounded text-[8px] font-black tracking-wider uppercase text-white/40">
+          <span
+            className="px-1 py-0.5 rounded text-[8px] font-black tracking-wider uppercase"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid var(--color-sidebar-border)",
+              color: "rgba(200,216,232,0.30)"
+            }}
+          >
             {(import.meta as any).env?.VITE_APP_ENV || "DEV"}
           </span>
         </div>
