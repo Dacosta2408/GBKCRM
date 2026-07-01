@@ -89,17 +89,17 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
   }).slice(0, 5);
 
   return (
-    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md p-4 flex flex-col h-[380px]" id="upcoming-deadlines">
-      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3 shrink-0">
+    <div className="glass-card p-4 flex flex-col h-[380px]" id="upcoming-deadlines">
+      <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-3 mb-3 shrink-0">
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#eeeef2] flex items-center gap-1.5">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
             <span>📅 Critical Dates & Deadlines</span>
           </h4>
-          <p className="text-[9px] text-[#8e95a3] mt-0.5">
+          <p className="text-[9px] text-[var(--color-text-muted)] mt-0.5">
             Key chronological dates for active loan files
           </p>
         </div>
-        <Calendar className="w-4 h-4 text-[#b5a642]" />
+        <Calendar className="w-4 h-4 text-[var(--color-accent)]" />
       </div>
 
       <div className="flex-1 overflow-y-auto flex flex-col gap-2.5">
@@ -109,17 +109,17 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
               <div
                 key={idx}
                 onClick={() => onOpenClient(dl.clientId)}
-                className="p-3 bg-[#1b1b20]/40 border border-white/5 hover:border-white/10 hover:bg-[#1b1b20]/75 rounded-lg transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)] rounded-lg transition-all cursor-pointer flex items-center justify-between gap-3 group"
               >
                 <div className="min-w-0">
-                  <div className="text-xs font-bold text-white group-hover:text-[#b5a642] transition-colors truncate">
+                  <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors truncate">
                     {dl.clientName}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${dl.statusColor}`}>
                       {dl.type}
                     </span>
-                    <span className="text-[9px] text-white/30 font-mono">
+                    <span className="text-[9px] text-[var(--color-text-faint)] font-mono">
                       {dl.date}
                     </span>
                   </div>
@@ -131,13 +131,13 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
                   ) : dl.daysLeft === 1 ? (
                     <span className="text-xs font-bold text-red-400 font-mono">TOMORROW</span>
                   ) : dl.daysLeft < 0 ? (
-                    <span className="text-xs font-bold text-white/30 font-mono">Passed</span>
+                    <span className="text-xs font-bold text-[var(--color-text-faint)] font-mono">Passed</span>
                   ) : (
                     <span className={`text-xs font-bold font-mono ${dl.color}`}>
                       {dl.daysLeft} days
                     </span>
                   )}
-                  <p className="text-[8px] text-[#8e95a3]/70 truncate mt-0.5">
+                  <p className="text-[8px] text-[var(--color-text-muted)]/70 truncate mt-0.5">
                     {dl.daysLeft >= 0 ? "Remaining" : "Overdue"}
                   </p>
                 </div>
@@ -146,20 +146,20 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
           })
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <Clock className="w-8 h-8 text-[#8e95a3]/40 mb-2" />
-            <h5 className="text-xs font-semibold text-white/80">Schedule Uncluttered</h5>
-            <p className="text-[9px] text-[#8e95a3] mt-0.5 max-w-[200px]">
+            <Clock className="w-8 h-8 text-[var(--color-text-faint)]/40 mb-2" />
+            <h5 className="text-xs font-semibold text-[var(--color-text-muted)]">Schedule Uncluttered</h5>
+            <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 max-w-[200px]">
               No approaching term maturities or condition removals in the next 30 days.
             </p>
           </div>
         )}
       </div>
 
-      <div className="pt-3 border-t border-white/5 mt-auto shrink-0 flex items-center justify-between text-[9px]">
-        <span className="text-white/30">Calendar coordination in sync</span>
+      <div className="pt-3 border-t border-[var(--color-divider)] mt-auto shrink-0 flex items-center justify-between text-[9px]">
+        <span className="text-[var(--color-text-faint)]">Calendar coordination in sync</span>
         <button
           onClick={() => setActiveTab("calendar")}
-          className="text-[#b5a642] font-semibold hover:underline"
+          className="text-[var(--color-accent)] font-semibold hover:underline cursor-pointer"
         >
           View Calendar &rarr;
         </button>

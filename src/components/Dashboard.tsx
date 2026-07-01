@@ -80,32 +80,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-6 text-sans" id="gbk-crm-dashboard">
       
       {/* Dynamic Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-4 bg-gradient-to-r from-[#141418] to-transparent p-4 rounded-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--color-divider)] pb-4 bg-gradient-to-r from-[var(--color-surface)] to-transparent p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold tracking-tight text-[#eeeef2]">{getGreeting()}</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text)]">{getGreeting()}</h2>
             <span className="text-[10px] font-bold bg-[#b5a642]/10 text-[#b5a642] px-2.5 py-0.5 rounded-full border border-[#b5a642]/15 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
               {currentUser.role} Session Active
             </span>
           </div>
-          <p className="text-xs text-[#8e95a3] mt-1 flex items-center gap-1.5">
+          <p className="text-xs text-[var(--color-text-muted)] mt-1 flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5" />
             <span>{getFormattedDate()}</span>
             <span>•</span>
-            <span className="font-mono text-[#b5a642]">{liveTime} EST</span>
+            <span className="font-mono text-[var(--color-accent)]">{liveTime} EST</span>
           </p>
         </div>
 
         {/* Calendar outreach reminder / stats indicator */}
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <span className="text-[9px] text-[#8e95a3] uppercase tracking-wider font-semibold">Total Portfolios Managed</span>
-            <div className="text-sm font-bold text-[#eeeef2] font-mono">{clients.length} Active Records</div>
+            <span className="text-[9px] text-[var(--color-text-muted)] uppercase tracking-wider font-semibold">Total Portfolios Managed</span>
+            <div className="text-sm font-bold text-[var(--color-text)] font-mono">{clients.length} Active Records</div>
           </div>
           <button 
             onClick={onAddEvent}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 text-[#b5a642] transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 text-[#b5a642] transition-all cursor-pointer font-sans"
           >
             <Clock className="w-3.5 h-3.5" /> Log Outreach Event
           </button>

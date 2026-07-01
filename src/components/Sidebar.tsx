@@ -120,10 +120,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       className="w-56 flex flex-col h-full shrink-0 z-40 relative border-r border-white/5 select-none"
       style={{ backgroundColor: "#2D3250" }}
     >
-      {/* Top Header Block - var(--grad-deep) */}
+      {/* Top Header Block - linear-gradient */}
       <div 
         className="h-20 flex flex-col justify-center px-4 border-b border-[var(--glass-border)] relative overflow-hidden" 
-        style={{ background: "var(--grad-deep)" }}
+        style={{ background: "linear-gradient(135deg, #486D83 0%, #4A2C3F 100%)" }}
       >
         <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
         <div className="flex items-center gap-2 z-10">
@@ -149,17 +149,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200 outline-none ${
+                  className={`group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200 outline-none cursor-pointer ${
                     isActive 
-                      ? "text-[#F9B17A] font-bold" 
-                      : "text-[#9a9db8] hover:text-white hover:bg-white/5"
+                      ? "text-[var(--color-accent)] font-bold" 
+                      : "text-[var(--color-text-muted)] hover:text-white hover:bg-[rgba(103,111,157,0.15)]"
                   }`}
                 >
                   {/* Framer motion slide background active indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-active"
-                      className="absolute inset-0 bg-[#F9B17A]/12 border-l-3 border-[#F9B17A] shadow-[0_0_20px_rgba(249,177,122,0.15)] rounded-lg pointer-events-none"
+                      className="absolute inset-0 bg-[rgba(249,177,122,0.12)] border-l-2 border-[var(--color-accent)] rounded-lg pointer-events-none"
                     />
                   )}
 
@@ -189,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Bottom User Area */}
-      <div className="p-3 border-t border-white/5 flex flex-col gap-3 shrink-0">
+      <div className="p-3 border-t border-[var(--color-divider)] flex flex-col gap-3 shrink-0">
         <div 
           onClick={onOpenProfileManager}
           className="p-2.5 cursor-pointer rounded-xl transition-all duration-300 glass-card hover:border-[#F9B17A]/40 flex items-center gap-2.5 select-none"
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>v{(import.meta as any).env?.VITE_APP_VERSION || "1.0.0"}</span>
           </div>
-          <span className="px-1 py-0.5 bg-white/5 border border-white/5 rounded text-[8px] font-black tracking-wider uppercase text-white/40">
+          <span className="px-1 py-0.5 bg-white/5 border border-[var(--color-border)] rounded text-[8px] font-black tracking-wider uppercase text-white/40">
             {(import.meta as any).env?.VITE_APP_ENV || "DEV"}
           </span>
         </div>

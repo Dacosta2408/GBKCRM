@@ -125,24 +125,24 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] backdrop-blur-[8px] z-50 flex items-center justify-center p-4 overflow-y-auto">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         transition={{ duration: 0.2 }}
-        className="bg-[#101014] border border-white/10 rounded-2xl w-full max-w-4xl p-6 shadow-2xl relative flex flex-col max-h-[90vh]"
+        className="panel-card w-full max-w-4xl p-6 shadow-2xl relative flex flex-col max-h-[90vh]"
         id="new-client-modal-container"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5 shrink-0">
+        <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-4 mb-5 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-[#b5a642]/10 rounded-xl border border-[#b5a642]/20 text-[#b5a642]">
+            <div className="p-2 bg-[#b5a642]/10 rounded-xl border border-[#b5a642]/20 text-[var(--color-accent)]">
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white uppercase tracking-wider">Manual Client Intake Form</h2>
-              <p className="text-[10px] text-white/40 mt-0.5">Quickly commission a new file onto the workstation pipeline.</p>
+              <h2 className="text-base font-extrabold text-[var(--color-text)] uppercase tracking-wider">Manual Client Intake Form</h2>
+              <p className="text-[10px] text-[var(--color-text-faint)] mt-0.5">Quickly commission a new file onto the workstation pipeline.</p>
             </div>
           </div>
           <button 

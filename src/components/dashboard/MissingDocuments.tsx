@@ -68,13 +68,13 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
   }).filter(item => item.missing.length > 0).slice(0, 4);
 
   return (
-    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md p-4 flex flex-col h-[380px]" id="missing-documents">
-      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3 shrink-0">
+    <div className="glass-card p-4 flex flex-col h-[380px]" id="missing-documents">
+      <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-3 mb-3 shrink-0">
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#eeeef2] flex items-center gap-1.5">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
             <span>📎 Missing Documents Checklist</span>
           </h4>
-          <p className="text-[9px] text-[#8e95a3] mt-0.5">
+          <p className="text-[9px] text-[var(--color-text-muted)] mt-0.5">
             Active folders pending critical underwriting documents
           </p>
         </div>
@@ -87,12 +87,12 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
             return (
               <div
                 key={client.id}
-                className="p-3 bg-[#1b1b20]/40 border border-white/5 rounded-lg flex flex-col gap-2 hover:border-white/10 transition-all"
+                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg flex flex-col gap-2 hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)] transition-all"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span
                     onClick={() => onOpenClient(client.id)}
-                    className="text-xs font-bold text-white hover:text-[#b5a642] cursor-pointer transition-colors truncate"
+                    className="text-xs font-bold text-[var(--color-text)] hover:text-[#b5a642] cursor-pointer transition-colors truncate"
                   >
                     {client.first} {client.last}
                   </span>
@@ -112,7 +112,7 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
                         ) : (
                           <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
                         )}
-                        <span className={`truncate ${isMissing ? "text-red-400/80" : "text-white/40"}`}>
+                        <span className={`truncate ${isMissing ? "text-red-400/80" : "text-[var(--color-text-muted)]/60"}`}>
                           {doc.label}
                         </span>
                       </div>
@@ -122,13 +122,13 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
 
                 {/* Action trigger row */}
                 <div className="flex items-center justify-between mt-1 text-[9px]">
-                  <span className="text-white/30 font-mono">Pending: {missing.length} files</span>
+                  <span className="text-[var(--color-text-faint)] font-mono">Pending: {missing.length} files</span>
                   <button
                     onClick={() => {
                       onOpenClient(client.id);
                       setActiveTab("emails");
                     }}
-                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20 hover:bg-[#b5a642]/20 font-bold transition-all"
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20 hover:bg-[#b5a642]/20 font-bold transition-all cursor-pointer"
                   >
                     <Mail className="w-2.5 h-2.5" /> Request Docs
                   </button>
@@ -139,19 +139,19 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
             <CheckCircle2 className="w-8 h-8 text-green-400/40 mb-2" />
-            <h5 className="text-xs font-semibold text-white/80">All Documents Cleared</h5>
-            <p className="text-[9px] text-[#8e95a3] mt-0.5 max-w-[200px]">
+            <h5 className="text-xs font-semibold text-[var(--color-text-muted)]">All Documents Cleared</h5>
+            <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 max-w-[200px]">
               No active files in working, lender, or conditional stage are missing critical paperwork!
             </p>
           </div>
         )}
       </div>
 
-      <div className="pt-3 border-t border-white/5 mt-auto shrink-0 flex items-center justify-between text-[9px]">
-        <span className="text-white/30">Lender ready validation active</span>
+      <div className="pt-3 border-t border-[var(--color-divider)] mt-auto shrink-0 flex items-center justify-between text-[9px]">
+        <span className="text-[var(--color-text-faint)]">Lender ready validation active</span>
         <button
           onClick={() => setActiveTab("clients")}
-          className="text-[#b5a642] font-semibold hover:underline"
+          className="text-[var(--color-accent)] font-semibold hover:underline cursor-pointer"
         >
           Check Compliance &rarr;
         </button>

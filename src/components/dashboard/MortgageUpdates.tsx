@@ -115,21 +115,21 @@ export const MortgageUpdates: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md p-5 flex flex-col gap-4" id="mortgage-updates">
+    <div className="glass-card p-5 flex flex-col gap-4" id="mortgage-updates">
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-divider)] pb-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-[#b5a642]/10 rounded-lg text-[#b5a642]">
+          <div className="p-1.5 bg-[#b5a642]/10 rounded-lg text-[var(--color-accent)]">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#eeeef2] flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-2">
               GBK Market Intelligence Report
-              <span className="text-[9px] bg-[#b5a642]/15 text-[#b5a642] px-2 py-0.5 rounded-full border border-[#b5a642]/20 animate-pulse">
+              <span className="text-[9px] bg-[#b5a642]/15 text-[var(--color-accent)] px-2 py-0.5 rounded-full border border-[#b5a642]/20 animate-pulse">
                 AI Powered
               </span>
             </h3>
-            <p className="text-[10px] text-[#8e95a3] mt-0.5">
+            <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
               Daily parsed lending developments, OSFI rules, rate outlooks, and policy changes
             </p>
           </div>
@@ -138,7 +138,7 @@ export const MortgageUpdates: React.FC = () => {
         <button
           onClick={handleFetchAINews}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#b5a642] text-black hover:bg-[#9a8c38] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg bg-[var(--color-accent)] text-black hover:bg-[#d68b4f] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer font-sans"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
           {loading ? "Re-Analyzing Market..." : "Refresh AI Intel Update"}
@@ -151,21 +151,21 @@ export const MortgageUpdates: React.FC = () => {
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <div>
             <span className="font-bold">Market Intelligence Offline:</span> {error}
-            <p className="mt-1 text-[10px] text-white/40">Default curated seed data is active below for broker use.</p>
+            <p className="mt-1 text-[10px] text-[var(--color-text-faint)]">Default curated seed data is active below for broker use.</p>
           </div>
         </div>
       )}
 
       {/* Loading state */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-[#1b1b20]/20 border border-white/5 border-dashed rounded-xl gap-4">
+        <div className="flex flex-col items-center justify-center py-20 bg-black/10 border border-[var(--color-border)] border-dashed rounded-xl gap-4">
           <div className="relative w-10 h-10 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-[#b5a642]/10 border-t-[#b5a642] animate-spin" />
-            <Sparkles className="w-4 h-4 text-[#b5a642] animate-pulse" />
+            <div className="absolute inset-0 rounded-full border-2 border-[var(--color-accent)]/10 border-t-[var(--color-accent)] animate-spin" />
+            <Sparkles className="w-4 h-4 text-[var(--color-accent)] animate-pulse" />
           </div>
           <div className="text-center">
-            <h4 className="text-xs font-semibold text-[#eeeef2]">AI Underwriting Crawler Active</h4>
-            <p className="text-[10px] text-white/40 mt-1 max-w-sm animate-pulse">
+            <h4 className="text-xs font-semibold text-[var(--color-text)]">AI Underwriting Crawler Active</h4>
+            <p className="text-[10px] text-[var(--color-text-faint)] mt-1 max-w-sm animate-pulse">
               {loadingMessage}
             </p>
           </div>
@@ -176,35 +176,35 @@ export const MortgageUpdates: React.FC = () => {
           {updates.map((item, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-xl bg-[#1b1b20]/30 border border-white/5 hover:border-white/10 hover:bg-[#1b1b20]/50 transition-all flex flex-col justify-between gap-3 group relative overflow-hidden"
+              className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)] transition-all flex flex-col justify-between gap-3 group relative overflow-hidden"
             >
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className={`text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getCategoryColor(item.category)}`}>
                     {item.category}
                   </span>
-                  <div className="flex items-center gap-1.5 text-[9px] text-white/30 font-mono">
+                  <div className="flex items-center gap-1.5 text-[9px] text-[var(--color-text-faint)] font-mono">
                     <Calendar className="w-3 h-3" />
                     <span>{item.date}</span>
                   </div>
                 </div>
 
-                <h4 className="text-xs font-bold text-white group-hover:text-[#b5a642] leading-relaxed transition-colors mt-1">
+                <h4 className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] leading-relaxed transition-colors mt-1">
                   {item.headline}
                 </h4>
 
-                <p className="text-[10px] text-[#8e95a3] leading-relaxed mt-1">
+                <p className="text-[10px] text-[var(--color-text-muted)] leading-relaxed mt-1">
                   {item.summary}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-auto text-[9px]">
-                <span className="text-white/30">Source: <span className="font-semibold text-white/50">{item.source}</span></span>
+              <div className="flex items-center justify-between pt-2 border-t border-[var(--color-divider)] mt-auto text-[9px]">
+                <span className="text-[var(--color-text-faint)]">Source: <span className="font-semibold text-[var(--color-text-muted)]">{item.source}</span></span>
                 <a
                   href={item.link}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="flex items-center gap-1 text-[#b5a642] font-semibold hover:underline"
+                  className="flex items-center gap-1 text-[var(--color-accent)] font-semibold hover:underline"
                 >
                   <Globe className="w-3 h-3" /> Source Bulletin
                 </a>

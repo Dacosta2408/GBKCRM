@@ -108,7 +108,7 @@ export function ClientDetailPanel({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/70 z-30 backdrop-blur-sm"
+        className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-30 backdrop-blur-[8px]"
         onClick={closeDetail}
       >
         <motion.div 
@@ -488,8 +488,8 @@ export function ClientDetailPanel({
 
       {/* Absolute PIPEDA Delete Confirmation Modal */}
       {showDeleteConfirmModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-[#12131a] border border-red-500/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px]">
+          <div className="panel-card border border-red-500/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => {
                 setShowDeleteConfirmModal(false);

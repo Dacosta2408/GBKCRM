@@ -648,7 +648,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0c0c0e] font-sans text-[#eeeef2] overflow-hidden">
+    <div className="flex h-screen bg-[var(--color-bg)] font-sans text-[var(--color-text)] overflow-hidden">
       
       {/* ── Security Lock Screen Overlay ── */}
       <AnimatePresence>
@@ -745,7 +745,7 @@ export default function App() {
       />
 
       {/* Main Workspace */}
-      <div className="flex-1 flex flex-col h-full min-w-0 bg-[#0c0c0e]">
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-[var(--color-bg)]">
         
         {/* Version Mismatch Banner */}
         {versionMismatch && (
@@ -761,7 +761,7 @@ export default function App() {
         <header 
           className="h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
           style={{
-            background: "rgba(18, 19, 26, 0.8)",
+            background: "rgba(18, 19, 26, 0.85)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             borderBottom: "1px solid var(--color-divider)"
@@ -793,8 +793,8 @@ export default function App() {
               </div>
 
               {activeTab !== "clients" && activeTab !== "pipeline" && globalSearch.trim().length > 0 && (
-                <div className="absolute top-full mt-1 right-0 w-60 bg-[#141418] border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden py-1">
-                  <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-white/40 border-b border-white/5">
+                <div className="absolute top-full mt-1 right-0 w-60 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                  <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[var(--color-text-faint)] border-b border-[var(--color-divider)]">
                     Matched Clients
                   </div>
                   {(() => {
@@ -815,15 +815,15 @@ export default function App() {
                             openClient(c.id);
                             setGlobalSearch("");
                           }}
-                          className="w-full text-left px-2.5 py-2 text-xs text-white hover:bg-[#b5a642]/10 hover:text-[#b5a642] transition-colors flex flex-col gap-0.5"
+                          className="w-full text-left px-2.5 py-2 text-xs text-[var(--color-text)] hover:bg-[var(--color-surface-2)] transition-colors flex flex-col gap-0.5 cursor-pointer"
                         >
                           <span className="font-bold">{c.first} {c.last}</span>
-                          <span className="text-[10px] text-white/50 capitalize">{c.status} • {c.email || "No email"}</span>
+                          <span className="text-[10px] text-[var(--color-text-muted)] capitalize">{c.status} • {c.email || "No email"}</span>
                         </button>
                       ));
                     } else {
                       return (
-                        <div className="px-2.5 py-2 text-xs text-white/50 italic">
+                        <div className="px-2.5 py-2 text-xs text-[var(--color-text-faint)] italic">
                           No clients matched
                         </div>
                       );
@@ -937,13 +937,13 @@ export default function App() {
                   />
                   
                   <div 
-                    className="absolute right-0 mt-2 w-56 rounded-xl bg-[#101014] border border-white/10 p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-100"
+                    className="absolute right-0 mt-2 w-56 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-100"
                     id="header-profile-dropdown-menu"
                   >
-                    <div className="px-2.5 py-2 border-b border-white/5 mb-1.5">
-                      <p className="text-[9px] uppercase font-bold tracking-wider text-[#8e95a3]">Broker Account</p>
-                      <p className="text-xs font-bold text-white mt-0.5 truncate">{currentUser.first} {currentUser.last}</p>
-                      <p className="text-[10px] text-white/50 truncate font-mono">{currentUser.email}</p>
+                    <div className="px-2.5 py-2 border-b border-[var(--color-divider)] mb-1.5">
+                      <p className="text-[9px] uppercase font-black tracking-widest text-[var(--color-text-faint)]">Broker Account</p>
+                      <p className="text-xs font-black text-[var(--color-text)] mt-0.5 truncate">{currentUser.first} {currentUser.last}</p>
+                      <p className="text-[10px] text-[var(--color-text-muted)] truncate font-mono">{currentUser.email}</p>
                     </div>
 
                     <button
@@ -951,9 +951,9 @@ export default function App() {
                         setActiveTab("settings");
                         setHeaderProfileOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-white/80 hover:text-white hover:bg-[#b5a642]/10 hover:text-[#b5a642] rounded-lg transition-all text-left"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] rounded-lg transition-all text-left cursor-pointer"
                     >
-                      <SettingsIcon className="w-4 h-4 text-[#b5a642]" />
+                      <SettingsIcon className="w-4 h-4 text-[var(--color-accent)]" />
                       <span>My Profile &amp; Settings</span>
                     </button>
 
@@ -963,20 +963,20 @@ export default function App() {
                         setProfileModalOpen(true);
                         setHeaderProfileOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-white/80 hover:text-white hover:bg-[#6fa3b8]/10 hover:text-[#6fa3b8] rounded-lg transition-all text-left"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] rounded-lg transition-all text-left cursor-pointer"
                     >
-                      <Key className="w-4 h-4 text-[#6fa3b8]" />
+                      <Key className="w-4 h-4 text-[var(--color-accent)]" />
                       <span>Sync Credentials</span>
                     </button>
 
-                    <div className="border-t border-white/5 my-1.5" />
+                    <div className="border-t border-[var(--color-divider)] my-1.5" />
 
                     <button
                       onClick={() => {
                         setAppLocked(true);
                         setHeaderProfileOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all text-left"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all text-left cursor-pointer"
                     >
                       <Lock className="w-4 h-4" />
                       <span>Lock Workstation</span>

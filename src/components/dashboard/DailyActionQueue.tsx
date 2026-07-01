@@ -199,21 +199,21 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
   });
 
   return (
-    <div className="bg-[#141418] border border-white/5 rounded-xl shadow-md overflow-hidden flex flex-col h-[480px]" id="daily-action-queue">
+    <div className="glass-card flex flex-col h-[480px]" id="daily-action-queue">
       {/* Queue Header */}
-      <div className="p-4 border-b border-white/5 bg-[#1b1b20]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+      <div className="p-4 border-b border-[var(--color-divider)] bg-[rgba(18,19,26,0.3)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-[#b5a642]/10 rounded-lg text-[#b5a642]">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#eeeef2] flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-2">
               My Daily Action Queue 
               <span className="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full border border-red-500/15">
                 {queueItems.length} alerts
               </span>
             </h3>
-            <p className="text-[10px] text-[#8e95a3] mt-0.5">
+            <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
               Personalized operational tasks requiring broker attention today
             </p>
           </div>
@@ -222,50 +222,50 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         {/* Toggles and Filter controls */}
         <div className="flex items-center gap-2">
           {isManager && (
-            <div className="bg-[#111115] border border-white/5 rounded-lg p-0.5 flex">
+            <div className="bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5 flex">
               <button
                 onClick={() => setQueueMode("personal")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 ${queueMode === "personal" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "personal" ? "bg-[#b5a642] text-black" : "text-[var(--color-text-muted)] hover:text-white"}`}
               >
                 My Queue
               </button>
               <button
                 onClick={() => setQueueMode("team")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 ${queueMode === "team" ? "bg-[#b5a642] text-black" : "text-white/60 hover:text-white"}`}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "team" ? "bg-[#b5a642] text-black" : "text-[var(--color-text-muted)] hover:text-white"}`}
               >
                 <Users className="w-3 h-3" /> Team Queue
               </button>
             </div>
           )}
 
-          <div className="flex items-center gap-1 bg-[#111115] border border-white/5 rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5">
             <button
               onClick={() => setFilterType("all")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${filterType === "all" ? "bg-white/10 text-white" : "text-white/40 hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "all" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
             >
               All
             </button>
             <button
               onClick={() => setFilterType("task")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${filterType === "task" ? "bg-white/10 text-white" : "text-white/40 hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "task" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
             >
               Tasks
             </button>
             <button
               onClick={() => setFilterType("stale")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${filterType === "stale" ? "bg-white/10 text-white" : "text-white/40 hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "stale" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
             >
               Stale
             </button>
             <button
               onClick={() => setFilterType("incomplete")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${filterType === "incomplete" ? "bg-white/10 text-white" : "text-white/40 hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "incomplete" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
             >
               Profiles
             </button>
             <button
               onClick={() => setFilterType("dates")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${filterType === "dates" ? "bg-white/10 text-white" : "text-white/40 hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "dates" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
             >
               Dates
             </button>
@@ -274,24 +274,24 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
       </div>
 
       {/* Queue Body list */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5 bg-gradient-to-b from-transparent to-[#101014]/40">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5 bg-gradient-to-b from-transparent to-[var(--color-bg)]/40">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const Icon = item.icon;
             return (
               <div 
                 key={item.id}
-                className="flex items-center justify-between p-3.5 bg-[#1b1b20]/60 border border-white/5 hover:border-white/10 hover:bg-[#1b1b20]/80 rounded-xl transition-all group"
+                className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)]/80 rounded-xl transition-all group"
               >
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                  <div className={`p-2.5 rounded-lg bg-black/30 border border-white/5 ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>
+                  <div className={`p-2.5 rounded-lg bg-black/30 border border-[var(--color-border)] ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h4 
                         onClick={item.onNavigate}
-                        className="text-xs font-semibold text-[#eeeef2] hover:text-[#b5a642] cursor-pointer transition-colors truncate"
+                        className="text-xs font-semibold text-[var(--color-text)] hover:text-[#b5a642] cursor-pointer transition-colors truncate"
                       >
                         {item.title}
                       </h4>
@@ -299,10 +299,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                         {item.badge}
                       </span>
                     </div>
-                    <p className="text-[10px] text-[#8e95a3] mt-1 leading-relaxed max-w-xl">
+                    <p className="text-[10px] text-[var(--color-text-muted)] mt-1 leading-relaxed max-w-xl">
                       {item.desc}
                     </p>
-                    <div className="text-[9px] text-white/30 font-mono mt-1.5 flex items-center gap-1.5">
+                    <div className="text-[9px] text-[var(--color-text-faint)] font-mono mt-1.5 flex items-center gap-1.5">
                       <span>{item.category}</span>
                       <span>•</span>
                       <span>{item.date}</span>
@@ -313,7 +313,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                 <div className="flex items-center gap-2 shrink-0 pl-4">
                   <button
                     onClick={item.onAction}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#b5a642]/10 border border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#b5a642]/10 border border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20 transition-all cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />
@@ -327,8 +327,8 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
             <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
               <Check className="w-6 h-6" />
             </div>
-            <h4 className="text-xs font-semibold text-[#eeeef2]">Daily Queue Cleared!</h4>
-            <p className="text-[10px] text-[#8e95a3] mt-1 max-w-xs">
+            <h4 className="text-xs font-semibold text-[var(--color-text)]">Daily Queue Cleared!</h4>
+            <p className="text-[10px] text-[var(--color-text-muted)] mt-1 max-w-xs">
               Excellent work! There are no high-priority action alerts matching your current selection filter.
             </p>
           </div>
