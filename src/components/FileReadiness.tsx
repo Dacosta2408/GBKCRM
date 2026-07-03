@@ -369,12 +369,12 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
     <div className="flex flex-col gap-6 h-full select-none overflow-hidden text-xs">
       
       {/* 1. OPERATIONS HEADER */}
-      <div className="flex flex-col gap-1.5 border-b border-white/5 pb-4 bg-gradient-to-r from-[#141418] to-transparent p-4 rounded-xl">
+      <div className="flex flex-col gap-1.5 border-b border-[var(--color-border)]/70 pb-4 bg-gradient-to-r from-[var(--color-surface)] to-transparent p-4 rounded-xl">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-5 w-5 text-[#b5a642]" />
-          <h2 className="text-sm font-black uppercase text-white tracking-wider">File Readiness Dashboard</h2>
+          <h2 className="text-sm font-black uppercase text-[var(--color-text)] tracking-wider">File Readiness Dashboard</h2>
         </div>
-        <p className="text-[10px] text-white/40 font-medium">
+        <p className="text-[10px] text-[var(--color-text-muted)] font-medium">
           Global underwriting queue &amp; checklist exceptions audit page for managers, admins, and brokers.
         </p>
       </div>
@@ -382,16 +382,16 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
       {/* 2. READINESS KPI SUMMARY CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         {[
-          { id: "ready", label: "Ready Files", value: kpis.ready, color: "text-green-400", bg: "bg-green-500/5", border: "border-green-500/15" },
-          { id: "blocked", label: "Blocked Files", value: kpis.blockedByChecklist, color: "text-red-400", bg: "bg-red-500/5", border: "border-red-500/15" },
-          { id: "client", label: "Waiting Client", value: kpis.waitingOnClient, color: "text-amber-400", bg: "bg-amber-500/5", border: "border-amber-500/15" },
-          { id: "review", label: "Awaiting Review", value: kpis.underReview, color: "text-blue-400", bg: "bg-blue-500/5", border: "border-blue-500/15" },
-          { id: "stale", label: "Stale/Expired", value: kpis.staleExpired, color: "text-orange-400", bg: "bg-orange-500/5", border: "border-orange-500/15" },
-          { id: "missing", label: "Missing Docs", value: kpis.missingCritical, color: "text-zinc-400", bg: "bg-zinc-500/5", border: "border-zinc-500/15" },
-          { id: "compliance", label: "Compliance Issue", value: kpis.complianceIssues, color: "text-rose-400", bg: "bg-rose-500/5", border: "border-rose-500/15" }
+          { id: "ready", label: "Ready Files", value: kpis.ready, color: "text-green-500", bg: "bg-[var(--color-surface)]", border: "border-green-500/30" },
+          { id: "blocked", label: "Blocked Files", value: kpis.blockedByChecklist, color: "text-red-500", bg: "bg-[var(--color-surface)]", border: "border-red-500/30" },
+          { id: "client", label: "Waiting Client", value: kpis.waitingOnClient, color: "text-amber-500", bg: "bg-[var(--color-surface)]", border: "border-amber-500/30" },
+          { id: "review", label: "Awaiting Review", value: kpis.underReview, color: "text-blue-500", bg: "bg-[var(--color-surface)]", border: "border-blue-500/30" },
+          { id: "stale", label: "Stale/Expired", value: kpis.staleExpired, color: "text-orange-500", bg: "bg-[var(--color-surface)]", border: "border-orange-500/30" },
+          { id: "missing", label: "Missing Docs", value: kpis.missingCritical, color: "text-zinc-500", bg: "bg-[var(--color-surface)]", border: "border-[var(--color-border)]/70" },
+          { id: "compliance", label: "Compliance Issue", value: kpis.complianceIssues, color: "text-rose-500", bg: "bg-[var(--color-surface)]", border: "border-rose-500/30" }
         ].map(card => (
           <div key={card.id} className={`p-3 rounded-xl border ${card.bg} ${card.border} flex flex-col justify-between h-20 shadow-sm relative group hover:scale-[1.01] transition-transform`}>
-            <span className="text-[9px] text-white/40 uppercase font-black tracking-wider">{card.label}</span>
+            <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-black tracking-wider">{card.label}</span>
             <div className="flex items-baseline justify-between mt-1">
               <span className={`text-2xl font-black ${card.color}`}>{card.value}</span>
             </div>
@@ -403,10 +403,10 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
       <div className="flex flex-col lg:flex-row gap-5 flex-grow overflow-hidden">
         
         {/* LEFT WORK QUEUE */}
-        <div className="flex-1 bg-[#131317] border border-white/5 rounded-2xl flex flex-col overflow-hidden">
+        <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl flex flex-col overflow-hidden">
           
           {/* INTERACTIVE COMPREHENSIVE FILTERING BAR */}
-          <div className="p-4 border-b border-white/5 bg-[#171720]/40 space-y-3">
+          <div className="p-4 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/30 space-y-3">
             <div className="flex flex-col md:flex-row gap-3">
               {/* Search */}
               <div className="relative flex-1">
@@ -415,9 +415,9 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                   placeholder="Search borrower name or folder ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg pl-8 pr-3 py-2 text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg pl-8 pr-3 py-2 text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[#b5a642] font-semibold"
                 />
-                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-white/30" />
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--color-text-faint)]" />
               </div>
 
               {/* Broker select */}
@@ -425,11 +425,11 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                 <select 
                   value={brokerFilter}
                   onChange={(e) => setBrokerFilter(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2 font-bold uppercase text-white/80 focus:outline-none cursor-pointer"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                 >
-                  <option value="all">All Brokers</option>
+                  <option value="all" className="bg-[var(--color-surface)]">All Brokers</option>
                   {agentNames.map(name => (
-                    <option key={name} value={name}>{name}</option>
+                    <option key={name} value={name} className="bg-[var(--color-surface)]">{name}</option>
                   ))}
                 </select>
               </div>
@@ -439,11 +439,11 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                 <select 
                   value={stateFilter}
                   onChange={(e) => setStateFilter(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2 font-bold uppercase text-white/80 focus:outline-none cursor-pointer"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                 >
-                  <option value="all">All States</option>
+                  <option value="all" className="bg-[var(--color-surface)]">All States</option>
                   {Object.keys(stateStyling).map(state => (
-                    <option key={state} value={state}>{state}</option>
+                    <option key={state} value={state} className="bg-[var(--color-surface)]">{state}</option>
                   ))}
                 </select>
               </div>
@@ -453,90 +453,90 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
               <div className="flex flex-wrap gap-3 items-center">
                 {/* File Type */}
                 <div className="flex items-center gap-1">
-                  <span className="text-white/30 font-bold">Type:</span>
+                  <span className="text-[var(--color-text-faint)] font-bold">Type:</span>
                   <select 
                     value={typeFilter} 
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="bg-[#111114] border border-white/5 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-white/70"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-[var(--color-text-muted)]"
                   >
-                    <option value="all">All</option>
-                    <option value="purchase">Purchase</option>
-                    <option value="refinance">Refinance</option>
-                    <option value="renewal">Renewal</option>
-                    <option value="heloc">HELOC</option>
+                    <option value="all" className="bg-[var(--color-surface)]">All</option>
+                    <option value="purchase" className="bg-[var(--color-surface)]">Purchase</option>
+                    <option value="refinance" className="bg-[var(--color-surface)]">Refinance</option>
+                    <option value="renewal" className="bg-[var(--color-surface)]">Renewal</option>
+                    <option value="heloc" className="bg-[var(--color-surface)]">HELOC</option>
                   </select>
                 </div>
 
                 {/* Mortgage Stage */}
                 <div className="flex items-center gap-1">
-                  <span className="text-white/30 font-bold">Stage:</span>
+                  <span className="text-[var(--color-text-faint)] font-bold">Stage:</span>
                   <select 
                     value={stageFilter} 
                     onChange={(e) => setStageFilter(e.target.value)}
-                    className="bg-[#111114] border border-white/5 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-white/70"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-[var(--color-text-muted)]"
                   >
-                    <option value="all">All</option>
-                    <option value="open">Open</option>
-                    <option value="working">Working</option>
-                    <option value="lender">Lender</option>
-                    <option value="conditional">Conditional</option>
-                    <option value="approved">Approved</option>
-                    <option value="funded">Funded</option>
-                    <option value="closed">Closed</option>
+                    <option value="all" className="bg-[var(--color-surface)]">All</option>
+                    <option value="open" className="bg-[var(--color-surface)]">Open</option>
+                    <option value="working" className="bg-[var(--color-surface)]">Working</option>
+                    <option value="lender" className="bg-[var(--color-surface)]">Lender</option>
+                    <option value="conditional" className="bg-[var(--color-surface)]">Conditional</option>
+                    <option value="approved" className="bg-[var(--color-surface)]">Approved</option>
+                    <option value="funded" className="bg-[var(--color-surface)]">Funded</option>
+                    <option value="closed" className="bg-[var(--color-surface)]">Closed</option>
                   </select>
                 </div>
 
                 {/* Missing Items */}
                 <div className="flex items-center gap-1">
-                  <span className="text-white/30 font-bold">Missing Docs:</span>
+                  <span className="text-[var(--color-text-faint)] font-bold">Missing Docs:</span>
                   <select 
                     value={missingFilter} 
                     onChange={(e) => setMissingFilter(e.target.value)}
-                    className="bg-[#111114] border border-white/5 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-white/70"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-[var(--color-text-muted)]"
                   >
-                    <option value="any">Any</option>
-                    <option value="none">No missing</option>
-                    <option value="1plus">1+ missing</option>
-                    <option value="3plus">3+ missing</option>
+                    <option value="any" className="bg-[var(--color-surface)]">Any</option>
+                    <option value="none" className="bg-[var(--color-surface)]">No missing</option>
+                    <option value="1plus" className="bg-[var(--color-surface)]">1+ missing</option>
+                    <option value="3plus" className="bg-[var(--color-surface)]">3+ missing</option>
                   </select>
                 </div>
 
                 {/* Update Date */}
                 <div className="flex items-center gap-1">
-                  <span className="text-white/30 font-bold">Updated:</span>
+                  <span className="text-[var(--color-text-faint)] font-bold">Updated:</span>
                   <select 
                     value={dateFilter} 
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="bg-[#111114] border border-white/5 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-white/70"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[10px] rounded px-1.5 py-0.5 font-bold uppercase text-[var(--color-text-muted)]"
                   >
-                    <option value="any">Any time</option>
-                    <option value="today">Today</option>
-                    <option value="week">Last 7 Days</option>
-                    <option value="month">Last 30 Days</option>
+                    <option value="any" className="bg-[var(--color-surface)]">Any time</option>
+                    <option value="today" className="bg-[var(--color-surface)]">Today</option>
+                    <option value="week" className="bg-[var(--color-surface)]">Last 7 Days</option>
+                    <option value="month" className="bg-[var(--color-surface)]">Last 30 Days</option>
                   </select>
                 </div>
               </div>
 
               {/* Checkboxes */}
-              <div className="flex gap-4">
-                <label className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+              <div className="flex gap-4 text-[var(--color-text-muted)]">
+                <label className="flex items-center gap-1.5 cursor-pointer hover:text-[var(--color-text)] transition-colors">
                   <input 
                     type="checkbox" 
                     checked={staleOnly} 
                     onChange={(e) => setStaleOnly(e.target.checked)}
-                    className="rounded border-white/10 bg-black/40 text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
+                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
                   />
-                  <span className="font-bold text-white/50 text-[10px] uppercase">Stale / Expired Only</span>
+                  <span className="font-bold text-[var(--color-text-faint)] text-[10px] uppercase">Stale / Expired Only</span>
                 </label>
 
-                <label className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                <label className="flex items-center gap-1.5 cursor-pointer hover:text-[var(--color-text)] transition-colors">
                   <input 
                     type="checkbox" 
                     checked={complianceOnly} 
                     onChange={(e) => setComplianceOnly(e.target.checked)}
-                    className="rounded border-white/10 bg-black/40 text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
+                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
                   />
-                  <span className="font-bold text-white/50 text-[10px] uppercase">Compliance Issues Only</span>
+                  <span className="font-bold text-[var(--color-text-faint)] text-[10px] uppercase">Compliance Issues Only</span>
                 </label>
               </div>
             </div>
@@ -545,15 +545,15 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
           {/* MAIN QUEUE TABLE */}
           <div className="flex-grow overflow-auto p-4">
             {filteredList.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+              <div className="h-64 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--color-border)]/70 rounded-2xl bg-[var(--color-surface-2)]/30">
                 <AlertCircle className="h-8 w-8 text-[#b5a642]/40 mb-2" />
-                <span className="text-xs text-white/50 font-bold">No portfolio files found matching the search and filter constraints.</span>
+                <span className="text-xs text-[var(--color-text-muted)] font-bold">No portfolio files found matching the search and filter constraints.</span>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left font-semibold border-collapse">
                   <thead>
-                    <tr className="border-b border-white/5 text-[9px] text-white/30 uppercase tracking-widest pb-3">
+                    <tr className="border-b border-[var(--color-border)]/70 text-[9px] text-[var(--color-text-faint)] uppercase tracking-widest pb-3">
                       <th className="pb-3 pr-3 font-black">Borrower</th>
                       <th className="pb-3 pr-3 font-black">Broker</th>
                       <th className="pb-3 pr-3 font-black">LTV &amp; Stage</th>
@@ -563,7 +563,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                       <th className="pb-3 text-right font-black">Quick Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.02]">
+                  <tbody className="divide-y divide-[var(--color-divider)]">
                     {filteredList.map((item) => {
                       const style = stateStyling[item.state] || stateStyling["Blocked"];
                       
@@ -573,7 +573,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                       const ltv = prop > 0 ? Math.round((loan / prop) * 100) : 0;
 
                       return (
-                        <tr key={item.client.id} className="hover:bg-white/[0.01] transition-colors relative group">
+                        <tr key={item.client.id} className="hover:bg-[var(--color-surface-2)]/30 transition-colors relative group">
                           {/* Borrower Column */}
                           <td className="py-3.5 pr-3">
                             <div className="flex items-center gap-2">
@@ -583,11 +583,11 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                               <div>
                                 <button 
                                   onClick={() => onOpenClient(item.client.id, "overview")}
-                                  className="hover:text-[#b5a642] hover:underline font-black text-white/90 text-left text-xs"
+                                  className="hover:text-[#b5a642] hover:underline font-black text-[var(--color-text)] text-left text-xs"
                                 >
                                   {item.client.first} {item.client.last}
                                 </button>
-                                <span className="block text-[8px] text-[#8e95a3] font-black uppercase mt-0.5">
+                                <span className="block text-[8px] text-[var(--color-text-faint)] font-black uppercase mt-0.5">
                                   ID: {item.client.id} | {item.client.type || "Purchase"}
                                 </span>
                               </div>
@@ -595,12 +595,12 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                           </td>
 
                           {/* Broker Column */}
-                          <td className="py-3.5 pr-3 text-white/60 font-medium">
+                          <td className="py-3.5 pr-3 text-[var(--color-text-muted)] font-medium">
                             <div className="flex items-center gap-1.5">
                               <span>{item.client.agent || "Unassigned"}</span>
                               <button 
                                 onClick={() => setAssigningClientId(item.client.id)}
-                                className="text-white/20 hover:text-[#b5a642] p-1 rounded hover:bg-white/5 transition-all"
+                                className="text-[var(--color-text-faint)] hover:text-[#b5a642] p-1 rounded hover:bg-[var(--color-surface-2)] transition-all"
                                 title="Reassign Broker"
                               >
                                 <UserPlus className="h-3 w-3" />
@@ -611,10 +611,10 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                           {/* Stage Column */}
                           <td className="py-3.5 pr-3">
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
                                 {item.client.status}
                               </span>
-                              <span className="text-[8px] text-white/40 font-mono">
+                              <span className="text-[8px] text-[var(--color-text-faint)] font-mono">
                                 LTV: {ltv > 0 ? `${ltv}%` : "—"}
                               </span>
                             </div>
@@ -626,13 +626,13 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                               {/* Circle percentage */}
                               <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
                                 <svg className="w-full h-full transform -rotate-90">
-                                  <circle cx="16" cy="16" r="12" stroke="rgba(255,255,255,0.03)" strokeWidth="2.5" fill="transparent" />
+                                  <circle cx="16" cy="16" r="12" stroke="var(--color-border)" strokeWidth="2.5" fill="transparent" />
                                   <circle cx="16" cy="16" r="12" stroke={item.score === 100 ? "#22c55e" : item.score >= 75 ? "#10b981" : "#ef4444"} strokeWidth="2.5" fill="transparent" 
                                     strokeDasharray={2 * Math.PI * 12}
                                     strokeDashoffset={2 * Math.PI * 12 * (1 - item.score / 100)}
                                   />
                                 </svg>
-                                <span className="absolute text-[8px] font-black font-mono text-white/90">{item.score}%</span>
+                                <span className="absolute text-[8px] font-black font-mono text-[var(--color-text)]">{item.score}%</span>
                               </div>
 
                               <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${style.bg} ${style.border} ${style.text} flex items-center gap-1`}>
@@ -645,16 +645,16 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                           {/* Blocker Column */}
                           <td className="py-3.5 pr-3 max-w-[200px]">
                             {item.state === "Ready" ? (
-                              <span className="text-[9px] text-green-400 font-bold flex items-center gap-1">
+                              <span className="text-[9px] text-green-500 font-bold flex items-center gap-1">
                                 <CheckCircle2 className="h-3 w-3 shrink-0" /> Ready to Submit
                               </span>
                             ) : (
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-[10px] text-white/80 font-semibold line-clamp-1">
+                                <span className="text-[10px] text-[var(--color-text-muted)] font-semibold line-clamp-1">
                                   {item.primaryBlocker}
                                 </span>
                                 {item.blockers.length > 1 && (
-                                  <span className="text-[8px] text-white/30 font-black uppercase tracking-wider">
+                                  <span className="text-[8px] text-[var(--color-text-faint)] font-black uppercase tracking-wider">
                                     +{item.blockers.length - 1} other exceptions
                                   </span>
                                 )}
@@ -665,15 +665,15 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                           {/* Warnings & Update Column */}
                           <td className="py-3.5 pr-3">
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-white/40 font-mono text-[9px]">
+                              <span className="text-[var(--color-text-faint)] font-mono text-[9px]">
                                 {new Date(item.lastUpdated).toLocaleDateString("en-CA")}
                               </span>
                               <div className="flex gap-1.5 mt-0.5">
                                 {item.staleExpiredCount > 0 && (
-                                  <span className="bg-orange-500/10 border border-orange-500/15 text-orange-400 text-[8px] px-1 py-0.2 rounded font-mono font-bold" title="Stale Document Files">STALE</span>
+                                  <span className="bg-orange-500/10 border border-orange-500/15 text-orange-500 text-[8px] px-1 py-0.2 rounded font-mono font-bold" title="Stale Document Files">STALE</span>
                                 )}
                                 {item.complianceIssueCount > 0 && (
-                                  <span className="bg-rose-500/10 border border-rose-500/15 text-rose-400 text-[8px] px-1 py-0.2 rounded font-mono font-bold" title="Compliance Issues Found">ERR</span>
+                                  <span className="bg-rose-500/10 border border-rose-500/15 text-rose-500 text-[8px] px-1 py-0.2 rounded font-mono font-bold" title="Compliance Issues Found">ERR</span>
                                 )}
                               </div>
                             </div>
@@ -684,7 +684,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                             <div className="flex items-center justify-end gap-1 relative">
                               <button 
                                 onClick={() => onOpenClient(item.client.id, "overview")}
-                                className="px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase text-white/70 border border-white/5"
+                                className="px-2 py-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] rounded-lg text-[9px] font-black uppercase text-[var(--color-text-muted)] border border-[var(--color-border)]/70"
                                 title="Open File Overview"
                               >
                                 View
@@ -710,8 +710,8 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                                 onClick={() => toggleFollowUp(item.client.id)}
                                 className={`p-1 rounded-lg border transition-all ${
                                   item.isMarkedFollowUp 
-                                    ? "bg-rose-500/20 text-rose-400 border-rose-500/30" 
-                                    : "bg-white/2 text-white/30 border-white/5 hover:text-rose-400 hover:bg-rose-500/5 hover:border-rose-500/10"
+                                    ? "bg-rose-500/20 text-rose-500 border-rose-500/30" 
+                                    : "bg-[var(--color-surface-2)] text-[var(--color-text-faint)] border-[var(--color-border)]/70 hover:text-rose-500 hover:bg-rose-500/5 hover:border-rose-500/10"
                                 }`}
                                 title={item.isMarkedFollowUp ? "Remove follow-up priority" : "Mark as high-priority follow-up"}
                               >
@@ -720,7 +720,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
 
                               <button 
                                 onClick={() => setReviewClientId(item.client.id)}
-                                className="px-1.5 py-1 bg-zinc-500/10 hover:bg-zinc-500/20 text-zinc-300 rounded border border-zinc-500/15"
+                                className="px-1.5 py-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] rounded border border-[var(--color-border)]/70"
                                 title="Log Manager Internal Review Action"
                               >
                                 Review
@@ -739,9 +739,9 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
         </div>
 
         {/* RIGHT SIDEBAR: HIGH PRIORITY MANAGER WORKFLOWS */}
-        <div className="w-full lg:w-72 bg-[#131317] border border-white/5 rounded-2xl p-4 flex flex-col gap-5 shrink-0 overflow-y-auto">
+        <div className="w-full lg:w-72 bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-4 flex flex-col gap-5 shrink-0 overflow-y-auto">
           <div>
-            <h4 className="text-[10px] text-white/30 uppercase font-black tracking-widest">Manager Action Center</h4>
+            <h4 className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest">Manager Action Center</h4>
             <div className="h-0.5 bg-[#b5a642]/20 mt-1.5 rounded" />
           </div>
 
@@ -751,20 +751,20 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
               <Clock className="w-3.5 h-3.5" /> Awaiting Review ({sidebarWorkflow.reviewNeeded.length})
             </span>
             {sidebarWorkflow.reviewNeeded.length === 0 ? (
-              <p className="text-[10px] text-white/30 italic">No files awaiting audit approval.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] italic">No files awaiting audit approval.</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {sidebarWorkflow.reviewNeeded.map(f => (
                   <div 
                     key={f.client.id}
                     onClick={() => onOpenClient(f.client.id, "documents")}
-                    className="p-2.5 bg-blue-500/[0.02] hover:bg-blue-500/[0.06] border border-blue-500/10 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
+                    className="p-2.5 bg-blue-500/[0.02] hover:bg-blue-500/[0.06] border border-blue-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-white group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
-                      <p className="text-[9px] text-[#8e95a3] mt-0.5 uppercase tracking-wide">Broker: {f.client.agent || "None"}</p>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 uppercase tracking-wide">Broker: {f.client.agent || "None"}</p>
                     </div>
-                    <ChevronRight className="h-3.5 w-3.5 text-white/25 group-hover:text-white transition-all transform group-hover:translate-x-0.5" />
+                    <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
                   </div>
                 ))}
               </div>
@@ -773,24 +773,24 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
 
           {/* 2. URGENT MISSING DOCS FILES */}
           <div className="space-y-2.5">
-            <span className="text-[9px] text-rose-400 uppercase font-black tracking-wider flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" /> Blocker Exceptions ({sidebarWorkflow.urgentMissing.length})
+            <span className="text-[9px] text-rose-500 uppercase font-black tracking-wider flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-500" /> Blocker Exceptions ({sidebarWorkflow.urgentMissing.length})
             </span>
             {sidebarWorkflow.urgentMissing.length === 0 ? (
-              <p className="text-[10px] text-white/30 italic">All files meet criteria.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] italic">All files meet criteria.</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {sidebarWorkflow.urgentMissing.map(f => (
                   <div 
                     key={f.client.id}
                     onClick={() => onOpenClient(f.client.id, "checklist")}
-                    className="p-2.5 bg-rose-500/[0.01] hover:bg-rose-500/[0.04] border border-rose-500/10 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
+                    className="p-2.5 bg-rose-500/[0.01] hover:bg-rose-500/[0.04] border border-rose-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-white group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
-                      <p className="text-[9px] text-rose-300 font-mono mt-0.5 uppercase tracking-wide">{f.missingCount} Missing Checklist Items</p>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <p className="text-[9px] text-rose-500 font-mono mt-0.5 uppercase tracking-wide">{f.missingCount} Missing Checklist Items</p>
                     </div>
-                    <ChevronRight className="h-3.5 w-3.5 text-white/25 group-hover:text-white transition-all transform group-hover:translate-x-0.5" />
+                    <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
                   </div>
                 ))}
               </div>
@@ -799,24 +799,24 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
 
           {/* 3. STALE OR EXPIRED RECORDS */}
           <div className="space-y-2.5">
-            <span className="text-[9px] text-orange-400 uppercase font-black tracking-wider flex items-center gap-1">
-              <RefreshCw className="w-3 h-3 text-orange-400" /> Stale / Outdated Docs ({sidebarWorkflow.staleFiles.length})
+            <span className="text-[9px] text-orange-500 uppercase font-black tracking-wider flex items-center gap-1">
+              <RefreshCw className="w-3 h-3 text-orange-500" /> Stale / Outdated Docs ({sidebarWorkflow.staleFiles.length})
             </span>
             {sidebarWorkflow.staleFiles.length === 0 ? (
-              <p className="text-[10px] text-white/30 italic">No stale files found.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] italic">No stale files found.</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {sidebarWorkflow.staleFiles.map(f => (
                   <div 
                     key={f.client.id}
                     onClick={() => onOpenClient(f.client.id, "documents")}
-                    className="p-2.5 bg-orange-500/[0.01] hover:bg-orange-500/[0.04] border border-orange-500/10 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
+                    className="p-2.5 bg-orange-500/[0.01] hover:bg-orange-500/[0.04] border border-orange-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-white group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
-                      <p className="text-[9px] text-orange-300 font-mono mt-0.5 uppercase tracking-wide">{f.staleExpiredCount} Outdated Records</p>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <p className="text-[9px] text-orange-500 font-mono mt-0.5 uppercase tracking-wide">{f.staleExpiredCount} Outdated Records</p>
                     </div>
-                    <ChevronRight className="h-3.5 w-3.5 text-white/25 group-hover:text-white transition-all transform group-hover:translate-x-0.5" />
+                    <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
                   </div>
                 ))}
               </div>
@@ -824,8 +824,8 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
           </div>
 
           {/* 4. RECENT ACTIVITY MONITOR */}
-          <div className="space-y-2.5 pt-2 border-t border-white/5">
-            <span className="text-[9px] text-white/40 uppercase font-black tracking-wider flex items-center gap-1">
+          <div className="space-y-2.5 pt-2 border-t border-[var(--color-border)]/70">
+            <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-black tracking-wider flex items-center gap-1">
               <Activity className="w-3.5 h-3.5" /> Recently Updated Files
             </span>
             <div className="flex flex-col gap-2">
@@ -833,16 +833,16 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                 <div 
                   key={f.client.id}
                   onClick={() => onOpenClient(f.client.id, "overview")}
-                  className="p-2 bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
+                  className="p-2 bg-[var(--color-surface-2)]/20 hover:bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                 >
                   <div className="min-w-0 flex-1">
-                    <h5 className="font-semibold text-white/80 group-hover:text-white text-[10.5px] truncate">{f.client.first} {f.client.last}</h5>
+                    <h5 className="font-semibold text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] text-[10.5px] truncate">{f.client.first} {f.client.last}</h5>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[8px] text-white/30 font-mono">{new Date(f.lastUpdated).toLocaleDateString("en-CA")}</span>
+                      <span className="text-[8px] text-[var(--color-text-faint)] font-mono">{new Date(f.lastUpdated).toLocaleDateString("en-CA")}</span>
                       <span className="text-[8.5px] font-black uppercase text-[#b5a642]">{f.score}% ready</span>
                     </div>
                   </div>
-                  <ArrowRight className="h-3 w-3 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-0.5 shrink-0" />
+                  <ArrowRight className="h-3 w-3 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5 shrink-0" />
                 </div>
               ))}
             </div>
@@ -854,16 +854,16 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
 
       {/* --- QUICK MODAL: REASSIGN BROKER AGENT --- */}
       {assigningClientId && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#131317] border border-white/5 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
             <button 
               onClick={() => setAssigningClientId(null)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white p-1 rounded bg-white/5"
+              className="absolute right-4 top-4 text-[var(--color-text-faint)] hover:text-[var(--color-text)] p-1 rounded bg-[var(--color-surface-2)]"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-white/5 pb-2">
+            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
               Assign Broker to File
             </h3>
 
@@ -872,10 +872,10 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                 <button
                   key={name}
                   onClick={() => handleAssignBroker(assigningClientId, name)}
-                  className="w-full text-left bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 p-2.5 rounded-lg text-white font-bold text-xs uppercase flex items-center justify-between transition-colors"
+                  className="w-full text-left bg-[var(--color-surface-2)]/50 hover:bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 p-2.5 rounded-lg text-[var(--color-text)] font-bold text-xs uppercase flex items-center justify-between transition-colors"
                 >
                   <span>{name}</span>
-                  <ChevronRight className="h-3.5 w-3.5 text-white/40" />
+                  <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)]" />
                 </button>
               ))}
             </div>
@@ -885,22 +885,22 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
 
       {/* --- QUICK MODAL: LOG INTERNAL REVIEW ACTION --- */}
       {reviewClientId && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#131317] border border-white/5 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => setReviewClientId(null)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white p-1 rounded bg-white/5"
+              className="absolute right-4 top-4 text-[var(--color-text-faint)] hover:text-[var(--color-text)] p-1 rounded bg-[var(--color-surface-2)]"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-white/5 pb-2">
+            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
               Log Manager Internal Review Action
             </h3>
 
             <form onSubmit={submitInternalReview} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Operational Action</label>
+                <label className="block text-[9px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">Operational Action</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: "approve", label: "Approve File" },
@@ -915,7 +915,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                       className={`py-2 rounded-lg text-[10px] font-black uppercase border text-center transition-colors ${
                         reviewAction === act.id 
                           ? "bg-[#b5a642] text-black border-[#b5a642]" 
-                          : "bg-white/[0.01] border-white/5 text-white/60 hover:bg-white/5"
+                          : "bg-[var(--color-surface-2)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/80"
                       }`}
                     >
                       {act.label}
@@ -925,12 +925,12 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Internal Review Log Notes</label>
+                <label className="block text-[9px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">Internal Review Log Notes</label>
                 <textarea 
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Specify review findings, checklists approved, or rejection details..."
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2.5 text-white placeholder-white/20 h-24 focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)] h-24 focus:outline-none focus:border-[#b5a642] font-semibold"
                   required={reviewAction !== "approve"}
                 />
               </div>

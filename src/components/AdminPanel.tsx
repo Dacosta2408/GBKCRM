@@ -96,26 +96,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Guard Clause: Access Denied Shield for Unauthorized Roles
   if (!hasAccess) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#0a0a0d] h-full relative overflow-hidden" id="admin-guard-shield">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--color-bg)] h-full relative overflow-hidden" id="admin-guard-shield">
         {/* Abstract radar sweep or background shield */}
         <div className="absolute w-96 h-96 rounded-full bg-red-500/5 animate-pulse filter blur-3xl pointer-events-none" />
         
-        <div className="max-w-md bg-[#111115] border border-red-500/20 rounded-2xl p-8 text-center shadow-2xl relative">
+        <div className="max-w-md bg-[var(--color-surface)] border border-red-500/25 rounded-2xl p-8 text-center shadow-2xl relative">
           <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto mb-5">
             <ShieldAlert className="w-8 h-8" />
           </div>
 
-          <h2 className="text-lg font-black text-white uppercase tracking-wider">Access Breach Intercepted</h2>
-          <p className="text-xs text-white/50 leading-relaxed mt-3">
+          <h2 className="text-lg font-black text-[var(--color-text)] uppercase tracking-wider">Access Breach Intercepted</h2>
+          <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mt-3">
             Your current security profile level (<span className="text-red-400 font-bold">{currentUser.role}</span>) does not possess clearance for the high-level Admin Control Center.
           </p>
 
-          <div className="bg-red-500/5 border border-red-500/10 rounded-lg p-3 mt-4 text-[11px] text-red-300/80 leading-normal text-left font-mono">
+          <div className="bg-red-500/5 border border-red-500/15 rounded-lg p-3 mt-4 text-[11px] text-red-300/80 leading-normal text-left font-mono">
             ⚠️ WORKSTATION LOGGED: This unauthorized lookup attempt has been recorded in the security logs under user {currentUser.first} {currentUser.last}.
           </div>
 
-          <div className="mt-6 border-t border-white/5 pt-4">
-            <span className="text-[10px] text-white/30 uppercase font-bold tracking-wider">Ontario FSRA Mortgage Compliance Directive</span>
+          <div className="mt-6 border-t border-[var(--color-border)]/70 pt-4">
+            <span className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider">Ontario FSRA Mortgage Compliance Directive</span>
           </div>
         </div>
       </div>
@@ -161,15 +161,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const currentMeta = tabMetadata[activeTab];
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0a0a0d] overflow-hidden" id="admin-unified-control-center">
+    <div className="flex-1 flex flex-col h-full bg-[var(--color-bg)] overflow-hidden" id="admin-unified-control-center">
       
       {/* Visual Header bar */}
-      <div className="h-14 border-b border-white/5 bg-[#111115]/80 px-6 flex items-center justify-between shrink-0 select-none">
+      <div className="h-14 border-b border-[var(--color-border)]/70 bg-[var(--color-surface)]/80 px-6 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center gap-2.5">
           <ShieldAlert className="w-5 h-5 text-red-400 animate-pulse" />
           <div>
-            <h1 className="text-xs font-black text-white uppercase tracking-wider">High-Level Operations Control Center</h1>
-            <p className="text-[10px] text-white/40 font-semibold leading-none mt-0.5">GBK Internal Mortgage Brokerage Console</p>
+            <h1 className="text-xs font-black text-[var(--color-text)] uppercase tracking-wider">High-Level Operations Control Center</h1>
+            <p className="text-[10px] text-[var(--color-text-muted)] font-semibold leading-none mt-0.5">GBK Internal Mortgage Brokerage Console</p>
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <span className="text-[9px] bg-red-500/10 text-red-400 font-mono px-2 py-0.5 rounded border border-red-500/15 uppercase font-black">
             System Overseer Access
           </span>
-          <span className="text-[10px] text-white/40 font-semibold hidden sm:inline">
+          <span className="text-[10px] text-[var(--color-text-muted)] font-semibold hidden sm:inline">
             Active Operator: <span className="text-[#b5a642] font-black">{currentUser.first} {currentUser.last}</span>
           </span>
         </div>
@@ -187,10 +187,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Side Navigation Panel */}
-        <aside className="w-60 border-r border-white/5 bg-[#0e0e12]/80 flex flex-col justify-between p-4 select-none shrink-0 overflow-y-auto hidden md:flex" id="admin-sub-navigation">
+        <aside className="w-60 border-r border-[var(--color-border)]/70 bg-[var(--color-surface)]/80 flex flex-col justify-between p-4 select-none shrink-0 overflow-y-auto hidden md:flex" id="admin-sub-navigation">
           <div className="space-y-4">
             <div>
-              <span className="text-[9px] font-black uppercase tracking-wider text-white/30 block px-2.5 mb-2">Control Nodes</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-faint)] block px-2.5 mb-2">Control Nodes</span>
               
               <div className="space-y-1">
                 {/* 1. Overview */}
@@ -199,7 +199,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "overview" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <LayoutDashboard className="w-4 h-4 shrink-0" /> Control Tower
@@ -211,7 +211,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "users" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <Users className="w-4 h-4 shrink-0" /> User Management
@@ -223,7 +223,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "permissions" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <ShieldCheck className="w-4 h-4 shrink-0" /> Clearance Matrix
@@ -235,7 +235,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "security" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <LockKeyhole className="w-4 h-4 shrink-0" /> Security Policies
@@ -244,7 +244,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <div>
-              <span className="text-[9px] font-black uppercase tracking-wider text-white/30 block px-2.5 mb-2">System CONTINUITY</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-faint)] block px-2.5 mb-2">System CONTINUITY</span>
               
               <div className="space-y-1">
                 {/* 5. Backup & Recovery */}
@@ -253,7 +253,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "backup" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <Database className="w-4 h-4 shrink-0" /> Backups &amp; Recovery
@@ -266,7 +266,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                       activeTab === "deployment" 
                         ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                        : "text-white/60 hover:text-white hover:bg-white/5"
+                        : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                     }`}
                   >
                     <ShieldCheck className="w-4 h-4 shrink-0 text-[#b5a642]" /> Deployment Readiness
@@ -279,7 +279,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "audit" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <Terminal className="w-4 h-4 shrink-0" /> Audit Trajectory
@@ -291,7 +291,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "alerts" 
                       ? "bg-[#b5a642]/10 text-[#b5a642]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
                   <Bell className="w-4 h-4 shrink-0" /> Notice Broadcaster
@@ -301,19 +301,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
 
           {/* Secure compliance notice bottom */}
-          <div className="bg-[#15151c]/50 border border-white/5 rounded-xl p-3 text-[10px] text-white/40 leading-relaxed">
-            🛡️ <span className="text-white font-bold">FSRA Standard:</span> Underwriting logs are securely recorded on local storage arrays daily.
+          <div className="bg-[var(--color-surface-2)]/50 border border-[var(--color-border)]/70 rounded-xl p-3 text-[10px] text-[var(--color-text-faint)] leading-relaxed">
+            🛡️ <span className="text-[var(--color-text-muted)] font-bold">FSRA Standard:</span> Underwriting logs are securely recorded on local storage arrays daily.
           </div>
         </aside>
 
         {/* Core Sub-Viewport Content Panel */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#0c0c0e]">
+        <main className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--color-bg)]">
           
           {/* Subheader context bar */}
-          <div className="bg-[#111115]/50 border-b border-white/5 px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-none">
+          <div className="bg-[var(--color-surface-2)]/50 border-b border-[var(--color-border)]/70 px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-none">
             <div>
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">{currentMeta.title}</h2>
-              <p className="text-[10px] text-white/40 font-semibold mt-0.5">{currentMeta.desc}</p>
+              <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider">{currentMeta.title}</h2>
+              <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">{currentMeta.desc}</p>
             </div>
             
             {/* Mobile Subnavigation (Toggles only when viewport is smaller) */}
@@ -321,7 +321,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <select
                 value={activeTab}
                 onChange={(e) => setActiveTab(e.target.value as AdminTab)}
-                className="bg-[#181820] border border-white/5 text-[11px] text-[#b5a642] px-2.5 py-1 rounded outline-none cursor-pointer font-bold"
+                className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[11px] text-[#b5a642] px-2.5 py-1 rounded outline-none cursor-pointer font-bold"
               >
                 <option value="overview">Tower Overview</option>
                 <option value="users">Roster Control</option>

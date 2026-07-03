@@ -432,15 +432,15 @@ Could you please let me know what my max qualifying amount is under the stress t
     <div className="flex flex-col gap-6 h-full pb-10" id="ai-assistance-center">
       
       {/* 1. CLEAR PAGE HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[#17171e] to-[#121216] border border-white/5 rounded-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[var(--color-surface-2)] to-[var(--color-surface)] border border-[var(--color-border)] rounded-xl">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-[#b5a642]/15 text-[#b5a642] rounded-lg">
               <Sparkles className="w-5 h-5 fill-current animate-pulse" />
             </div>
-            <h2 className="text-lg font-black uppercase tracking-wider text-white">GBK AI Productivity Workspace</h2>
+            <h2 className="text-lg font-black uppercase tracking-wider text-[var(--color-text)]">GBK AI Productivity Workspace</h2>
           </div>
-          <p className="text-xs text-[#8e95a3] max-w-2xl">
+          <p className="text-xs text-[var(--color-text-muted)] max-w-2xl">
             A real-time mortgage operations assistant. Instantly generate professional client emails, run monoline underwriters briefs, draft partner updates, extract tasks from notes, and review files.
           </p>
         </div>
@@ -450,7 +450,7 @@ Could you please let me know what my max qualifying amount is under the stress t
           <span className="text-[10px] font-black uppercase tracking-widest text-[#b5a642] flex items-center gap-1">
             <User className="w-3 h-3" /> Focus Advisory Active
           </span>
-          <span className="text-[9px] text-[#eeeef2] font-semibold">
+          <span className="text-[9px] text-[var(--color-text)] font-semibold">
             {isBroker 
               ? "Broker Mode: Prioritizing follow-ups, client files, and next steps first."
               : "Admin Mode: Prioritizing qualifiers, file blockers, and monoline emails."

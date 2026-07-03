@@ -312,7 +312,7 @@ export const Partners: React.FC<PartnersProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0d] text-[#eeeef2] overflow-hidden select-none" id="partner-network-workspace">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden select-none" id="partner-network-workspace">
       
       {/* Main Grid View */}
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
@@ -320,10 +320,10 @@ export const Partners: React.FC<PartnersProps> = ({
         {/* Header Ribbon & Control Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <h1 className="text-sm font-black text-[var(--color-text)] uppercase tracking-wider flex items-center gap-2">
               <Users className="w-5 h-5 text-[#b5a642]" /> GBK Professional Partner Network
             </h1>
-            <p className="text-[10px] text-white/40 font-semibold mt-0.5">
+            <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">
               Browse, filter, coordinate, and review active lawyers, appraisers, realtors, and inspectors
             </p>
           </div>
@@ -337,7 +337,7 @@ export const Partners: React.FC<PartnersProps> = ({
         </div>
 
         {/* 1. Category Tab Navigation Bar */}
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-white/5 pb-2" id="partner-category-tabs">
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-[var(--color-border)] pb-2" id="partner-category-tabs">
           {[
             { id: "All", label: "All Partners" },
             { id: "Lawyers", label: "Lawyers" },
@@ -358,7 +358,7 @@ export const Partners: React.FC<PartnersProps> = ({
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border ${
                   isActive
                     ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 shadow-sm shadow-[#b5a642]/5 font-bold"
-                    : "bg-[#111115]/80 border-white/5 text-[#8e95a3] hover:text-white hover:bg-[#16161c]"
+                    : "bg-[var(--color-surface)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
                 }`}
               >
                 {tab.label}
@@ -380,7 +380,7 @@ export const Partners: React.FC<PartnersProps> = ({
                   "Credit / Debt Specialists"
                 ].includes(selectedCategory)
                   ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 font-bold"
-                  : "bg-[#111115]/80 border-white/5 text-[#8e95a3] hover:text-white hover:bg-[#16161c]"
+                  : "bg-[var(--color-surface)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
               }`}
             >
               <span>
@@ -399,7 +399,7 @@ export const Partners: React.FC<PartnersProps> = ({
             </button>
             
             {moreOpen && (
-              <div className="absolute left-0 mt-1.5 w-56 bg-[#16161c] border border-white/10 rounded-xl shadow-xl z-50 py-1.5">
+              <div className="absolute left-0 mt-1.5 w-56 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl shadow-xl z-50 py-1.5">
                 {[
                   "Accountants",
                   "Contractors / Renovation",
@@ -414,8 +414,8 @@ export const Partners: React.FC<PartnersProps> = ({
                       setSelectedCategory(cat);
                       setMoreOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-white/5 ${
-                      selectedCategory === cat ? "text-[#b5a642] font-bold" : "text-white/70 hover:text-white"
+                    className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-[var(--color-surface-3)] ${
+                      selectedCategory === cat ? "text-[#b5a642] font-bold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                     }`}
                   >
                     {cat}
@@ -427,7 +427,7 @@ export const Partners: React.FC<PartnersProps> = ({
         </div>
 
         {/* 2. Compact Search and Filtering Controls */}
-        <div className="flex flex-col lg:flex-row items-center gap-3 bg-[#111115]/40 border border-white/5 rounded-xl p-3" id="partner-compact-filter-bar">
+        <div className="flex flex-col lg:flex-row items-center gap-3 bg-[var(--color-surface-2)]/30 border border-[var(--color-border)]/70 rounded-xl p-3" id="partner-compact-filter-bar">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
             <input
@@ -435,13 +435,13 @@ export const Partners: React.FC<PartnersProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name, company, email, or keyword..."
-              className="w-full bg-[#16161c] border border-white/5 rounded-lg pl-9 pr-8 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#b5a642]/30 transition-all font-medium"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg pl-9 pr-8 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-medium"
             />
-            <Search className="h-3.5 w-3.5 text-white/30 absolute left-3 top-2.5" />
+            <Search className="h-3.5 w-3.5 text-[var(--color-text-faint)] absolute left-3 top-2.5" />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-2.5 text-white/40 hover:text-white text-xs font-bold"
+                className="absolute right-3 top-2.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold"
               >
                 ✕
               </button>
@@ -454,11 +454,11 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
             >
-              <option value="All">All Statuses</option>
+              <option value="All" className="bg-[var(--color-surface)]">All Statuses</option>
               {PARTNER_STATUSES.map(status => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status} className="bg-[var(--color-surface)]">{status}</option>
               ))}
             </select>
 
@@ -466,11 +466,11 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
             >
-              <option value="All">All Cities</option>
+              <option value="All" className="bg-[var(--color-surface)]">All Cities</option>
               {ONTARIO_REGIONS.map(region => (
-                <option key={region} value={region}>{region}</option>
+                <option key={region} value={region} className="bg-[var(--color-surface)]">{region}</option>
               ))}
             </select>
 
@@ -478,18 +478,18 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-[#eeeef2] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
             >
-              <option value="name">Sort: Name</option>
-              <option value="company">Sort: Company</option>
-              <option value="health">Sort: Health</option>
-              <option value="added">Sort: Added</option>
+              <option value="name" className="bg-[var(--color-surface)]">Sort: Name</option>
+              <option value="company" className="bg-[var(--color-surface)]">Sort: Company</option>
+              <option value="health" className="bg-[var(--color-surface)]">Sort: Health</option>
+              <option value="added" className="bg-[var(--color-surface)]">Sort: Added</option>
             </select>
 
             {/* Sort Order Toggle */}
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-[#eeeef2] hover:border-[#b5a642]/20 transition-all"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-2 text-xs text-[var(--color-text)] hover:border-[#b5a642]/20 transition-all"
               title="Toggle Sort Order"
             >
               <ArrowUpDown className="w-3.5 h-3.5 text-[#b5a642]" />
@@ -501,7 +501,7 @@ export const Partners: React.FC<PartnersProps> = ({
               className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
                 preferredOnly
                   ? "bg-amber-500/10 text-amber-400 border-amber-500/30 font-bold"
-                  : "bg-[#16161c] border-white/5 text-[#8e95a3] hover:text-white"
+                  : "bg-[var(--color-surface-2)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
               }`}
             >
               <Star className={`w-3 h-3 ${preferredOnly ? "fill-current" : ""}`} />
@@ -512,7 +512,7 @@ export const Partners: React.FC<PartnersProps> = ({
             {(searchTerm || selectedCategory !== "All" || selectedStatus !== "All" || selectedCity !== "All" || preferredOnly) && (
               <button
                 onClick={handleResetFilters}
-                className="px-3 py-2 rounded-lg text-xs font-semibold text-white/40 hover:text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-white/5 hover:border-red-500/10 transition-all flex items-center gap-1"
+                className="px-3 py-2 rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-[var(--color-border)]/70 hover:border-red-500/10 transition-all flex items-center gap-1"
                 title="Reset Filters"
               >
                 <RefreshCw className="w-3 h-3" />
@@ -525,23 +525,23 @@ export const Partners: React.FC<PartnersProps> = ({
         {/* 3. Results Section */}
         <div className="space-y-2">
           <div className="flex justify-between items-center px-1">
-            <span className="text-[10px] font-black uppercase text-white/30 tracking-wider">
+            <span className="text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider">
               Directory Results ({filteredAndSortedPartners.length} Found)
             </span>
-            <span className="text-[10px] text-white/30 italic">Click row to inspect full dossier</span>
+            <span className="text-[10px] text-[var(--color-text-faint)] italic">Click row to inspect full dossier</span>
           </div>
           
           {filteredAndSortedPartners.length === 0 ? (
-            <div className="bg-[#121216] border border-dashed border-white/5 rounded-xl p-12 text-center" id="empty-partner-results">
+            <div className="bg-[var(--color-surface-2)]/50 border border-dashed border-[var(--color-border)]/70 rounded-xl p-12 text-center" id="empty-partner-results">
               <MapPin className="h-10 w-10 text-[#b5a642] opacity-60 mx-auto mb-3 stroke-1 animate-pulse" />
-              <h3 className="text-xs font-black text-white uppercase tracking-wider">No Partners Located</h3>
-              <p className="text-[10px] font-sans font-semibold text-white/40 mt-1 max-w-sm mx-auto">
+              <h3 className="text-xs font-black text-[var(--color-text)] uppercase tracking-wider">No Partners Located</h3>
+              <p className="text-[10px] font-sans font-semibold text-[var(--color-text-muted)] mt-1 max-w-sm mx-auto">
                 No external professional partners match the current search filters or region constraints.
               </p>
               <div className="flex items-center justify-center gap-3 mt-5">
                 <button
                   onClick={handleResetFilters}
-                  className="px-3.5 py-1.5 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase rounded-lg transition-all"
+                  className="px-3.5 py-1.5 border border-[var(--color-border)] hover:border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] font-bold text-[10px] uppercase rounded-lg transition-all"
                 >
                   Clear Filters
                 </button>
@@ -574,12 +574,12 @@ export const Partners: React.FC<PartnersProps> = ({
 
         {/* 3. Detailed Dossier View (Active Partner Workspace Detail panel) */}
         {selectedPartner && (
-          <div className="space-y-3.5 pt-4 border-t border-white/5 animate-slideUp">
+          <div className="space-y-3.5 pt-4 border-t border-[var(--color-border)]/70 animate-slideUp">
             <div className="flex items-center justify-between px-1">
               <span className="text-[10px] font-black uppercase text-[#b5a642] tracking-wider">
                 🔬 Active Partner Dossier Workspace
               </span>
-              <span className="text-[10px] text-white/30 font-semibold uppercase">
+              <span className="text-[10px] text-[var(--color-text-faint)] font-semibold uppercase">
                 ID: {selectedPartner.id}
               </span>
             </div>

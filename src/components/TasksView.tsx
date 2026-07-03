@@ -567,14 +567,14 @@ export const TasksView: React.FC<TasksViewProps> = ({
     <div className="flex-1 flex flex-col h-full bg-[#0c0c0e] min-h-0 select-none text-left" id="broker-daily-tasks-workspace">
       
       {/* ✦ UPPER NAVIGATION HEADER WITH LIVE MONITORING DETAILS ✦ */}
-      <div className="p-4 border-b border-white/5 bg-[#101014]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0 select-none">
+      <div className="p-4 border-b border-[var(--color-border)]/70 bg-[#101014]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0 select-none">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-white/40 font-mono mb-1">
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-muted)] font-mono mb-1">
             <span>ONTARIO MORTGAGE WORKFLOW ENGINE</span>
             <span className="h-1.5 w-1.5 bg-yellow-500 rounded-full animate-pulse" />
             <span className="text-[#b5a642] text-[9.5px] uppercase tracking-wider font-extrabold">Active Portfolio Control Panel</span>
           </div>
-          <h1 className="text-xl font-black text-white flex items-center gap-2">
+          <h1 className="text-xl font-black text-[var(--color-text)] flex items-center gap-2">
             <CheckSquare2 className="w-5 h-5 text-[#b5a642]" />
             Brokerage Task Command Center
           </h1>
@@ -582,11 +582,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
         {/* Quick Assignee Switchers */}
         <div className="flex items-center gap-3">
-          <div className="bg-[#141418] border border-white/5 p-1 rounded-xl flex items-center shrink-0">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-1 rounded-xl flex items-center shrink-0">
             <button
               onClick={() => setCurrentGroup("me")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                currentGroup === "me" ? "bg-[#b5a642] text-black font-extrabold" : "text-white/45 hover:text-white"
+                currentGroup === "me" ? "bg-[#b5a642] text-black font-extrabold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
               }`}
             >
               <User className="w-3.5 h-3.5" /> My Tasks
@@ -594,7 +594,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
             <button
               onClick={() => setCurrentGroup("team")}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                currentGroup === "team" ? "bg-[#b5a642] text-black font-extrabold" : "text-white/45 hover:text-white"
+                currentGroup === "team" ? "bg-[#b5a642] text-black font-extrabold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" /> Team Board
@@ -611,45 +611,45 @@ export const TasksView: React.FC<TasksViewProps> = ({
       </div>
 
       {/* ✦ 3-COLUMN LAYOUT MAIN IMPLEMENTATION ✦ */}
-      <div className="flex-grow flex flex-col xl:flex-row h-full min-h-0 divide-y xl:divide-y-0 xl:divide-x divide-white/5">
+      <div className="flex-grow flex flex-col xl:flex-row h-full min-h-0 divide-y xl:divide-y-0 xl:divide-x divide-[var(--color-border)]/50">
         
         {/* ========================================================= */}
         {/* COLUMN 1: LEFT FILTERS, STATS & CATEGORIES INDEX (WIDTH 80) */}
         {/* ========================================================= */}
-        <div className="w-full xl:w-80 shrink-0 flex flex-col min-h-0 bg-[#0c0c0e]/95 overflow-y-auto p-4 space-y-4 select-none">
+        <div className="w-full xl:w-80 shrink-0 flex flex-col min-h-0 bg-[var(--color-surface)]/40 overflow-y-auto p-4 space-y-4 select-none">
           
           {/* Section A: Live urgencies parameters */}
           <div className="grid grid-cols-2 gap-2 shrink-0">
             <div 
               onClick={() => setActiveFilter("today")}
               className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                activeFilter === "today" ? "bg-red-500/10 border-red-500/30" : "bg-[#141418] border-white/5 hover:bg-white/[0.02]"
+                activeFilter === "today" ? "bg-red-500/10 border-red-500/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
               }`}
             >
               <span className="text-[9px] text-[#f87171] font-bold block uppercase tracking-wider mb-1">Today Due</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-mono font-black text-red-400">{sanitizedTasks.filter(t => t.extendedStatus !== "done" && t.dueDate === todayStr).length}</span>
-                <span className="text-[8.5px] text-white/35 font-medium">outstanding</span>
+                <span className="text-[8.5px] text-[var(--color-text-faint)] font-medium">outstanding</span>
               </div>
             </div>
 
             <div 
               onClick={() => setActiveFilter("overdue")}
               className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                activeFilter === "overdue" ? "bg-amber-500/10 border-amber-500/30" : "bg-[#141418] border-white/5 hover:bg-white/[0.02]"
+                activeFilter === "overdue" ? "bg-amber-500/10 border-amber-500/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
               }`}
             >
               <span className="text-[9px] text-[#fbbf24] font-bold block uppercase tracking-wider mb-1">Overdue alert</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-mono font-black text-amber-400">{stats.overdue}</span>
-                <span className="text-[8.5px] text-white/35 font-medium">unresolved</span>
+                <span className="text-[8.5px] text-[var(--color-text-faint)] font-medium">unresolved</span>
               </div>
             </div>
           </div>
 
           {/* Section B: Dynamic Navigation List of Status filters */}
-          <div className="bg-[#141418] border border-white/5 rounded-2xl p-3 shrink-0">
-            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-2.5 px-1.5">Agenda Status Folders</span>
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3 shrink-0">
+            <span className="text-[10px] font-black text-[var(--color-text-faint)] uppercase tracking-widest block mb-2.5 px-1.5">Agenda Status Folders</span>
             <div className="space-y-1">
               {[
                 { id: "all", label: "Outstanding Backlog", count: sanitizedTasks.filter(t => t.extendedStatus !== "done").length, icon: Radio },
@@ -669,7 +669,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                     className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left border text-[11px] font-bold transition-all ${
                       isSel 
                         ? "bg-[#b5a642]/10 border-[#b5a642]/20 text-[#b5a642]" 
-                        : "bg-transparent border-transparent text-white/55 hover:bg-white/5 hover:text-white"
+                        : "bg-transparent border-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -684,15 +684,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
           </div>
 
           {/* Section C: Client File Quick Filter */}
-          <div className="bg-[#141418] border border-white/5 rounded-2xl p-3 shrink-0">
-            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-2 px-1.5">View By Client File</span>
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3 shrink-0">
+            <span className="text-[10px] font-black text-[var(--color-text-faint)] uppercase tracking-widest block mb-2 px-1.5">View By Client File</span>
             <select
               value={selectedClientFilter}
               onChange={(e) => {
                 setSelectedClientFilter(e.target.value);
                 if (e.target.value !== "") setActiveFilter("all"); // release standard filters to show client ones
               }}
-              className="w-full bg-[#1b1b20] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white/80 focus:outline-none focus:border-[#b5a642]/25 font-bold"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/25 font-bold"
             >
               <option value="">-- All Active Client Files --</option>
               {clients.map(c => {
@@ -707,8 +707,8 @@ export const TasksView: React.FC<TasksViewProps> = ({
           </div>
 
           {/* Section D: Category color codes matching legend */}
-          <div className="bg-[#141418] border border-white/5 rounded-2xl p-3 flex-1 flex flex-col min-h-0">
-            <span className="text-[10.5px] font-extrabold text-white/40 uppercase tracking-widest mb-3 flex items-center gap-1.5 px-1.5 shrink-0">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3 flex-1 flex flex-col min-h-0">
+            <span className="text-[10.5px] font-extrabold text-[var(--color-text-muted)] uppercase tracking-widest mb-3 flex items-center gap-1.5 px-1.5 shrink-0">
               <Layers className="w-3.5 h-3.5 text-[#b5a642]" /> 
               Color Coded Groups
             </span>
@@ -727,7 +727,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                     className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-[11.5px] font-bold transition-all ${
                       isSelected 
                         ? `${et.lightBg} ${et.border} ${et.text}` 
-                        : "bg-transparent border-transparent text-white/55 hover:bg-[#1b1b20]/50 hover:text-white"
+                        : "bg-transparent border-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/50 hover:text-[var(--color-text)]"
                     }`}
                   >
                     <span className="flex items-center gap-2 min-w-0">
@@ -748,16 +748,16 @@ export const TasksView: React.FC<TasksViewProps> = ({
         {/* ========================================================= */}
         {/* COLUMN 2: CENTER TASK FLOW CANVAS & LAYOUTS (WEIGHT FLEX-1) */}
         {/* ========================================================= */}
-        <div className="flex-1 flex flex-col min-h-0 bg-[#0c0c0e]">
+        <div className="flex-1 flex flex-col min-h-0 bg-[var(--color-bg)]">
           
           {/* Sub-Header view layout selectors and search filter bar */}
-          <div className="p-3 border-b border-white/5 bg-[#101014]/30 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 select-none">
+          <div className="p-3 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/20 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 select-none">
             {/* Visual layouts selector segment */}
-            <div className="bg-[#141418] border border-white/5 p-1 rounded-xl flex items-center shrink-0 w-full sm:w-auto">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-1 rounded-xl flex items-center shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setViewLayout("list")}
                 className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "list" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-white/45 hover:text-white"
+                  viewLayout === "list" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <ListFilter className="w-3.5 h-3.5" /> Pipeline Feed
@@ -765,7 +765,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <button
                 onClick={() => setViewLayout("board")}
                 className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "board" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-white/45 hover:text-white"
+                  viewLayout === "board" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" /> Kanban Board
@@ -773,7 +773,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <button
                 onClick={() => setViewLayout("checklist")}
                 className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "checklist" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-white/45 hover:text-white"
+                  viewLayout === "checklist" ? "bg-[#b5a642] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <CheckSquare2 className="w-3.5 h-3.5" /> Checklist Focus
@@ -788,10 +788,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   placeholder="Query actions ..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#141418] border border-white/5 rounded-xl pl-3 pr-8 py-1.5 text-xs text-white placeholder-white/30 w-full focus:outline-none"
+                  className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl pl-3 pr-8 py-1.5 text-xs text-[var(--color-text)] placeholder-white/30 w-full focus:outline-none"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-2.5 text-white/30 hover:text-white">
+                  <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-2.5 text-[var(--color-text-faint)] hover:text-[var(--color-text)]">
                     <X className="w-3 h-3" />
                   </button>
                 )}
@@ -800,7 +800,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#141418] border border-white/5 rounded-xl px-2 py-1.5 text-xs text-white/70 focus:outline-none font-bold"
+                className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl px-2 py-1.5 text-xs text-[var(--color-text-muted)] focus:outline-none font-bold"
               >
                 <option value="dueDate">🎯 Date Due</option>
                 <option value="priority">🔥 Risk Level</option>
@@ -814,16 +814,16 @@ export const TasksView: React.FC<TasksViewProps> = ({
             
             {/* Visual Null State */}
             {sortedAndFilteredTasks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-white/5 rounded-2xl bg-[#141418]/15 select-none">
-                <CheckSquare className="text-white/10 w-12 h-12 mb-3" />
-                <h3 className="text-xs font-black text-white/80 uppercase tracking-widest">No matching actions</h3>
+              <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-[var(--color-border)]/70 rounded-2xl bg-[var(--color-surface-2)]/15 select-none">
+                <CheckSquare className="text-[var(--color-text)]/10 w-12 h-12 mb-3" />
+                <h3 className="text-xs font-black text-[var(--color-text)] uppercase tracking-widest">No matching actions</h3>
                 <p className="text-[11px] text-[#eeeef2]/35 max-w-sm mt-1.5 leading-relaxed">
                   Your pipeline is clear! There are no unresolved action requests matching active filters inside this workspace.
                 </p>
                 {selectedClientFilter && (
                   <button 
                     onClick={() => setSelectedClientFilter("")}
-                    className="mt-4 px-3 py-1.5 border border-white/10 bg-white/5 rounded-lg text-[10px] text-[#b5a642] font-black uppercase hover:bg-white/10 transition-colors"
+                    className="mt-4 px-3 py-1.5 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-lg text-[10px] text-[#b5a642] font-black uppercase hover:bg-[var(--color-surface-3)] transition-colors"
                   >
                     Clear Client Filter
                   </button>
@@ -851,10 +851,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
                         onClick={() => setSelectedTaskId(tk.id)}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 text-left ${
                           isSelected 
-                            ? "bg-[#1b1b20] border-white/10 ring-1 ring-[#b5a642]/25 shadow-xl" 
+                            ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[#b5a642]/25 shadow-xl" 
                             : isCompleted 
-                              ? "bg-[#101014]/30 border-white/5 opacity-55 hover:opacity-80" 
-                              : "bg-[#141418] border-white/5 hover:border-white/10 hover:bg-[#18181c]"
+                              ? "bg-[var(--color-surface-2)]/30 border-[var(--color-border)]/70 opacity-55 hover:opacity-80" 
+                              : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50"
                         }`}
                       >
                         <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -864,7 +864,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               type="checkbox"
                               checked={isCompleted}
                               onChange={() => handleToggleTaskCheckbox(tk.id)}
-                              className="h-4 w-4 rounded border-white/10 bg-[#1b1b20] accent-[#b5a642] cursor-pointer"
+                              className="h-4 w-4 rounded border-[var(--color-border)] bg-[var(--color-surface-2)] accent-[#b5a642] cursor-pointer"
                             />
                           </div>
 
@@ -872,7 +872,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             <div className="flex items-center gap-2 flex-wrap">
                               {/* Title description */}
                               <span className={`text-[12px] font-semibold leading-relaxed ${
-                                isCompleted ? "line-through text-white/35 font-normal" : "text-white/90"
+                                isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : "text-[var(--color-text)]/90"
                               }`}>
                                 {tk.title}
                               </span>
@@ -886,7 +886,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             </div>
 
                             {/* Group Details Badges */}
-                            <div className="flex flex-wrap items-center gap-2 mt-2 text-[9.5px] text-[#eeeef2]/40">
+                            <div className="flex flex-wrap items-center gap-2 mt-2 text-[9.5px] text-[var(--color-text-faint)]">
                               
                               {/* Color category badge matching legend */}
                               <span className={`px-2 py-0.5 rounded-md border text-[9px] font-black ${badge.lightBg} ${badge.text} ${badge.border} flex items-center gap-1`}>
@@ -895,20 +895,20 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               </span>
 
                               {tk.clientName && (
-                                <span className="flex items-center gap-1 bg-[#1b1b20] border border-white/5 px-1.5 py-0.5 rounded text-white/50">
-                                  <FileText className="w-3 h-3 text-white/30" /> Deal: <b className="text-white/70">{tk.clientName}</b>
+                                <span className="flex items-center gap-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">
+                                  <FileText className="w-3 h-3 text-[var(--color-text-faint)]" /> Deal: <b className="text-[var(--color-text-muted)]">{tk.clientName}</b>
                                 </span>
                               )}
 
                               {tk.dueDate && (
-                                <span className={`flex items-center gap-1 font-mono px-1.5 py-0.5 rounded ${isOverdue ? "text-red-400 font-bold" : "text-white/40"}`}>
-                                  <Calendar className="w-3 h-3 text-white/30" /> Due: {tk.dueDate} {tk.dueTime && `@ ${tk.dueTime}`}
+                                <span className={`flex items-center gap-1 font-mono px-1.5 py-0.5 rounded ${isOverdue ? "text-red-400 font-bold" : "text-[var(--color-text-muted)]"}`}>
+                                  <Calendar className="w-3 h-3 text-[var(--color-text-faint)]" /> Due: {tk.dueDate} {tk.dueTime && `@ ${tk.dueTime}`}
                                 </span>
                               )}
 
                               {tk.assignedTo && (
-                                <span className="flex items-center gap-1 bg-[#1b1b20] px-1.5 py-0.5 rounded text-white/40">
-                                  <User className="w-3 h-3 text-white/20" /> Owner: {tk.assignedTo}
+                                <span className="flex items-center gap-1 bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">
+                                  <User className="w-3 h-3 text-[var(--color-text-faint)]/40" /> Owner: {tk.assignedTo}
                                 </span>
                               )}
 
@@ -923,11 +923,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             {/* Nested checklist progress tracker */}
                             {subtaskCount > 0 && (
                               <div className="mt-2.5 w-60 shrink-0 select-none">
-                                <div className="flex justify-between items-center text-[9px] text-white/40 mb-1">
+                                <div className="flex justify-between items-center text-[9px] text-[var(--color-text-muted)] mb-1">
                                   <span>Checklist Items: <b>{subtaskDone}/{subtaskCount}</b> done</span>
                                   <span className="font-mono">{progressPercent}%</span>
                                 </div>
-                                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                <div className="w-full h-1 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                                   <div className="h-full bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
                                 </div>
                               </div>
@@ -940,10 +940,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
                         <div className="flex items-center gap-2 shrink-0 md:justify-end">
                           <span className={`text-[8.5px] font-black uppercase px-2 py-1 rounded-lg border tracking-wider select-none ${
                             tk.extendedStatus === "done" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/15" :
-                            tk.extendedStatus === "cancelled" ? "bg-slate-500/5 text-slate-500 border-white/5 line-through" :
+                            tk.extendedStatus === "cancelled" ? "bg-slate-500/5 text-slate-500 border-[var(--color-border)]/70 line-through" :
                             tk.extendedStatus === "in_progress" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/15" :
                             tk.extendedStatus === "waiting" ? "bg-orange-500/10 text-orange-400 border-orange-500/15" :
-                            "bg-amber-500/5 text-slate-400 border-white/5"
+                            "bg-amber-500/5 text-slate-400 border-[var(--color-border)]/70"
                           }`}>
                             {tk.extendedStatus === "todo" ? "To Do" : tk.extendedStatus?.replace("_", " ")}
                           </span>
@@ -967,12 +967,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 ].map(col => {
                   const itemsInCol = sortedAndFilteredTasks.filter(t => t.extendedStatus === col.key);
                   return (
-                    <div key={col.key} className="flex flex-col bg-[#101014]/40 border border-white/5 rounded-2xl p-2.5 min-h-[300px]">
+                    <div key={col.key} className="flex flex-col bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-2xl p-2.5 min-h-[300px]">
                       
                       {/* Column title descriptor */}
-                      <div className="flex items-center justify-between px-2 py-1 border-b border-white/5 mb-3">
+                      <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-border)]/70 mb-3">
                         <span className={`text-[10px] font-black uppercase tracking-wider ${col.colorText}`}>{col.label}</span>
-                        <span className="text-[10px] font-mono bg-white/5 text-white/55 px-1.5 py-0.5 rounded-md font-semibold font-mono">
+                        <span className="text-[10px] font-mono bg-[var(--color-surface-2)] text-[var(--color-text-muted)] px-1.5 py-0.5 rounded-md font-semibold font-mono">
                           {itemsInCol.length}
                         </span>
                       </div>
@@ -988,11 +988,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               onClick={() => setSelectedTaskId(it.id)}
                               className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
                                 isSelected 
-                                  ? "bg-[#1b1b20] border-white/10 ring-1 ring-[#b5a642]/20" 
-                                  : "bg-[#141418] border-white/5 hover:border-white/10"
+                                  ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[#b5a642]/20" 
+                                  : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)]"
                               }`}
                             >
-                              <span className={`text-[11.5px] font-bold block leading-normal text-white/95 truncate ${it.extendedStatus === "done" ? "line-through text-white/35 font-normal" : ""}`}>
+                              <span className={`text-[11.5px] font-bold block leading-normal text-[var(--color-text)] truncate ${it.extendedStatus === "done" ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
                                 {it.title}
                               </span>
 
@@ -1002,7 +1002,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                 </span>
 
                                 {it.dueDate && (
-                                  <span className="text-[8.5px] font-mono text-white/40">{it.dueDate}</span>
+                                  <span className="text-[8.5px] font-mono text-[var(--color-text-muted)]">{it.dueDate}</span>
                                 )}
                               </div>
 
@@ -1039,13 +1039,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       onClick={() => setSelectedTaskId(tk.id)}
                       className={`p-4 rounded-2xl border flex flex-col text-left transition-all cursor-pointer ${
                         isSelected 
-                          ? "bg-[#1b1b20] border-white/10 ring-1 ring-[#b5a642]/25" 
-                          : "bg-[#141418] border-white/5 hover:border-white/10"
+                          ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[#b5a642]/25" 
+                          : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)]"
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-2.5 mb-2.5 select-none">
+                      <div className="flex items-start justify-between gap-3 border-b border-[var(--color-border)]/70 pb-2.5 mb-2.5 select-none">
                         <div>
-                          <span className={`text-[11.5px] font-black block leading-snug text-white/90 ${isCompleted ? "line-through text-white/30 font-normal" : ""}`}>
+                          <span className={`text-[11.5px] font-black block leading-snug text-[var(--color-text)]/90 ${isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
                             {tk.title}
                           </span>
                           <span className={`inline-flex items-center gap-1.5 text-[8.5px] font-black uppercase px-2 py-0.5 rounded border mt-1.5 ${scheme.lightBg} ${scheme.text} ${scheme.border}`}>
@@ -1053,7 +1053,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                           </span>
                         </div>
 
-                        <span className="text-[10px] font-mono bg-white/5 text-white/50 px-1.5 py-0.5 rounded font-black font-sans shrink-0">
+                        <span className="text-[10px] font-mono bg-[var(--color-surface-2)] text-[var(--color-text-muted)] px-1.5 py-0.5 rounded font-black font-sans shrink-0">
                           {doneSubs}/{subs.length} Items
                         </span>
                       </div>
@@ -1062,8 +1062,8 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       {subs.length === 0 ? (
                         <div className="flex-1 py-4 flex flex-col items-center justify-center text-center">
                           <Check className="w-5 h-5 text-emerald-500 opacity-30 mb-1" />
-                          <span className="text-[9.5px] uppercase font-bold text-white/20">Empty Checklist Board</span>
-                          <span className="text-[8.5px] text-white/20 mt-0.5">Click to apply templates in details</span>
+                          <span className="text-[9.5px] uppercase font-bold text-[var(--color-text-faint)]/40">Empty Checklist Board</span>
+                          <span className="text-[8.5px] text-[var(--color-text-faint)]/40 mt-0.5">Click to apply templates in details</span>
                         </div>
                       ) : (
                         <div className="flex-1 space-y-2 mb-3">
@@ -1077,14 +1077,14 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                   setSelectedTaskId(tk.id);
                                   handleToggleSubtask(sb.id);
                                 }}
-                                className="w-full flex items-center gap-2 px-2.5 py-2.5 bg-[#1b1b20]/60 hover:bg-white/[0.02] border border-white/5 rounded-xl text-left text-[11px] font-semibold text-white/80 transition-colors"
+                                className="w-full flex items-center gap-2 px-2.5 py-2.5 bg-[var(--color-surface-2)]/60 hover:bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-xl text-left text-[11px] font-semibold text-[var(--color-text)] transition-colors"
                               >
                                 {sb.done ? (
                                   <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                                 ) : (
                                   <div className="w-4 h-4 border border-white/25 rounded-md shrink-0" />
                                 )}
-                                <span className={sb.done ? "line-through text-white/30" : "text-white/80"}>
+                                <span className={sb.done ? "line-through text-[var(--color-text-faint)]" : "text-[var(--color-text)]"}>
                                   {sb.title}
                                 </span>
                               </button>
@@ -1095,8 +1095,8 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                       {/* Progress bar container */}
                       {subs.length > 0 && (
-                        <div className="mt-auto pt-2.5 border-t border-white/5 bg-transparent select-none">
-                          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="mt-auto pt-2.5 border-t border-[var(--color-border)]/70 bg-transparent select-none">
+                          <div className="w-full h-1 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                             <div className="h-full bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${percent}%` }} />
                           </div>
                         </div>
@@ -1115,14 +1115,14 @@ export const TasksView: React.FC<TasksViewProps> = ({
         {/* ========================================================= */}
         {/* COLUMN 3: RIGHT TASK ACTIVE OPERATIONS WORKSPACE (WIDTH 96) */}
         {/* ========================================================= */}
-        <div className="w-full xl:w-96 shrink-0 bg-[#101014]/60 overflow-y-auto p-4 select-none">
+        <div className="w-full xl:w-96 shrink-0 bg-[var(--color-surface)]/20 overflow-y-auto p-4 select-none">
           
           <AnimatePresence mode="wait">
             {!selectedTask ? (
-              <div className="h-full flex flex-col justify-center items-center py-24 text-center text-white/20 select-none">
+              <div className="h-full flex flex-col justify-center items-center py-24 text-center text-[var(--color-text-faint)] select-none">
                 <SlidersHorizontal className="w-8 h-8 opacity-40 mb-3" />
                 <span className="text-[10px] font-black uppercase tracking-wider">Select an Action file</span>
-                <p className="text-[9.5px] text-[#eeeef2]/30 mt-1 max-w-xs">Click on any Daily Task from the center list feed to trigger the interactive command panel.</p>
+                <p className="text-[9.5px] text-[var(--color-text-muted)] mt-1 max-w-xs">Click on any Daily Task from the center list feed to trigger the interactive command panel.</p>
               </div>
             ) : (
               <motion.div
@@ -1134,12 +1134,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
               >
                 
                 {/* Visual header section */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-2.5">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-2.5">
                   <div className="flex items-center justify-between shrink-0">
-                    <span className="text-[9.5px] uppercase font-black text-white/45 tracking-widest font-mono">Operations Folder Details</span>
+                    <span className="text-[9.5px] uppercase font-black text-[var(--color-text-muted)] tracking-widest font-mono">Operations Folder Details</span>
                     <button
                       onClick={() => handleRemoveTask(selectedTask.id)}
-                      className="p-1.5 text-white/30 hover:text-red-400 bg-white/5 hover:bg-red-500/10 rounded-lg border border-transparent hover:border-red-500/20 transition-colors"
+                      className="p-1.5 text-[var(--color-text-faint)] hover:text-red-400 bg-[var(--color-surface-2)] hover:bg-red-500/10 rounded-lg border border-transparent hover:border-red-500/20 transition-colors"
                       title="Delete task item"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -1152,19 +1152,19 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       type="text"
                       value={selectedTask.title}
                       onChange={(e) => handleUpdateTaskDetail({ title: e.target.value })}
-                      className="w-full bg-transparent border-b border-transparent hover:border-white/10 focus:border-[#b5a642]/40 pb-1 text-[13px] font-black text-white/95 focus:outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-transparent hover:border-[var(--color-border)] focus:border-[#b5a642]/40 pb-1 text-[13px] font-black text-[var(--color-text)] focus:outline-none transition-colors"
                     />
                     
-                    <span className="text-[10px] text-white/40 block">Created: <b className="font-mono">{selectedTask.createdAt?.split("T")[0]}</b> by {selectedTask.createdBy || "System"}</span>
+                    <span className="text-[10px] text-[var(--color-text-muted)] block">Created: <b className="font-mono">{selectedTask.createdAt?.split("T")[0]}</b> by {selectedTask.createdBy || "System"}</span>
                   </div>
                 </div>
 
                 {/* Section A: Multi-Toggle Status and Risk Selector */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-3">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-3">
                   <div className="grid grid-cols-2 gap-3.5">
                     {/* Status state dropdown mapped correctly to open/done */}
                     <div>
-                      <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Status State</label>
+                      <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Status State</label>
                       <select
                         value={selectedTask.extendedStatus}
                         onChange={(e) => {
@@ -1175,7 +1175,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             completedAt: ext === "done" ? new Date().toISOString() : null
                           });
                         }}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1.5 text-xs text-white/95 focus:outline-none focus:border-[#b5a642]/20 font-bold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold"
                       >
                         <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
@@ -1187,11 +1187,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                     {/* Priority risk rating */}
                     <div>
-                      <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Risk Rating</label>
+                      <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Risk Rating</label>
                       <select
                         value={selectedTask.priority}
                         onChange={(e) => handleUpdateTaskDetail({ priority: e.target.value as any })}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none font-bold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none font-bold"
                       >
                         <option value="urgent">🌋 Urgent Task</option>
                         <option value="high">🔥 High Priority</option>
@@ -1203,11 +1203,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                   {/* Broker Assigned element picker */}
                   <div>
-                    <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Broker Assigned</label>
+                    <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Broker Assigned</label>
                     <select
                       value={selectedTask.assignedTo || "David Acosta"}
                       onChange={(e) => handleUpdateTaskDetail({ assignedTo: e.target.value })}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1.5 text-xs text-white/95 focus:outline-none focus:border-[#b5a642]/20 font-bold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold"
                     >
                       {userRoster && userRoster.length > 0 ? (
                         userRoster.map(u => (
@@ -1225,7 +1225,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                   {/* Operational group categories mapping with full-color preview buttons */}
                   <div>
-                    <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1.5">Primary Folder Category</label>
+                    <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1.5">Primary Folder Category</label>
                     <div className="grid grid-cols-2 gap-1.5">
                       {TASK_CATEGORIES.map(et => {
                         const isMatch = selectedTask.category === et.value;
@@ -1237,7 +1237,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             className={`px-2 py-1 rounded-lg border text-[10px] font-bold text-left transition-all ${
                               isMatch 
                                 ? `${et.lightBg} ${et.border} ${et.text} ring-1 ring-white/10` 
-                                : "bg-[#1b1b20]/40 border-transparent text-white/50 hover:bg-white/5"
+                                : "bg-[var(--color-surface-2)]/40 border-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]"
                             }`}
                           >
                             <span className="flex items-center gap-1.5 truncate">
@@ -1252,33 +1252,33 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 </div>
 
                 {/* Section B: Timing, Calendar Synchronization Integration */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-3">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Target Date Due</label>
+                      <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Target Date Due</label>
                       <input
                         type="date"
                         value={selectedTask.dueDate || ""}
                         onChange={(e) => handleUpdateTaskDetail({ dueDate: e.target.value })}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white font-mono focus:outline-none"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-xs text-[var(--color-text)] font-mono focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Start Time (Optional)</label>
+                      <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Start Time (Optional)</label>
                       <input
                         type="time"
                         value={selectedTask.dueTime || ""}
                         onChange={(e) => handleUpdateTaskDetail({ dueTime: e.target.value })}
-                        className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white font-mono focus:outline-none"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-xs text-[var(--color-text)] font-mono focus:outline-none"
                       />
                     </div>
                   </div>
 
                   {/* Calendar Sync bidirectional selector */}
-                  <div className="p-2.5 bg-[#1b1b20]/40 border border-white/5 rounded-xl space-y-1.5">
+                  <div className="p-2.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-xl space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-white/80 uppercase">Publish to Team Calendar</span>
+                      <span className="text-[10px] font-black text-[var(--color-text)] uppercase">Publish to Team Calendar</span>
                       <input
                         type="checkbox"
                         checked={selectedTask.calendarSync !== false}
@@ -1289,18 +1289,18 @@ export const TasksView: React.FC<TasksViewProps> = ({
                         className="h-3.5 w-3.5 accent-[#b5a642] rounded cursor-pointer"
                       />
                     </div>
-                    <p className="text-[9px] text-white/35 leading-relaxed">
+                    <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed">
                       If enabled, saving this Daily Task automatically provisions a real-time event block onto the Calendar Timeline so team members stay aligned.
                     </p>
                   </div>
 
                   {/* Reminders drop-down */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-white/50 uppercase">Set Reminder Ring</span>
+                    <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Set Reminder Ring</span>
                     <select
                       value={selectedTask.reminder || "none"}
                       onChange={(e) => handleUpdateTaskDetail({ reminder: e.target.value })}
-                      className="bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-[11px] text-white/80 focus:outline-none font-semibold"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-[11px] text-[var(--color-text)] focus:outline-none font-semibold"
                     >
                       <option value="none">No reminder ping</option>
                       <option value="15m">15 Minutes before</option>
@@ -1312,9 +1312,9 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 </div>
 
                 {/* Section C: Linked Client Deal detail */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-3">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-3">
                   <div>
-                    <label className="text-[9.5px] text-white/40 uppercase font-black tracking-wider block mb-1">Linked Client File</label>
+                    <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Linked Client File</label>
                     <select
                       value={selectedTask.clientId || ""}
                       onChange={(e) => {
@@ -1325,7 +1325,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                           clientName: clientObj ? `${clientObj.first} ${clientObj.last}` : undefined
                         });
                       }}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1.5 text-xs text-white/95 focus:outline-none focus:border-[#b5a642]/20 font-bold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold"
                     >
                       <option value="">-- General Unlinked Backlog --</option>
                       {clients.map(cl => (
@@ -1337,7 +1337,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   {selectedTask.clientId && (
                     <div className="p-2.5 bg-[#b5a642]/5 border border-[#b5a642]/15 rounded-xl flex items-center justify-between gap-2.5">
                       <div className="min-w-0 flex-1">
-                        <span className="text-[10.5px] font-black text-white block">Jump into client record:</span>
+                        <span className="text-[10.5px] font-black text-[var(--color-text)] block">Jump into client record:</span>
                         <span className="text-[9px] text-[#b5a642] font-semibold mt-0.5 block truncate">
                           Ref: {selectedTask.clientName}
                         </span>
@@ -1350,9 +1350,9 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 </div>
 
                 {/* Section D: Checklists subtasks Workspace */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-3">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-white/45 uppercase tracking-wider">Subtasks Workflow Checklist</span>
+                    <span className="text-[10px] font-black text-[var(--color-text-muted)] uppercase tracking-wider">Subtasks Workflow Checklist</span>
                     <span className="text-[9px] text-[#b5a642] bg-[#b5a642]/5 border border-[#b5a642]/10 rounded px-1.5 py-0.5">
                       {selectedTask.subtasks?.filter(s => s.done).length || 0} / {selectedTask.subtasks?.length || 0} completed
                     </span>
@@ -1364,25 +1364,25 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       {selectedTask.subtasks.map(sb => (
                         <div 
                           key={sb.id}
-                          className="flex items-center justify-between p-2 bg-[#1b1b20]/60 border border-white/5 rounded-xl gap-2"
+                          className="flex items-center justify-between p-2 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)]/70 rounded-xl gap-2"
                         >
                           <button
                             type="button"
                             onClick={() => handleToggleSubtask(sb.id)}
-                            className="flex items-center gap-2 text-left text-[11px] font-semibold text-white/80 min-w-0 flex-1"
+                            className="flex items-center gap-2 text-left text-[11px] font-semibold text-[var(--color-text)] min-w-0 flex-1"
                           >
                             {sb.done ? (
                               <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                             ) : (
                               <div className="w-4 h-4 border border-white/20 rounded-md shrink-0" />
                             )}
-                            <span className={`truncate ${sb.done ? "line-through text-white/35" : "text-white/85"}`}>{sb.title}</span>
+                            <span className={`truncate ${sb.done ? "line-through text-[var(--color-text-faint)]" : "text-[var(--color-text)]"}`}>{sb.title}</span>
                           </button>
 
                           <button 
                             type="button"
                             onClick={() => handleRemoveSubtask(sb.id)}
-                            className="text-white/20 hover:text-red-400 p-0.5"
+                            className="text-[var(--color-text-faint)]/40 hover:text-red-400 p-0.5"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -1399,7 +1399,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       value={newSubtaskText}
                       onChange={(e) => setNewSubtaskText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleAddSubtask()}
-                      className="bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-white/25 flex-1 focus:outline-none focus:border-[#b5a642]/30"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-white/25 flex-1 focus:outline-none focus:border-[#b5a642]/30"
                     />
                     <button
                       type="button"
@@ -1411,15 +1411,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   </div>
 
                   {/* Checklist Operational templates */}
-                  <div className="pt-2 border-t border-white/5">
-                    <span className="text-[9px] text-white/30 uppercase font-semibold block mb-2">Apply Operational Templates</span>
+                  <div className="pt-2 border-t border-[var(--color-border)]/70">
+                    <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-semibold block mb-2">Apply Operational Templates</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                       {CHECKLIST_TEMPLATES.map((tmpl, offset) => (
                         <button
                           key={offset}
                           type="button"
                           onClick={() => handleApplyChecklistTemplate(offset)}
-                          className="p-1.5 bg-[#1b1b20]/30 hover:bg-[#b5a642]/10 border border-white/5 hover:border-[#b5a642]/20 rounded-xl text-[10.5px] font-extrabold text-left transition-colors text-[#b5a642] truncate"
+                          className="p-1.5 bg-[var(--color-surface-2)]/30 hover:bg-[#b5a642]/10 border border-[var(--color-border)]/70 hover:border-[#b5a642]/20 rounded-xl text-[10.5px] font-extrabold text-left transition-colors text-[#b5a642] truncate"
                           title={tmpl.desc}
                         >
                           📋 {tmpl.name}
@@ -1430,32 +1430,32 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 </div>
 
                 {/* Section E: Exception description and Notes area */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-2">
-                  <label className="text-[9.5px] text-white/40 uppercase font-black block tracking-wider">Exception Instructions & Notes</label>
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-2">
+                  <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black block tracking-wider">Exception Instructions & Notes</label>
                   <textarea
                     rows={4}
                     placeholder="Specific instruction notes regarding this file target conditions..."
                     value={selectedTask.notes || ""}
                     onChange={(e) => handleUpdateTaskDetail({ notes: e.target.value })}
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold leading-relaxed"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold leading-relaxed"
                   />
                 </div>
 
                 {/* Section F: Live Interactive Audit Trail Logs */}
-                <div className="bg-[#141418] border border-white/5 rounded-2xl p-3.5 space-y-3 shrink-0">
-                  <span className="text-[10px] font-black text-white/45 uppercase tracking-wider flex items-center gap-1">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3.5 space-y-3 shrink-0">
+                  <span className="text-[10px] font-black text-[var(--color-text-muted)] uppercase tracking-wider flex items-center gap-1">
                     <Activity className="w-3.5 h-3.5 text-cyan-400" /> Audit Trail log
                   </span>
 
                   {/* Comments Feed list */}
                   <div className="space-y-2.5 max-h-44 overflow-y-auto pr-1">
                     {selectedTask.auditLogs?.map((log, index) => (
-                      <div key={index} className="p-2 bg-[#1b1b20]/40 border border-white/5 rounded-xl space-y-1">
-                        <div className="flex items-center justify-between text-[8px] text-white/30 font-semibold">
+                      <div key={index} className="p-2 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-xl space-y-1">
+                        <div className="flex items-center justify-between text-[8px] text-[var(--color-text-faint)] font-semibold">
                           <span>{log.user}</span>
                           <span className="font-mono">{log.timestamp?.replace("T", " ")?.split(".")[0]}</span>
                         </div>
-                        <p className="text-[10px] text-white/80 font-semibold leading-normal">{log.action}</p>
+                        <p className="text-[10px] text-[var(--color-text)] font-semibold leading-normal">{log.action}</p>
                       </div>
                     ))}
                   </div>
@@ -1468,7 +1468,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       value={newAuditLogMsg}
                       onChange={(e) => setNewAuditLogMsg(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleAddAuditLogComment()}
-                      className="bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-white/20 flex-1 focus:outline-none"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-white/20 flex-1 focus:outline-none"
                     />
                     <button
                       type="button"
@@ -1496,17 +1496,17 @@ export const TasksView: React.FC<TasksViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#141418] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden"
+              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="p-4 border-b border-white/5 bg-[#1b1b20]/40 flex items-center justify-between">
+              <div className="p-4 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/40 flex items-center justify-between">
                 <h3 className="text-xs uppercase font-extrabold text-[#b5a642] tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 fill-[#b5a642]/35 text-[#b5a642]" />
                   Log Mortgage Condition Action
                 </h3>
                 <button
                   onClick={() => setIsAddingTask(false)}
-                  className="text-white/40 hover:text-white p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded-lg bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1517,20 +1517,20 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 
                 {/* Title and Requirements descriptor */}
                 <div>
-                  <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Requirement Description <span className="text-red-400">*</span></label>
+                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Requirement Description <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     required
                     placeholder="e.g., Gather 90-day statements, draft Scotia mortgage package"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/20 font-bold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold"
                   />
                 </div>
 
                 {/* Color-Coded classification selector matching layout legend exactly */}
                 <div>
-                  <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-2">Classification Division Group</label>
+                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-2">Classification Division Group</label>
                   <div className="grid grid-cols-2 gap-2">
                     {TASK_CATEGORIES.map(et => {
                       const isMatch = newCategory === et.value;
@@ -1542,7 +1542,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                           className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left border text-[11px] font-semibold transition-all ${
                             isMatch 
                               ? `${et.lightBg} ${et.border} ${et.text} ${et.glow} border-white/20 ring-1 ring-white/10` 
-                              : "bg-[#1b1b20]/40 border-white/5 text-white/50 hover:bg-white/5 hover:text-white"
+                              : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
                           }`}
                         >
                           <span className={`w-2 h-2 rounded-full ${et.color} ${et.glow} shrink-0`} />
@@ -1556,11 +1556,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 {/* Priority status and Associated Client Deal */}
                 <div className="grid grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Priority Risk Level</label>
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Priority Risk Level</label>
                     <select
                       value={newPriority}
                       onChange={(e) => setNewPriority(e.target.value as any)}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
                     >
                       <option value="high">🌋 High Urgency</option>
                       <option value="medium">⚠️ Medium</option>
@@ -1569,11 +1569,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Related Client File</label>
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Related Client File</label>
                     <select
                       value={selectedClientId}
                       onChange={(e) => setSelectedClientId(e.target.value)}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
                     >
                       <option value="">-- General Unlinked Task --</option>
                       {clients.map(cl => (
@@ -1585,11 +1585,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                 {/* Broker Assigned choice */}
                 <div>
-                  <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Assign Broker Owner</label>
+                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Assign Broker Owner</label>
                   <select
                     value={newAssignedTo}
                     onChange={(e) => setNewAssignedTo(e.target.value)}
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none font-semibold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
                   >
                     {userRoster && userRoster.length > 0 ? (
                       userRoster.map(u => (
@@ -1608,30 +1608,30 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 {/* Due Date & Optional Due time */}
                 <div className="grid grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Target Date Due</label>
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Date Due</label>
                     <input
                       type="date"
                       value={newDueDate}
                       onChange={(e) => setNewDueDate(e.target.value)}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Target Start Time</label>
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Start Time</label>
                     <input
                       type="time"
                       value={newDueTime}
                       onChange={(e) => setNewDueTime(e.target.value)}
-                      className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none font-mono"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none font-mono"
                     />
                   </div>
                 </div>
 
                 {/* Calendar Sync bidirectional selector */}
-                <div className="p-3 bg-[#1b1b20]/60 border border-white/5 rounded-xl space-y-1.5">
+                <div className="p-3 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)]/70 rounded-xl space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-white/80 uppercase">Push on Team Calendar Scheduler</span>
+                    <span className="text-[10px] font-black text-[var(--color-text)] uppercase">Push on Team Calendar Scheduler</span>
                     <input
                       type="checkbox"
                       checked={newCalendarSync}
@@ -1639,18 +1639,18 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       className="h-3.5 w-3.5 accent-[#b5a642] rounded cursor-pointer"
                     />
                   </div>
-                  <p className="text-[9px] text-white/40 leading-relaxed">
+                  <p className="text-[9px] text-[var(--color-text-muted)] leading-relaxed">
                     Instantly syncs with your team calendar overview so appointments and condition checkpoints align.
                   </p>
                 </div>
 
                 {/* Dropdown reminder */}
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-white/50 uppercase">Timing Warning Reminder</span>
+                  <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Timing Warning Reminder</span>
                   <select
                     value={newReminder}
                     onChange={(e) => setNewReminder(e.target.value)}
-                    className="bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white/80 focus:outline-none font-semibold"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
                   >
                     <option value="none">No warning ping</option>
                     <option value="15m">15 Minutes before</option>
@@ -1661,22 +1661,22 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                 {/* Notes box */}
                 <div>
-                  <label className="text-[10px] text-white/45 font-bold uppercase tracking-wider block mb-1">Exception notes or Specific lists</label>
+                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Exception notes or Specific lists</label>
                   <textarea
                     rows={3}
                     placeholder="Provide specific notes regarding document verification criteria, or instructions..."
                     value={newNotes}
                     onChange={(e) => setNewNotes(e.target.value)}
-                    className="w-full bg-[#1b1b20] border border-[#eeeef2]/5 rounded-lg px-3 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-white/30 focus:outline-none focus:border-[#b5a642]/30"
                   />
                 </div>
 
                 {/* Modal actions buttons */}
-                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/5 shrink-0">
+                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--color-border)]/70 shrink-0">
                   <button
                     type="button"
                     onClick={() => setIsAddingTask(false)}
-                    className="px-4 py-2 border border-white/5 hover:border-white/10 rounded-xl text-white/45 hover:text-white text-xs font-bold transition-all"
+                    className="px-4 py-2 border border-[var(--color-border)]/70 hover:border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold transition-all"
                   >
                     Cancel
                   </button>

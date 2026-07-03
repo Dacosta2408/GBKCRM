@@ -25,10 +25,10 @@ export const PartnerList: React.FC<PartnerListProps> = ({
 }) => {
   if (partners.length === 0) {
     return (
-      <div className="bg-[#121216] border border-white/5 rounded-xl p-12 text-center" id="empty-partner-results">
-        <MapPin className="h-10 w-10 text-white/10 mx-auto mb-3 stroke-1" />
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">No Partners Located</h3>
-        <p className="text-xs text-white/40 mt-1 max-w-sm mx-auto">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-12 text-center" id="empty-partner-results">
+        <MapPin className="h-10 w-10 text-[var(--color-text-faint)]/30 mx-auto mb-3 stroke-1" />
+        <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider">No Partners Located</h3>
+        <p className="text-xs text-[var(--color-text-muted)] mt-1 max-w-sm mx-auto">
           No external professional partners match the current search filters or region constraints. Refine or expand parameters.
         </p>
       </div>
@@ -36,13 +36,13 @@ export const PartnerList: React.FC<PartnerListProps> = ({
   }
 
   return (
-    <div className="bg-[#121216] border border-white/5 rounded-xl overflow-hidden shadow-lg" id="partner-results-directory">
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-lg" id="partner-results-directory">
       
       {/* Desktop Tabular Directory View */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-xs">
           <thead>
-            <tr className="bg-[#181820]/80 border-b border-white/5 select-none text-[10px] uppercase font-black tracking-widest text-white/40">
+            <tr className="bg-[var(--color-surface-2)]/80 border-b border-[var(--color-border)]/70 select-none text-[10px] uppercase font-black tracking-widest text-[var(--color-text-muted)]">
               <th className="py-3 px-4 w-10 text-center">Pref</th>
               <th className="py-3 px-4">Partner Name</th>
               <th className="py-3 px-4">Company</th>
@@ -55,12 +55,12 @@ export const PartnerList: React.FC<PartnerListProps> = ({
               <th className="py-3 px-4 text-right w-24">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.03]">
+          <tbody className="divide-y divide-[var(--color-border)]/50">
             {partners.map((partner) => {
               const isSelected = selectedPartnerId === partner.id;
               
               // Map status badge colors
-              let statusColorClass = "bg-white/5 text-white/60";
+              let statusColorClass = "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]";
               if (partner.status === "Preferred") {
                 statusColorClass = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
               } else if (partner.status === "Active") {
@@ -75,8 +75,8 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                 <tr
                   key={partner.id}
                   onClick={() => onSelectPartner(partner.id)}
-                  className={`group cursor-pointer transition-all hover:bg-white/[0.01] ${
-                    isSelected ? "bg-[#1b1b24] border-l-2 border-[#b5a642]" : ""
+                  className={`group cursor-pointer transition-all hover:bg-[var(--color-surface-2)]/40 ${
+                    isSelected ? "bg-[var(--color-surface-3)] border-l-2 border-[#b5a642]" : ""
                   }`}
                 >
                   {/* Preferred Status Star Toggle */}
@@ -86,7 +86,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                       className={`transition-colors duration-200 focus:outline-none ${
                         partner.isPreferred || partner.status === "Preferred"
                           ? "text-[#b5a642] hover:text-[#9a8c38]"
-                          : "text-white/10 hover:text-[#b5a642]/50"
+                          : "text-[var(--color-text-faint)]/40 hover:text-[#b5a642]/50"
                       }`}
                       title={partner.isPreferred ? "Preferred Partner" : "Mark as Preferred"}
                     >
@@ -97,13 +97,13 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                   {/* Partner Name with initial avatar */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded bg-[#1d1d26] border border-white/5 text-[10px] font-black text-[#b5a642] flex items-center justify-center uppercase shrink-0">
+                      <div className="w-7 h-7 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-black text-[#b5a642] flex items-center justify-center uppercase shrink-0">
                         {partner.first[0]}{partner.last[0]}
                       </div>
-                      <div className="font-semibold text-white group-hover:text-[#b5a642] transition-colors">
+                      <div className="font-semibold text-[var(--color-text)] group-hover:text-[#b5a642] transition-colors">
                         {partner.first} {partner.last}
                         {partner.role && (
-                          <span className="block text-[9px] text-white/30 font-medium">
+                          <span className="block text-[9px] text-[var(--color-text-faint)] font-medium">
                             {partner.role}
                           </span>
                         )}
@@ -112,28 +112,28 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                   </td>
 
                   {/* Company */}
-                  <td className="py-3 px-4 text-white/70 font-medium max-w-[150px] truncate">
-                    {partner.company || <span className="text-white/20 italic">Independent</span>}
+                  <td className="py-3 px-4 text-[var(--color-text-muted)] font-medium max-w-[150px] truncate">
+                    {partner.company || <span className="text-[var(--color-text-faint)]/30 italic">Independent</span>}
                   </td>
 
                   {/* Category Badge */}
                   <td className="py-3 px-4">
-                    <span className="bg-[#1b1b24] text-[#6fa3b8] text-[9px] font-bold uppercase px-2 py-0.5 rounded border border-[#6fa3b8]/15">
+                    <span className="bg-[var(--color-surface-2)] text-[#6fa3b8] text-[9px] font-bold uppercase px-2 py-0.5 rounded border border-[#6fa3b8]/15">
                       {partner.type}
                     </span>
                   </td>
 
                   {/* Location (City / Service Area) */}
-                  <td className="py-3 px-4 text-white/60">
+                  <td className="py-3 px-4 text-[var(--color-text-muted)]">
                     <div className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-white/30" />
+                      <MapPin className="w-3.5 h-3.5 text-[var(--color-text-faint)]/30" />
                       <span>{partner.city || "Ontario"}</span>
                     </div>
                   </td>
 
                   {/* Phone */}
-                  <td className="py-3 px-4 text-white/70 font-mono">
-                    {partner.phone || <span className="text-white/20 italic">--</span>}
+                  <td className="py-3 px-4 text-[var(--color-text-muted)] font-mono">
+                    {partner.phone || <span className="text-[var(--color-text-faint)]/30 italic">--</span>}
                   </td>
 
                   {/* Email */}
@@ -147,7 +147,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                         {partner.email}
                       </button>
                     ) : (
-                      <span className="text-white/20 italic">No Email</span>
+                      <span className="text-[var(--color-text-faint)]/30 italic">No Email</span>
                     )}
                   </td>
 
@@ -160,7 +160,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
 
                   {/* Relationship Owner */}
                   <td className="py-3 px-4 text-emerald-400 font-semibold flex items-center gap-1.5 pt-4">
-                    <User className="w-3.5 h-3.5 text-white/20" />
+                    <User className="w-3.5 h-3.5 text-[var(--color-text-faint)]/30" />
                     <span>{partner.assignedOwner || "Unassigned"}</span>
                   </td>
 
@@ -169,19 +169,19 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                     <div className="flex items-center justify-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => onEditPartner(partner, e)}
-                        className="p-1 hover:bg-[#1b1b24] border border-transparent hover:border-white/5 rounded text-white/50 hover:text-white transition-all"
+                        className="p-1 hover:bg-[var(--color-surface-2)] border border-transparent hover:border-[var(--color-border)] rounded text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all"
                         title="Edit Partner Profile"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={(e) => onDeletePartner(partner.id, e)}
-                        className="p-1 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 rounded text-white/30 hover:text-red-400 transition-all"
+                        className="p-1 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 rounded text-[var(--color-text-faint)]/30 hover:text-red-400 transition-all"
                         title="Delete Relationship Record"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                      <div className="p-1 text-white/20">
+                      <div className="p-1 text-[var(--color-text-faint)]/40">
                         <ArrowRight className="w-3.5 h-3.5" />
                       </div>
                     </div>
