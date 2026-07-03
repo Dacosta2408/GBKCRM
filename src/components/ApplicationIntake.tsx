@@ -483,20 +483,20 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/85 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[#121216] border border-white/10 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
+    <div className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         
         {/* Modal Header */}
-        <div className="p-5 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#16161c]">
+        <div className="p-5 border-b border-[var(--color-border)] flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-tr from-[#bdae45] to-[#5d9bb1] rounded-xl text-black">
               <Sparkles className="w-5 h-5 font-bold" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              <h2 className="text-sm font-black text-[var(--color-text)] uppercase tracking-wider">
                 {mode === "ai" ? "✨ AI Full Application Intake" : "📋 Manual Client Intake Form"}
               </h2>
-              <p className="text-[10px] text-[#8e95a3] mt-0.5">
+              <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
                 {mode === "ai" 
                   ? "Take application forms from emails or PDFs, parse them with Gemini AI, and instantly populate a secure CRM file" 
                   : "Manually fill out a complete, structured mortgage application to initiate a new file"}
@@ -505,7 +505,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           </div>
           <button 
             onClick={() => { onClose(); if (onClearPreloaded) onClearPreloaded(); }}
-            className="text-[#8e95a3] hover:text-white p-1.5 hover:bg-white/5 rounded-lg transition-all"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1.5 hover:bg-[var(--color-surface-2)]/80 rounded-lg transition-all"
             id="close-intake-modal-btn"
           >
             ✕
@@ -526,22 +526,22 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                 className={`border-2 border-dashed rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
                   isDragActive 
                     ? "border-[#5d9bb1] bg-[#5d9bb1]/10" 
-                    : "border-white/10 bg-white/[0.01] hover:bg-white/[0.02]"
+                    : "border-[var(--color-border)] bg-[var(--color-bg)]/30 hover:bg-[var(--color-surface-2)]/30"
                 }`}
               >
-                <div className="p-4 bg-white/5 rounded-full text-[#5d9bb1]">
+                <div className="p-4 bg-[var(--color-surface-2)] rounded-full text-[#5d9bb1]">
                   <UploadCloud className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Drag &amp; Drop Mortgage Application File</h3>
-                  <p className="text-[11px] text-white/50 mt-1">Supports application text formats, HTML templates, PDFs, or email notes.</p>
+                  <h3 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Drag &amp; Drop Mortgage Application File</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)] mt-1">Supports application text formats, HTML templates, PDFs, or email notes.</p>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <label className="px-4 py-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold rounded-lg cursor-pointer transition-all">
+                  <label className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] text-xs font-semibold rounded-lg cursor-pointer transition-all">
                     Browse File
                     <input type="file" onChange={handleFileUpload} className="hidden" accept=".txt,.html,.pdf,.doc,.docx" />
                   </label>
-                  <span className="text-[10px] text-white/40">or</span>
+                  <span className="text-[10px] text-[var(--color-text-faint)]">or</span>
                   <button 
                     onClick={() => handleLoadSample('barrie')}
                     className="px-4 py-1.5 bg-[#bdae45]/20 text-[#bdae45] hover:bg-[#bdae45]/30 border border-[#bdae45]/30 text-xs font-semibold rounded-lg transition-all"
@@ -557,14 +557,14 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                 </div>
                 {fileName && (
                   <div className="mt-3 px-3 py-1.5 bg-[#5d9bb1]/10 border border-[#5d9bb1]/20 text-[#5d9bb1] rounded-lg text-xs font-bold flex items-center gap-2">
-                    <FileCheck className="w-4 h-4" />
-                    <span>Loaded: {fileName} ({fileSize})</span>
+                     <FileCheck className="w-4 h-4" />
+                     <span>Loaded: {fileName} ({fileSize})</span>
                   </div>
                 )}
               </div>
 
               {/* Paste Text / Email Application Form Field */}
-              <div className="bg-[#16161c] border border-white/5 rounded-xl p-5 flex flex-col gap-3">
+              <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-5 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <h4 className="text-xs font-black uppercase tracking-wider text-[#bdae45] flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#bdae45]" /> Paste Application Text / Email Content
@@ -581,7 +581,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder="Paste the mortgage application content, credit details, or copy/pasted email form here. Example: Jane Smith, single, cell 705-555-1212. Works at RVH Hospital in Barrie, salary 98,500. Buying a house for 620,000..."
-                  className="w-full bg-[#0d0d10] border border-white/5 rounded-xl p-4 text-xs text-[#eeeef2] focus:outline-none focus:border-[#5d9bb1]/40 font-mono leading-relaxed"
+                  className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#5d9bb1]/40 font-mono leading-relaxed"
                 />
 
                 <div className="flex justify-end gap-2 mt-1">
@@ -611,7 +611,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
           {workflowStep === "review" && (
             <div className="flex-grow flex flex-col overflow-hidden" id="structured-review-workspace">
               {/* Stepper Tab Indicators */}
-              <div className="bg-[#16161c] border-b border-white/5 overflow-x-auto scrollbar-none flex shrink-0">
+              <div className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)] overflow-x-auto scrollbar-none flex shrink-0">
                 {(["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[]).map((tab, idx) => {
                   const isActive = activeTab === tab;
                   const labelMap: Record<string, string> = {
@@ -630,11 +630,11 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                       className={`px-5 py-3 text-xs font-bold transition-all border-b-2 uppercase tracking-wider shrink-0 flex items-center gap-2 ${
                         isActive 
                           ? "text-[#bdae45] border-[#bdae45] bg-[#bdae45]/5" 
-                          : "text-white/40 border-transparent hover:text-white"
+                          : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)]"
                       }`}
                     >
                       <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
-                        isActive ? "bg-[#bdae45] text-black border-[#bdae45]" : "border-white/20"
+                        isActive ? "bg-[#bdae45] text-black border-[#bdae45]" : "border-[var(--color-border)]"
                       }`}>{idx + 1}</span>
                       <span>{labelMap[tab]}</span>
                     </button>
@@ -643,7 +643,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
               </div>
 
               {/* Tab Scrollable Contents */}
-              <div className="flex-1 overflow-y-auto p-6 bg-[#0c0c0f]">
+              <div className="flex-1 overflow-y-auto p-6 bg-[var(--color-bg)]">
                 {/* 1. PERSONAL INFORMATION */}
                 {activeTab === "personal" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-personal-form">

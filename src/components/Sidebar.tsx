@@ -5,7 +5,7 @@ import {
   Settings, BarChart3
 } from "lucide-react";
 import { User, Client, Task, Event } from "../types";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 interface SidebarProps {
   activeTab: string;
@@ -32,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOwner,
   onOpenProfileManager
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const activeTasksCount = tasks.filter(t => t.status === "open").length;
 
   const menuGroups = [
@@ -127,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div
         className="h-20 flex flex-col justify-center px-4 relative overflow-hidden shrink-0"
         style={{
-          background: "var(--grad-sidebar-header)",
+          background: "linear-gradient(135deg, #051528 0%, #0C213D 60%, #1D3A60 100%)",
           borderBottom: "1px solid var(--color-sidebar-border)"
         }}
       >
@@ -135,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse at 20% 50%, rgba(200,146,42,0.08) 0%, transparent 70%)"
+            background: "radial-gradient(ellipse at 20% 50%, rgba(244,163,132,0.1) 0%, transparent 70%)"
           }}
         />
 
@@ -144,8 +145,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
             style={{
-              background: "var(--grad-accent)",
-              boxShadow: "0 2px 8px rgba(200,146,42,0.35)"
+              background: "var(--grad-warm-highlight)",
+              boxShadow: "0 3px 10px rgba(244,163,132,0.3)"
             }}
           >
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -182,9 +183,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               const isActive = activeTab === item.id;
               const Icon = item.icon;
               return (
-                <button
+                <motion.button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.01, x: 2 }}
+                  whileTap={shouldReduceMotion ? {} : { scale: 0.99 }}
                   className="group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg outline-none cursor-pointer w-full text-left"
                   style={{
                     color: isActive
@@ -212,8 +215,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       layoutId="sidebar-active"
                       className="absolute inset-0 rounded-lg pointer-events-none"
                       style={{
-                        background: "var(--color-sidebar-active)",
-                        borderLeft: "2px solid var(--color-accent)"
+                        background: "linear-gradient(90deg, rgba(200, 146, 42, 0.16) 0%, rgba(200, 146, 42, 0.03) 100%)",
+                        borderLeft: "3px solid var(--color-accent)",
+                        boxShadow: "inset 4px 0 10px rgba(200, 146, 42, 0.05)"
                       }}
                     />
                   )}
@@ -247,7 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {item.badge}
                     </span>
                   )}
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -281,8 +285,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0"
             style={{
-              background: "var(--grad-accent)",
-              boxShadow: "0 2px 6px rgba(200,146,42,0.30)"
+              background: "var(--grad-warm-highlight)",
+              boxShadow: "0 2px 8px rgba(244, 163, 132, 0.4)"
             }}
           >
             {currentUser.name

@@ -222,50 +222,50 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         {/* Toggles and Filter controls */}
         <div className="flex items-center gap-2">
           {isManager && (
-            <div className="bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5 flex">
+            <div className="bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5 flex">
               <button
                 onClick={() => setQueueMode("personal")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "personal" ? "bg-[#b5a642] text-black" : "text-[var(--color-text-muted)] hover:text-white"}`}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "personal" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 My Queue
               </button>
               <button
                 onClick={() => setQueueMode("team")}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "team" ? "bg-[#b5a642] text-black" : "text-[var(--color-text-muted)] hover:text-white"}`}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "team" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 <Users className="w-3 h-3" /> Team Queue
               </button>
             </div>
           )}
 
-          <div className="flex items-center gap-1 bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5">
             <button
               onClick={() => setFilterType("all")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "all" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "all" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
             >
               All
             </button>
             <button
               onClick={() => setFilterType("task")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "task" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "task" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
             >
               Tasks
             </button>
             <button
               onClick={() => setFilterType("stale")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "stale" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "stale" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
             >
               Stale
             </button>
             <button
               onClick={() => setFilterType("incomplete")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "incomplete" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "incomplete" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
             >
               Profiles
             </button>
             <button
               onClick={() => setFilterType("dates")}
-              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "dates" ? "bg-white/10 text-white" : "text-[var(--color-text-muted)] hover:text-white"}`}
+              className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "dates" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
             >
               Dates
             </button>
@@ -281,7 +281,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
             return (
               <div 
                 key={item.id}
-                className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)]/80 rounded-xl transition-all group"
+                className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)]/80 rounded-xl transition-all group"
               >
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
                   <div className={`p-2.5 rounded-lg bg-black/30 border border-[var(--color-border)] ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>

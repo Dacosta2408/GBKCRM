@@ -4,6 +4,7 @@ import {
   HelpCircle, ShieldCheck, DollarSign, ArrowUpRight 
 } from "lucide-react";
 import { Client, Task, User } from "../../types";
+import { motion, useReducedMotion } from "motion/react";
 
 interface KPICardsProps {
   clients: Client[];
@@ -20,6 +21,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
   currentUser,
   setActiveTab
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const isAgent = currentUser.role === "Agent" || currentUser.role === "Senior Broker";
   const userFullName = `${currentUser.first} ${currentUser.last}`;
 
@@ -130,15 +132,18 @@ export const KPICards: React.FC<KPICardsProps> = ({
       {cards.map((card) => {
         const Icon = card.icon;
         return (
-          <div
+          <motion.div
             key={card.id}
             onClick={() => setActiveTab(card.tab)}
-            className="glass-card relative overflow-hidden pt-5 pb-3 px-3 flex flex-col justify-between cursor-pointer group hover:-translate-y-1 hover:border-[#F9B17A]/30 active:translate-y-0"
+            whileHover={shouldReduceMotion ? {} : { scale: 1.02, y: -2 }}
+            whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="glass-card relative overflow-hidden pt-5 pb-3 px-3 flex flex-col justify-between cursor-pointer group hover:border-[var(--color-accent)]/30"
           >
             {/* Top Border Color Strip */}
             <div 
               className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl"
-              style={{ background: card.alert ? "linear-gradient(135deg, #e05c6e 0%, #7A5063 100%)" : card.isPrimary ? "var(--grad-warm)" : "var(--grad-deep)" }}
+              style={{ background: card.alert ? "linear-gradient(135deg, #e05c6e 0%, #7A5063 100%)" : card.isPrimary ? "var(--grad-warm-highlight)" : "var(--grad-slate-blue)" }}
             />
 
             <div className="flex items-center justify-between gap-1">
@@ -160,7 +165,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
             <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-1 font-bold">
               {card.sub}
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

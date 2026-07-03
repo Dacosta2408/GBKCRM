@@ -413,48 +413,48 @@ export const Compliance: React.FC<ComplianceProps> = ({
   }, [auditLogs, timelineSearch, timelineActionFilter]);
 
   return (
-    <div className="flex flex-col h-full bg-[#0c0c0e] text-[#eeeef2] overflow-hidden font-sans" id="compliance-module-root">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden font-sans" id="compliance-module-root">
       
       {/* Central Header */}
-      <div className="bg-[#111115] border-b border-white/5 p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="compliance-header">
+      <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)] p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="compliance-header">
         <div>
-          <h2 className="text-sm font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-1.5">
-            <Shield className="h-4 w-4 text-[#b5a642]" /> CRM COMPLIANCE &amp; OVERSIGHT CENTRAL
+          <h2 className="text-sm font-black uppercase text-[var(--color-accent)] tracking-widest flex items-center gap-1.5">
+            <Shield className="h-4 w-4 text-[var(--color-accent)]" /> CRM COMPLIANCE &amp; OVERSIGHT CENTRAL
           </h2>
-          <p className="text-[10px] text-white/40 font-semibold mt-0.5">Risk control, user accountability timeline, SIN masking audits, and process quality checkrooms</p>
+          <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">Risk control, user accountability timeline, SIN masking audits, and process quality checkrooms</p>
         </div>
 
         {/* Filters */}
         <div className="flex items-center flex-wrap gap-2.5">
           {isPrivileged ? (
-            <div className="flex items-center gap-1.5 bg-[#16161c] border border-white/5 px-2 py-1 rounded-lg text-xs">
-              <Filter className="h-3 w-3 text-[#b5a642]" />
+            <div className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-1 rounded-lg text-xs">
+              <Filter className="h-3 w-3 text-[var(--color-accent)]" />
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="bg-transparent border-none text-[11px] text-white focus:outline-none font-bold"
+                className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none font-bold"
               >
-                <option value="All">All Broker ledgers</option>
+                <option value="All" className="bg-[var(--color-surface-2)]">All Broker ledgers</option>
                 {userRoster.map(u => (
-                  <option key={u.id} value={`${u.first} ${u.last}`}>{u.first} {u.last}</option>
+                  <option key={u.id} value={`${u.first} ${u.last}`} className="bg-[var(--color-surface-2)]">{u.first} {u.last}</option>
                 ))}
               </select>
             </div>
           ) : (
-            <div className="bg-[#b5a642]/10 border border-[#b5a642]/20 text-[10px] text-[#b5a642] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+            <div className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[10px] text-[var(--color-accent)] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
               <ShieldAlert className="h-3.5 w-3.5" /> PERSONAL COMPLIANCE SCREEN
             </div>
           )}
 
           {activeTab === "checklist" && (
-            <div className="relative bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-1 flex items-center w-48 sm:w-60">
-              <Search className="h-3.5 w-3.5 text-white/30 shrink-0 mr-1.5" />
+            <div className="relative bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 flex items-center w-48 sm:w-60">
+              <Search className="h-3.5 w-3.5 text-[var(--color-text-muted)] shrink-0 mr-1.5" />
               <input
                 type="text"
                 placeholder="Search file checklists..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-transparent border-none text-[11px] text-white focus:outline-none w-full font-semibold"
+                className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none w-full font-semibold"
               />
             </div>
           )}
@@ -462,88 +462,88 @@ export const Compliance: React.FC<ComplianceProps> = ({
       </div>
 
       {/* Metric Stats Banner */}
-      <div className="bg-[#131318] px-6 py-4 border-b border-white/[0.03] grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0" id="compliance-metrics">
-        <div className="bg-[#16161c]/80 border border-white/5 rounded-xl p-3 text-left">
-          <div className="flex justify-between items-center text-white/40">
+      <div className="bg-[var(--color-surface)] px-6 py-4 border-b border-[var(--color-border)] grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0" id="compliance-metrics">
+        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-left">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)]">
             <span className="text-[9px] uppercase font-black tracking-wider">File Cleanliness Index</span>
-            <span className="text-[#b5a642] font-bold text-xs">★</span>
+            <span className="text-[var(--color-accent)] font-bold text-xs">★</span>
           </div>
-          <span className="text-xl font-black block mt-1 text-white">{metrics.cleanPct}%</span>
-          <span className="text-[8px] text-white/40 block mt-0.5">
+          <span className="text-xl font-black block mt-1 text-[var(--color-text)]">{metrics.cleanPct}%</span>
+          <span className="text-[8px] text-[var(--color-text-muted)] block mt-0.5">
             {metrics.cleanCount} of {metrics.totalClients} folders certified ready
           </span>
         </div>
 
-        <div className="bg-[#16161c]/80 border border-white/5 rounded-xl p-3 text-left">
-          <div className="flex justify-between items-center text-white/40">
+        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-left">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)]">
             <span className="text-[9px] uppercase font-black tracking-wider">Process Gaps Radar</span>
             <span className="text-red-400 font-bold text-xs">⚠️</span>
           </div>
           <span className="text-xl font-black block mt-1 text-red-400 font-mono">{metrics.exceptionsCount}</span>
-          <span className="text-[8px] text-white/40 block mt-0.5">
+          <span className="text-[8px] text-[var(--color-text-muted)] block mt-0.5">
             Files needing manual audit confirmation
           </span>
         </div>
 
-        <div className="bg-[#16161c]/80 border border-white/5 rounded-xl p-3 text-left">
-          <div className="flex justify-between items-center text-white/40">
+        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-left">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)]">
             <span className="text-[9px] uppercase font-black tracking-wider">Sensitive Field Accesses</span>
             <span className="text-amber-300 font-bold text-xs">🛡️</span>
           </div>
           <span className="text-xl font-black block mt-1 text-amber-300 font-mono">{metrics.totalSensitive}</span>
-          <span className="text-[8px] text-white/40 block mt-0.5">
+          <span className="text-[8px] text-[var(--color-text-muted)] block mt-0.5">
             SIN, settings, and credential requests audited
           </span>
         </div>
 
-        <div className="bg-[#16161c]/80 border border-white/5 rounded-xl p-3 text-left">
-          <div className="flex justify-between items-center text-white/40">
+        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-left">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)]">
             <span className="text-[9px] uppercase font-black tracking-wider">Audit timeline Volume</span>
             <span className="text-emerald-400 font-bold text-xs">📈</span>
           </div>
           <span className="text-xl font-black block mt-1 text-emerald-400 font-mono">{auditLogs.length}</span>
-          <span className="text-[8px] text-white/40 block mt-0.5">
+          <span className="text-[8px] text-[var(--color-text-muted)] block mt-0.5">
             Immutable process steps logged to date
           </span>
         </div>
       </div>
 
       {/* Tab Selectors */}
-      <div className="bg-[#111114] border-b border-white/5 px-6 py-2 shrink-0 flex items-center justify-between" id="compliance-tab-bar">
+      <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)] px-6 py-2 shrink-0 flex items-center justify-between" id="compliance-tab-bar">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab("checklist")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "checklist" ? "bg-white/5 text-[#b5a642] border border-white/5" : "text-white/40 hover:text-white/80"
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 border ${
+              activeTab === "checklist" ? "bg-[var(--color-surface-2)] text-[var(--color-accent)] border-[var(--color-border)]" : "bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] border-transparent"
             }`}
           >
             <CheckSquare className="h-3.5 w-3.5" /> File Checklists &amp; Audit
           </button>
           <button
             onClick={() => setActiveTab("exceptions")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 relative ${
-              activeTab === "exceptions" ? "bg-white/5 text-[#b5a642] border border-white/5" : "text-white/40 hover:text-white/80"
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 relative border ${
+              activeTab === "exceptions" ? "bg-[var(--color-surface-2)] text-[var(--color-accent)] border-[var(--color-border)]" : "bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] border-transparent"
             }`}
           >
             <AlertCircle className="h-3.5 w-3.5" /> Exceptions Radar
             {metrics.exceptionsCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-black text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center">
                 {metrics.exceptionsCount}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab("timeline")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "timeline" ? "bg-white/5 text-[#b5a642] border border-white/5" : "text-white/40 hover:text-white/80"
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 border ${
+              activeTab === "timeline" ? "bg-[var(--color-surface-2)] text-[var(--color-accent)] border-[var(--color-border)]" : "bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] border-transparent"
             }`}
           >
             <Activity className="h-3.5 w-3.5" /> Audit log Timeline
           </button>
           <button
             onClick={() => setActiveTab("security")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "security" ? "bg-white/5 text-[#b5a642] border border-white/5" : "text-white/40 hover:text-white/80"
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 border ${
+              activeTab === "security" ? "bg-[var(--color-surface-2)] text-[var(--color-accent)] border-[var(--color-border)]" : "bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] border-transparent"
             }`}
           >
             <Lock className="h-3.5 w-3.5" /> Security &amp; SIN Access
@@ -567,19 +567,19 @@ export const Compliance: React.FC<ComplianceProps> = ({
         {/* CHECKLISTS AND READINESS RADAR */}
         {activeTab === "checklist" && (
           <div className="space-y-6">
-            <div className="bg-[#16161c]/45 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="text-xs">
-                <span className="text-[#b5a642] font-black uppercase tracking-wider block">🛡️ Client File Cleanliness Verification Engine</span>
-                <span className="text-white/40 block mt-0.5 font-semibold">
+                <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">🛡️ Client File Cleanliness Verification Engine</span>
+                <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
                   Review mandatory document collections, verify GDS/TDS parameters, log clearance decisions, and mark files as "Broker Audit-Ready".
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#121216] border border-white/5 rounded-2xl overflow-hidden">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs font-semibold">
-                  <thead className="bg-[#16161c] text-white/40 uppercase text-[9px] tracking-wider border-b border-white/5">
+                  <thead className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] uppercase text-[9px] tracking-wider border-b border-[var(--color-border)]">
                     <tr>
                       <th className="p-4">Borrower Name</th>
                       <th className="p-4">Assigned Broker</th>
@@ -590,7 +590,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                       <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.03]">
+                  <tbody className="divide-y divide-[var(--color-border)]">
                     {clientComplianceList.map(c => {
                       const docStats = getClientDocStats(c.id);
                       const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
@@ -608,26 +608,26 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
                       return (
                         <React.Fragment key={c.id}>
-                          <tr className="hover:bg-white/[0.02] transition-colors">
+                          <tr className="hover:bg-[var(--color-surface-2)]/50 transition-colors">
                             <td className="p-4">
-                              <div className="text-white font-bold">{c.first} {c.last}</div>
-                              <div className="text-[10px] text-white/30 truncate max-w-[180px] mt-0.5">{c.addr || "No registered address"}</div>
+                              <div className="text-[var(--color-text)] font-bold">{c.first} {c.last}</div>
+                              <div className="text-[10px] text-[var(--color-text-muted)] truncate max-w-[180px] mt-0.5">{c.addr || "No registered address"}</div>
                             </td>
-                            <td className="p-4 text-white/70 font-semibold">{owner}</td>
+                            <td className="p-4 text-[var(--color-text-muted)] font-semibold">{owner}</td>
                             <td className="p-4">
-                              <span className="bg-white/5 text-white/60 text-[9px] font-black uppercase px-2 py-0.5 rounded border border-white/5">
+                              <span className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[9px] font-black uppercase px-2 py-0.5 rounded border border-[var(--color-border)]">
                                 {c.status.toUpperCase()}
                               </span>
                             </td>
                             <td className="p-4">
-                              <div className="text-white">${Number(c.income || 0).toLocaleString()}/yr</div>
-                              <div className="text-[10px] text-white/30 mt-0.5">Debts: ${Number(c.debts || 0).toLocaleString()}</div>
+                              <div className="text-[var(--color-text)]">${Number(c.income || 0).toLocaleString()}/yr</div>
+                              <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Debts: ${Number(c.debts || 0).toLocaleString()}</div>
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-white font-mono">{docStats.totalReceived}/{docStats.totalRequired}</span>
-                                <div className="w-16 bg-white/5 h-1.5 rounded-full overflow-hidden">
-                                  <div className="bg-[#b5a642] h-full" style={{ width: `${docStats.percent}%` }} />
+                                <span className="text-[var(--color-text)] font-mono">{docStats.totalReceived}/{docStats.totalRequired}</span>
+                                <div className="w-16 bg-[var(--color-surface-2)] h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-[var(--color-accent)] h-full" style={{ width: `${docStats.percent}%` }} />
                                 </div>
                               </div>
                             </td>
@@ -639,7 +639,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                             <td className="p-4 text-right">
                               <button
                                 onClick={() => setSelectedClient(selectedClient?.id === c.id ? null : c)}
-                                className="px-3 py-1.5 bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border border-[#b5a642]/20 text-[#b5a642] rounded-lg text-[10px] font-black uppercase transition-all"
+                                className="px-3 py-1.5 bg-[var(--color-accent-subtle)] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border-accent)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
                               >
                                 {selectedClient?.id === c.id ? "Close Audit" : "Audit File"}
                               </button>
@@ -649,29 +649,29 @@ export const Compliance: React.FC<ComplianceProps> = ({
                           {/* Nested compliance client detail audit card */}
                           {selectedClient?.id === c.id && (
                             <tr>
-                              <td colSpan={7} className="bg-[#141419]/90 p-6 border-y border-white/5">
+                              <td colSpan={7} className="bg-[var(--color-surface-2)] p-6 border-y border-[var(--color-border)]">
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-xs font-semibold">
                                   
                                   {/* Left col: documents checklist */}
                                   <div>
-                                    <h4 className="text-[10px] text-white/30 uppercase font-black tracking-widest mb-3 flex items-center gap-1">
-                                      <FileText className="h-3.5 w-3.5 text-[#b5a642]" /> Required Document Audit
+                                    <h4 className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest mb-3 flex items-center gap-1">
+                                      <FileText className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Required Document Audit
                                     </h4>
                                     <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                                       {REQUIRED_DOC_TYPES.map(doc => {
                                         const state = (docVault[c.id] || {})[doc.id] || { status: doc.req ? "required" : "na" };
                                         return (
-                                          <div key={doc.id} className="p-2.5 bg-[#17171e] rounded-lg border border-white/5 flex items-center justify-between gap-2">
+                                          <div key={doc.id} className="p-2.5 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] flex items-center justify-between gap-2">
                                             <div className="min-w-0 flex-1">
-                                              <div className="text-white/80 font-bold truncate">{doc.label}</div>
-                                              <div className="text-[9px] text-[#8e95a3] truncate mt-0.5">
+                                              <div className="text-[var(--color-text)] font-bold truncate">{doc.label}</div>
+                                              <div className="text-[9px] text-[var(--color-text-muted)] truncate mt-0.5">
                                                 {state.path || "No file uploaded yet"}
                                               </div>
                                             </div>
                                             <select
                                               value={state.status}
                                               onChange={(e) => handleUpdateDocStatusChecklist(c.id, doc.id, e.target.value)}
-                                              className="bg-[#111114] border border-white/10 text-[9px] font-black uppercase p-1.5 rounded focus:outline-none focus:border-[#b5a642]"
+                                              className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] font-black uppercase p-1.5 rounded focus:outline-none focus:border-[var(--color-accent)]"
                                             >
                                               <option value="required">Required</option>
                                               <option value="received">✓ Received</option>
@@ -687,30 +687,30 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                   {/* Center col: financial safety parameters */}
                                   <div className="space-y-4">
                                     <div>
-                                      <h4 className="text-[10px] text-white/30 uppercase font-black tracking-widest mb-3">
+                                      <h4 className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest mb-3">
                                         📈 Mortgage GDS/TDS safety constraints
                                       </h4>
-                                      <div className="p-3.5 bg-[#17171e] rounded-xl border border-white/5 space-y-2.5">
-                                        <div className="flex justify-between border-b border-white/5 pb-1.5">
-                                          <span className="text-white/50">Primary Income:</span>
-                                          <span className="text-white font-mono">${Number(c.income || 0).toLocaleString()}/yr</span>
+                                      <div className="p-3.5 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] space-y-2.5">
+                                        <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
+                                          <span className="text-[var(--color-text-muted)]">Primary Income:</span>
+                                          <span className="text-[var(--color-text)] font-mono">${Number(c.income || 0).toLocaleString()}/yr</span>
                                         </div>
-                                        <div className="flex justify-between border-b border-white/5 pb-1.5">
-                                          <span className="text-white/50">Mortgage Loan Amt:</span>
-                                          <span className="text-white font-mono">${Number(c.mtgamt || 0).toLocaleString()}</span>
+                                        <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
+                                          <span className="text-[var(--color-text-muted)]">Mortgage Loan Amt:</span>
+                                          <span className="text-[var(--color-text)] font-mono">${Number(c.mtgamt || 0).toLocaleString()}</span>
                                         </div>
-                                        <div className="flex justify-between border-b border-white/5 pb-1.5">
-                                          <span className="text-white/50">Registered SIN:</span>
-                                          <span className="text-amber-300 font-mono">{c.sin ? formatSinValue(c.sin) : "Not Provided"}</span>
+                                        <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
+                                          <span className="text-[var(--color-text-muted)]">Registered SIN:</span>
+                                          <span className="text-amber-500 font-mono font-bold">{c.sin ? formatSinValue(c.sin) : "Not Provided"}</span>
                                         </div>
-                                        <div className="flex justify-between border-b border-white/5 pb-1.5">
-                                          <span className="text-white/50">Client Date of Birth:</span>
-                                          <span className="text-white font-mono">{c.dob || "Not Entered"}</span>
+                                        <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
+                                          <span className="text-[var(--color-text-muted)]">Client Date of Birth:</span>
+                                          <span className="text-[var(--color-text)] font-mono">{c.dob || "Not Entered"}</span>
                                         </div>
                                         {c.co && (
                                           <div className="flex justify-between">
-                                            <span className="text-white/50">Co-Signer Added:</span>
-                                            <span className="text-[#b5a642] truncate max-w-[120px]">{c.co}</span>
+                                            <span className="text-[var(--color-text-muted)]">Co-Signer Added:</span>
+                                            <span className="text-[var(--color-accent)] truncate max-w-[120px]">{c.co}</span>
                                           </div>
                                         )}
                                       </div>
@@ -718,26 +718,26 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
                                     {/* AI summaries check */}
                                     {c.aiSummary && (
-                                      <div className="p-3 bg-[#16161c] border border-white/5 rounded-xl space-y-2">
+                                      <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl space-y-2">
                                         <div className="flex justify-between items-center">
-                                          <span className="text-[10px] text-white/40 uppercase font-black">AI Intake report Verification</span>
+                                          <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black">AI Intake report Verification</span>
                                           {c.appData?.aiConfirmed ? (
                                             <span className="text-[9px] bg-emerald-500/10 text-emerald-400 font-bold px-1.5 py-0.5 rounded uppercase flex items-center gap-0.5">
                                               ✓ Locked
                                             </span>
                                           ) : (
-                                            <span className="text-[9px] bg-amber-500/10 text-amber-400 font-bold px-1.5 py-0.5 rounded uppercase">
+                                            <span className="text-[9px] bg-amber-500/10 text-amber-500 font-bold px-1.5 py-0.5 rounded uppercase">
                                               Awaiting Review
                                             </span>
                                           )}
                                         </div>
-                                        <p className="text-[10px] text-white/50 line-clamp-3 leading-relaxed italic">
+                                        <p className="text-[10px] text-[var(--color-text-muted)] line-clamp-3 leading-relaxed italic">
                                           {c.aiSummary}
                                         </p>
                                         {!c.appData?.aiConfirmed && (
                                           <button
                                             onClick={() => handleConfirmAiSummary(c.id)}
-                                            className="w-full py-1.5 bg-[#b5a642] hover:bg-[#9a8c38] text-black font-black text-[9px] uppercase rounded-lg tracking-wider transition-all"
+                                            className="w-full py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] font-black text-[9px] uppercase rounded-lg tracking-wider transition-all cursor-pointer"
                                           >
                                             Confirm AI Accuracy &amp; Approve Intake
                                           </button>
@@ -749,10 +749,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                   {/* Right col: log notes, outcomes, and clearance actions */}
                                   <div className="flex flex-col justify-between">
                                     <div>
-                                      <h4 className="text-[10px] text-white/30 uppercase font-black tracking-widest mb-3">
+                                      <h4 className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest mb-3">
                                         📝 Compliance Auditing notes &amp; decisions
                                       </h4>
-                                      <div className="bg-[#17171e] border border-white/5 p-3 rounded-xl max-h-40 overflow-y-auto mb-3 text-[11px] leading-relaxed text-white/70 whitespace-pre-line font-mono">
+                                      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-3 rounded-xl max-h-40 overflow-y-auto mb-3 text-[11px] leading-relaxed text-[var(--color-text)] whitespace-pre-line font-mono">
                                         {c.retentionNotes || "No manual compliance clearance records logged yet for this folder."}
                                       </div>
                                       
@@ -761,14 +761,14 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                         value={newComplianceNote}
                                         onChange={(e) => setNewComplianceNote(e.target.value)}
                                         placeholder="Add permanent auditor commentary regarding document validation exceptions or GDS overrides..."
-                                        className="w-full bg-[#16161c] border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#b5a642]/30 font-semibold"
+                                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-accent)]/30 font-semibold"
                                       />
                                     </div>
 
                                     <div className="flex gap-2 mt-4">
                                       <button
                                         onClick={handleAddComplianceNote}
-                                        className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-[10px] font-black uppercase border border-white/5 transition-all"
+                                        className="flex-1 py-2 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] rounded-lg text-[10px] font-black uppercase border border-[var(--color-border)] transition-all cursor-pointer"
                                       >
                                         Log Auditor Note
                                       </button>
@@ -802,7 +802,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                           showToast(`File certified and cleared for submission!`, "success");
                                           setSelectedClient(null);
                                         }}
-                                        className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 text-black rounded-lg text-[10px] font-black uppercase transition-all"
+                                        className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
                                       >
                                         Clear File Compliance
                                       </button>
@@ -826,20 +826,20 @@ export const Compliance: React.FC<ComplianceProps> = ({
         {/* EXCEPTIONS RADAR */}
         {activeTab === "exceptions" && (
           <div className="space-y-6">
-            <div className="bg-[#16161c]/45 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="text-xs">
-                <span className="text-[#b5a642] font-black uppercase tracking-wider block">⚠️ Real-Time Process Exception &amp; Stagnation Radar</span>
-                <span className="text-white/40 block mt-0.5 font-semibold">
+                <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">⚠️ Real-Time Process Exception &amp; Stagnation Radar</span>
+                <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
                   This radar scans the database dynamically to catch incomplete file openings, overdue deadlines, documents gap, inactive pipelines, and unconfirmed AI structures.
                 </span>
               </div>
             </div>
 
             {complianceExceptions.length === 0 ? (
-              <div className="bg-[#131318]/40 border border-white/5 rounded-2xl p-16 text-center space-y-2">
+              <div className="bg-[var(--color-surface)]/40 border border-[var(--color-border)] rounded-2xl p-16 text-center space-y-2">
                 <ShieldCheck className="h-10 w-10 text-emerald-400 mx-auto" />
-                <p className="text-sm font-black text-white/50 uppercase">Zero exception anomalies flagged</p>
-                <p className="text-xs text-white/30 max-w-sm mx-auto font-medium">Excellent work! All active folders, communication channels, and documentation vaults conform to GBK Financial's process standards.</p>
+                <p className="text-sm font-black text-[var(--color-text-muted)] uppercase">Zero exception anomalies flagged</p>
+                <p className="text-xs text-[var(--color-text-faint)] max-w-sm mx-auto font-medium">Excellent work! All active folders, communication channels, and documentation vaults conform to GBK Financial's process standards.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="exceptions-grid">
@@ -849,12 +849,12 @@ export const Compliance: React.FC<ComplianceProps> = ({
                   if (ex.severity === "low") badge = "bg-purple-500/10 text-purple-300 border-purple-500/20";
 
                   return (
-                    <div key={index} className="bg-[#141419] border border-white/5 hover:border-white/10 rounded-2xl p-5 flex flex-col justify-between transition-all">
+                    <div key={index} className="bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] rounded-2xl p-5 flex flex-col justify-between transition-all">
                       <div>
                         <div className="flex justify-between items-start gap-4">
                           <div>
-                            <span className="text-xs text-white font-black">{ex.clientName}</span>
-                            <span className="text-[10px] text-white/30 block mt-0.5">Assigned broker: {ex.agent}</span>
+                            <span className="text-xs text-[var(--color-text)] font-black">{ex.clientName}</span>
+                            <span className="text-[10px] text-[var(--color-text-muted)] block mt-0.5">Assigned broker: {ex.agent}</span>
                           </div>
                           <span className={`px-2 py-0.5 text-[8px] border font-black uppercase rounded ${badge}`}>
                             {ex.severity} RISK
@@ -862,18 +862,18 @@ export const Compliance: React.FC<ComplianceProps> = ({
                         </div>
 
                         <div className="my-4 space-y-2 text-xs">
-                          <p className="text-[#eeeef2] font-semibold leading-relaxed">{ex.description}</p>
-                          <div className="bg-[#191922] border border-white/5 p-3 rounded-xl flex gap-2">
-                            <Info className="h-4 w-4 text-[#b5a642] shrink-0 mt-0.5" />
+                          <p className="text-[var(--color-text)] font-semibold leading-relaxed">{ex.description}</p>
+                          <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-3 rounded-xl flex gap-2">
+                            <Info className="h-4 w-4 text-[var(--color-accent)] shrink-0 mt-0.5" />
                             <div>
-                              <span className="text-[10px] text-white/40 uppercase font-black block">Suggested Resolution Action:</span>
-                              <p className="text-[11px] text-white/70 font-semibold mt-0.5 leading-relaxed">{ex.actionable}</p>
+                              <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black block">Suggested Resolution Action:</span>
+                              <p className="text-[11px] text-[var(--color-text)] font-semibold mt-0.5 leading-relaxed">{ex.actionable}</p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="border-t border-white/5 pt-3 flex justify-end gap-2">
+                      <div className="border-t border-[var(--color-border)] pt-3 flex justify-end gap-2">
                         <button
                           onClick={() => {
                             // Find the client object
@@ -884,7 +884,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                               showToast(`Loaded auditing desk for ${found.first}!`, "info");
                             }
                           }}
-                          className="px-3 py-1.5 bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border border-[#b5a642]/20 text-[#b5a642] rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1"
+                          className="px-3 py-1.5 bg-[var(--color-accent-subtle)] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border-accent)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
                         >
                           Audit Document Checklist <ArrowRight className="h-3 w-3" />
                         </button>
@@ -900,25 +900,25 @@ export const Compliance: React.FC<ComplianceProps> = ({
         {/* AUDIT LOG TIMELINE */}
         {activeTab === "timeline" && (
           <div className="space-y-6">
-            <div className="bg-[#16161c]/45 border border-white/5 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="text-xs">
-                <span className="text-[#b5a642] font-black uppercase tracking-wider block">🕒 Immutable Operations Activity Timeline</span>
-                <span className="text-white/40 block mt-0.5 font-semibold">
+                <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">🕒 Immutable Operations Activity Timeline</span>
+                <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
                   Real-time accountability stream tracking profile views, exports, credentials access, document state modifications, and logins.
                 </span>
               </div>
               <button
                 onClick={() => setShowExportModal(true)}
-                className="px-3.5 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black font-black text-[10px] uppercase rounded-lg flex items-center gap-1.5 shrink-0 transition-all"
+                className="px-3.5 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] font-black text-[10px] uppercase rounded-lg flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
               >
                 <Download className="h-3.5 w-3.5" /> Export Audit Records
               </button>
             </div>
 
             {/* Audit log filters */}
-            <div className="bg-[#131317] border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between gap-3">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-white/40 uppercase font-black">Timeline Actions:</span>
+                <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black">Timeline Actions:</span>
                 <div className="flex gap-1.5 flex-wrap">
                   {[
                     { id: "All", label: "All Logs" },
@@ -929,10 +929,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
                     <button
                       key={btn.id}
                       onClick={() => setTimelineActionFilter(btn.id)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all border cursor-pointer ${
                         timelineActionFilter === btn.id 
-                          ? "bg-[#b5a642] text-black" 
-                          : "bg-white/5 hover:bg-white/10 text-white"
+                          ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" 
+                          : "bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border-[var(--color-border)]"
                       }`}
                     >
                       {btn.label}
@@ -941,26 +941,26 @@ export const Compliance: React.FC<ComplianceProps> = ({
                 </div>
               </div>
 
-              <div className="relative bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center w-full sm:w-64">
-                <Search className="h-3.5 w-3.5 text-white/30 shrink-0 mr-1.5" />
+              <div className="relative bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 flex items-center w-full sm:w-64">
+                <Search className="h-3.5 w-3.5 text-[var(--color-text-muted)] shrink-0 mr-1.5" />
                 <input
                   type="text"
                   placeholder="Filter timeline records..."
                   value={timelineSearch}
                   onChange={(e) => setTimelineSearch(e.target.value)}
-                  className="bg-transparent border-none text-[11px] text-white focus:outline-none w-full font-semibold"
+                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none w-full font-semibold"
                 />
               </div>
             </div>
 
             {/* Timeline Stream */}
-            <div className="bg-[#121216] border border-white/5 rounded-2xl overflow-hidden p-6 space-y-4">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl overflow-hidden p-6 space-y-4">
               {filteredAuditLogs.length === 0 ? (
-                <div className="text-center py-10 text-white/30 font-semibold text-xs">
+                <div className="text-center py-10 text-[var(--color-text-faint)] font-semibold text-xs">
                   No logged entries match your search criteria.
                 </div>
               ) : (
-                <div className="relative border-l border-white/5 ml-3 pl-6 space-y-6">
+                <div className="relative border-l border-[var(--color-border)] ml-3 pl-6 space-y-6">
                   {filteredAuditLogs.map((log, index) => {
                     let isSensitive = 
                       log.action.toLowerCase().includes("sin") || 
@@ -972,27 +972,27 @@ export const Compliance: React.FC<ComplianceProps> = ({
                     return (
                       <div key={index} className="relative group">
                         {/* Bullet */}
-                        <div className={`absolute -left-[30px] top-1 w-3 h-3 rounded-full border-2 bg-[#0c0c0e] group-hover:scale-125 transition-transform ${
-                          isSensitive ? "border-amber-400" : "border-[#b5a642]"
+                        <div className={`absolute -left-[30px] top-1 w-3 h-3 rounded-full border-2 bg-[var(--color-bg)] group-hover:scale-125 transition-transform ${
+                          isSensitive ? "border-amber-400" : "border-[var(--color-accent)]"
                         }`} />
                         
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
                           <div className="text-xs">
-                            <span className="text-white font-black">{log.user}</span>
-                            <span className="text-white/40 mx-1.5">performed</span>
+                            <span className="text-[var(--color-text)] font-black">{log.user}</span>
+                            <span className="text-[var(--color-text-muted)] mx-1.5">performed</span>
                             <span className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded ${
-                              isSensitive ? "text-amber-300 bg-amber-500/10" : "text-white bg-white/5"
+                              isSensitive ? "text-amber-500 bg-amber-500/10" : "text-[var(--color-text)] bg-[var(--color-surface-2)]"
                             }`}>
                               {log.action}
                             </span>
                             {log.target && (
                               <>
-                                <span className="text-white/40 mx-1.5">on</span>
-                                <span className="text-white font-semibold">{log.target}</span>
+                                <span className="text-[var(--color-text-muted)] mx-1.5">on</span>
+                                <span className="text-[var(--color-text)] font-semibold">{log.target}</span>
                               </>
                             )}
                           </div>
-                          <span className="text-[10px] text-white/30 font-mono">
+                          <span className="text-[10px] text-[var(--color-text-muted)] font-mono">
                             {new Date(log.time).toLocaleString()}
                           </span>
                         </div>
@@ -1008,10 +1008,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
         {/* SECURITY & SENSITIVE DATA CONTROLS */}
         {activeTab === "security" && (
           <div className="space-y-6">
-            <div className="bg-[#16161c]/45 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="text-xs">
-                <span className="text-[#b5a642] font-black uppercase tracking-wider block">🔒 Automated Workstation Security &amp; SIN Masking Rules</span>
-                <span className="text-white/40 block mt-0.5 font-semibold">
+                <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">🔒 Automated Workstation Security &amp; SIN Masking Rules</span>
+                <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
                   Verify internal process accountability, configure workstation auto-lock timers, audit failed lockouts, and manage masked SIN views.
                 </span>
               </div>
@@ -1020,22 +1020,22 @@ export const Compliance: React.FC<ComplianceProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Left Column: Security Settings Toggles */}
-              <div className="bg-[#121216] border border-white/5 rounded-2xl p-6 space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 space-y-6">
                 <div>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-white/80 border-b border-white/5 pb-2.5">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] border-b border-[var(--color-border)] pb-2.5">
                     Security Policy Configuration
                   </h3>
-                  <p className="text-[10px] text-white/40 mt-1 font-semibold leading-relaxed">
+                  <p className="text-[10px] text-[var(--color-text-muted)] mt-1 font-semibold leading-relaxed">
                     Set operational guidelines for local workstation idle timers,failed unlock constraints, and audit log pipelines.
                   </p>
                 </div>
 
                 <div className="space-y-4 text-xs font-semibold">
                   {/* Toggle 1: Auto-Lock */}
-                  <div className="flex items-center justify-between p-3.5 bg-[#17171e] rounded-xl border border-white/5">
+                  <div className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)]">
                     <div>
-                      <span className="text-white font-bold block">Session Auto-Lock</span>
-                      <span className="text-[10px] text-white/30 mt-0.5 block leading-relaxed">Automatically lock the workspace if no keyboard or mouse activity is observed.</span>
+                      <span className="text-[var(--color-text)] font-bold block">Session Auto-Lock</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block leading-relaxed">Automatically lock the workspace if no keyboard or mouse activity is observed.</span>
                     </div>
                     <button
                       onClick={() => {
@@ -1044,11 +1044,11 @@ export const Compliance: React.FC<ComplianceProps> = ({
                         localStorage.setItem("gbk_sec_autolock", String(nextVal));
                         showToast(`Session auto-lock ${nextVal ? "enabled" : "disabled"}.`, "info");
                       }}
-                      className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
-                        sessionAutoLock ? "bg-[#b5a642]" : "bg-white/10"
+                      className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none cursor-pointer ${
+                        sessionAutoLock ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-3)]"
                       }`}
                     >
-                      <div className={`bg-[#121216] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
+                      <div className={`bg-[var(--color-surface)] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
                         sessionAutoLock ? "translate-x-5.5" : "translate-x-0"
                       }`} />
                     </button>
@@ -1056,10 +1056,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
                   {/* Selector: Auto-Lock Minutes */}
                   {sessionAutoLock && (
-                    <div className="flex items-center justify-between p-3.5 bg-[#17171e] rounded-xl border border-white/5">
+                    <div className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)]">
                       <div>
-                        <span className="text-white font-bold block">Lockstation Idle Timer</span>
-                        <span className="text-[10px] text-white/30 mt-0.5 block">Threshold duration of idle state before app requires a 4-digit security PIN.</span>
+                        <span className="text-[var(--color-text)] font-bold block">Lockstation Idle Timer</span>
+                        <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Threshold duration of idle state before app requires a 4-digit security PIN.</span>
                       </div>
                       <select
                         value={autoLockMinutes}
@@ -1069,22 +1069,22 @@ export const Compliance: React.FC<ComplianceProps> = ({
                           localStorage.setItem("gbk_sec_idle_min", String(val));
                           showToast(`Lockstation idle threshold updated to ${val} minutes.`, "info");
                         }}
-                        className="bg-[#111114] border border-white/10 text-white font-black text-xs p-2 rounded focus:outline-none focus:border-[#b5a642]"
+                        className="bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)] font-black text-xs p-2 rounded focus:outline-none focus:border-[var(--color-accent)]"
                       >
-                        <option value={3}>3 Minutes (High Secure)</option>
-                        <option value={5}>5 Minutes</option>
-                        <option value={10}>10 Minutes</option>
-                        <option value={15}>15 Minutes</option>
-                        <option value={30}>30 Minutes</option>
+                        <option value={3} className="bg-[var(--color-surface-2)]">3 Minutes (High Secure)</option>
+                        <option value={5} className="bg-[var(--color-surface-2)]">5 Minutes</option>
+                        <option value={10} className="bg-[var(--color-surface-2)]">10 Minutes</option>
+                        <option value={15} className="bg-[var(--color-surface-2)]">15 Minutes</option>
+                        <option value={30} className="bg-[var(--color-surface-2)]">30 Minutes</option>
                       </select>
                     </div>
                   )}
 
                   {/* Toggle 2: Immutable Auditing */}
-                  <div className="flex items-center justify-between p-3.5 bg-[#17171e] rounded-xl border border-white/5">
+                  <div className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)]">
                     <div>
-                      <span className="text-white font-bold block">Immutable Audit Logging</span>
-                      <span className="text-[10px] text-white/30 mt-0.5 block leading-relaxed">Mandate persistent audit trails for all critical folder modifications, exports, and document actions.</span>
+                      <span className="text-[var(--color-text)] font-bold block">Immutable Audit Logging</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block leading-relaxed">Mandate persistent audit trails for all critical folder modifications, exports, and document actions.</span>
                     </div>
                     <button
                       onClick={() => {
@@ -1093,11 +1093,11 @@ export const Compliance: React.FC<ComplianceProps> = ({
                         localStorage.setItem("gbk_sec_audit", String(nextVal));
                         showToast(`Process audit log pipeline ${nextVal ? "active" : "dormant"}.`, "info");
                       }}
-                      className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
-                        auditLoggingEnabled ? "bg-[#b5a642]" : "bg-white/10"
+                      className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none cursor-pointer ${
+                        auditLoggingEnabled ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-3)]"
                       }`}
                     >
-                      <div className={`bg-[#121216] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
+                      <div className={`bg-[var(--color-surface)] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
                         auditLoggingEnabled ? "translate-x-5.5" : "translate-x-0"
                       }`} />
                     </button>
@@ -1106,28 +1106,28 @@ export const Compliance: React.FC<ComplianceProps> = ({
               </div>
 
               {/* Right Column: SIN Masking Verification list */}
-              <div className="bg-[#121216] border border-white/5 rounded-2xl p-6 space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 space-y-6">
                 <div>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-white/80 border-b border-white/5 pb-2.5 flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] border-b border-[var(--color-border)] pb-2.5 flex items-center justify-between">
                     <span>SIN Information Masking &amp; Auditing</span>
                     <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded uppercase font-black">
                       active &amp; enforced
                     </span>
                   </h3>
-                  <p className="text-[10px] text-white/40 mt-1 font-semibold leading-relaxed">
+                  <p className="text-[10px] text-[var(--color-text-muted)] mt-1 font-semibold leading-relaxed">
                     Social Insurance Numbers (SIN) are strictly masked by default. The last 4 digits are only visible to authorized brokers. Full SIN edits require manual re-validation.
                   </p>
                 </div>
 
                 <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                   {clients.map(cl => (
-                    <div key={cl.id} className="p-3 bg-[#17171e] rounded-xl border border-white/5 flex justify-between items-center text-xs">
+                    <div key={cl.id} className="p-3 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] flex justify-between items-center text-xs">
                       <div>
-                        <span className="text-white font-bold block">{cl.first} {cl.last}</span>
-                        <span className="text-[10px] text-white/30 mt-0.5 block">File status: {cl.status.toUpperCase()}</span>
+                        <span className="text-[var(--color-text)] font-bold block">{cl.first} {cl.last}</span>
+                        <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">File status: {cl.status.toUpperCase()}</span>
                       </div>
                       <div className="text-right">
-                        <span className="bg-[#111114] border border-white/5 px-2.5 py-1.5 rounded-lg text-amber-300 font-mono text-[11px] block select-none">
+                        <span className="bg-[var(--color-surface)] border border-[var(--color-border)] px-2.5 py-1.5 rounded-lg text-amber-500 font-mono font-bold text-[11px] block select-none">
                           {cl.sin ? formatSinValue(cl.sin) : "Not Configured"}
                         </span>
                         {cl.sin && (
@@ -1143,7 +1143,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                               setAuditLogs(prev => [logItem, ...prev]);
                               showToast(`SIN access for ${cl.first} logged to immutable database audit records!`, "warning", "🛡️");
                             }}
-                            className="text-[9px] text-[#b5a642] hover:underline font-black uppercase mt-1 inline-block"
+                            className="text-[9px] text-[var(--color-accent)] hover:underline font-black uppercase mt-1 inline-block cursor-pointer bg-transparent border-none"
                           >
                             Trace Access Log
                           </button>
@@ -1162,19 +1162,19 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
       {/* Export CSV Audit Log Modal */}
       {showExportModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in" id="export-overlay">
-          <div className="bg-[#121216] border border-white/10 rounded-2xl w-full max-w-xl p-6 relative flex flex-col text-xs font-semibold">
+        <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in" id="export-overlay">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-xl p-6 relative flex flex-col text-xs font-semibold">
             <button 
               onClick={() => setShowExportModal(false)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-base font-black uppercase tracking-wider text-[#b5a642] flex items-center gap-2 mb-2">
-              <FileSpreadsheet className="h-5 w-5 text-[#b5a642]" /> Export Compliance Audit CSV Text
+            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2 mb-2">
+              <FileSpreadsheet className="h-5 w-5 text-[var(--color-accent)]" /> Export Compliance Audit CSV Text
             </h3>
-            <p className="text-xs text-white/40 font-semibold mb-4 border-b border-white/5 pb-3">
+            <p className="text-xs text-[var(--color-text-muted)] font-semibold mb-4 border-b border-[var(--color-border)] pb-3">
               Copy and compile the following standardized audit logs format to meet FSRA license compliance checks or backups.
             </p>
 
@@ -1182,11 +1182,11 @@ export const Compliance: React.FC<ComplianceProps> = ({
               rows={12}
               readOnly
               value={generateCsvReport()}
-              className="w-full bg-[#16161c] border border-white/5 text-white p-3.5 rounded-lg font-mono text-[10px] leading-relaxed focus:outline-none"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] p-3.5 rounded-lg font-mono text-[10px] leading-relaxed focus:outline-none"
               onClick={(e) => (e.target as HTMLTextAreaElement).select()}
             />
 
-            <div className="border-t border-white/5 mt-5 pt-4 flex justify-end gap-3 shrink-0">
+            <div className="border-t border-[var(--color-border)] mt-5 pt-4 flex justify-end gap-3 shrink-0">
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(generateCsvReport());
@@ -1203,13 +1203,13 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
                   setShowExportModal(false);
                 }}
-                className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black rounded-lg text-xs font-black uppercase flex items-center gap-1.5 transition-all"
+                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] rounded-lg text-xs font-black uppercase flex items-center gap-1.5 transition-all cursor-pointer"
               >
                 Copy to Clipboard
               </button>
               <button
                 onClick={() => setShowExportModal(false)}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all border border-white/5"
+                className="px-4 py-2 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] cursor-pointer"
               >
                 Close
               </button>

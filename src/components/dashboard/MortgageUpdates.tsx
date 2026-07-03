@@ -176,7 +176,7 @@ export const MortgageUpdates: React.FC = () => {
           {updates.map((item, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)] transition-all flex flex-col justify-between gap-3 group relative overflow-hidden"
+              className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)] transition-all flex flex-col justify-between gap-3 group relative overflow-hidden"
             >
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">

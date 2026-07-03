@@ -443,7 +443,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
           <div className="space-y-4">
             
             {/* Notes Tool bar search and filter */}
-            <div className="bg-[#131317] border border-white/5 p-3 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="bg-[var(--color-surface-2)] border border-white/5 p-3 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="relative w-full sm:max-w-xs">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-white/30" />
                 <input 
@@ -451,7 +451,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   placeholder="Search file notes or keywords..."
                   value={notesSearch}
                   onChange={(e) => setNotesSearch(e.target.value)}
-                  className="w-full bg-[#171720]/80 border border-white/5 rounded-lg pl-9 pr-4 py-2 text-[11px] text-white focus:outline-none focus:border-[#b5a642]"
+                  className="w-full bg-[var(--color-surface-2)]/80 border border-white/5 rounded-lg pl-9 pr-4 py-2 text-[11px] text-white focus:outline-none focus:border-[var(--color-accent)]"
                 />
               </div>
 
@@ -460,7 +460,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 <select 
                   value={notesFilterType}
                   onChange={(e) => setNotesFilterType(e.target.value)}
-                  className="bg-[#111114] border border-white/5 rounded p-1.5 text-[10px] uppercase font-black tracking-wider text-white focus:outline-none w-full sm:w-auto"
+                  className="bg-[var(--color-surface)] border border-white/5 rounded p-1.5 text-[10px] uppercase font-black tracking-wider text-white focus:outline-none w-full sm:w-auto"
                 >
                   <option value="all">All Note Types</option>
                   <option value="general">General</option>
@@ -484,10 +484,10 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
             </div>
 
             {/* Note addition editor */}
-            <form onSubmit={handleAddNote} className="bg-[#171720]/40 border border-white/5 p-4 rounded-xl space-y-3">
+            <form onSubmit={handleAddNote} className="bg-[var(--color-surface-2)]/40 border border-white/5 p-4 rounded-xl space-y-3">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Edit2 className="w-4 h-4 text-[#b5a642]" />
+                  <Edit2 className="w-4 h-4 text-[var(--color-accent)]" />
                   <span className="font-black uppercase tracking-wider text-white text-xs">New Intentional File Note</span>
                 </div>
                 
@@ -497,7 +497,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   <select 
                     value={newNoteType}
                     onChange={(e) => setNewNoteType(e.target.value as FileNote["type"])}
-                    className="bg-[#111114] border border-white/5 rounded px-2 py-1 text-[10px] uppercase font-bold text-white focus:outline-none"
+                    className="bg-[var(--color-surface)] border border-white/5 rounded px-2 py-1 text-[10px] uppercase font-bold text-white focus:outline-none"
                   >
                     <option value="general">General Notes</option>
                     <option value="broker">Broker Notes</option>
@@ -518,7 +518,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 value={newNoteContent}
                 onChange={(e) => setNewNoteContent(e.target.value)}
                 placeholder="Compose professional underwriting notes, compliance updates, phone calls, or file decisions..."
-                className="w-full bg-[#101014] border border-white/5 rounded-lg p-3 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642]/60 font-semibold"
+                className="w-full bg-[var(--color-surface)] border border-white/5 rounded-lg p-3 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[var(--color-accent)]/60 font-semibold"
               />
 
               {/* Tags & Submit */}
@@ -528,12 +528,12 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   value={newNoteTags}
                   onChange={(e) => setNewNoteTags(e.target.value)}
                   placeholder="Comma separated tags: (e.g. salary, appraisal, exception)"
-                  className="w-full sm:max-w-xs bg-[#101014] border border-white/5 rounded px-2.5 py-1.5 text-[10px] text-white placeholder-white/25 focus:outline-none"
+                  className="w-full sm:max-w-xs bg-[var(--color-surface)] border border-white/5 rounded px-2.5 py-1.5 text-[10px] text-white placeholder-white/25 focus:outline-none"
                 />
 
                 <button 
                   type="submit"
-                  className="w-full sm:w-auto px-4 py-2 bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 rounded-md text-[9px] font-black uppercase tracking-wider text-[#b5a642] flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20 rounded-md text-[9px] font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" /> Log File Note
                 </button>
@@ -543,7 +543,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
             {/* Notes List Bubble Rendering */}
             <div className="space-y-3.5">
               {filteredNotes.length === 0 ? (
-                <div className="p-8 text-center bg-[#131317]/20 border border-white/5 rounded-xl">
+                <div className="p-8 text-center bg-[var(--color-surface-2)]/20 border border-white/5 rounded-xl">
                   <p className="text-white/30 italic">No notes found matching your active filter criteria.</p>
                 </div>
               ) : (
@@ -552,7 +552,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   const isEditing = editingNoteId === n.id;
 
                   return (
-                    <div key={n.id} className="p-4 bg-[#131317] border border-white/5 rounded-xl flex flex-col gap-3 hover:border-white/10 transition-colors">
+                    <div key={n.id} className="p-4 bg-[var(--color-surface-2)] border border-white/5 rounded-xl flex flex-col gap-3 hover:border-white/10 transition-colors">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-black text-white uppercase text-[10px] tracking-wide">{n.author}</span>
@@ -569,7 +569,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                             rows={3}
                             value={editedNoteContent}
                             onChange={(e) => setEditedNoteContent(e.target.value)}
-                            className="w-full bg-[#101014] border border-white/5 rounded p-2.5 text-xs text-white focus:outline-none focus:border-[#b5a642]"
+                            className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]"
                           />
                           <div className="flex justify-end gap-2">
                             <button 
@@ -580,7 +580,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                             </button>
                             <button 
                               onClick={() => saveEditedNote(n.id)}
-                              className="px-2 py-1 bg-[#b5a642]/10 border border-[#b5a642]/20 rounded text-[8.5px] uppercase font-black text-[#b5a642] flex items-center gap-1"
+                              className="px-2 py-1 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded text-[8.5px] uppercase font-black text-[var(--color-accent)] flex items-center gap-1"
                             >
                               <Save className="w-3 h-3" /> Save Note
                             </button>
@@ -611,7 +611,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                                 <span>Direction: {n.communicationDetails.direction}</span>
                               </div>
                               {n.communicationDetails.nextActionNeeded && (
-                                <div className="text-[#b5a642] font-semibold italic text-right">
+                                <div className="text-[var(--color-accent)] font-semibold italic text-right">
                                   Action: {n.communicationDetails.nextActionNeeded} (Due: {n.communicationDetails.nextActionDueDate || "Immediate"})
                                 </div>
                               )}
@@ -655,8 +655,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
           <div className="space-y-4">
             
             {/* Timeline Filter toolbar */}
-            <div className="bg-[#131317] border border-white/5 p-3 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
-              <span className="text-[10px] text-[#b5a642] uppercase font-black tracking-widest flex items-center gap-1.5">
+            <div className="bg-[var(--color-surface-2)] border border-white/5 p-3 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+              <span className="text-[10px] text-[var(--color-accent)] uppercase font-black tracking-widest flex items-center gap-1.5">
                 <Clock className="w-4 h-4 shrink-0" /> Unified Operations Audit Trail
               </span>
               
@@ -665,7 +665,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 <select 
                   value={activityFilter}
                   onChange={(e) => setActivityFilter(e.target.value)}
-                  className="bg-[#111114] border border-white/5 rounded p-1.5 text-[10px] uppercase font-black tracking-wider text-white focus:outline-none w-full sm:w-auto"
+                  className="bg-[var(--color-surface)] border border-white/5 rounded p-1.5 text-[10px] uppercase font-black tracking-wider text-white focus:outline-none w-full sm:w-auto"
                 >
                   <option value="all">All File Events</option>
                   <option value="notes_only">Notes Logs Only</option>
@@ -682,7 +682,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
             {/* Render Chronological List */}
             <div className="relative border-l-2 border-white/5 pl-4 py-1.5 space-y-5">
               {filteredActivities.length === 0 ? (
-                <div className="p-8 text-center bg-[#131317]/10 border border-white/5 rounded-xl ml-2">
+                <div className="p-8 text-center bg-[var(--color-surface-2)]/10 border border-white/5 rounded-xl ml-2">
                   <p className="text-white/30 italic">No operational activity logs found for this filter query.</p>
                 </div>
               ) : (
@@ -692,8 +692,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   let eventTitleColor = "text-white/95";
 
                   if (act.eventType === "stage_change") {
-                    dotColor = "bg-[#b5a642] border-[#b5a642]";
-                    eventTitleColor = "text-[#b5a642] font-black";
+                    dotColor = "bg-[var(--color-accent)] border-[var(--color-accent)]";
+                    eventTitleColor = "text-[var(--color-accent)] font-black";
                   } else if (act.eventType === "compliance_flagged") {
                     dotColor = "bg-red-500 border-red-500 animate-pulse";
                     eventTitleColor = "text-red-400 font-extrabold";
@@ -741,8 +741,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       <div className="w-full xl:w-72 shrink-0 space-y-4">
         
         {/* DIAGNOSTIC WARNINGS (MANAGER BOTTLE-NECK WATCH) */}
-        <div className="bg-[#131317] border border-white/5 rounded-xl p-4 space-y-3 shadow-md">
-          <h4 className="text-[9.5px] text-[#b5a642] uppercase font-black tracking-widest flex items-center gap-1.5 border-b border-white/5 pb-2">
+        <div className="bg-[var(--color-surface-2)] border border-white/5 rounded-xl p-4 space-y-3 shadow-md">
+          <h4 className="text-[9.5px] text-[var(--color-accent)] uppercase font-black tracking-widest flex items-center gap-1.5 border-b border-white/5 pb-2">
             <AlertTriangle className="w-3.5 h-3.5" /> Underwriting Audit Health
           </h4>
 
@@ -781,7 +781,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
           {/* Warning: Heavy document chases */}
           {auditDiagnostics.isChasingHeavy && (
-            <div className="p-2.5 bg-[#b5a642]/5 border border-[#b5a642]/15 text-[#b5a642] rounded-lg flex items-start gap-2 text-[10px]">
+            <div className="p-2.5 bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/15 text-[var(--color-accent)] rounded-lg flex items-start gap-2 text-[10px]">
               <Archive className="w-4 h-4 shrink-0 mt-0.5" />
               <div>
                 <strong className="block font-black uppercase tracking-wider">Excessive Document Chases</strong>
@@ -800,9 +800,9 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
         </div>
 
         {/* INTEGRATED FOLLOW-UPS TRACKER PANEL */}
-        <div className="bg-[#131317] border border-white/5 rounded-xl p-4 space-y-3 shadow-md">
+        <div className="bg-[var(--color-surface-2)] border border-white/5 rounded-xl p-4 space-y-3 shadow-md">
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <h4 className="text-[9.5px] text-[#b5a642] uppercase font-black tracking-widest flex items-center gap-1.5">
+            <h4 className="text-[9.5px] text-[var(--color-accent)] uppercase font-black tracking-widest flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" /> Scheduled Follow-Ups
             </h4>
             
@@ -826,7 +826,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   placeholder="e.g. Call client for bank statements"
                   value={followUpTitle}
                   onChange={(e) => setFollowUpTitle(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 rounded p-1.5 text-xs text-white placeholder-white/20 focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-1.5 text-xs text-white placeholder-white/20 focus:outline-none"
                 />
               </div>
 
@@ -838,7 +838,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                     required
                     value={followUpDueDate}
                     onChange={(e) => setFollowUpDueDate(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 rounded p-1 text-[10px] text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-1 text-[10px] text-white focus:outline-none"
                   />
                 </div>
                 
@@ -847,7 +847,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   <select 
                     value={followUpPriority}
                     onChange={(e) => setFollowUpPriority(e.target.value as any)}
-                    className="w-full bg-[#111114] border border-white/5 rounded p-1 text-[10px] font-bold text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-1 text-[10px] font-bold text-white focus:outline-none"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -862,7 +862,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 <select 
                   value={followUpOwner}
                   onChange={(e) => setFollowUpOwner(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 rounded p-1 text-[10px] font-bold uppercase text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-1 text-[10px] font-bold uppercase text-white focus:outline-none"
                 >
                   {agentNames.map(name => (
                     <option key={name} value={name}>{name}</option>
@@ -880,7 +880,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 </button>
                 <button 
                   type="submit" 
-                  className="px-2 py-1 bg-[#b5a642]/10 border border-[#b5a642]/20 text-[#b5a642] rounded text-[9px] uppercase font-black"
+                  className="px-2 py-1 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[var(--color-accent)] rounded text-[9px] uppercase font-black"
                 >
                   Schedule
                 </button>
@@ -955,9 +955,9 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
         <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none animate-fade-in">
           <form 
             onSubmit={handleLogCommunication}
-            className="bg-[#131317] border border-white/5 rounded-2xl w-full max-w-md p-5 shadow-2xl relative flex flex-col gap-4 text-xs"
+            className="bg-[var(--color-surface-2)] border border-white/5 rounded-2xl w-full max-w-md p-5 shadow-2xl relative flex flex-col gap-4 text-xs"
           >
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest border-b border-white/5 pb-2">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest border-b border-white/5 pb-2">
               Log Operations Outreach or Touchpoint
             </h3>
 
@@ -968,7 +968,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 <select 
                   value={commType}
                   onChange={(e) => setCommType(e.target.value as any)}
-                  className="w-full bg-[#111114] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-bold uppercase"
+                  className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[var(--color-accent)] font-bold uppercase"
                 >
                   <option value="phone_call">📞 Phone Call</option>
                   <option value="voicemail">📟 Voicemail</option>
@@ -987,7 +987,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 <select 
                   value={commDirection}
                   onChange={(e) => setCommDirection(e.target.value as any)}
-                  className="w-full bg-[#111114] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-bold uppercase"
+                  className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[var(--color-accent)] font-bold uppercase"
                 >
                   <option value="outgoing">Outgoing Outbound</option>
                   <option value="incoming">Incoming Inbound</option>
@@ -1004,13 +1004,13 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 value={commSummary}
                 onChange={(e) => setCommSummary(e.target.value)}
                 placeholder="Log exact discussion parameters, files discussed, lender confirmation numbers, or follow up promises..."
-                className="w-full bg-[#111114] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-semibold"
+                className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-2 text-white focus:outline-none focus:border-[var(--color-accent)] font-semibold"
               />
             </div>
 
             {/* Next Action Scheduling */}
             <div className="border-t border-white/5 pt-3.5 space-y-3">
-              <span className="text-[9px] text-[#b5a642] font-black uppercase tracking-widest block">Optionally Schedule Future Follow-Up Outreach</span>
+              <span className="text-[9px] text-[var(--color-accent)] font-black uppercase tracking-widest block">Optionally Schedule Future Follow-Up Outreach</span>
               
               <div className="space-y-1.5">
                 <label className="block text-[8px] text-white/40 uppercase font-black">Next Planned Action</label>
@@ -1019,7 +1019,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   value={commNextStep}
                   onChange={(e) => setCommNextStep(e.target.value)}
                   placeholder="e.g. Call client back to confirm receipt of paystub files"
-                  className="w-full bg-[#111114] border border-white/5 rounded p-2 text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-2 text-white focus:outline-none"
                 />
               </div>
 
@@ -1030,7 +1030,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                     type="date" 
                     value={commNextDueDate}
                     onChange={(e) => setCommNextDueDate(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 rounded p-1.5 text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-white/5 rounded p-1.5 text-white focus:outline-none"
                   />
                 </div>
               </div>
@@ -1047,7 +1047,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
               </button>
               <button 
                 type="submit" 
-                className="px-3 py-1.5 bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 text-[#b5a642] rounded-lg text-[9px] font-black uppercase flex items-center gap-1.5"
+                className="px-3 py-1.5 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] rounded-lg text-[9px] font-black uppercase flex items-center gap-1.5"
               >
                 <Check className="w-3.5 h-3.5" /> Log Touchpoint
               </button>

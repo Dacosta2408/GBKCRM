@@ -15,7 +15,7 @@ const STAGES = [
   { id: "lender", label: "At Lender", color: "bg-orange-500/10 text-orange-400 border-orange-500/20", progressColor: "bg-orange-500" },
   { id: "conditional", label: "Conditional", color: "bg-red-500/10 text-red-400 border-red-500/20", progressColor: "bg-red-500" },
   { id: "approved", label: "Approved", color: "bg-green-500/10 text-green-400 border-green-500/20", progressColor: "bg-green-500" },
-  { id: "funded", label: "Funded", color: "bg-[#F9B17A]/10 text-[#F9B17A] border-[#F9B17A]/20", progressColor: "bg-[#F9B17A]" }
+  { id: "funded", label: "Funded", color: "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/20", progressColor: "bg-[var(--color-accent)]" }
 ];
 
 export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
@@ -85,13 +85,13 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
             <div className="bg-black/25 border border-white/5 rounded-full p-0.5 flex">
               <button
                 onClick={() => setPipelineMode("personal")}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer ${pipelineMode === "personal" ? "bg-[#F9B17A] text-[#12131a]" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer ${pipelineMode === "personal" ? "bg-[var(--color-accent)] text-[#12131a]" : "text-white/60 hover:text-white"}`}
               >
                 My Volume
               </button>
               <button
                 onClick={() => setPipelineMode("team")}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer flex items-center gap-1 ${pipelineMode === "team" ? "bg-[#F9B17A] text-[#12131a]" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer flex items-center gap-1 ${pipelineMode === "team" ? "bg-[var(--color-accent)] text-[#12131a]" : "text-white/60 hover:text-white"}`}
               >
                 <Users className="w-3 h-3" /> Team
               </button>
@@ -115,19 +115,19 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                 <div 
                   key={s.id}
                   onClick={() => setActiveTab("pipeline")}
-                  className="glass-card p-3 flex flex-col justify-between hover:border-[#F9B17A]/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                  className="glass-card p-3 flex flex-col justify-between hover:border-[var(--color-accent)]/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden group"
                 >
                   <div className="flex flex-col gap-1.5">
                     <span className={`text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded border self-start ${s.color}`}>
                       {s.label}
                     </span>
-                    <span className="text-xl font-black mt-1 text-white group-hover:text-[#F9B17A] origin-left transition-colors">
+                    <span className="text-xl font-black mt-1 text-[var(--color-text)] group-hover:text-[var(--color-accent)] origin-left transition-colors">
                       {stageFiles.length}
                     </span>
                   </div>
                   
                   <div className="mt-2.5">
-                    <div className="text-[10px] font-bold font-mono text-white/80">
+                    <div className="text-[10px] font-bold font-mono text-[var(--color-text-muted)]">
                       {fdShort(stageValue)}
                     </div>
                     <div className="text-[9px] text-[var(--color-text-faint)] mt-0.5 font-bold">
@@ -157,12 +157,12 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
           >
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-white/80 font-bold">Active Loan Progression Index:</span>
+              <span className="text-[var(--color-text)] font-bold">Active Loan Progression Index:</span>
               <span className="text-[var(--color-text-muted)] font-medium">78.4% of intake files successfully cleared lender submission in Q2.</span>
             </div>
             <button 
               onClick={() => setActiveTab("pipeline")}
-              className="text-[10px] font-black text-[#F9B17A] hover:underline uppercase tracking-tight shrink-0"
+              className="text-[10px] font-black text-[var(--color-accent)] hover:underline uppercase tracking-tight shrink-0"
             >
               Pipeline Board &rarr;
             </button>
@@ -172,7 +172,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
         {/* High Value Target Deals (Right col) */}
         <div className="glass-card p-4.5 flex flex-col justify-between gap-3">
           <div>
-            <h4 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+            <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
               <span>💎 High-Value Active Targets</span>
             </h4>
             <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 font-bold">
@@ -195,7 +195,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                     }}
                   >
                     <div className="min-w-0">
-                      <div className="text-xs font-black text-white truncate group-hover:text-[#F9B17A] transition-colors">
+                      <div className="text-xs font-black text-[var(--color-text)] truncate group-hover:text-[var(--color-accent)] transition-colors">
                         {deal.first} {deal.last}
                       </div>
                       <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-0.5 font-bold uppercase tracking-wider">
@@ -203,8 +203,8 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-xs font-bold text-white font-mono">{fd(mtgAmt)}</div>
-                      <div className="text-[8px] text-white/30 truncate uppercase tracking-wider font-extrabold">{deal.type || "Purchase"}</div>
+                      <div className="text-xs font-bold text-[var(--color-text)] font-mono">{fd(mtgAmt)}</div>
+                      <div className="text-[8px] text-[var(--color-text-faint)] truncate uppercase tracking-wider font-extrabold">{deal.type || "Purchase"}</div>
                     </div>
                   </div>
                 );

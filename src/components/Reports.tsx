@@ -461,28 +461,28 @@ export const Reports: React.FC<ReportsProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0c0c0e] text-[#eeeef2] overflow-hidden" id="reports-module-root">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" id="reports-module-root">
       
       {/* Top filter dashboard controls */}
-      <div className="bg-[#111115] border-b border-white/5 p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="reports-controls-bar">
+      <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)] p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="reports-controls-bar">
         <div>
-          <h2 className="text-sm font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-1.5">
+          <h2 className="text-sm font-black uppercase text-[var(--color-accent)] tracking-widest flex items-center gap-1.5">
             <BarChart3 className="h-4 w-4" /> CRM Executive Intelligence Centre
           </h2>
-          <p className="text-[10px] text-white/40 font-semibold mt-0.5">Live broker pipeline health, lender shares, and conversion audits</p>
+          <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">Live broker pipeline health, lender shares, and conversion audits</p>
         </div>
 
         <div className="flex items-center flex-wrap gap-2.5">
           {/* Period Filter Buttons */}
-          <div className="bg-[#16161c] border border-white/5 p-1 rounded-lg flex">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-1 rounded-lg flex">
             {(["month", "quarter", "year", "all"] as PeriodType[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setSelectedPeriod(p)}
                 className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md transition-all ${
                   selectedPeriod === p 
-                    ? "bg-[#b5a642] text-black" 
-                    : "text-white/40 hover:text-white"
+                    ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] font-extrabold" 
+                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 {p === "month" ? "This Month" : p === "quarter" ? "This Quarter" : p === "year" ? "This Year" : "All Time"}
@@ -492,21 +492,21 @@ export const Reports: React.FC<ReportsProps> = ({
 
           {/* Broker Filter Dropdown */}
           {isPrivileged ? (
-            <div className="flex items-center gap-1.5 bg-[#16161c] border border-white/5 px-2 py-1 rounded-lg text-xs">
-              <Filter className="h-3 w-3 text-[#b5a642]" />
+            <div className="flex items-center gap-1.5 bg-[var(--color-surface)] border border-[var(--color-border)] px-2 py-1 rounded-lg text-xs">
+              <Filter className="h-3 w-3 text-[var(--color-accent)]" />
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="bg-transparent border-none text-[11px] text-white focus:outline-none font-bold"
+                className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none font-bold"
               >
-                <option value="All">All GBK Agents</option>
-                <option value="David Acosta">David Acosta</option>
-                <option value="Jeff Brown">Jeff Brown</option>
-                <option value="Broker Desk">Broker Desk</option>
+                <option value="All" className="bg-[var(--color-bg)]">All GBK Agents</option>
+                <option value="David Acosta" className="bg-[var(--color-bg)]">David Acosta</option>
+                <option value="Jeff Brown" className="bg-[var(--color-bg)]">Jeff Brown</option>
+                <option value="Broker Desk" className="bg-[var(--color-bg)]">Broker Desk</option>
               </select>
             </div>
           ) : (
-            <div className="bg-[#b5a642]/10 border border-[#b5a642]/20 text-[10px] text-[#b5a642] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+            <div className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[10px] text-[var(--color-accent)] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
               <Info className="h-3.5 w-3.5" /> Agent Scope: Self-Ledger
             </div>
           )}
@@ -514,16 +514,16 @@ export const Reports: React.FC<ReportsProps> = ({
           {/* Export Buttons */}
           <button
             onClick={handleExportPDF}
-            className="bg-white/5 hover:bg-white/10 border border-white/5 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+            className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <FileText className="h-3.5 w-3.5 text-[#b5a642]" /> Export PDF Report
+            <FileText className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Export PDF Report
           </button>
 
           <button
             onClick={handleExportCSV}
-            className="bg-white/5 hover:bg-white/10 border border-white/5 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+            className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text)] text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <FileSpreadsheet className="h-3.5 w-3.5 text-[#b5a642]" /> Export CSV
+            <FileSpreadsheet className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Export CSV
           </button>
         </div>
       </div>
@@ -533,11 +533,11 @@ export const Reports: React.FC<ReportsProps> = ({
 
         {/* Security / Agent level boundary message if applicable */}
         {!isPrivileged && (
-          <div className="bg-[#1b1b20]/60 border border-white/5 rounded-xl p-3 flex items-center gap-3">
+          <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] rounded-xl p-3 flex items-center gap-3">
             <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0" />
             <div className="text-xs">
-              <span className="font-bold text-white block">Role Compliance Filter Active</span>
-              <span className="text-white/40">In compliance with brokerage data segregation regulations, your access is configured to view only personal deal flows, active client pipelines, and referred sources.</span>
+              <span className="font-bold text-[var(--color-text)] block">Role Compliance Filter Active</span>
+              <span className="text-[var(--color-text-muted)]">In compliance with brokerage data segregation regulations, your access is configured to view only personal deal flows, active client pipelines, and referred sources.</span>
             </div>
           </div>
         )}
@@ -545,56 +545,56 @@ export const Reports: React.FC<ReportsProps> = ({
         {/* KPI Cards section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="reports-kpi-grid">
           
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] text-white/40 uppercase font-black tracking-wider">Funded Volume Closed</span>
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider">Funded Volume Closed</span>
               <DollarSign className="h-4 w-4 text-emerald-400" />
             </div>
             <div className="mt-3">
               <span className="text-xl font-black font-sans text-emerald-400">${kpis.fundedVolume.toLocaleString()}</span>
-              <div className="flex justify-between text-[10px] text-white/35 font-semibold mt-1">
+              <div className="flex justify-between text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">
                 <span>Funded files: {kpis.fundedCount}</span>
                 <span>CAD</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] text-white/40 uppercase font-black tracking-wider">Active Pipeline Value</span>
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider">Active Pipeline Value</span>
               <TrendingUp className="h-4 w-4 text-[#6fa3b8]" />
             </div>
             <div className="mt-3">
               <span className="text-xl font-black font-sans text-[#6fa3b8]">${kpis.activeVolume.toLocaleString()}</span>
-              <div className="flex justify-between text-[10px] text-white/35 font-semibold mt-1">
+              <div className="flex justify-between text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">
                 <span>Working files: {kpis.activeCount}</span>
                 <span>Pending Clearance</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] text-white/40 uppercase font-black tracking-wider">File Conversion Rate</span>
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider">File Conversion Rate</span>
               <Percent className="h-4 w-4 text-amber-300" />
             </div>
             <div className="mt-3">
               <span className="text-xl font-black font-sans text-amber-300">{kpis.conversionRate}%</span>
-              <div className="flex justify-between text-[10px] text-white/35 font-semibold mt-1">
+              <div className="flex justify-between text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">
                 <span>Funded vs Total Leads</span>
                 <span>Closed Rate</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] text-white/40 uppercase font-black tracking-wider">Average Deal Size</span>
-              <FileText className="h-4 w-4 text-[#b5a642]" />
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider">Average Deal Size</span>
+              <FileText className="h-4 w-4 text-[var(--color-accent)]" />
             </div>
             <div className="mt-3">
-              <span className="text-xl font-black font-sans text-white">${kpis.avgDealSize.toLocaleString()}</span>
-              <div className="flex justify-between text-[10px] text-white/35 font-semibold mt-1">
+              <span className="text-xl font-black font-sans text-[var(--color-text)]">${kpis.avgDealSize.toLocaleString()}</span>
+              <div className="flex justify-between text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">
                 <span>Average GDS/TDS size</span>
                 <span>Funded Average</span>
               </div>
@@ -607,10 +607,10 @@ export const Reports: React.FC<ReportsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" id="reports-charts-grid">
           
           {/* Trend: Funded Volume last 6 months */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col h-[300px]">
+          <div className="bg-[var(--color-surface)] border border-white/5 rounded-xl p-4 flex flex-col h-[300px]">
             <div className="flex justify-between items-center mb-4 shrink-0">
               <h3 className="text-xs font-black uppercase text-white/50 tracking-wider">6-Month Closed Volume Trends</h3>
-              <span className="text-[9px] text-[#b5a642] font-semibold bg-[#b5a642]/5 border border-[#b5a642]/10 px-1.5 py-0.5 rounded">Lenders-Funded</span>
+              <span className="text-[9px] text-[var(--color-accent)] font-semibold bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/10 px-1.5 py-0.5 rounded">Lenders-Funded</span>
             </div>
 
             <div className="flex-1 w-full relative min-h-[180px] flex items-end">
@@ -688,8 +688,8 @@ export const Reports: React.FC<ReportsProps> = ({
                 {/* SVG Gradients */}
                 <defs>
                   <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#b5a642" stopOpacity="0.85" />
-                    <stop offset="100%" stopColor="#b5a642" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.85" />
+                    <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.2" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -697,9 +697,9 @@ export const Reports: React.FC<ReportsProps> = ({
           </div>
 
           {/* Trend: Stage Distribution */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col h-[300px]">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col h-[300px]">
             <div className="flex justify-between items-center mb-4 shrink-0">
-              <h3 className="text-xs font-black uppercase text-white/50 tracking-wider">Broker Pipeline Balance</h3>
+              <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider">Broker Pipeline Balance</h3>
               <span className="text-[9px] text-[#6fa3b8] font-semibold bg-[#6fa3b8]/5 border border-[#6fa3b8]/10 px-1.5 py-0.5 rounded">Active Pipeline</span>
             </div>
 
@@ -711,15 +711,15 @@ export const Reports: React.FC<ReportsProps> = ({
                 return (
                   <div key={idx} className="flex flex-col gap-1.5 text-xs">
                     <div className="flex justify-between items-baseline">
-                      <span className="font-bold text-white">{st.stage}</span>
-                      <div className="flex gap-2 text-[10px] font-bold text-white/40">
+                      <span className="font-bold text-[var(--color-text)]">{st.stage}</span>
+                      <div className="flex gap-2 text-[10px] font-bold text-[var(--color-text-faint)]">
                         <span>{st.count} files</span>
                         <span>•</span>
-                        <span className="text-amber-300 font-mono">${(st.volume).toLocaleString()}</span>
+                        <span className="text-amber-500 dark:text-amber-300 font-mono">${(st.volume).toLocaleString()}</span>
                       </div>
                     </div>
 
-                    <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden flex">
+                    <div className="w-full bg-[var(--color-surface-2)] rounded-full h-2 overflow-hidden flex">
                       <div 
                         className={`h-full rounded-full ${
                           st.stage === "Funded" ? "bg-emerald-500" :
@@ -743,16 +743,16 @@ export const Reports: React.FC<ReportsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" id="reports-tables-grid">
           
           {/* Table: Agent performance */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col h-[320px] overflow-hidden">
-            <h3 className="text-xs font-black uppercase text-white/50 tracking-wider border-b border-white/5 pb-2 mb-3.5 flex justify-between items-center shrink-0">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col h-[320px] overflow-hidden">
+            <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider border-b border-[var(--color-border)] pb-2 mb-3.5 flex justify-between items-center shrink-0">
               <span>Agent Performance Metrics</span>
-              <span className="text-[9px] text-emerald-400 font-semibold uppercase">Brokerage Audited</span>
+              <span className="text-[9px] text-emerald-500 font-semibold uppercase">Brokerage Audited</span>
             </h3>
 
             <div className="flex-1 overflow-y-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-white/30 border-b border-white/5 font-bold">
+                  <tr className="text-[var(--color-text-faint)] border-b border-[var(--color-border)] font-bold">
                     <th className="pb-2">GBK Agent</th>
                     <th className="pb-2 text-center">Total Files</th>
                     <th className="pb-2 text-center">Funded</th>
@@ -761,18 +761,18 @@ export const Reports: React.FC<ReportsProps> = ({
                     <th className="pb-2 text-right">Conv. Rate</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.03]">
+                <tbody className="divide-y divide-[var(--color-border)]/30">
                   {agentPerformance.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-white/[0.01]">
+                    <tr key={idx} className="hover:bg-[var(--color-surface-2)]/30">
                       <td className="py-2.5">
-                        <span className="font-bold text-white block">{item.name}</span>
-                        <span className="text-[9.5px] text-white/35 block font-semibold">{item.role}</span>
+                        <span className="font-bold text-[var(--color-text)] block">{item.name}</span>
+                        <span className="text-[9.5px] text-[var(--color-text-faint)] block font-semibold">{item.role}</span>
                       </td>
-                      <td className="py-2.5 text-center font-bold text-white/80">{item.totalFiles}</td>
-                      <td className="py-2.5 text-center font-bold text-emerald-400">{item.fundedCount}</td>
-                      <td className="py-2.5 text-right font-bold text-emerald-400 font-mono">${(item.fundedVolume).toLocaleString()}</td>
+                      <td className="py-2.5 text-center font-bold text-[var(--color-text-muted)]">{item.totalFiles}</td>
+                      <td className="py-2.5 text-center font-bold text-emerald-500">{item.fundedCount}</td>
+                      <td className="py-2.5 text-right font-bold text-emerald-500 font-mono">${(item.fundedVolume).toLocaleString()}</td>
                       <td className="py-2.5 text-center font-bold text-[#6fa3b8]">{item.activeCount}</td>
-                      <td className="py-2.5 text-right font-black text-amber-300 font-mono">{item.conversionRate}%</td>
+                      <td className="py-2.5 text-right font-black text-amber-500 dark:text-amber-300 font-mono">{item.conversionRate}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -781,21 +781,21 @@ export const Reports: React.FC<ReportsProps> = ({
           </div>
 
           {/* Table: Lender Usage shares */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col h-[320px] overflow-hidden">
-            <h3 className="text-xs font-black uppercase text-white/50 tracking-wider border-b border-white/5 pb-2 mb-3.5 flex justify-between items-center shrink-0">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col h-[320px] overflow-hidden">
+            <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider border-b border-[var(--color-border)] pb-2 mb-3.5 flex justify-between items-center shrink-0">
               <span>Lender Placement Distribution</span>
-              <span className="text-[9px] text-[#b5a642] font-semibold uppercase">Underwriting Shares</span>
+              <span className="text-[9px] text-[var(--color-accent)] font-semibold uppercase">Underwriting Shares</span>
             </h3>
 
             <div className="flex-1 overflow-y-auto">
               {lenderUsage.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#8e95a3]/40">
+                <div className="h-full flex items-center justify-center text-xs text-[var(--color-text-faint)]">
                   No lender allocations logged in client folders.
                 </div>
               ) : (
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="text-white/30 border-b border-white/5 font-bold">
+                    <tr className="text-[var(--color-text-faint)] border-b border-[var(--color-border)] font-bold">
                       <th className="pb-2">Institution</th>
                       <th className="pb-2 text-center">Tier</th>
                       <th className="pb-2 text-center">Allocated Files</th>
@@ -803,25 +803,25 @@ export const Reports: React.FC<ReportsProps> = ({
                       <th className="pb-2 text-right">Placement %</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.03]">
+                  <tbody className="divide-y divide-[var(--color-border)]/30">
                     {lenderUsage.map((item, idx) => {
                       const totalCrmVolume = lenderUsage.reduce((sum, l) => sum + l.volume, 0) || 1;
                       const placementPct = Math.round((item.volume / totalCrmVolume) * 100);
 
                       return (
-                        <tr key={idx} className="hover:bg-white/[0.01]">
-                          <td className="py-2.5 font-bold text-white">{item.name}</td>
+                        <tr key={idx} className="hover:bg-[var(--color-surface-2)]/30">
+                          <td className="py-2.5 font-bold text-[var(--color-text)]">{item.name}</td>
                           <td className="py-2.5 text-center">
-                            <span className="bg-white/5 text-[#b5a642] border border-[#b5a642]/25 font-bold text-[9px] px-1.5 py-0.5 rounded">
+                            <span className="bg-[var(--color-surface-2)] text-[var(--color-accent)] border border-[var(--color-accent)]/25 font-bold text-[9px] px-1.5 py-0.5 rounded">
                               Tier {item.tier}
                             </span>
                           </td>
-                          <td className="py-2.5 text-center font-bold text-white/80">{item.count}</td>
-                          <td className="py-2.5 text-right font-bold text-emerald-400 font-mono">${(item.volume).toLocaleString()}</td>
+                          <td className="py-2.5 text-center font-bold text-[var(--color-text-muted)]">{item.count}</td>
+                          <td className="py-2.5 text-right font-bold text-emerald-500 font-mono">${(item.volume).toLocaleString()}</td>
                           <td className="py-2.5 text-right">
                             <div className="flex items-center justify-end gap-1.5 font-bold">
                               <span className="font-mono text-[#6fa3b8]">{placementPct}%</span>
-                              <div className="w-12 bg-white/5 h-1.5 rounded-full overflow-hidden hidden sm:block">
+                              <div className="w-12 bg-[var(--color-surface-2)] h-1.5 rounded-full overflow-hidden hidden sm:block">
                                 <div className="bg-[#6fa3b8] h-full" style={{ width: `${placementPct}%` }} />
                               </div>
                             </div>
@@ -841,74 +841,74 @@ export const Reports: React.FC<ReportsProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5" id="reports-health-indicators">
           
           {/* File Aging analysis */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div>
-              <h3 className="text-xs font-black uppercase text-white/50 tracking-wider border-b border-white/5 pb-2 mb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider border-b border-[var(--color-border)] pb-2 mb-3 flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-amber-500" /> Pipeline Aging Analysis
               </h3>
-              <p className="text-[10px] text-white/35 font-semibold leading-relaxed mb-4">Underwriting delays decrease closing conversions. Monitor stagnation levels of conditional and working files.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed mb-4">Underwriting delays decrease closing conversions. Monitor stagnation levels of conditional and working files.</p>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-[#1b1b20]/60 border border-white/5 rounded-lg p-2">
+              <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] rounded-lg p-2">
                 <span className="text-[9px] text-orange-400 block font-black uppercase">30+ Days</span>
-                <span className="text-lg font-black text-white mt-1 block">{fileAging.stale30}</span>
-                <span className="text-[8px] text-white/20 uppercase font-bold">Stagnant</span>
+                <span className="text-lg font-black text-[var(--color-text)] mt-1 block">{fileAging.stale30}</span>
+                <span className="text-[8px] text-[var(--color-text-faint)] uppercase font-bold">Stagnant</span>
               </div>
-              <div className="bg-[#1b1b20]/60 border border-white/5 rounded-lg p-2">
+              <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] rounded-lg p-2">
                 <span className="text-[9px] text-red-400 block font-black uppercase">60+ Days</span>
-                <span className="text-lg font-black text-white mt-1 block">{fileAging.stale60}</span>
-                <span className="text-[8px] text-white/20 uppercase font-bold">Delayed</span>
+                <span className="text-lg font-black text-[var(--color-text)] mt-1 block">{fileAging.stale60}</span>
+                <span className="text-[8px] text-[var(--color-text-faint)] uppercase font-bold">Delayed</span>
               </div>
-              <div className="bg-[#1b1b20]/60 border border-white/5 rounded-lg p-2">
+              <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] rounded-lg p-2">
                 <span className="text-[9px] text-rose-500 block font-black uppercase">90+ Days</span>
                 <span className="text-lg font-black text-rose-400 mt-1 block">{fileAging.stale90}</span>
-                <span className="text-[8px] text-white/20 uppercase font-bold">CRITICAL</span>
+                <span className="text-[8px] text-[var(--color-text-faint)] uppercase font-bold">CRITICAL</span>
               </div>
             </div>
           </div>
 
           {/* Source distribution mix */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div>
-              <h3 className="text-xs font-black uppercase text-white/50 tracking-wider border-b border-white/5 pb-2 mb-3 flex items-center gap-1.5">
-                <PieChart className="h-3.5 w-3.5 text-[#b5a642]" /> Lead Acquisition Mix
+              <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider border-b border-[var(--color-border)] pb-2 mb-3 flex items-center gap-1.5">
+                <PieChart className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Lead Acquisition Mix
               </h3>
-              <p className="text-[10px] text-white/35 font-semibold leading-relaxed mb-3">Revenue attribution mapping of closed files. Balances independent web marketing vs professional referrals.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed mb-3">Revenue attribution mapping of closed files. Balances independent web marketing vs professional referrals.</p>
             </div>
 
-            <div className="space-y-1.5 max-h-[120px] overflow-y-auto text-xs font-bold text-white/80">
+            <div className="space-y-1.5 max-h-[120px] overflow-y-auto text-xs font-bold text-[var(--color-text-muted)]">
               {sourceDistribution.slice(0, 4).map((src, idx) => (
-                <div key={idx} className="flex justify-between items-center py-0.5 border-b border-white/[0.02]">
-                  <span className="truncate max-w-[160px] text-white/70 font-semibold">{src.name}</span>
-                  <span className="text-[#b5a642] font-mono">{src.count} cases</span>
+                <div key={idx} className="flex justify-between items-center py-0.5 border-b border-[var(--color-border)]/20">
+                  <span className="truncate max-w-[160px] text-[var(--color-text-muted)] font-semibold">{src.name}</span>
+                  <span className="text-[var(--color-accent)] font-mono">{src.count} cases</span>
                 </div>
               ))}
               {sourceDistribution.length === 0 && (
-                <div className="text-center text-[10px] text-white/20 py-4">No referrers logged.</div>
+                <div className="text-center text-[10px] text-[var(--color-text-faint)] py-4">No referrers logged.</div>
               )}
             </div>
           </div>
 
           {/* Operational statistics (Events & Tasks completions) */}
-          <div className="bg-[#16161c] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col justify-between">
             <div>
-              <h3 className="text-xs font-black uppercase text-white/50 tracking-wider border-b border-white/5 pb-2 mb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-black uppercase text-[var(--color-text-muted)] tracking-wider border-b border-[var(--color-border)] pb-2 mb-3 flex items-center gap-1.5">
                 <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> CRM Operational Activity
               </h3>
-              <p className="text-[10px] text-white/35 font-semibold leading-relaxed mb-4">Tracking task-clearance velocities and broker actions. High operational volumes correlate to positive closing quarters.</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed mb-4">Tracking task-clearance velocities and broker actions. High operational volumes correlate to positive closing quarters.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 text-xs text-white/70 font-semibold">
-              <div className="bg-[#1b1b20]/40 border border-white/5 rounded-lg p-2.5 flex items-center justify-between">
+            <div className="grid grid-cols-2 gap-2.5 text-xs text-[var(--color-text-muted)] font-semibold">
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-lg p-2.5 flex items-center justify-between">
                 <span>Task Clear</span>
-                <span className="font-mono text-emerald-400 font-bold">
+                <span className="font-mono text-emerald-500 font-bold">
                   {tasks.filter(t => t.status === "done").length} / {tasks.length}
                 </span>
               </div>
-              <div className="bg-[#1b1b20]/40 border border-white/5 rounded-lg p-2.5 flex items-center justify-between">
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-lg p-2.5 flex items-center justify-between">
                 <span>Strategic Partners</span>
-                <span className="font-mono text-[#b5a642] font-bold">{partners.length} registered</span>
+                <span className="font-mono text-[var(--color-accent)] font-bold">{partners.length} registered</span>
               </div>
             </div>
           </div>

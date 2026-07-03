@@ -793,16 +793,16 @@ export const EmailView: React.FC<EmailViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#101014] text-white">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)]">
       
       {/* ── GOOGLE WORKSPACE API SYSTEM HEADER CONTROL ── */}
-      <div className="p-4 bg-[#141418] border border-white/5 rounded-xl mb-4 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
+      <div className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl mb-4 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-red-600/10 border border-red-500/20 flex items-center justify-center">
             <Mail className="w-5 h-5 text-red-500" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold tracking-tight text-[var(--color-text)] flex items-center gap-2">
               Google Workspace Email Center
               {isLoggedIn ? (
                 <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -815,7 +815,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 </span>
               )}
             </h2>
-            <p className="text-[10px] text-white/50">
+            <p className="text-[10px] text-[var(--color-text-muted)]">
               {isLoggedIn 
                 ? `Connected: ${loginEmail} (All communications auto-synced with GSUITE API)`
                 : "Secure local offline database mode. Connect Workspace for real Gmail transfers."}
@@ -826,14 +826,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
         {/* Auth Connector Action */}
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
-            <div className="flex items-center gap-3 bg-[#1b1b21] px-3 py-1.5 border border-white/5 rounded-lg">
+            <div className="flex items-center gap-3 bg-[var(--color-surface-2)] px-3 py-1.5 border border-[var(--color-border)] rounded-lg">
               <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center font-bold text-[10px] text-white">
                 {loginEmail[0]?.toUpperCase() || "E"}
               </div>
-              <span className="text-xs font-mono text-white/70 max-w-[170px] truncate">{loginEmail}</span>
+              <span className="text-xs font-mono text-[var(--color-text-muted)] max-w-[170px] truncate">{loginEmail}</span>
               <button 
                 onClick={handleGoogleLogout} 
-                className="text-white/40 hover:text-white transition-colors p-1"
+                className="text-[var(--color-text-faint)] hover:text-[var(--color-text)] transition-colors p-1 cursor-pointer bg-transparent border-none"
                 title="Disconnect Workspace"
               >
                 <LogOut className="w-3.5 h-3.5 hover:text-red-400" />
@@ -866,15 +866,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
       <div className="flex-1 flex gap-4 min-h-0">
         
         {/* ── LEFT SIDEBAR (FOLDERS & ACTIONS) ── */}
-        <div className="w-56 bg-[#141418] border border-white/5 rounded-xl flex flex-col p-3 overflow-y-auto gap-2 shrink-0 select-none shadow-lg">
+        <div className="w-56 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl flex flex-col p-3 overflow-y-auto gap-2 shrink-0 select-none shadow-lg">
           <button 
             onClick={() => handleComposeWithTemplate()}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 rounded-lg transition-all mb-3 flex items-center justify-center gap-1.5 shadow-md shadow-red-950/20"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 rounded-lg transition-all mb-3 flex items-center justify-center gap-1.5 shadow-md shadow-red-950/20 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Compose Message
           </button>
 
-          <span className="text-[9px] uppercase font-bold tracking-wider text-white/40 mb-1 px-1">Directory Folders</span>
+          <span className="text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-1 px-1">Directory Folders</span>
           {[
             { id: "inbox", label: "Inbox Messages", count: getMailboxEmails().filter(e => e.unread).length, icon: Mail },
             { id: "drafts", label: "Draft Notebooks", count: getMailboxEmails().filter(e => activeFolder === "drafts").length, icon: FileText },
@@ -889,7 +889,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
               <button
                 key={f.id}
                 onClick={() => { setActiveFolder(f.id); setSelectedEmail(null); }}
-                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${isActive ? "bg-red-600/10 text-red-400 border border-red-500/10 font-bold" : "text-white/60 hover:bg-white/5 border border-transparent"}`}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between transition-all cursor-pointer border ${isActive ? "bg-red-600/10 text-red-400 border-red-500/10 font-bold" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] border-transparent"}`}
               >
                 <div className="flex items-center gap-2">
                   <Icon className="w-3.5 h-3.5" />
@@ -905,13 +905,13 @@ export const EmailView: React.FC<EmailViewProps> = ({
           })}
 
           {/* Quick-Match Active client lists matching inbox */}
-          <div className="mt-4 border-t border-white/5 pt-3">
-            <span className="block text-[9px] uppercase font-bold tracking-wider text-white/40 mb-2 px-1">Pipeline Auto-Matched</span>
+          <div className="mt-4 border-t border-[var(--color-border)] pt-3">
+            <span className="block text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-2 px-1">Pipeline Auto-Matched</span>
             {clients.slice(0, 3).map(c => (
               <button
                 key={c.id}
                 onClick={() => onOpenClient && onOpenClient(c.id)}
-                className="w-full text-left px-2 py-1 text-[10px] text-white/50 hover:text-red-400 truncate transition-all flex items-center gap-1.5"
+                className="w-full text-left px-2 py-1 text-[10px] text-[var(--color-text-muted)] hover:text-red-400 truncate transition-all flex items-center gap-1.5 cursor-pointer"
                 title={`${c.first} ${c.last}`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400/80"></span>
@@ -921,8 +921,8 @@ export const EmailView: React.FC<EmailViewProps> = ({
           </div>
 
           {/* Pre-Automated Mortgage Email Templates Accelerator */}
-          <div className="mt-4 border-t border-white/5 pt-3">
-            <span className="block text-[9px] uppercase font-bold tracking-wider text-white/40 mb-2 px-1 flex items-center gap-1 font-sans">
+          <div className="mt-4 border-t border-[var(--color-border)] pt-3">
+            <span className="block text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-2 px-1 flex items-center gap-1 font-sans">
               ⚡ Pre-Automated Outlines
             </span>
             <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
@@ -930,34 +930,34 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 <button
                   key={mt.id}
                   onClick={() => handleComposeWithTemplate(mt.id)}
-                  className="w-full text-left px-2 py-1.5 rounded bg-white/[0.02] hover:bg-red-600/10 border border-white/5 hover:border-red-500/20 text-[10px] text-white/70 hover:text-red-300 transition-all flex flex-col gap-0.5 group"
+                  className="w-full text-left px-2 py-1.5 rounded bg-[var(--color-surface-2)]/20 hover:bg-red-600/10 border border-[var(--color-border)] hover:border-red-500/20 text-[10px] text-[var(--color-text-muted)] hover:text-red-300 transition-all flex flex-col gap-0.5 group cursor-pointer"
                   title={mt.desc}
                 >
                   <span className="font-semibold truncate group-hover:text-red-400">{mt.name}</span>
-                  <span className="text-[8px] text-white/40 truncate">{mt.desc}</span>
+                  <span className="text-[8px] text-[var(--color-text-faint)] truncate">{mt.desc}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Email Signature Module */}
-          <div className="mt-auto border-t border-white/5 pt-3">
+          <div className="mt-auto border-t border-[var(--color-border)] pt-3">
             <button 
               onClick={() => setShowSignatureEdit(!showSignatureEdit)}
-              className="w-full text-left text-[10px] text-[#b5a642] hover:underline flex items-center gap-1"
+              className="w-full text-left text-[10px] text-[var(--color-accent)] hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none"
             >
               <Sliders className="w-3 h-3" /> Customize Signature
             </button>
             {showSignatureEdit && (
               <div className="mt-2 flex flex-col gap-1.5">
                 <textarea 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded p-1 text-[10px] font-mono text-white/80 h-24 focus:outline-none"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-1 text-[10px] font-mono text-[var(--color-text)] h-24 focus:outline-none"
                   value={signatureText}
                   onChange={(e) => setSignatureText(e.target.value)}
                 />
                 <button 
                   onClick={handleSaveSignature}
-                  className="w-full bg-[#1b1b20] border border-white/10 hover:border-[#b5a642]/30 text-white text-[9px] font-semibold py-1 rounded"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 text-[var(--color-text)] text-[9px] font-semibold py-1 rounded cursor-pointer"
                 >
                   ✓ Update Signature
                 </button>
@@ -967,17 +967,17 @@ export const EmailView: React.FC<EmailViewProps> = ({
         </div>
 
         {/* ── CENTRAL COLUMN (EMAIL DIRECTORY SEARCH & LIST) ── */}
-        <div className="w-72 bg-[#141418] border border-white/5 rounded-xl flex flex-col min-h-0 shrink-0 overflow-hidden shadow-lg">
-          <div className="p-3 border-b border-white/5 flex flex-col gap-2 bg-[#1b1b20]/20 select-none">
+        <div className="w-72 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl flex flex-col min-h-0 shrink-0 overflow-hidden shadow-lg">
+          <div className="p-3 border-b border-[var(--color-border)] flex flex-col gap-2 bg-[var(--color-surface-2)]/20 select-none">
             <div className="flex justify-between items-center">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-white/80 capitalize">{activeFolder} Folder</h3>
-              <span className="text-[10px] text-white/40 font-mono font-bold">Qty: {filteredEmails.length}</span>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] capitalize">{activeFolder} Folder</h3>
+              <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold">Qty: {filteredEmails.length}</span>
             </div>
             <input 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search correspondence..." 
-              className="bg-[#1b1b20] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-[#eeeef2] focus:outline-none focus:border-red-600 w-full font-sans shadow-inner placeholder-white/20"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-600 w-full font-sans shadow-inner placeholder-[var(--color-text-faint)]"
             />
           </div>
 
@@ -997,20 +997,20 @@ export const EmailView: React.FC<EmailViewProps> = ({
                       e.unread = false;
                     }
                   }}
-                  className={`flex flex-col p-3.5 border-b border-white/5 cursor-pointer hover:bg-[#1b1b20]/20 transition-all select-none ${isSelected ? "bg-[#1b1b20]/30 border-l-2 border-l-red-500" : ""} ${e.unread ? "bg-red-500/5" : ""}`}
+                  className={`flex flex-col p-3.5 border-b border-[var(--color-border)] cursor-pointer hover:bg-[var(--color-surface-2)] transition-all select-none ${isSelected ? "bg-[var(--color-surface-3)] border-l-2 border-l-red-500" : ""} ${e.unread ? "bg-red-500/5" : ""}`}
                 >
                   <div className="flex justify-between items-baseline mb-1">
-                    <span className={`text-xs truncate max-w-[150px] ${e.unread ? "font-bold text-white" : "text-white/60"}`}>
+                    <span className={`text-xs truncate max-w-[150px] ${e.unread ? "font-bold text-[var(--color-text)]" : "text-[var(--color-text-muted)]"}`}>
                       {activeFolder === "sent" ? `To: ${e.to}` : e.from}
                     </span>
-                    <span className="text-[9px] text-white/30 font-mono shrink-0">{e.time}</span>
+                    <span className="text-[9px] text-[var(--color-text-faint)] font-mono shrink-0">{e.time}</span>
                   </div>
                   
-                  <div className={`text-xs truncate ${e.unread ? "font-semibold text-white" : "text-white/80"}`}>
+                  <div className={`text-xs truncate ${e.unread ? "font-semibold text-[var(--color-text)]" : "text-[var(--color-text-muted)]"}`}>
                     {e.subject || "(no subject)"}
                   </div>
                   
-                  <div className="text-[10px] text-white/40 truncate mt-1">
+                  <div className="text-[10px] text-[var(--color-text-muted)] truncate mt-1">
                     {e.preview || e.body || ""}
                   </div>
 
@@ -1024,14 +1024,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   )}
                   
                   {e.scheduledFor && (
-                    <div className="mt-2 flex items-center gap-1 text-[8px] text-[#b5a642] font-mono select-none">
+                    <div className="mt-2 flex items-center gap-1 text-[8px] text-[var(--color-accent)] font-mono select-none">
                       <Clock className="w-2.5 h-2.5" /> Queue: {e.scheduledFor.replace("T", " ")}
                     </div>
                   )}
                 </div>
               );
             }) : (
-              <div className="h-64 flex flex-col items-center justify-center text-xs text-white/20 gap-3">
+              <div className="h-64 flex flex-col items-center justify-center text-xs text-[var(--color-text-faint)] gap-3">
                 <MailOpen className="w-8 h-8 opacity-40 shrink-0" />
                 <span>No emails match filters.</span>
               </div>
@@ -1040,21 +1040,21 @@ export const EmailView: React.FC<EmailViewProps> = ({
         </div>
 
         {/* ── RIGHT COLUMN (DETAILED CONTENT & CRM ACTIONS ACTION-SHORTCUTS) ── */}
-        <div className="flex-1 bg-[#141418] border border-white/5 rounded-xl flex flex-col min-h-0 overflow-y-auto shadow-lg relative">
+        <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl flex flex-col min-h-0 overflow-y-auto shadow-lg relative">
           
           {selectedEmail ? (
             <div className="flex-grow flex flex-col min-h-0">
               
               {/* DETAIL ACTIONS HEADER PANEL */}
-              <div className="p-3 border-b border-white/5 bg-[#1b1b20]/35 sticky top-0 bg-[#141418] z-10 flex flex-wrap items-center justify-between gap-2.5 select-none shrink-0">
+              <div className="p-3 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/35 sticky top-0 bg-[var(--color-surface)] z-10 flex flex-wrap items-center justify-between gap-2.5 select-none shrink-0">
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setSelectedEmail(null)}
-                    className="px-2 py-1 rounded bg-[#1b1b20] border border-white/5 text-[10px] font-bold text-white/60 hover:text-white flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center gap-1 cursor-pointer"
                   >
                     <ArrowLeft className="w-3 h-3" /> List
                   </button>
-                  <span className="text-[10px] font-mono text-[#b5a642] tracking-wider select-none bg-[#b5a642]/5 border border-[#b5a642]/10 px-1.5 py-0.5 rounded font-bold">
+                  <span className="text-[10px] font-mono text-[var(--color-accent)] tracking-wider select-none bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/10 px-1.5 py-0.5 rounded font-bold">
                     ID: {selectedEmail.id}
                   </span>
                 </div>
@@ -1071,13 +1071,13 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     <>
                       <button 
                         onClick={() => handleComposeWithTemplate()}
-                        className="px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 rounded text-[10px] font-bold text-red-400 flex items-center gap-1"
+                        className="px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 rounded text-[10px] font-bold text-red-400 flex items-center gap-1 cursor-pointer"
                       >
                         <Reply className="w-3 h-3" /> Reply
                       </button>
                       <button 
                         onClick={(e) => handleArchiveEmail(e, selectedEmail)}
-                        className="px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded text-[10px] font-bold text-white/60 hover:text-white flex items-center gap-1"
+                        className="px-2 py-1 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 border border-[var(--color-border)] rounded text-[10px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center gap-1 cursor-pointer"
                         title="Archive communication log"
                       >
                         <Trash2 className="w-3 h-3" /> Archive
@@ -1097,7 +1097,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   {/* Action 1: Log message to dossier */}
                   <button 
                     onClick={handleLogToClientFile}
-                    className="bg-[#1b1b20] hover:bg-neutral-800 text-[#eeeef2] border border-white/5 px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all"
+                    className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5 text-blue-400" /> Log to Dossier
                   </button>
@@ -1106,7 +1106,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   {activeMatchedClient ? (
                     <button 
                       onClick={handleOpenClientCard}
-                      className="bg-[#1b1b20] hover:bg-neutral-800 text-[#eeeef2] border border-white/5 px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all"
+                      className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all cursor-pointer"
                     >
                       <User className="w-3.5 h-3.5 text-emerald-400" /> Open File Folder ({activeMatchedClient.last})
                     </button>
@@ -1115,15 +1115,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   {/* Action 3: Create Task */}
                   <button 
                     onClick={handleOpenTaskWizard}
-                    className="bg-[#1b1b20] hover:bg-neutral-800 text-[#eeeef2] border border-white/5 px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all"
+                    className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all cursor-pointer"
                   >
-                    <CheckSquare className="w-3.5 h-3.5 text-[#b5a642]" /> Create CRM Task
+                    <CheckSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Create CRM Task
                   </button>
 
                   {/* Action 4: Create Event */}
                   <button 
                     onClick={handleOpenEventWizard}
-                    className="bg-[#1b1b20] hover:bg-neutral-800 text-[#eeeef2] border border-white/5 px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all"
+                    className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all cursor-pointer"
                   >
                     <Calendar className="w-3.5 h-3.5 text-purple-400" /> Calendar Meeting
                   </button>
@@ -1138,7 +1138,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                           if (logActivity) logActivity(`Dispatched out SMS ping to borrower`, activeMatchedClient.first);
                         }
                       }}
-                      className="bg-[#1b1b20] hover:bg-neutral-800 text-[#eeeef2] border border-white/5 px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all hover:border-red-500/25"
+                      className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] px-2.5 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all hover:border-red-500/25 cursor-pointer"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-teal-400" /> Mobile SMS
                     </button>
@@ -1148,35 +1148,35 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
               {/* EMAIL BODY CONTENT AREA */}
               <div className="p-6 flex-grow overflow-auto">
-                <h2 className="text-base font-bold text-white mb-2 leading-tight">
+                <h2 className="text-base font-bold text-[var(--color-text)] mb-2 leading-tight">
                   {selectedEmail.subject || "(no subject)"}
                 </h2>
                 
-                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4 select-none">
+                <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4 mb-4 select-none">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-full bg-red-500/10 border border-red-500/25 flex items-center justify-center font-bold text-xs text-red-400">
                       {(selectedEmail.from || selectedEmail.to || "?")[0].toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white/95">{selectedEmail.from || "Greg Brown"}</h4>
-                      <p className="text-[10px] text-white/50">{selectedEmail.fromEmail || "info@gbkfinancial.ca"}</p>
+                      <h4 className="text-xs font-bold text-[var(--color-text)]">{selectedEmail.from || "Greg Brown"}</h4>
+                      <p className="text-[10px] text-[var(--color-text-muted)]">{selectedEmail.fromEmail || "info@gbkfinancial.ca"}</p>
                     </div>
                   </div>
                   
-                  <div className="text-[10px] text-white/40 font-mono text-right select-none">
+                  <div className="text-[10px] text-[var(--color-text-muted)] font-mono text-right select-none">
                     <div>Time: {selectedEmail.time}</div>
                     <div className="mt-0.5">{selectedEmail.date}</div>
                   </div>
                 </div>
 
                 {/* Main Text Body */}
-                <div className="text-xs text-white/90 leading-relaxed whitespace-pre-wrap font-sans bg-[#1b1b21]/30 p-4 rounded-xl border border-white/5">
+                <div className="text-xs text-[var(--color-text)] leading-relaxed whitespace-pre-wrap font-sans bg-[var(--color-surface-2)]/30 p-4 rounded-xl border border-[var(--color-border)]">
                   {selectedEmail.body || selectedEmail.preview || "No transcript content."}
                 </div>
 
                 {/* ── ATTACHMENTS VAULT SECTION ── */}
                 {selectedEmail.clientMatch ? (
-                  <div className="mt-6 border-t border-white/5 pt-4 select-none">
+                  <div className="mt-6 border-t border-[var(--color-border)] pt-4 select-none">
                     <span className="block text-[10px] uppercase font-bold tracking-wider text-red-400 mb-3 flex items-center gap-1">
                       <Paperclip className="w-3.5 h-3.5" /> Extracted Secure Email Attachments ({selectedEmail.clientMatch === "Thompson" ? "2 Files" : "1 File"})
                     </span>
@@ -1190,18 +1190,18 @@ export const EmailView: React.FC<EmailViewProps> = ({
                         ].map((doc) => {
                           const isAlreadyMapped = docVault[activeMatchedClient?.id || ""]?.[doc.extCode]?.status === "received";
                           return (
-                            <div key={doc.id} className="p-3 bg-[#1b1b20] border border-white/5 rounded-lg flex items-center justify-between gap-4">
+                            <div key={doc.id} className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
                               <div className="flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                                 <div>
-                                  <div className="text-xs font-semibold text-white/95">{doc.label}</div>
-                                  <div className="text-[10px] text-white/40 mt-0.5 font-mono">Secured Vault Stream • {doc.size}</div>
+                                  <div className="text-xs font-semibold text-[var(--color-text)]">{doc.label}</div>
+                                  <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5 font-mono">Secured Vault Stream • {doc.size}</div>
                                 </div>
                               </div>
 
                               <button 
                                 onClick={() => handleSaveAttachmentToVault(doc.label, activeMatchedClient?.id || "c_smith", doc.extCode)}
-                                className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border transition-all ${isAlreadyMapped ? "bg-emerald-950/20 text-emerald-400 border-emerald-900" : "bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border-[#b5a642]/20 text-[#b5a642]"}`}
+                                className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border transition-all cursor-pointer ${isAlreadyMapped ? "bg-emerald-950/20 text-emerald-400 border-emerald-900" : "bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border-[var(--color-accent)]/20 text-[var(--color-accent)]"}`}
                               >
                                 {isAlreadyMapped ? "✓ Imported & Mapped in CRM" : "📁 Save to CRM Dossier"}
                               </button>
@@ -1212,18 +1212,18 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     )}
 
                     {selectedEmail.clientMatch === "Martinez" && (
-                      <div className="p-3 bg-[#1b1b20] border border-white/5 rounded-lg flex items-center justify-between gap-4">
+                      <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                           <div>
-                            <div className="text-xs font-semibold text-white/95">Appraisal_Invoice_Payment_Receipt.pdf</div>
-                            <div className="text-[10px] text-white/40 mt-0.5 font-mono">Receipt Archive • 345 KB</div>
+                            <div className="text-xs font-semibold text-[var(--color-text)]">Appraisal_Invoice_Payment_Receipt.pdf</div>
+                            <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5 font-mono">Receipt Archive • 345 KB</div>
                           </div>
                         </div>
 
                         <button 
                           onClick={() => handleSaveAttachmentToVault("Appraisal_Invoice_Payment_Receipt.pdf", activeMatchedClient?.id || "c_smith", "emp_letter")}
-                          className="bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border border-[#b5a642]/20 text-[#b5a642] text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded"
+                          className="bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/20 text-[var(--color-accent)] text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded cursor-pointer"
                         >
                           📁 Save to CRM Dossier
                         </button>
@@ -1248,16 +1248,16 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
       {/* ── COMPOSE EMAIL DIALOG MODAL OVERLAY ── */}
       {isComposeOpen && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none">
-          <div className="bg-[#141418] border border-white/10 rounded-2xl w-full max-w-lg p-5 shadow-2xl relative flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4 select-none">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-lg p-5 shadow-2xl relative flex flex-col max-h-[90vh]">
             <button 
               onClick={() => setIsComposeOpen(false)} 
-              className="absolute right-4 top-4 text-white/40 hover:text-white font-bold p-1 hover:bg-white/5 rounded text-xs"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-bold p-1 hover:bg-[var(--color-surface-2)] rounded text-xs cursor-pointer"
             >
               ✕
             </button>
             
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2.5 flex items-center gap-1.5 shrink-0">
+            <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-4 border-b border-[var(--color-border)] pb-2.5 flex items-center gap-1.5 shrink-0">
               <Send className="w-4 h-4 text-red-500" /> New Outbound Mortgage Correspondence
             </h3>
 
@@ -1266,11 +1266,11 @@ export const EmailView: React.FC<EmailViewProps> = ({
               {/* Linked Borrower Dropdown */}
               <div className="grid grid-cols-2 gap-3 shrink-0">
                 <div>
-                  <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Link CRM Borrower Profile (Optional)</label>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Link CRM Borrower Profile (Optional)</label>
                   <select 
                     value={selectedClientLink}
                     onChange={(e) => setSelectedClientLink(e.target.value)}
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                   >
                     <option value="">-- Do Not Link Client --</option>
                     {clients.map(cl => (
@@ -1280,10 +1280,10 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Fast Insert Response Template</label>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Fast Insert Response Template</label>
                   <select 
                     onChange={(e) => handleComposeWithTemplate(e.target.value)}
-                    className="w-full bg-[#1b1b20] border border-[#b5a642]/20 hover:border-[#b5a642]/45 rounded-lg px-2.5 py-1.5 text-xs text-[#b5a642] focus:outline-none focus:border-[#b5a642] font-semibold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/45 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   >
                     <option value="">-- Choose Campaign Template --</option>
                     {templates.map(t => (
@@ -1296,65 +1296,65 @@ export const EmailView: React.FC<EmailViewProps> = ({
               {/* Recipient Coordinates */}
               <div className="grid grid-cols-2 gap-3 shrink-0">
                 <div>
-                  <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Recipient Name</label>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Recipient Name</label>
                   <input 
                     type="text" 
                     value={composeTo}
                     onChange={(e) => setComposeTo(e.target.value)}
                     placeholder="E.g. David Martinez"
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Recipient Email (Target)</label>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Recipient Email (Target)</label>
                   <input 
                     type="email" 
                     value={composeToEmail}
                     onChange={(e) => setComposeToEmail(e.target.value)}
                     required
                     placeholder="E.g. borrower@example.com"
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Subject */}
               <div className="shrink-0">
-                <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Subject Title</label>
+                <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Subject Title</label>
                 <input 
                   type="text" 
                   value={composeSubject}
                   onChange={(e) => setComposeSubject(e.target.value)}
                   required
                   placeholder="Insert subject header line..."
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                 />
               </div>
 
               {/* Body */}
               <div className="flex-grow flex flex-col min-h-0">
-                <label className="block text-[9px] text-white/50 uppercase font-bold mb-1 tracking-wider">Content Frame Block</label>
+                <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Content Frame Block</label>
                 <textarea 
                   value={composeBody}
                   onChange={(e) => setComposeBody(e.target.value)}
                   required
                   rows={8}
                   placeholder="Write clear mortgage proposal communication layout here..."
-                  className="w-full flex-grow bg-[#1b1b20] border border-white/5 rounded-lg p-3 text-xs text-white focus:outline-none font-sans leading-relaxed resize-none h-44"
+                  className="w-full flex-grow bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 text-xs text-[var(--color-text)] focus:outline-none font-sans leading-relaxed resize-none h-44"
                 />
               </div>
 
               {/* Campaign Schedule Toggle */}
-              <div className="p-3 bg-[#1b1b20] border border-white/5 rounded-xl shrink-0 flex items-center justify-between gap-4">
+              <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl shrink-0 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <input 
                     type="checkbox" 
                     id="scheduleToggle" 
                     checked={isScheduled} 
                     onChange={(e) => setIsScheduled(e.target.checked)}
-                    className="rounded text-red-500 bg-[#141418] border-white/15"
+                    className="rounded text-red-500 bg-[var(--color-surface)] border-[var(--color-border)]/15"
                   />
-                  <label htmlFor="scheduleToggle" className="text-xs font-semibold text-white/80 cursor-pointer select-none">
+                  <label htmlFor="scheduleToggle" className="text-xs font-semibold text-[var(--color-text-muted)] cursor-pointer select-none">
                     ⏰ Schedule Campaign Outreach Delay (Queue Later)
                   </label>
                 </div>
@@ -1364,23 +1364,23 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     type="datetime-local" 
                     value={scheduleSendTime}
                     onChange={(e) => setScheduleSendTime(e.target.value)}
-                    className="bg-[#141418] border border-white/5 rounded px-2 py-1 text-[10px] text-white focus:outline-none font-mono"
+                    className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded px-2 py-1 text-[10px] text-[var(--color-text)] focus:outline-none font-mono"
                   />
                 )}
               </div>
 
               {/* Submit triggers */}
-              <div className="flex justify-end gap-2.5 pt-2 border-t border-white/5 shrink-0 select-none">
+              <div className="flex justify-end gap-2.5 pt-2 border-t border-[var(--color-border)] shrink-0 select-none">
                 <button 
                   type="button" 
                   onClick={() => setIsComposeOpen(false)}
-                  className="px-4 py-2 bg-transparent hover:bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-white/70"
+                  className="px-4 py-2 bg-transparent hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg text-xs font-semibold text-[var(--color-text-muted)] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-md shadow-red-950/20"
+                  className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-md shadow-red-950/20 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" /> 
                   {isScheduled ? "Queue Scheduled" : "Send & Log to Client Dossier"}
@@ -1393,24 +1393,24 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
       {/* ── CRM TASK CREATION popover DIALOG ── */}
       {isTaskWizardOpen && (
-        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none">
-          <div className="bg-[#141418] border border-[#b5a642]/30 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px] select-none">
+          <div className="panel-card border border-[var(--color-accent)]/30 w-full max-w-sm p-5 shadow-2xl relative">
             <button 
               onClick={() => setIsTaskWizardOpen(false)} 
-              className="absolute right-4 top-4 text-white/40 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
             >
               ✕
             </button>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2 flex items-center gap-1 text-[#b5a642]">
-              <CheckSquare className="w-4 h-4 text-[#b5a642]" /> Convert Email to CRM Task
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider mb-4 border-b border-[var(--color-divider)] pb-2 flex items-center gap-1 text-[var(--color-accent)]">
+              <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" /> Convert Email to CRM Task
             </h4>
             
             <form onSubmit={handleSaveTaskFromWizard} className="flex flex-col gap-3">
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">CRM Title</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">CRM Title</label>
                 <input 
                   type="text" 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                   value={taskWizardTitle}
                   onChange={(e) => setTaskWizardTitle(e.target.value)}
                   required
@@ -1419,22 +1419,22 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Priority</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Priority</label>
                   <select 
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none"
                     value={taskWizardPriority}
                     onChange={(e) => setTaskWizardPriority(e.target.value as any)}
                   >
-                    <option value="high">🔴 High</option>
-                    <option value="medium">🟡 Medium</option>
-                    <option value="low font-bold">🟢 Low</option>
+                    <option value="high" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🔴 High</option>
+                    <option value="medium" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🟡 Medium</option>
+                    <option value="low font-bold" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🟢 Low</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Due Date</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Due Date</label>
                   <input 
                     type="date" 
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none"
                     value={taskWizardDueDate}
                     onChange={(e) => setTaskWizardDueDate(e.target.value)}
                     required
@@ -1443,39 +1443,39 @@ export const EmailView: React.FC<EmailViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Assigned Staff Broker</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Assigned Staff Broker</label>
                 <select 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none"
                   value={taskWizardAssignee}
                   onChange={(e) => setTaskWizardAssignee(e.target.value)}
                 >
-                  <option value="Jeff Brown">Jeff Brown (Senior Agent)</option>
-                  <option value="Tim Brown">Tim Brown (Super Admin)</option>
-                  <option value="Wayne MacLeod">Wayne MacLeod (Managing Broker)</option>
-                  <option value="Jamey Brown">Jamey Brown (IT Staff)</option>
+                  <option value="Jeff Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jeff Brown (Senior Agent)</option>
+                  <option value="Tim Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Tim Brown (Super Admin)</option>
+                  <option value="Wayne MacLeod" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Wayne MacLeod (Managing Broker)</option>
+                  <option value="Jamey Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jamey Brown (IT Staff)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Description Brief</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Description Brief</label>
                 <textarea 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none h-20 resize-none font-sans"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] focus:outline-none h-20 resize-none font-sans"
                   value={taskWizardNotes}
                   onChange={(e) => setTaskWizardNotes(e.target.value)}
                 />
               </div>
 
-              <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-white/5">
+              <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-[var(--color-border)]">
                 <button 
                   type="button" 
                   onClick={() => setIsTaskWizardOpen(false)}
-                  className="bg-transparent hover:bg-white/5 border border-white/10 text-white/70 px-3 py-1.5 rounded text-[10px] font-semibold"
+                  className="bg-transparent hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] px-3 py-1.5 rounded text-[10px] font-semibold transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-[#b5a642] text-black font-bold px-4 py-1.5 rounded text-[10px] flex items-center gap-1 hover:bg-[#9a8c38]"
+                  className="bg-[var(--color-accent)] text-[var(--color-text-inverse)] font-bold px-4 py-1.5 rounded text-[10px] flex items-center gap-1 hover:bg-[var(--color-accent-hover)] transition-colors"
                 >
                   Create Task Record
                 </button>
@@ -1487,24 +1487,24 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
       {/* ── CRM CALENDAR EVENT DIALOG ── */}
       {isEventWizardOpen && (
-        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none">
-          <div className="bg-[#141418] border border-purple-500/30 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px] select-none">
+          <div className="panel-card border border-[var(--color-accent)]/30 w-full max-w-sm p-5 shadow-2xl relative">
             <button 
               onClick={() => setIsEventWizardOpen(false)} 
-              className="absolute right-4 top-4 text-white/40 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
             >
               ✕
             </button>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2 flex items-center gap-1 text-purple-400">
-              <Calendar className="w-4 h-4 text-purple-400" /> Convert Email to Calendar Event
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider mb-4 border-b border-[var(--color-divider)] pb-2 flex items-center gap-1 text-[var(--color-accent)]">
+              <Calendar className="w-4 h-4 text-[var(--color-accent)]" /> Convert Email to Calendar Event
             </h4>
             
             <form onSubmit={handleSaveEventFromWizard} className="flex flex-col gap-3">
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Meeting Title</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Meeting Title</label>
                 <input 
                   type="text" 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                   value={eventWizardTitle}
                   onChange={(e) => setEventWizardTitle(e.target.value)}
                   required
@@ -1513,20 +1513,20 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Date</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Date</label>
                   <input 
                     type="date" 
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none"
                     value={eventWizardDate}
                     onChange={(e) => setEventWizardDate(e.target.value)}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Hour/Time</label>
+                  <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Hour/Time</label>
                   <input 
                     type="text" 
-                    className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none font-mono"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none font-mono"
                     value={eventWizardTime}
                     onChange={(e) => setEventWizardTime(e.target.value)}
                     placeholder="E.g. 10:00 AM"
@@ -1536,39 +1536,39 @@ export const EmailView: React.FC<EmailViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Event Category</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Event Category</label>
                 <select 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg px-2 py-1 text-xs text-white focus:outline-none text-[11px]"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none text-[11px]"
                   value={eventWizardType}
                   onChange={(e) => setEventWizardType(e.target.value as any)}
                 >
-                  <option value="client">👤 Client Advisory Meeting</option>
-                  <option value="meeting">🏢 Internal Company Board Session</option>
-                  <option value="lender">🏦 External Lender BDM Negotiation</option>
-                  <option value="personal">🔒 Private Schedule Reserve</option>
+                  <option value="client" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">👤 Client Advisory Meeting</option>
+                  <option value="meeting" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🏢 Internal Company Board Session</option>
+                  <option value="lender" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🏦 External Lender BDM Negotiation</option>
+                  <option value="personal" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">🔒 Private Schedule Reserve</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[8px] text-white/50 uppercase font-bold mb-1 tracking-wider">Meeting Context Notes</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Meeting Context Notes</label>
                 <textarea 
-                  className="w-full bg-[#1b1b20] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none h-20 resize-none font-sans"
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] focus:outline-none h-20 resize-none font-sans"
                   value={eventWizardNotes}
                   onChange={(e) => setEventWizardNotes(e.target.value)}
                 />
               </div>
 
-              <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-white/5">
+              <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-[var(--color-border)]">
                 <button 
                   type="button" 
                   onClick={() => setIsEventWizardOpen(false)}
-                  className="bg-transparent hover:bg-white/5 border border-white/10 text-white/70 px-3 py-1.5 rounded text-[10px] font-semibold"
+                  className="bg-transparent hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] px-3 py-1.5 rounded text-[10px] font-semibold transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-1.5 rounded text-[10px]"
+                  className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] font-bold px-4 py-1.5 rounded text-[10px] transition-colors"
                 >
                   Submit Calendar Event
                 </button>

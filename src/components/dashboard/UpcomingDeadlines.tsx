@@ -109,7 +109,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
               <div
                 key={idx}
                 onClick={() => onOpenClient(dl.clientId)}
-                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:bg-[var(--color-surface-2)] rounded-lg transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)] rounded-lg transition-all cursor-pointer flex items-center justify-between gap-3 group"
               >
                 <div className="min-w-0">
                   <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors truncate">

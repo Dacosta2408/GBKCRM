@@ -95,7 +95,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
     { id: "lender", label: "Submissions", color: "#F4A384", style: "bg-orange-500/10 text-orange-400 border-orange-500/25" },
     { id: "conditional", label: "Conditional", color: "#e05c6e", style: "bg-red-500/10 text-red-400 border-red-500/25" },
     { id: "approved", label: "Approved", color: "#34D399", style: "bg-green-500/10 text-green-400 border-green-500/25" },
-    { id: "funded", label: "Funded", color: "#F9B17A", style: "bg-yellow-500/10 text-[#F9B17A] border-[#F9B17A]/25" }
+    { id: "funded", label: "Funded", color: "var(--color-accent)", style: "bg-yellow-500/10 text-[var(--color-accent)] border-[var(--color-accent)]/25" }
   ];
 
   return (
@@ -103,16 +103,16 @@ export const ClientsList: React.FC<ClientsListProps> = ({
       
       {/* Header bar and sub tabs */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-        <div className="flex bg-black/25 border border-white/5 rounded-full p-1 select-none self-start backdrop-blur-md">
+        <div className="flex bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-full p-1 select-none self-start backdrop-blur-md">
           <button 
             onClick={() => setViewMode("database")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[#F9B17A] text-[#12131a] shadow-md" : "text-white/60 hover:text-white"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-md" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
           >
             📋 Directory Table
           </button>
           <button 
             onClick={() => setViewMode("pipeline")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[#F9B17A] text-[#12131a] shadow-md" : "text-white/60 hover:text-white"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-md" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
           >
             📊 Stages
           </button>
@@ -141,7 +141,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onOpenNewClientIntake}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[#486D83]/30 hover:bg-[#486D83]/10 hover:shadow-[0_0_15px_rgba(72,109,131,0.2)] text-[#5d9bb1]"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text)] hover:shadow-md"
             style={{
               background: "var(--glass-bg)",
               backdropFilter: "var(--glass-blur)",
@@ -153,7 +153,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onOpenAIIntake}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full text-white hover:opacity-90 transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(244,163,132,0.25)]"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full text-[var(--color-text-inverse)] hover:opacity-90 transition-all cursor-pointer hover:shadow-md"
             style={{
               background: "var(--grad-deep)"
             }}
@@ -163,7 +163,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onAddClient}
-            className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-white transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] hover:-translate-y-0.5 active:translate-y-0 duration-200"
+            className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-[var(--color-text-inverse)] transition-all cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 duration-200"
             style={{
               background: "var(--grad-warm)",
               borderRadius: "999px"
@@ -195,7 +195,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               <button
                 key={f.id}
                 onClick={() => setDbFilter(f.id)}
-                className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${dbFilter === f.id ? "bg-[#F9B17A]/15 text-[#F9B17A] border-[#F9B17A]/40 shadow-sm" : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-white hover:bg-white/5"}`}
+                className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${dbFilter === f.id ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/40 shadow-sm" : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"}`}
               >
                 {f.label}
               </button>
@@ -206,8 +206,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               onChange={(e) => setAgentFilter(e.target.value)}
               className="ml-auto bg-black/25 border border-[var(--color-border)] rounded-full px-4 py-1 text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-[#12131a]">All Advising Agents</option>
-              {agentNames.map(name => <option key={name} value={name} className="bg-[#12131a]">{name}</option>)}
+              <option value="" className="bg-[var(--color-bg)]">All Advising Agents</option>
+              {agentNames.map(name => <option key={name} value={name} className="bg-[var(--color-bg)]">{name}</option>)}
             </select>
             <span className="text-xs text-[var(--color-text-faint)] font-bold border-l border-[var(--color-divider)] pl-3 ml-1">{filteredClients.length} clients</span>
           </div>
@@ -243,20 +243,20 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[#12131a] group-hover:scale-105 transition-transform"
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-bg)] group-hover:scale-105 transition-transform"
                             style={{ background: "var(--grad-soft)" }}
                           >
                             {avatar}
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[#F9B17A] transition-colors">{c.first} {c.last}</div>
+                            <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</div>
                             {c.cell && <div className="text-[10px] text-[var(--color-text-faint)] font-bold">{c.cell}</div>}
                           </div>
                         </td>
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            c.status === "funded" ? "bg-yellow-500/10 text-[#F9B17A] border border-[#F9B17A]/20" :
+                            c.status === "funded" ? "bg-yellow-500/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20" :
                             c.status === "approved" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
                             c.status === "conditional" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
                             c.status === "lender" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" :
@@ -291,7 +291,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     <td colSpan={9} className="p-16 text-center">
                       <div className="flex flex-col items-center justify-center max-w-sm mx-auto space-y-4">
                         <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] flex items-center justify-center border border-[var(--color-border)]">
-                          <Search className="h-5 w-5 text-[#F9B17A]" />
+                          <Search className="h-5 w-5 text-[var(--color-accent)]" />
                         </div>
                         <div className="space-y-1">
                           <h4 className="text-xs font-black uppercase text-[var(--color-text)] tracking-widest">No Clients Found</h4>
@@ -331,7 +331,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
                       <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-black/30 text-[var(--color-text-muted)]">{colClients.length}</span>
                     </div>
-                    <span className="text-xs font-bold font-mono text-[#F9B17A]">{fdShort(colValue)}</span>
+                    <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
                   </div>
 
                   {/* Column Body Cards Area */}
@@ -345,7 +345,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${isStale ? "border-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(224,92,110,0.15)]" : "border-[var(--color-border)] hover:border-[#F9B17A]/30 hover:shadow-[0_0_15px_rgba(249,177,122,0.1)]"}`}
+                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${isStale ? "border-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(224,92,110,0.15)]" : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_rgba(200, 146, 42, 0.1)]"}`}
                           style={{
                             background: isStale ? "rgba(122, 80, 99, 0.04)" : "var(--color-surface)"
                           }}
@@ -353,7 +353,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div 
-                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[#12131a]"
+                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-bg)]"
                                 style={{ background: "var(--grad-soft)" }}
                               >
                                 {initials}
@@ -363,7 +363,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                                 <div className="text-[10px] text-[var(--color-text-faint)] font-bold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-[#F9B17A] whitespace-nowrap mt-0.5">
+                            <div className="text-xs font-mono font-bold text-[var(--color-accent)] whitespace-nowrap mt-0.5">
                               {c.mtgamt ? fdShort(pn(c.mtgamt)) : "—"}
                             </div>
                           </div>

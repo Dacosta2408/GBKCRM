@@ -7,7 +7,7 @@ import {
   Clock, Award, Globe, FileSpreadsheet, Share2, Sparkles, Filter, 
   MailOpen, RefreshCw, Phone, MessageCircle, HardDrive, Sun, Moon
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { encryptValue, decryptValue } from "./lib/cryptoUtils";
 import { hashPin } from "./hooks/useAuth";
 import { 
@@ -46,6 +46,7 @@ import { ClientDetailPanel } from "./components/ClientDetailPanel";
 import { checkBridgeHealth, getBridgeVersion } from "./lib/bridgeService";
 
 export default function App() {
+  const shouldReduceMotion = useReducedMotion();
   const TAB_LABELS: Record<string, string> = {
     dashboard: "Dashboard",
     clients: "Clients",
@@ -659,25 +660,23 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center flex-col gap-6"
             style={{
-              background: "radial-gradient(circle at center, #1F2232 0%, #0c0c0e 100%)"
+              background: "radial-gradient(circle at center, #23131F 0%, #081525 60%, #050E18 100%)"
             }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,177,122,0.08)_0%,transparent_60%)] animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,163,132,0.12)_0%,transparent_60%)] animate-pulse pointer-events-none" />
             <motion.div 
               initial={{ scale: 0.92, y: 15 }}
               animate={{ scale: 1, y: 0 }}
-              className="border rounded-2xl p-8 w-80 text-center shadow-2xl relative"
+              className="panel-card p-8 w-80 text-center shadow-2xl relative border-t-2"
               style={{
-                background: "rgba(18, 19, 26, 0.75)",
-                borderColor: "rgba(255, 255, 255, 0.05)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)"
+                borderTopColor: "var(--color-accent)",
+                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(244, 163, 132, 0.08)"
               }}
             >
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "var(--grad-soft)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                <Lock className="w-6 h-6 text-[#12131a]" />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "var(--grad-warm-highlight)", boxShadow: "0 4px 14px rgba(244, 163, 132, 0.3)" }}>
+                <Lock className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-white mb-1">Workstation Locked</h3>
+              <h3 className="text-sm font-black uppercase tracking-widest text-[var(--color-text)] mb-1">Workstation Locked</h3>
               <p className="text-[10px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider mb-6">Enter 4-digit security PIN to resume</p>
               
               <input 
@@ -687,15 +686,15 @@ export default function App() {
                 onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
                 placeholder="••••"
                 disabled={lockoutActive}
-                className="w-full tracking-widest text-center text-3xl font-mono py-2.5 bg-black/30 border border-white/5 rounded-xl text-[#F9B17A] mb-4 focus:outline-none focus:border-[#F9B17A] focus:ring-1 focus:ring-[#F9B17A] disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                className="w-full tracking-widest text-center text-3xl font-mono py-2.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl text-[var(--color-accent)] mb-4 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed font-black"
                 onKeyDown={(e) => { if (e.key === "Enter") handleUnlock(); }}
               />
 
               <button 
                 onClick={handleUnlock}
                 disabled={lockoutActive}
-                className="w-full text-[#12131a] font-black uppercase tracking-wider text-[11px] py-3.5 rounded-xl hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.3)]"
-                style={{ background: "var(--grad-warm)" }}
+                className="w-full text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[11px] py-3.5 rounded-xl hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md hover:shadow-[0_0_24px_rgba(244,163,132,0.4)]"
+                style={{ background: "var(--grad-warm-highlight)" }}
               >
                 Unlock Workstation
               </button>
@@ -712,16 +711,16 @@ export default function App() {
       <AnimatePresence>
         {toastMessage && (
           <motion.div 
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.95 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15, scale: 0.95 }}
             className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl border max-w-sm shadow-xl"
             style={{
               background: "var(--glass-bg)",
-              borderColor: toastMessage.type === "error" ? "rgba(224,92,110,0.3)" : "rgba(249,177,122,0.3)",
+              borderColor: toastMessage.type === "error" ? "rgba(224,92,110,0.3)" : "rgba(200, 146, 42, 0.3)",
               backdropFilter: "var(--glass-blur)",
               WebkitBackdropFilter: "var(--glass-blur)",
-              boxShadow: toastMessage.type === "error" ? "0 4px 20px rgba(224,92,110,0.15)" : "0 4px 20px rgba(249,177,122,0.15)"
+              boxShadow: toastMessage.type === "error" ? "0 4px 20px rgba(224,92,110,0.15)" : "0 4px 20px rgba(200, 146, 42, 0.15)"
             }}
           >
             <div className="text-base select-none shrink-0">{toastMessage.icon || "✓"}</div>
@@ -761,9 +760,9 @@ export default function App() {
         <header 
           className="h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
           style={{
-            background: "rgba(18, 19, 26, 0.85)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
+            background: "var(--glass-bg)",
+            backdropFilter: "var(--glass-blur)",
+            WebkitBackdropFilter: "var(--glass-blur)",
             borderBottom: "1px solid var(--color-divider)"
           }}
         >
@@ -864,7 +863,7 @@ export default function App() {
               onClick={openManualIntake}
               className="flex items-center gap-1 px-4 py-1.5 text-[11px] font-extrabold text-white transition-all shrink-0 hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] duration-200 active:scale-95 cursor-pointer"
               style={{
-                background: "var(--grad-warm)",
+                background: "var(--grad-warm-highlight)",
                 borderRadius: "10px"
               }}
               id="header-new-client-btn"
@@ -879,7 +878,7 @@ export default function App() {
               title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
             >
               {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-[#F9B17A]" />
+                <Sun className="w-4 h-4 text-[var(--color-accent)]" />
               ) : (
                 <Moon className="w-4 h-4 text-[#7A5063]" />
               )}
@@ -906,7 +905,7 @@ export default function App() {
                     src={currentUser.photo}
                     alt="Profile"
                     referrerPolicy="no-referrer"
-                    className="w-5.5 h-5.5 rounded-full object-cover border border-[#F9B17A]/30"
+                    className="w-5.5 h-5.5 rounded-full object-cover border border-[var(--color-accent)]/30"
                   />
                 ) : (
                   <div 
@@ -917,14 +916,14 @@ export default function App() {
                   </div>
                 )}
                 <div className="hidden md:block">
-                  <div className="text-[10px] font-black text-white leading-tight">
+                  <div className="text-[10px] font-black text-[var(--color-text)] leading-tight">
                     {currentUser.displayName || `${currentUser.first} ${currentUser.last}`}
                   </div>
-                  <div className="text-[8px] text-white/40 leading-none font-bold uppercase tracking-wider">
+                  <div className="text-[8px] text-[var(--color-text-muted)] leading-none font-bold uppercase tracking-wider">
                     {currentUser.role}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-white/50 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" />
               </button>
 
               {/* Dropdown Menu */}
@@ -1047,8 +1046,17 @@ export default function App() {
         })}
 
         {/* Tab content viewer area */}
-        <main className="flex-1 overflow-hidden p-6">
-          {activeTab === "dashboard" && (
+        <main className="flex-1 overflow-hidden p-6 relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+              className="h-full w-full"
+            >
+              {activeTab === "dashboard" && (
             <Dashboard 
               clients={clients}
               tasks={tasks}
@@ -1371,6 +1379,8 @@ export default function App() {
               clients={clients}
             />
           )}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
@@ -1453,18 +1463,22 @@ export default function App() {
       {/* Settings Modal config */}
       <AnimatePresence>
         {settingsModalOpen && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div 
-              className="border rounded-2xl w-full max-w-sm p-6 shadow-2xl relative"
-              style={{
-                background: "rgba(18, 19, 26, 0.85)",
-                borderColor: "rgba(255, 255, 255, 0.05)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)"
-              }}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px]"
+          >
+            <motion.div 
+              initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="panel-card w-full max-w-sm p-6 shadow-2xl relative border-t-2" 
+              style={{ borderTopColor: "var(--color-accent)", boxShadow: "0 20px 50px rgba(0, 0, 0, 0.3), 0 0 24px rgba(200, 146, 42, 0.05)" }}
             >
-              <button onClick={() => setSettingsModalOpen(false)} className="absolute right-4 top-4 text-white/50 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer">✕</button>
-              <h3 className="text-[10px] font-black text-white uppercase tracking-widest mb-4 border-b pb-2" style={{ borderColor: "var(--color-divider)" }}>CRM Configuration</h3>
+              <button onClick={() => setSettingsModalOpen(false)} className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded-full hover:bg-[var(--color-surface-2)] transition-all cursor-pointer">✕</button>
+              <h3 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-widest mb-4 border-b pb-2" style={{ borderColor: "var(--color-divider)" }}>CRM Configuration</h3>
               
               <div className="flex flex-col gap-4">
                 <div>
@@ -1476,7 +1490,7 @@ export default function App() {
                       const parts = e.target.value.split(" ");
                       setCurrentUser(prev => ({ ...prev, first: parts[0] || "", last: parts.slice(1).join(" ") }));
                     }}
-                    className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                   />
                 </div>
 
@@ -1491,7 +1505,7 @@ export default function App() {
                       localStorage.setItem("gbk_apiKey", apiVal);
                     }}
                     placeholder="sk-ant-api03-..."
-                    className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                   />
                   <span className="text-[9px] text-[var(--color-text-faint)] font-bold mt-1.5 block leading-normal">Stored locally inside browser sandbox cache. Allows instant AI reports.</span>
                 </div>
@@ -1501,38 +1515,49 @@ export default function App() {
                     setSettingsModalOpen(false);
                     showToast("Configuration safely saved!", "success");
                   }}
-                  className="w-full mt-2 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                  className="w-full mt-2 text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.25)]"
                   style={{ background: "var(--grad-warm)" }}
                 >
                   Save and Dismiss
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Profile/Signup & Credential Manager Modal */}
       <AnimatePresence>
         {profileModalOpen && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div 
-              className="border rounded-2xl w-full max-w-md p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col scrollbar-thin"
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="border rounded-2xl w-full max-w-md p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col scrollbar-thin border-t-2"
               style={{
-                background: "rgba(18, 19, 26, 0.85)",
-                borderColor: "rgba(255, 255, 255, 0.05)",
+                background: "var(--color-surface)",
+                borderColor: "var(--color-border)",
+                borderTopColor: "var(--color-accent)",
                 backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)"
+                WebkitBackdropFilter: "blur(24px)",
+                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.3), 0 0 24px rgba(200, 146, 42, 0.05)"
               }}
             >
               <button 
                 onClick={() => setProfileModalOpen(false)} 
-                className="absolute right-4 top-4 text-white/50 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer text-sm"
+                className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded-full hover:bg-[var(--color-border)]/5 transition-all cursor-pointer text-sm"
               >
                 ✕
               </button>
               
-              <h3 className="text-[10px] font-black text-white uppercase tracking-widest mb-4 pb-2 border-b" style={{ borderColor: "var(--color-divider)" }}>
+              <h3 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-widest mb-4 pb-2 border-b animate-pulse" style={{ borderColor: "var(--color-divider)" }}>
                 Broker Account & Credentials
               </h3>
               
@@ -1556,8 +1581,8 @@ export default function App() {
                       }} 
                       className={`flex-1 pb-2.5 text-[9px] uppercase font-black tracking-widest text-center border-b-2 transition-colors cursor-pointer ${
                         isSelected 
-                          ? 'border-[#F9B17A] text-[#F9B17A]' 
-                          : 'border-transparent text-white/40 hover:text-white'
+                          ? 'border-[var(--color-accent)] text-[var(--color-accent)]' 
+                          : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
                       }`}
                     >
                       {tab.label}
@@ -1569,9 +1594,9 @@ export default function App() {
               {/* TAB CONTENT: PROFILE SYNC EDIT */}
               {profileTab === 'profile' && (
                 <div className="flex flex-col gap-4">
-                  <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                    <div className="text-xs font-black text-white mb-0.5">{currentUser.first} {currentUser.last}</div>
-                    <div className="text-[10px] text-[#F9B17A] font-extrabold uppercase tracking-wider mb-2">{currentUser.role}</div>
+                  <div className="bg-[var(--color-surface-2)] p-4 rounded-xl border border-[var(--color-border)]">
+                    <div className="text-xs font-black text-[var(--color-text)] mb-0.5">{currentUser.first} {currentUser.last}</div>
+                    <div className="text-[10px] text-[var(--color-accent)] font-extrabold uppercase tracking-wider mb-2">{currentUser.role}</div>
                     <div className="text-[10px] text-[var(--color-text-muted)] flex flex-col gap-1 font-mono font-bold leading-relaxed">
                       <span>Email: {currentUser.email}</span>
                       {currentUser.phone && <span>Phone: {currentUser.phone}</span>}
@@ -1589,7 +1614,7 @@ export default function App() {
                         placeholder="e.g. email@gbkfinancial.ca"
                         value={activeUsername}
                         onChange={(e) => setActiveUsername(e.target.value)}
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                       />
                     </div>
 
@@ -1600,7 +1625,7 @@ export default function App() {
                         placeholder="••••••••••••••••"
                         value={activePassword}
                         onChange={(e) => setActivePassword(e.target.value)}
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-mono font-semibold"
                       />
                     </div>
 
@@ -1612,7 +1637,7 @@ export default function App() {
                           placeholder="e.g. imap.gmail.com"
                           value={activeHost}
                           onChange={(e) => setActiveHost(e.target.value)}
-                          className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
+                          className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-mono font-semibold"
                         />
                       </div>
                       <div>
@@ -1622,7 +1647,7 @@ export default function App() {
                           placeholder="993"
                           value={activePort}
                           onChange={(e) => setActivePort(e.target.value)}
-                          className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
+                          className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-mono font-semibold"
                         />
                       </div>
                     </div>
@@ -1683,7 +1708,7 @@ export default function App() {
                           showToast("Workspace Credentials Sync Enabled!", "success", "🔐");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                        className="flex-1 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.25)]"
                         style={{ background: "var(--grad-warm)" }}
                       >
                         ✓ Save & Sync
@@ -1755,7 +1780,7 @@ export default function App() {
                         type="text" 
                         value={suFirst}
                         onChange={(e) => setSuFirst(e.target.value)}
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -1765,7 +1790,7 @@ export default function App() {
                         type="text" 
                         value={suLast}
                         onChange={(e) => setSuLast(e.target.value)}
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -1778,7 +1803,7 @@ export default function App() {
                       value={suEmail}
                       onChange={(e) => setSuEmail(e.target.value)}
                       placeholder="e.g. agent@gbkfinancial.ca"
-                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                       required
                     />
                   </div>
@@ -1792,7 +1817,7 @@ export default function App() {
                         value={suPin}
                         onChange={(e) => setSuPin(e.target.value.replace(/\D/g, ""))}
                         placeholder="••••"
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white text-center tracking-widest font-mono focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] text-center tracking-widest font-mono focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -1803,7 +1828,7 @@ export default function App() {
                         value={suFsra}
                         onChange={(e) => setSuFsra(e.target.value)}
                         placeholder="e.g. M230045"
-                        className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-semibold"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
                       />
                     </div>
                   </div>
@@ -1813,7 +1838,7 @@ export default function App() {
                     <select 
                       value={suRole}
                       onChange={(e) => setSuRole(e.target.value as any)}
-                      className="w-full bg-black/20 border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-bold cursor-pointer"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-bold cursor-pointer"
                     >
                       <option value="Agent">🏡 Licensed Mortgage Agent</option>
                       <option value="Senior Broker">🥇 Senior Broker Consultant</option>
@@ -1829,20 +1854,20 @@ export default function App() {
                       placeholder="imap.gmail.com"
                       value={suHost}
                       onChange={(e) => setSuHost(e.target.value)}
-                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-mono font-semibold"
                     />
                     <input 
                       type="password" 
                       placeholder="Gmail App Password"
                       value={suPass}
                       onChange={(e) => setSuPass(e.target.value)}
-                      className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F9B17A]/40 transition-all font-mono font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-mono font-semibold"
                     />
                   </div>
 
                   <button 
                     type="submit"
-                    className="w-full mt-2 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.25)]"
+                    className="w-full mt-2 text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.25)]"
                     style={{ background: "var(--grad-warm)" }}
                   >
                     Register and Login as Agent
@@ -1865,12 +1890,12 @@ export default function App() {
                         }}
                         className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                           swTargetId === u.id 
-                            ? 'border-[#F9B17A] bg-[#F9B17A]/5' 
+                            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5' 
                             : 'border-white/5 bg-white/[0.01] hover:bg-white/5'
                         }`}
                       >
                         <div>
-                          <div className={`text-xs font-black ${swTargetId === u.id ? 'text-[#F9B17A]' : 'text-white'}`}>{u.first} {u.last}</div>
+                          <div className={`text-xs font-black ${swTargetId === u.id ? 'text-[var(--color-accent)]' : 'text-white'}`}>{u.first} {u.last}</div>
                           <div className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider mt-0.5">{u.role}</div>
                         </div>
                         <div className="text-[10px] text-white/30 truncate font-mono max-w-[140px] font-bold">{u.email}</div>
@@ -1918,7 +1943,7 @@ export default function App() {
                       className="mt-2 border-t pt-4 flex flex-col gap-2.5"
                       style={{ borderColor: "var(--color-divider)" }}
                     >
-                      <div className="text-[10px] text-white/60 mb-1 font-bold">Enter your 4-digit Security PIN to switch:</div>
+                      <div className="text-[10px] text-[var(--color-text-muted)] mb-1 font-bold">Enter your 4-digit Security PIN to switch:</div>
                       
                       <div className="flex gap-3">
                         <input 
@@ -1927,12 +1952,12 @@ export default function App() {
                           value={swPin}
                           onChange={(e) => setSwPin(e.target.value.replace(/\D/g, ""))}
                           placeholder="••••"
-                          className="w-32 bg-black/20 border border-white/10 rounded-xl px-4 text-center text-sm font-mono font-black tracking-widest text-[#F9B17A] focus:outline-none focus:border-[#F9B17A]/40"
+                          className="w-32 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl px-4 text-center text-sm font-mono font-black tracking-widest text-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)]/40"
                           required
                         />
                         <button 
                           type="submit"
-                          className="flex-1 bg-[#F9B17A]/10 hover:bg-[#F9B17A]/15 border border-[#F9B17A]/25 text-[#F9B17A] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl transition-all cursor-pointer"
+                          className="flex-1 bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/25 text-[var(--color-accent)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl transition-all cursor-pointer"
                         >
                           Confirm Switch
                         </button>
@@ -1945,8 +1970,8 @@ export default function App() {
                   )}
                 </div>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 

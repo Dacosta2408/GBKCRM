@@ -462,31 +462,31 @@ export const Retention: React.FC<RetentionProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0c0c0e] text-[#eeeef2] overflow-hidden" id="retention-module-root">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" id="retention-module-root">
       
       {/* Top Header Panel */}
-      <div className="bg-[#111115] border-b border-white/5 p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="retention-header-bar">
+      <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)] p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="retention-header-bar">
         <div>
           <h2 className="text-sm font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-1.5">
             <Heart className="h-4 w-4 fill-current text-[#b5a642]" /> CRM Client Retention Desk
           </h2>
-          <p className="text-[10px] text-white/40 font-semibold mt-0.5">Post-close lifecycle automation, relationship nurturing, and proactive renewal locks</p>
+          <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">Post-close lifecycle automation, relationship nurturing, and proactive renewal locks</p>
         </div>
 
         {/* Global Controls */}
         <div className="flex items-center flex-wrap gap-2.5">
           {/* Agent Filter */}
           {isPrivileged ? (
-            <div className="flex items-center gap-1.5 bg-[#16161c] border border-white/5 px-2 py-1 rounded-lg text-xs">
+            <div className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-1 rounded-lg text-xs">
               <Filter className="h-3 w-3 text-[#b5a642]" />
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="bg-transparent border-none text-[11px] text-white focus:outline-none font-bold"
+                className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none font-bold"
               >
-                <option value="All">All Owners</option>
+                <option value="All" className="bg-[var(--color-bg)]">All Owners</option>
                 {userRoster.map(u => (
-                  <option key={u.id} value={`${u.first} ${u.last}`}>{u.first} {u.last}</option>
+                  <option key={u.id} value={`${u.first} ${u.last}`} className="bg-[var(--color-bg)]">{u.first} {u.last}</option>
                 ))}
               </select>
             </div>
@@ -497,34 +497,34 @@ export const Retention: React.FC<RetentionProps> = ({
           )}
 
           {/* Search */}
-          <div className="relative bg-[#16161c] border border-white/5 rounded-lg px-2.5 py-1 flex items-center w-48 sm:w-60">
-            <Search className="h-3.5 w-3.5 text-white/30 shrink-0 mr-1.5" />
+          <div className="relative bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 flex items-center w-48 sm:w-60">
+            <Search className="h-3.5 w-3.5 text-[var(--color-text-faint)] shrink-0 mr-1.5" />
             <input
               type="text"
               placeholder="Search past clients..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-transparent border-none text-[11px] text-white focus:outline-none w-full font-semibold"
+              className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none w-full font-semibold placeholder-[var(--color-text-faint)]"
             />
           </div>
         </div>
       </div>
 
       {/* Overview Metric Stats Dashboard Banner */}
-      <div className="bg-[#131318] px-6 py-4 border-b border-white/[0.03] grid grid-cols-2 md:grid-cols-5 gap-3 shrink-0" id="retention-stats-panel">
+      <div className="bg-[var(--color-surface)] px-6 py-4 border-b border-[var(--color-border)]/60 grid grid-cols-2 md:grid-cols-5 gap-3 shrink-0" id="retention-stats-panel">
         <button 
           onClick={() => setActiveStream("birthdays")}
           className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group ${
             activeStream === "birthdays" 
               ? "bg-[#b5a642]/10 border-[#b5a642]/40 shadow-md" 
-              : "bg-[#16161c]/60 border-white/5 hover:bg-[#16161c]"
+              : "bg-[var(--color-surface-2)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)]"
           }`}
         >
-          <div className="flex justify-between items-center text-white/40 group-hover:text-white/60 transition-all">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-all">
             <span className="text-[9px] uppercase font-black tracking-wider">Birthdays (30d)</span>
             <span className="text-pink-400 font-bold text-xs">🎂</span>
           </div>
-          <span className="text-lg font-black block mt-1 text-white">{metrics.totalBirthdays}</span>
+          <span className="text-lg font-black block mt-1 text-[var(--color-text)]">{metrics.totalBirthdays}</span>
           <span className="text-[8px] text-[#b5a642] font-bold block mt-0.5">Nurture Touchpoint</span>
         </button>
 
@@ -533,15 +533,15 @@ export const Retention: React.FC<RetentionProps> = ({
           className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group ${
             activeStream === "renewals" 
               ? "bg-[#6fa3b8]/10 border-[#6fa3b8]/40 shadow-md" 
-              : "bg-[#16161c]/60 border-white/5 hover:bg-[#16161c]"
+              : "bg-[var(--color-surface-2)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)]"
           }`}
         >
-          <div className="flex justify-between items-center text-white/40 group-hover:text-white/60 transition-all">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-all">
             <span className="text-[9px] uppercase font-black tracking-wider">Renewals (6m)</span>
             <span className="text-[#6fa3b8] font-bold text-xs">🔄</span>
           </div>
-          <span className="text-lg font-black block mt-1 text-white">{metrics.totalRenewals}</span>
-          <span className="text-[8px] text-emerald-400 font-bold block mt-0.5">High revenue risk</span>
+          <span className="text-lg font-black block mt-1 text-[var(--color-text)]">{metrics.totalRenewals}</span>
+          <span className="text-[8px] text-emerald-500 font-bold block mt-0.5">High revenue risk</span>
         </button>
 
         <button 
@@ -549,15 +549,15 @@ export const Retention: React.FC<RetentionProps> = ({
           className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group ${
             activeStream === "anniversaries" 
               ? "bg-amber-500/10 border-amber-500/30 shadow-md" 
-              : "bg-[#16161c]/60 border-white/5 hover:bg-[#16161c]"
+              : "bg-[var(--color-surface-2)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)]"
           }`}
         >
-          <div className="flex justify-between items-center text-white/40 group-hover:text-white/60 transition-all">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-all">
             <span className="text-[9px] uppercase font-black tracking-wider">Anniversaries</span>
             <span className="text-amber-400 font-bold text-xs">🎉</span>
           </div>
-          <span className="text-lg font-black block mt-1 text-white">{metrics.totalAnniversaries}</span>
-          <span className="text-[8px] text-amber-300 font-bold block mt-0.5">Equity leverage moment</span>
+          <span className="text-lg font-black block mt-1 text-[var(--color-text)]">{metrics.totalAnniversaries}</span>
+          <span className="text-[8px] text-amber-500 dark:text-amber-300 font-bold block mt-0.5">Equity leverage moment</span>
         </button>
 
         <button 
@@ -565,21 +565,21 @@ export const Retention: React.FC<RetentionProps> = ({
           className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group ${
             activeStream === "reengage" 
               ? "bg-purple-500/10 border-purple-500/30 shadow-md" 
-              : "bg-[#16161c]/60 border-white/5 hover:bg-[#16161c]"
+              : "bg-[var(--color-surface-2)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)]"
           }`}
         >
-          <div className="flex justify-between items-center text-white/40 group-hover:text-white/60 transition-all">
+          <div className="flex justify-between items-center text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-all">
             <span className="text-[9px] uppercase font-black tracking-wider">Re-engage Cold</span>
             <span className="text-purple-400 font-bold text-xs">⏰</span>
           </div>
-          <span className="text-lg font-black block mt-1 text-white">{metrics.totalReengage}</span>
-          <span className="text-[8px] text-purple-300 font-bold block mt-0.5">Quiet &gt; 90 Days</span>
+          <span className="text-lg font-black block mt-1 text-[var(--color-text)]">{metrics.totalReengage}</span>
+          <span className="text-[8px] text-purple-500 dark:text-purple-300 font-bold block mt-0.5">Quiet &gt; 90 Days</span>
         </button>
 
-        <div className="p-3 bg-[#16161c] border border-white/5 rounded-xl text-left hidden md:block">
-          <span className="text-[9px] text-white/40 uppercase font-black tracking-wider block">CRM Touchpoint Density</span>
+        <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl text-left hidden md:block">
+          <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-black tracking-wider block">CRM Touchpoint Density</span>
           <span className="text-lg font-black block mt-1 text-[#b5a642] font-mono">{metrics.outreachCompletionRate}%</span>
-          <div className="w-full bg-white/5 h-1 rounded-full mt-1.5 overflow-hidden">
+          <div className="w-full bg-[var(--color-surface)] h-1 rounded-full mt-1.5 overflow-hidden">
             <div className="bg-[#b5a642] h-full" style={{ width: `${metrics.outreachCompletionRate}%` }} />
           </div>
         </div>
@@ -589,7 +589,7 @@ export const Retention: React.FC<RetentionProps> = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         
         {/* Stream Banner description */}
-        <div className="bg-[#16161c]/45 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-[var(--color-surface-2)]/45 border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="text-xs">
             <span className="text-[#b5a642] font-black uppercase tracking-wider block">
               {activeStream === "birthdays" && "🎂 Client Birthday Nurture Engine"}
@@ -597,24 +597,24 @@ export const Retention: React.FC<RetentionProps> = ({
               {activeStream === "anniversaries" && "🎉 Mortgage Funding Anniversary Touchpoints"}
               {activeStream === "reengage" && "⏰ Long-Time Cold Relationship Recovery Radar"}
             </span>
-            <span className="text-white/40 block mt-0.5 font-semibold">
+            <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
               {activeStream === "birthdays" && "Nurturing professional goodwill. Send birthdays warm check-ins without pressure."}
               {activeStream === "renewals" && "Defend funded clients before retail lenders lock them into high-rate default renewals."}
               {activeStream === "anniversaries" && "Identify strategic mortgage equity adjustments, GDS/TDS health reviews or property appreciation metrics."}
               {activeStream === "reengage" && "Ensure no client goes quiet. Rekindle relationships with personalized market updates."}
             </span>
           </div>
-          <div className="shrink-0 bg-[#b5a642]/10 px-3 py-1 rounded-full text-[10px] font-black text-[#b5a642] border border-[#b5a642]/10">
+          <div className="shrink-0 bg-[#b5a642]/10 px-3 py-1 rounded-full text-[10px] font-black text-[#b5a642] border border-[#b5a642]/20">
             {filteredStreamClients.length} targets identified
           </div>
         </div>
 
         {/* Targets List */}
         {filteredStreamClients.length === 0 ? (
-          <div className="bg-[#131318]/40 border border-white/5 rounded-2xl p-16 text-center space-y-2">
-            <Heart className="h-10 w-10 text-white/10 mx-auto" />
-            <p className="text-sm font-black text-white/50 uppercase">No target files matched</p>
-            <p className="text-xs text-white/30 max-w-sm mx-auto font-medium">There are no client portfolios matching these timeline variables or filters at this time.</p>
+          <div className="bg-[var(--color-surface)]/40 border border-[var(--color-border)] rounded-2xl p-16 text-center space-y-2">
+            <Heart className="h-10 w-10 text-[var(--color-text-faint)] mx-auto" />
+            <p className="text-sm font-black text-[var(--color-text-muted)] uppercase">No target files matched</p>
+            <p className="text-xs text-[var(--color-text-faint)] max-w-sm mx-auto font-medium">There are no client portfolios matching these timeline variables or filters at this time.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5" id="retention-client-grid">
@@ -631,21 +631,21 @@ export const Retention: React.FC<RetentionProps> = ({
               return (
                 <div 
                   key={client.id}
-                  className="bg-[#141419] border border-white/5 hover:border-white/10 rounded-2xl p-5 flex flex-col justify-between transition-all"
+                  className="bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] rounded-2xl p-5 flex flex-col justify-between transition-all"
                   id={`retention-card-${client.id}`}
                 >
                   {/* Card upper row */}
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-black text-white hover:text-[#b5a642] transition-all cursor-pointer">
+                        <span className="text-sm font-black text-[var(--color-text)] hover:text-[#b5a642] transition-all cursor-pointer">
                           {client.first} {client.last}
                         </span>
-                        <span className="bg-white/5 text-white/50 text-[8px] font-black uppercase px-2 py-0.5 rounded border border-white/5">
+                        <span className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[8px] font-black uppercase px-2 py-0.5 rounded border border-[var(--color-border)]">
                           {client.status.toUpperCase()}
                         </span>
                       </div>
-                      <span className="text-[10px] text-white/30 font-semibold block mt-1">{client.addr || "No registered address"}</span>
+                      <span className="text-[10px] text-[var(--color-text-faint)] font-semibold block mt-1">{client.addr || "No registered address"}</span>
                     </div>
 
                     <div className="text-right text-xs">
@@ -673,46 +673,46 @@ export const Retention: React.FC<RetentionProps> = ({
                   </div>
 
                   {/* Portfolio parameters panel */}
-                  <div className="grid grid-cols-3 gap-2 bg-[#191920]/40 border border-white/5 rounded-xl p-3 my-4 text-xs font-semibold">
+                  <div className="grid grid-cols-3 gap-2 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl p-3 my-4 text-xs font-semibold">
                     <div>
-                      <span className="text-[9px] text-white/20 uppercase font-bold block">Funded Lender</span>
-                      <span className="text-[#eeeef2] truncate block mt-0.5">{client.lender || "Scotiabank"}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-bold block">Funded Lender</span>
+                      <span className="text-[var(--color-text)] truncate block mt-0.5">{client.lender || "Scotiabank"}</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-white/20 uppercase font-bold block">Mortgage Amount</span>
-                      <span className="text-[#eeeef2] block mt-0.5">${(Number(client.mtgamt || 0)).toLocaleString()}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-bold block">Mortgage Amount</span>
+                      <span className="text-[var(--color-text)] block mt-0.5">${(Number(client.mtgamt || 0)).toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-white/20 uppercase font-bold block">Client Contact</span>
-                      <span className="text-[#eeeef2] block mt-0.5 text-[10px] truncate">{client.email}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-bold block">Client Contact</span>
+                      <span className="text-[var(--color-text)] block mt-0.5 text-[10px] truncate">{client.email}</span>
                     </div>
                   </div>
 
                   {/* Operational Settings panel */}
-                  <div className="border-t border-white/5 pt-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+                  <div className="border-t border-[var(--color-border)] pt-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
                     
                     {/* Relationship Owner Assignment */}
                     <div className="flex items-center gap-1.5 w-full sm:w-auto">
-                      <span className="text-[10px] text-white/35 font-semibold shrink-0">Owner:</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] font-semibold shrink-0">Owner:</span>
                       <select
                         value={currentOwner}
                         onChange={(e) => handleUpdateOwner(client.id, e.target.value)}
-                        className="bg-[#17171e] border border-white/5 rounded px-2 py-1 text-[11px] text-white font-bold max-w-[140px]"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2 py-1 text-[11px] text-[var(--color-text)] font-bold max-w-[140px]"
                       >
                         {userRoster.map(u => (
-                          <option key={u.id} value={`${u.first} ${u.last}`}>{u.first} {u.last}</option>
+                          <option key={u.id} value={`${u.first} ${u.last}`} className="bg-[var(--color-bg)]">{u.first} {u.last}</option>
                         ))}
                       </select>
                     </div>
 
                     {/* Follow up status indicators */}
-                    <div className="flex flex-wrap gap-2.5 text-[10px] font-black uppercase text-white/40">
+                    <div className="flex flex-wrap gap-2.5 text-[10px] font-black uppercase text-[var(--color-text-faint)]">
                       <div>
-                        <span className="text-white/20 mr-1">Last Touch:</span>
-                        <span className="text-white/70 font-mono">{client.lastContactedDate || "None Logged"}</span>
+                        <span className="text-[var(--color-text-faint)]/60 mr-1">Last Touch:</span>
+                        <span className="text-[var(--color-text-muted)] font-mono">{client.lastContactedDate || "None Logged"}</span>
                       </div>
                       <div>
-                        <span className="text-white/20 mr-1">Next Call:</span>
+                        <span className="text-[var(--color-text-faint)]/60 mr-1">Next Call:</span>
                         <span className="text-[#b5a642] font-mono">{client.nextFollowUpDate || "Not Set"}</span>
                       </div>
                     </div>
@@ -720,26 +720,26 @@ export const Retention: React.FC<RetentionProps> = ({
 
                   {/* Outcome indicator summary if present */}
                   {client.retentionOutcome && (
-                    <div className="bg-[#1b1b22] border-l-2 border-[#b5a642] px-3 py-1.5 rounded-r mt-3 text-[11px] text-white/70 italic flex justify-between items-center">
+                    <div className="bg-[var(--color-surface-2)] border-l-2 border-[#b5a642] px-3 py-1.5 rounded-r mt-3 text-[11px] text-[var(--color-text-muted)] italic flex justify-between items-center">
                       <span>Outcome: "{client.retentionOutcome.toUpperCase()}" - {client.retentionNotes}</span>
-                      <span className="text-[9px] text-white/30 not-italic font-mono">{client.lastContactedDate}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] not-italic font-mono">{client.lastContactedDate}</span>
                     </div>
                   )}
 
                   {/* Action Controls Section */}
-                  <div className="border-t border-white/5 mt-4 pt-4 flex flex-wrap gap-2 justify-between">
+                  <div className="border-t border-[var(--color-border)] mt-4 pt-4 flex flex-wrap gap-2 justify-between">
                     {/* Quick outreach channels */}
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => handleOpenOutreach(client, "email")}
-                        className="p-2 bg-white/5 hover:bg-white/10 text-[#eeeef2] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-white/5"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)]"
                         title="Send Email Campaign"
                       >
                         <Mail className="h-3.5 w-3.5 text-[#b5a642]" /> Email
                       </button>
                       <button 
                         onClick={() => handleOpenOutreach(client, "sms")}
-                        className="p-2 bg-white/5 hover:bg-white/10 text-[#eeeef2] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-white/5"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)]"
                         title="Send SMS check-in"
                       >
                         <MessageSquare className="h-3.5 w-3.5 text-[#6fa3b8]" /> SMS
@@ -757,7 +757,7 @@ export const Retention: React.FC<RetentionProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleOpenTaskCreation(client)}
-                        className="p-2 bg-white/5 hover:bg-white/10 text-white/80 rounded-lg transition-all text-[11px] font-black uppercase border border-white/5 flex items-center gap-1"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] rounded-lg transition-all text-[11px] font-black uppercase border border-[var(--color-border)] flex items-center gap-1"
                       >
                         <Plus className="h-3.5 w-3.5 text-amber-500" /> Create Task
                       </button>
@@ -782,12 +782,12 @@ export const Retention: React.FC<RetentionProps> = ({
       {/* Outreach modal windows overlay */}
       {outreachClient && outreachType && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in" id="outreach-overlay">
-          <div className="bg-[#121216] border border-white/10 rounded-2xl w-full max-w-2xl p-6 relative flex flex-col max-h-[90vh] overflow-hidden">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-2xl p-6 relative flex flex-col max-h-[90vh] overflow-hidden shadow-xl">
             
             {/* Close */}
             <button 
               onClick={() => { setOutreachClient(null); setOutreachType(null); }}
-              className="absolute right-4 top-4 text-white/40 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             >
               <X className="h-5 w-5" />
             </button>
@@ -800,7 +800,7 @@ export const Retention: React.FC<RetentionProps> = ({
               {outreachType === "sms" && `Compose SMS to ${outreachClient.first}`}
               {outreachType === "outcome" && `Log Interaction Outcome: ${outreachClient.first} ${outreachClient.last}`}
             </h3>
-            <p className="text-xs text-white/40 font-semibold mb-4 border-b border-white/5 pb-3">
+            <p className="text-xs text-[var(--color-text-faint)] font-semibold mb-4 border-b border-[var(--color-border)] pb-3">
               Target Profile: ID {outreachClient.id} • Assigned Owner: {outreachClient.retentionOwner || "David Acosta"}
             </p>
 
@@ -809,35 +809,35 @@ export const Retention: React.FC<RetentionProps> = ({
               {outreachType === "email" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase text-white/30 font-bold">To Email Address</label>
+                    <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">To Email Address</label>
                     <input 
                       type="text" 
                       value={outreachClient.email} 
                       disabled 
-                      className="bg-white/5 border border-white/5 text-white/50 px-3 py-2 rounded-lg cursor-not-allowed"
+                      className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] text-[var(--color-text-muted)] px-3 py-2 rounded-lg cursor-not-allowed"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase text-white/30 font-bold">Email Subject</label>
+                    <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Email Subject</label>
                     <input 
                       type="text" 
                       value={compSubject} 
                       onChange={(e) => setCompSubject(e.target.value)}
-                      className="bg-[#16161c] border border-white/5 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-bold"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-bold"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] uppercase text-white/30 font-bold">Email Body Content</label>
+                      <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Email Body Content</label>
                       <span className="text-[9px] text-[#b5a642]">Placeholders resolved</span>
                     </div>
                     <textarea 
                       rows={12}
                       value={compBody} 
                       onChange={(e) => setCompBody(e.target.value)}
-                      className="bg-[#16161c] border border-white/5 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-sans leading-relaxed"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-sans leading-relaxed"
                     />
                   </div>
                 </>
@@ -847,24 +847,24 @@ export const Retention: React.FC<RetentionProps> = ({
               {outreachType === "sms" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase text-white/30 font-bold">Client Mobile Number</label>
+                    <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Client Mobile Number</label>
                     <input 
                       type="text" 
                       value={outreachClient.cell || "(No Mobile Registered)"} 
                       disabled 
-                      className="bg-white/5 border border-white/5 text-white/50 px-3 py-2 rounded-lg cursor-not-allowed"
+                      className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] text-[var(--color-text-muted)] px-3 py-2 rounded-lg cursor-not-allowed"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] uppercase text-white/30 font-bold">SMS Text Message</label>
+                    <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">SMS Text Message</label>
                     <textarea 
                       rows={6}
                       value={customSms} 
                       onChange={(e) => setCustomSms(e.target.value)}
-                      className="bg-[#16161c] border border-white/5 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-semibold"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-semibold"
                     />
-                    <div className="flex justify-between text-[9px] text-white/30 mt-1">
+                    <div className="flex justify-between text-[9px] text-[var(--color-text-faint)] mt-1">
                       <span>SMS character limit check (standard length)</span>
                       <span>{customSms.length} chars</span>
                     </div>
@@ -877,39 +877,39 @@ export const Retention: React.FC<RetentionProps> = ({
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase text-white/30 font-bold">Interaction Outcome Type</label>
+                      <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Interaction Outcome Type</label>
                       <select
                         value={outcomeType}
                         onChange={(e) => setOutcomeType(e.target.value)}
-                        className="bg-[#16161c] border border-white/5 text-white px-3 py-2 rounded-lg"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
                       >
-                        <option value="contacted">Contacted (Spoke directly)</option>
-                        <option value="no response">No Response (Left Voicemail/Text)</option>
-                        <option value="booked review">Booked Mortgage Review Meeting</option>
-                        <option value="referred someone">Referred Someone New</option>
-                        <option value="renewal opportunity created">Renewal Opportunity Created</option>
+                        <option value="contacted" className="bg-[var(--color-bg)] text-[var(--color-text)]">Contacted (Spoke directly)</option>
+                        <option value="no response" className="bg-[var(--color-bg)] text-[var(--color-text)]">No Response (Left Voicemail/Text)</option>
+                        <option value="booked review" className="bg-[var(--color-bg)] text-[var(--color-text)]">Booked Mortgage Review Meeting</option>
+                        <option value="referred someone" className="bg-[var(--color-bg)] text-[var(--color-text)]">Referred Someone New</option>
+                        <option value="renewal opportunity created" className="bg-[var(--color-bg)] text-[var(--color-text)]">Renewal Opportunity Created</option>
                       </select>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase text-white/30 font-bold">Next Follow-up Due Date</label>
+                      <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Next Follow-up Due Date</label>
                       <input 
                         type="date"
                         value={nextFollowUp}
                         onChange={(e) => setNextFollowUp(e.target.value)}
-                        className="bg-[#16161c] border border-white/5 text-white px-3 py-1.5 rounded-lg"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1.5 mt-3">
-                    <label className="text-[10px] uppercase text-white/30 font-bold">Conversation Log Notes</label>
+                    <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Conversation Log Notes</label>
                     <textarea 
                       rows={5}
                       value={outcomeNotes} 
                       onChange={(e) => setOutcomeNotes(e.target.value)}
                       placeholder="Add summary notes regarding current housing updates, GDS interest rates discussed, or next timeline expectations..."
-                      className="bg-[#16161c] border border-white/5 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-medium"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-medium"
                     />
                   </div>
                 </>
@@ -917,10 +917,10 @@ export const Retention: React.FC<RetentionProps> = ({
             </div>
 
             {/* Modal actions footer */}
-            <div className="border-t border-white/5 mt-5 pt-4 flex justify-end gap-3 shrink-0">
+            <div className="border-t border-[var(--color-border)] mt-5 pt-4 flex justify-end gap-3 shrink-0">
               <button
                 onClick={() => { setOutreachClient(null); setOutreachType(null); }}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all border border-white/5"
+                className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)]"
               >
                 Cancel
               </button>
@@ -960,12 +960,12 @@ export const Retention: React.FC<RetentionProps> = ({
       {/* Task Creation Modal overlay */}
       {taskClient && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in" id="task-creation-overlay">
-          <div className="bg-[#121216] border border-white/10 rounded-2xl w-full max-w-md p-6 relative flex flex-col text-xs font-semibold">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-6 relative flex flex-col text-xs font-semibold shadow-xl">
             
             {/* Close */}
             <button 
               onClick={() => setTaskClient(null)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             >
               <X className="h-5 w-5" />
             </button>
@@ -973,51 +973,51 @@ export const Retention: React.FC<RetentionProps> = ({
             <h3 className="text-base font-black uppercase tracking-wider text-[#b5a642] flex items-center gap-2 mb-3">
               <CheckSquare className="h-5 w-5" /> Create Retention Follow-up Task
             </h3>
-            <p className="text-white/40 mb-4 border-b border-white/5 pb-2 font-semibold">
+            <p className="text-[var(--color-text-faint)] mb-4 border-b border-[var(--color-border)] pb-2 font-semibold">
               Client: {taskClient.first} {taskClient.last} • Assigned: {taskClient.retentionOwner || "David Acosta"}
             </p>
 
             <div className="space-y-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] uppercase text-white/30 font-bold">Task Objective Title</label>
+                <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Task Objective Title</label>
                 <input 
                   type="text"
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  className="bg-[#16161c] border border-white/5 text-white px-3 py-2 rounded-lg font-bold"
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg font-bold focus:outline-none focus:border-[#b5a642]/30"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase text-white/30 font-bold">Action Due Date</label>
+                  <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Action Due Date</label>
                   <input 
                     type="date"
                     value={taskDueDate}
                     onChange={(e) => setTaskDueDate(e.target.value)}
-                    className="bg-[#16161c] border border-white/5 text-white px-3 py-1.5 rounded-lg"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase text-white/30 font-bold">Priority Status</label>
+                  <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Priority Status</label>
                   <select
                     value={taskPriority}
                     onChange={(e) => setTaskPriority(e.target.value as any)}
-                    className="bg-[#16161c] border border-white/5 text-white px-3 py-1.5 rounded-lg"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
                   >
-                    <option value="high">🔴 High Priority</option>
-                    <option value="medium">🟡 Medium Priority</option>
-                    <option value="low">🟢 Low Priority</option>
+                    <option value="high" className="bg-[var(--color-bg)]">🔴 High Priority</option>
+                    <option value="medium" className="bg-[var(--color-bg)]">🟡 Medium Priority</option>
+                    <option value="low" className="bg-[var(--color-bg)]">🟢 Low Priority</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-white/5 mt-5 pt-4 flex justify-end gap-3">
+            <div className="border-t border-[var(--color-border)] mt-5 pt-4 flex justify-end gap-3">
               <button
                 onClick={() => setTaskClient(null)}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all border border-white/5"
+                className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)]"
               >
                 Cancel
               </button>

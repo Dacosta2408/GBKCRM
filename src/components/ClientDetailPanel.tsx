@@ -119,7 +119,7 @@ export function ClientDetailPanel({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-0 top-0 bottom-0 w-full max-w-2xl border-l flex flex-col shadow-2xl h-full select-none"
           style={{
-            background: "rgba(18, 19, 26, 0.96)",
+            background: "var(--color-surface)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
             borderColor: "var(--color-divider)"
@@ -129,13 +129,13 @@ export function ClientDetailPanel({
           <div className="p-5 border-b flex justify-between items-center shrink-0" style={{ borderColor: "var(--color-divider)" }}>
             <div className="flex items-center gap-3">
               <div 
-                className="w-10 h-10 rounded-lg font-black text-sm text-[#12131a] flex items-center justify-center shadow-inner"
+                className="w-10 h-10 rounded-lg font-black text-sm text-[var(--color-text-inverse)] flex items-center justify-center shadow-inner"
                 style={{ background: "var(--grad-warm)" }}
               >
                 {currentClient.first[0]}{currentClient.last[0]}
               </div>
               <div>
-                <h3 className="text-base font-black text-white">{currentClient.first} {currentClient.last}</h3>
+                <h3 className="text-base font-black text-[var(--color-text)]">{currentClient.first} {currentClient.last}</h3>
                 <p className="text-[10px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">{currentClient.type || "Purchase File"}</p>
               </div>
             </div>
@@ -148,22 +148,22 @@ export function ClientDetailPanel({
                   borderColor: "var(--glass-border)"
                 }}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F9B17A] animate-pulse shadow-[0_0_8px_#F9B17A]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse shadow-[0_0_8px_var(--color-accent)]" />
                 <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-widest leading-none">Stage:</span>
                 <select
                   value={currentClient.status}
                   onChange={(e) => handleUpdateClientStatus(currentClient.id, e.target.value)}
-                  className="bg-transparent border-none text-[10px] font-black uppercase text-[#F9B17A] focus:outline-none cursor-pointer pr-1"
+                  className="bg-transparent border-none text-[10px] font-black uppercase text-[var(--color-accent)] focus:outline-none cursor-pointer pr-1"
                 >
                   {["lead", "open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
-                    <option key={st} value={st} className="bg-[#12131a] text-white font-bold uppercase">{st}</option>
+                    <option key={st} value={st} className="bg-[var(--color-surface)] text-[var(--color-text)] font-bold uppercase">{st}</option>
                   ))}
                 </select>
               </div>
               
               <button 
                 onClick={closeDetail} 
-                className="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-2 rounded-full hover:bg-[var(--color-surface-2)]/80 transition-all cursor-pointer border border-transparent hover:border-[var(--color-border)]"
               >
                 ✕
               </button>
@@ -186,8 +186,8 @@ export function ClientDetailPanel({
                   onClick={() => setDetailTab(tab.toLowerCase())}
                   className={`px-3.5 py-1.5 font-bold tracking-tight text-[11px] rounded-full transition-all duration-200 shrink-0 cursor-pointer ${
                     isSelected 
-                      ? "bg-[#F9B17A] text-[#12131a] shadow-md font-black" 
-                      : "text-[var(--color-text-muted)] hover:text-white hover:bg-white/5"
+                      ? "bg-[var(--color-accent)] text-[#12131a] shadow-md font-black" 
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/80"
                   }`}
                 >
                   {tab}
@@ -220,9 +220,9 @@ export function ClientDetailPanel({
                       <div className="glass-card p-4 flex flex-col justify-between">
                         <div>
                           <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">Mortgage Requested</div>
-                          <div className="text-xl font-black text-white mt-1">{fd(mtg)}</div>
+                          <div className="text-xl font-black text-[var(--color-text)] mt-1">{fd(mtg)}</div>
                         </div>
-                        <div className="text-[9px] text-[var(--color-text-faint)] font-bold mt-2.5 border-t border-white/5 pt-2">
+                        <div className="text-[9px] text-[var(--color-text-faint)] font-bold mt-2.5 border-t border-[var(--color-border)] pt-2">
                           Amortization: 25 Years @ 5.25% (Qualifying)
                         </div>
                       </div>
@@ -230,18 +230,18 @@ export function ClientDetailPanel({
                       <div className="glass-card p-4 flex flex-col justify-between">
                         <div>
                           <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">Property Value</div>
-                          <div className="text-xl font-black text-white mt-1">{fd(prop)}</div>
+                          <div className="text-xl font-black text-[var(--color-text)] mt-1">{fd(prop)}</div>
                         </div>
-                        <div className="text-[9px] text-[var(--color-text-faint)] font-bold mt-2.5 border-t border-white/5 pt-2">
-                          LTV Ratio: <span className="font-extrabold text-[#F9B17A]">{prop > 0 ? ((mtg / prop) * 100).toFixed(1) : "0.0"}%</span>
+                        <div className="text-[9px] text-[var(--color-text-faint)] font-bold mt-2.5 border-t border-[var(--color-border)] pt-2">
+                          LTV Ratio: <span className="font-extrabold text-[var(--color-accent)]">{prop > 0 ? ((mtg / prop) * 100).toFixed(1) : "0.0"}%</span>
                         </div>
                       </div>
                     </div>
 
                     {/* GDS / TDS Debt Ratios */}
                     <div className="glass-card p-4.5">
-                      <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
-                        <h4 className="text-[9px] uppercase font-black tracking-widest text-[#F9B17A]">Debt Service Ratios</h4>
+                      <div className="flex items-center justify-between mb-3 border-b border-[var(--color-border)] pb-2">
+                        <h4 className="text-[9px] uppercase font-black tracking-widest text-[var(--color-accent)]">Debt Service Ratios</h4>
                         <span className="text-[8px] text-[var(--color-text-faint)] uppercase font-black tracking-wide">Qualifying benchmarks: GDS &lt; 39% | TDS &lt; 44%</span>
                       </div>
                       
@@ -251,7 +251,7 @@ export function ClientDetailPanel({
                             <span className="text-[var(--color-text-muted)] font-bold">Gross Debt Service (GDS)</span>
                             <span className={`font-mono font-black ${gds > 39 ? "text-red-400" : "text-green-400"}`}>{gds > 0 ? `${gds.toFixed(1)}%` : "0.0%"}</span>
                           </div>
-                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full transition-all duration-500 ${gds > 39 ? "bg-red-500" : "bg-emerald-500"}`} 
                               style={{ width: `${Math.min(gds, 100)}%` }}
@@ -264,7 +264,7 @@ export function ClientDetailPanel({
                             <span className="text-[var(--color-text-muted)] font-bold">Total Debt Service (TDS)</span>
                             <span className={`font-mono font-black ${tds > 44 ? "text-red-400" : "text-green-400"}`}>{tds > 0 ? `${tds.toFixed(1)}%` : "0.0%"}</span>
                           </div>
-                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full transition-all duration-500 ${tds > 44 ? "bg-red-500" : "bg-emerald-500"}`} 
                               style={{ width: `${Math.min(tds, 100)}%` }}
@@ -278,7 +278,7 @@ export function ClientDetailPanel({
                     <div className="flex justify-end">
                       <button
                         onClick={() => setDetailTab("application details")}
-                        className="text-[10px] uppercase tracking-wider bg-[#F9B17A]/10 text-[#F9B17A] border border-[#F9B17A]/20 hover:bg-[#F9B17A]/20 font-black px-4 py-2 rounded-full transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="text-[10px] uppercase tracking-wider bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 font-black px-4 py-2 rounded-full transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         📝 Go to Application Details
                       </button>
@@ -286,29 +286,29 @@ export function ClientDetailPanel({
 
                     {/* General Borrower Details Grid */}
                     <div className="grid grid-cols-2 gap-3.5">
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Borrower Name</div>
-                        <div className="text-xs font-bold text-white mt-1">{currentClient.first} {currentClient.last}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1">{currentClient.first} {currentClient.last}</div>
                       </div>
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Email Address</div>
-                        <div className="text-xs font-bold text-white mt-1 truncate">{currentClient.email || "—"}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1 truncate">{currentClient.email || "—"}</div>
                       </div>
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Cell Phone</div>
-                        <div className="text-xs font-bold text-white mt-1">{currentClient.cell || "—"}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1">{currentClient.cell || "—"}</div>
                       </div>
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Employment Type</div>
-                        <div className="text-xs font-bold text-white mt-1 uppercase tracking-wide">{currentClient.emptype || "Salaried"}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1 uppercase tracking-wide">{currentClient.emptype || "Salaried"}</div>
                       </div>
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Assigned Broker</div>
-                        <div className="text-xs font-bold text-white mt-1">{currentClient.agent || "Unassigned"}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1">{currentClient.agent || "Unassigned"}</div>
                       </div>
-                      <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <div className="p-3.5 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] rounded-xl">
                         <div className="text-[9px] text-[var(--color-text-faint)] uppercase font-extrabold tracking-wider">Lender Partner</div>
-                        <div className="text-xs font-bold text-white mt-1">{currentClient.lender || "Not submitted"}</div>
+                        <div className="text-xs font-bold text-[var(--color-text)] mt-1">{currentClient.lender || "Not submitted"}</div>
                       </div>
                     </div>
                   </div>
@@ -393,7 +393,7 @@ export function ClientDetailPanel({
                 <button 
                   onClick={() => triggerUnderwritingAnalysis(currentClient)}
                   disabled={underwritingLoading}
-                  className="w-full text-[#12131a] disabled:opacity-50 font-black uppercase text-[10px] tracking-wider py-3 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(249,177,122,0.2)]"
+                  className="w-full text-[var(--color-text-inverse)] disabled:opacity-50 font-black uppercase text-[10px] tracking-wider py-3 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.2)]"
                   style={{ background: "var(--grad-warm)" }}
                 >
                   <Sparkles className="w-3.5 h-3.5 fill-current" /> {underwritingLoading ? "Analyzing File..." : "Run Deep Underwrite Analysis (Gemini)"}
@@ -401,13 +401,13 @@ export function ClientDetailPanel({
 
                 {underwritingLoading ? (
                   <div className="glass-card p-4 flex flex-col gap-3.5 animate-pulse">
-                    <div className="text-[10px] font-black text-[#F9B17A] uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#F9B17A]" /> Formulating Automated Underwriter Report...
+                    <div className="text-[10px] font-black text-[var(--color-accent)] uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Formulating Automated Underwriter Report...
                     </div>
-                    <div className="h-4 bg-white/5 rounded w-3/4"></div>
-                    <div className="h-4 bg-white/5 rounded w-5/6"></div>
-                    <div className="h-4 bg-white/5 rounded w-2/3"></div>
-                    <div className="h-4 bg-white/5 rounded w-1/2"></div>
+                    <div className="h-4 bg-[var(--color-surface-2)] rounded w-3/4"></div>
+                    <div className="h-4 bg-[var(--color-surface-2)] rounded w-5/6"></div>
+                    <div className="h-4 bg-[var(--color-surface-2)] rounded w-2/3"></div>
+                    <div className="h-4 bg-[var(--color-surface-2)] rounded w-1/2"></div>
                   </div>
                 ) : underwritingError ? (
                   <div className="p-4 bg-red-950/20 border border-red-500/15 rounded-xl flex flex-col gap-2">
@@ -417,13 +417,13 @@ export function ClientDetailPanel({
                     <p className="text-xs text-red-300 leading-relaxed font-sans bg-red-900/10 p-2.5 rounded border border-red-500/10 font-mono">
                       {underwritingError}
                     </p>
-                    <p className="text-[9px] text-white/40 font-bold">
+                    <p className="text-[9px] text-[var(--color-text-muted)] font-bold">
                       Please check bridge server console logs, verify network Z drive connectivity, or configure VITE_GEMINI_API_KEY.
                     </p>
                   </div>
                 ) : (
                   <div className="glass-card p-4">
-                    <div className="text-[9px] font-black text-[#F9B17A] uppercase tracking-widest mb-3 pb-2 border-b border-white/5">Automated AI Underwriter Dossier</div>
+                    <div className="text-[9px] font-black text-[var(--color-accent)] uppercase tracking-widest mb-3 pb-2 border-b border-[var(--color-border)]">Automated AI Underwriter Dossier</div>
                     <div className="text-xs leading-relaxed text-[var(--color-text)] whitespace-pre-wrap font-medium">
                       {currentClient.aiSummary || "No dossier report has been compiled yet. Click the button above to initiate deep Gemini engine analysis."}
                     </div>
@@ -441,17 +441,17 @@ export function ClientDetailPanel({
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-black text-white uppercase tracking-wider">PIPEDA Portability & Archive Right</h4>
+                      <h4 className="text-xs font-black text-[var(--color-text)] uppercase tracking-wider">PIPEDA Portability & Archive Right</h4>
                       <p className="text-[10px] text-[var(--color-text-muted)] font-semibold leading-relaxed mt-1">
                         Under personal electronic portability standards (PIPEDA), clients have a legal "Right to Portability". You can export a comprehensive single-client backup archive containing all personal assets, checklists, and metadata.
                       </p>
                     </div>
                   </div>
 
-                  <div className="border-t border-white/5 pt-3.5 mt-1 flex justify-end">
+                  <div className="border-t border-[var(--color-border)] pt-3.5 mt-1 flex justify-end">
                     <button
                       onClick={handleExportData}
-                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" /> Export Client Dossier
                     </button>
@@ -464,7 +464,7 @@ export function ClientDetailPanel({
                       <ShieldAlert className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-black text-red-400 uppercase tracking-wider">Absolute Erasure under PIPEDA</h4>
+                      <h4 className="text-xs font-black text-red-500 uppercase tracking-wider">Absolute Erasure under PIPEDA</h4>
                       <p className="text-[10px] text-[var(--color-text-muted)] font-semibold leading-relaxed mt-1">
                         Permanently destroy this client folder, including all uploaded electronic assets, checklist states, and logs from local storage. This erasure is binding, permanent, and completely irreversible.
                       </p>
@@ -495,7 +495,7 @@ export function ClientDetailPanel({
                 setShowDeleteConfirmModal(false);
                 setDeleteConfirmInput("");
               }} 
-              className="absolute right-4 top-4 text-white/50 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded-full hover:bg-[var(--color-surface-2)] transition-all cursor-pointer"
             >
               ✕
             </button>
@@ -507,7 +507,7 @@ export function ClientDetailPanel({
             </p>
             
             <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3.5 mb-4 text-[11px] text-red-300 font-bold">
-              To authorize this request, please type the client's full name exactly: <strong className="text-white select-all">{currentClient.first} {currentClient.last}</strong>
+              To authorize this request, please type the client's full name exactly: <strong className="text-[var(--color-text)] select-all">{currentClient.first} {currentClient.last}</strong>
             </div>
 
             <input 
@@ -515,7 +515,7 @@ export function ClientDetailPanel({
               placeholder="Type client's full name to authorize"
               value={deleteConfirmInput}
               onChange={(e) => setDeleteConfirmInput(e.target.value)}
-              className="w-full bg-black/30 border border-red-500/20 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500/50 mb-4 text-center font-bold tracking-wide"
+              className="w-full bg-[var(--color-bg)] border border-red-500/20 rounded-xl px-4 py-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50 mb-4 text-center font-bold tracking-wide"
             />
 
             <div className="flex gap-3">
@@ -525,7 +525,7 @@ export function ClientDetailPanel({
                   setShowDeleteConfirmModal(false);
                   setDeleteConfirmInput("");
                 }}
-                className="flex-1 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[10px] tracking-wider py-3 rounded-xl transition-all cursor-pointer"
+                className="flex-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] font-black uppercase text-[10px] tracking-wider py-3 rounded-xl transition-all cursor-pointer"
               >
                 Cancel
               </button>

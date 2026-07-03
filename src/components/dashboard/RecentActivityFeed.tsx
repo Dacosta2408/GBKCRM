@@ -33,9 +33,9 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
     if (act.includes("onboard") || act.includes("client") || act.includes("add") || act.includes("intake")) {
       return {
         icon: UserPlus,
-        borderColor: "#F9B17A", // --color-accent
-        iconColor: "text-[#F9B17A]",
-        bg: "rgba(249, 177, 122, 0.08)"
+        borderColor: "var(--color-accent)", // --color-accent
+        iconColor: "text-[var(--color-accent)]",
+        bg: "rgba(200, 146, 42, 0.08)"
       };
     }
 
@@ -66,7 +66,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
             <ListFilter className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-black uppercase text-white tracking-wider">Activity Feed</h3>
+            <h3 className="text-xs font-black uppercase text-[var(--color-text)] tracking-wider">Activity Feed</h3>
             <p className="text-[10px] text-[var(--color-text-faint)] mt-0.5 font-bold leading-none">
               Chronological log of verified workstation actions
             </p>
@@ -75,7 +75,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
         {isManager && (
           <button
             onClick={() => setActiveTab("admin")}
-            className="text-[10px] text-[#F9B17A] font-bold hover:underline tracking-tight uppercase"
+            className="text-[10px] text-[var(--color-accent)] font-bold hover:underline tracking-tight uppercase"
           >
             Manage Audit &rarr;
           </button>
@@ -103,8 +103,8 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
                 
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-[var(--color-text)] leading-relaxed">
-                    <span className="font-extrabold text-[#F9B17A] mr-1">{log.user || "System"}</span>
-                    <span className="text-white/80 font-medium">{log.action || ""}</span>
+                    <span className="font-extrabold text-[var(--color-accent)] mr-1">{log.user || "System"}</span>
+                    <span className="text-[var(--color-text)] font-medium opacity-90">{log.action || ""}</span>
                     {log.target && (
                       <span className="font-bold text-blue-300 ml-1.5 bg-[#486D83]/20 px-1.5 py-0.5 rounded border border-[#486D83]/30 text-[10px]">
                         {log.target}

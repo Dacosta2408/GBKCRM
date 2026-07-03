@@ -71,10 +71,13 @@
   --grad-sidebar:          linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
   --grad-sidebar-header:   linear-gradient(135deg, #0D2845 0%, #081A33 100%);
   --grad-deep:             linear-gradient(135deg, #0D2845 0%, #051528 100%);
-  --grad-accent:           linear-gradient(135deg, #C8922A 0%, #E0A83A 100%);
-  --grad-warm:             linear-gradient(135deg, #C8922A 0%, #A87820 100%);
+  --grad-accent:           linear-gradient(135deg, #F0C265 0%, #C8922A 60%, #9C6F1E 100%);
+  --grad-warm:             linear-gradient(135deg, #E2B045 0%, #C8922A 50%, #A3721A 100%);
   --grad-soft:             linear-gradient(135deg, #162C44 0%, #1C3554 100%);
   --grad-card:             linear-gradient(145deg, #152A40 0%, #112236 100%);
+  --grad-slate-blue:       linear-gradient(135deg, #486D83 0%, #1A2E3B 100%);
+  --grad-plum:             linear-gradient(135deg, #4A2C3F 0%, #1C111A 100%);
+  --grad-warm-highlight:   linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
 
   /* ── Glass & Blur ── */
   --glass-bg:              rgba(17, 34, 54, 0.70);
@@ -156,10 +159,13 @@
   --grad-sidebar:          linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
   --grad-sidebar-header:   linear-gradient(135deg, #0D2845 0%, #081A33 100%);
   --grad-deep:             linear-gradient(135deg, #0D2845 0%, #051528 100%);
-  --grad-accent:           linear-gradient(135deg, #C8922A 0%, #E0A83A 100%);
-  --grad-warm:             linear-gradient(135deg, #C8922A 0%, #A87820 100%);
+  --grad-accent:           linear-gradient(135deg, #F0C265 0%, #C8922A 60%, #9C6F1E 100%);
+  --grad-warm:             linear-gradient(135deg, #E2B045 0%, #C8922A 50%, #A3721A 100%);
   --grad-soft:             linear-gradient(135deg, #F2EEE8 0%, #EDE8E1 100%);
   --grad-card:             linear-gradient(145deg, #FDFAF7 0%, #F5F1EB 100%);
+  --grad-slate-blue:       linear-gradient(135deg, #6FA3B8 0%, #EDE9E2 100%);
+  --grad-plum:             linear-gradient(135deg, #7A5063 0%, #FDFAF7 100%);
+  --grad-warm-highlight:   linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
 
   /* ── Glass & Blur ── */
   --glass-bg:              rgba(253, 250, 247, 0.80);

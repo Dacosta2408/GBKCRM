@@ -26,7 +26,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Create client folder",
       icon: UserPlus,
       onClick: onAddClient,
-      iconColor: "text-[#F9B17A]"
+      iconColor: "text-[var(--color-accent)]"
     },
     {
       label: "Full Loan Intake",
@@ -77,13 +77,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             <button
               key={i}
               onClick={act.onClick}
-              className="glass-card flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:border-[#F9B17A]/30 hover:shadow-[0_0_20px_rgba(249,177,122,0.15)] group"
+              className="glass-card flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.15)] group"
             >
               <div className="p-2 rounded-lg bg-black/20 shrink-0 group-hover:bg-black/40 transition-colors">
                 <Icon className={`w-4 h-4 ${act.iconColor}`} />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-black text-white truncate leading-tight">
+                <div className="text-xs font-black text-[var(--color-text)] truncate leading-tight">
                   {act.label}
                 </div>
                 <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-0.5 font-bold">
