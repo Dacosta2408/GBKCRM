@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div
         className="h-20 flex flex-col justify-center px-4 relative overflow-hidden shrink-0"
         style={{
-          background: "linear-gradient(135deg, #051528 0%, #0C213D 60%, #1D3A60 100%)",
+          background: "var(--grad-sidebar-header)",
           borderBottom: "1px solid var(--color-sidebar-border)"
         }}
       >
@@ -136,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse at 20% 50%, rgba(244,163,132,0.1) 0%, transparent 70%)"
+            background: "radial-gradient(ellipse at 20% 50%, rgba(249, 177, 122, 0.08) 0%, transparent 70%)"
           }}
         />
 
@@ -146,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
             style={{
               background: "var(--grad-warm-highlight)",
-              boxShadow: "0 3px 10px rgba(244,163,132,0.3)"
+              boxShadow: "0 3px 10px rgba(244, 163, 132, 0.2)"
             }}
           >
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -191,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg outline-none cursor-pointer w-full text-left"
                   style={{
                     color: isActive
-                      ? "var(--color-accent)"
+                      ? "#FFFFFF"
                       : "var(--color-text-sidebar)",
                     fontWeight: isActive ? 700 : 600,
                     transition: "var(--transition-fast)"
@@ -209,15 +209,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }
                   }}
                 >
-                  {/* Active slide indicator */}
+                  {/* Active slide indicator (refined to be card-like/pill highlight) */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-active"
                       className="absolute inset-0 rounded-lg pointer-events-none"
                       style={{
-                        background: "linear-gradient(90deg, rgba(200, 146, 42, 0.16) 0%, rgba(200, 146, 42, 0.03) 100%)",
-                        borderLeft: "3px solid var(--color-accent)",
-                        boxShadow: "inset 4px 0 10px rgba(200, 146, 42, 0.05)"
+                        background: "var(--color-sidebar-active)",
+                        border: "1px solid rgba(103, 111, 157, 0.25)",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)"
                       }}
                     />
                   )}
@@ -227,9 +227,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       className="h-4 w-4 shrink-0"
                       style={{
                         color: isActive
-                          ? "var(--color-accent)"
+                          ? "var(--color-brand-peach)"
                           : item.highlight
-                            ? "var(--color-accent)"
+                            ? "var(--color-brand-peach)"
                             : item.alert
                               ? "var(--color-error)"
                               : "var(--color-text-sidebar-muted)",
@@ -244,8 +244,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span
                       className="z-10 text-[9px] font-black px-1.5 py-0.5 rounded-full min-w-4 text-center"
                       style={{
-                        background: "var(--color-accent)",
-                        color: "var(--color-text-inverse)"
+                        background: "var(--color-brand-peach)",
+                        color: "var(--color-brand-slate-darker)"
                       }}
                     >
                       {item.badge}
@@ -268,16 +268,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onOpenProfileManager}
           className="p-2.5 cursor-pointer rounded-xl flex items-center gap-2.5 select-none"
           style={{
-            background: "rgba(255,255,255,0.04)",
+            background: "rgba(255,255,255,0.03)",
             border: "1px solid var(--color-sidebar-border)",
             transition: "var(--transition-smooth)"
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(200,146,42,0.10)";
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--color-accent-border)";
+            (e.currentTarget as HTMLElement).style.background = "var(--color-sidebar-active)";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(103, 111, 157, 0.3)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+            (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
             (e.currentTarget as HTMLElement).style.borderColor = "var(--color-sidebar-border)";
           }}
         >
@@ -286,7 +286,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0"
             style={{
               background: "var(--grad-warm-highlight)",
-              boxShadow: "0 2px 8px rgba(244, 163, 132, 0.4)"
+              boxShadow: "0 2px 8px rgba(244, 163, 132, 0.3)"
             }}
           >
             {currentUser.name
