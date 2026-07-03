@@ -2,193 +2,203 @@
 @import "tailwindcss";
 
 /* ============================================================
-   GBK FINANCIAL CRM — DESIGN TOKEN SYSTEM
-   Phase 7 — Theme Unification & Visual Polish
+   GBK FINANCIAL CRM — DESIGN TOKEN SYSTEM (REFINED)
+   Section 1 Fix — Refined Dual-Theme Global Tokens & Base Styles
    
-   Brand anchors:
-     Sidebar / Nav foundation : #081A33  (deep navy)
-     Light mode canvas        : #F2EEE8  (warm off-white)
-     Accent                   : #C8922A  (rich gold-amber)
-   
-   Architecture:
-     :root               = DARK MODE (default)
-     [data-theme="light"] = LIGHT MODE override
+   Brand Anchors:
+     Sidebar / Nav Foundation : #081A33  (fixed deep navy)
+     Light Mode Canvas        : #F2EEE8  (warm refined sand)
+     Primary (Slate Family)   : #676F9D, #424769, #2D3250
+     Accent (Warm Highlights) : #C8922A, #F9B17A (peach)
+     
+   Theme Architecture:
+     :root               = Dark Slate Mode (default)
+     [data-theme="light"] = Warm Light Mode
    ============================================================ */
 
 /* ─────────────────────────────────────────────────────────────
    DARK MODE (default / :root)
-───────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────── */
 :root {
-  /* ── Core Backgrounds ── */
-  --color-bg:              #0D1B2A;
-  --color-surface:         #112236;
-  --color-surface-2:       #162C44;
-  --color-surface-3:       #1C3554;
+  /* ── Brand Palette (Explicit Constants) ── */
+  --color-brand-slate:        #676F9D;
+  --color-brand-slate-deep:   #424769;
+  --color-brand-slate-darker: #2D3250;
+  --color-brand-peach:        #F9B17A;
 
-  /* ── Sidebar (fixed brand — same in both modes) ── */
-  --color-sidebar:         #081A33;
-  --color-sidebar-header:  #051528;
-  --color-sidebar-hover:   rgba(255, 255, 255, 0.06);
-  --color-sidebar-active:  rgba(200, 146, 42, 0.14);
-  --color-sidebar-border:  rgba(255, 255, 255, 0.05);
+  /* ── Core Backgrounds ── */
+  --color-bg:                 #0D1525; /* Sleek deep navy slate background, not pitch black */
+  --color-surface:            #142137; /* Layered container surface */
+  --color-surface-2:          #1C2E4C; /* Elevated inner containers */
+  --color-surface-3:          #243C61; /* High contrast interactive surfaces */
+
+  /* ── Fixed Sidebar (Same deep navy #081A33 in both modes) ── */
+  --color-sidebar:            #081A33;
+  --color-sidebar-header:     #051528;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.06);
+  --color-sidebar-active:     rgba(103, 111, 157, 0.16); /* Switched to a refined slate-based active highlight */
+  --color-sidebar-border:     rgba(255, 255, 255, 0.05);
 
   /* ── Panel / Module Areas ── */
-  --color-panel:           #1A2F47;
-  --color-panel-2:         #213856;
-  --color-muted:           #3D6080;
+  --color-panel:              #121F35;
+  --color-panel-2:            #192B48;
 
-  /* ── Accent — Gold Amber ── */
-  --color-accent:          #C8922A;
-  --color-accent-hover:    #E0A83A;
-  --color-accent-active:   #A87820;
-  --color-accent-subtle:   rgba(200, 146, 42, 0.12);
-  --color-accent-border:   rgba(200, 146, 42, 0.30);
+  /* ── Primary Interaction Colors (Slate-driven direction) ── */
+  --color-primary:            #676F9D;
+  --color-primary-hover:      #7C85B5;
+  --color-primary-active:     #515780;
+  --color-primary-subtle:     rgba(103, 111, 157, 0.15);
 
-  /* ── Typography ── */
-  --color-text:            #EDF2F7;
-  --color-text-muted:      #8BA3BC;
-  --color-text-faint:      #4A6480;
-  --color-text-inverse:    #081A33;
-  --color-text-sidebar:    #C8D8E8;
+  /* ── Secondary Accent — Gold Amber (compatibility preserved, visual dominance reduced) ── */
+  --color-accent:             #C8922A;
+  --color-accent-hover:       #E0A83A;
+  --color-accent-active:      #A87820;
+  --color-accent-subtle:      rgba(200, 146, 42, 0.10);
+  --color-accent-border:      rgba(200, 146, 42, 0.25);
+
+  /* ── Typography (Slightly softened, eye-safe contrast) ── */
+  --color-text:               #F0F4F8; /* Soft readable off-white */
+  --color-text-muted:         #9FB4CC; /* Clean steel-blue */
+  --color-text-faint:         #5C7594; /* Still legible secondary indicators */
+  --color-text-inverse:       #FFFFFF;
+  --color-text-sidebar:       #C8D8E8;
   --color-text-sidebar-muted: rgba(200, 216, 232, 0.45);
 
   /* ── Borders & Dividers ── */
-  --color-border:          rgba(139, 163, 188, 0.14);
-  --color-divider:         rgba(139, 163, 188, 0.08);
-  --color-border-accent:   rgba(200, 146, 42, 0.30);
+  --color-border:             rgba(103, 128, 157, 0.20);
+  --color-divider:            rgba(103, 128, 157, 0.10);
 
   /* ── Status Colors ── */
-  --color-success:         #2DB87C;
-  --color-success-subtle:  rgba(45, 184, 124, 0.12);
-  --color-warning:         #E8A020;
-  --color-warning-subtle:  rgba(232, 160, 32, 0.12);
-  --color-error:           #E05C6E;
-  --color-error-subtle:    rgba(224, 92, 110, 0.12);
-  --color-info:            #4A9ECC;
-  --color-info-subtle:     rgba(74, 158, 204, 0.12);
+  --color-success:            #24B273;
+  --color-success-subtle:     rgba(36, 178, 115, 0.12);
+  --color-warning:            #DF921F;
+  --color-warning-subtle:     rgba(223, 146, 31, 0.12);
+  --color-error:              #DC4C5F;
+  --color-error-subtle:       rgba(220, 76, 95, 0.12);
+  --color-info:               #3D97C9;
+  --color-info-subtle:        rgba(61, 151, 201, 0.12);
 
   /* ── Gradients ── */
-  --grad-sidebar:          linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
-  --grad-sidebar-header:   linear-gradient(135deg, #0D2845 0%, #081A33 100%);
-  --grad-deep:             linear-gradient(135deg, #0D2845 0%, #051528 100%);
-  --grad-accent:           linear-gradient(135deg, #F0C265 0%, #C8922A 60%, #9C6F1E 100%);
-  --grad-warm:             linear-gradient(135deg, #E2B045 0%, #C8922A 50%, #A3721A 100%);
-  --grad-soft:             linear-gradient(135deg, #162C44 0%, #1C3554 100%);
-  --grad-card:             linear-gradient(145deg, #152A40 0%, #112236 100%);
-  --grad-slate-blue:       linear-gradient(135deg, #486D83 0%, #1A2E3B 100%);
-  --grad-plum:             linear-gradient(135deg, #4A2C3F 0%, #1C111A 100%);
-  --grad-warm-highlight:   linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
+  --grad-sidebar:             linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #0D2845 0%, #081A33 100%);
+  --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
+  --grad-plum:                linear-gradient(135deg, #4A2C3F 0%, #1C111A 100%);
+  --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
+  --grad-warm-canvas:         linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
+  --grad-card:                linear-gradient(145deg, #16263F 0%, #112036 100%);
+  --grad-soft:                linear-gradient(135deg, #142137 0%, #1C2E4C 100%);
 
-  /* ── Glass & Blur ── */
-  --glass-bg:              rgba(17, 34, 54, 0.70);
-  --glass-border:          rgba(139, 163, 188, 0.15);
-  --glass-blur:            blur(16px);
+  /* ── Glass & Blur (Layered & premium) ── */
+  --glass-bg:                 rgba(20, 33, 55, 0.75);
+  --glass-border:             rgba(255, 255, 255, 0.08);
+  --glass-blur:               blur(16px);
 
   /* ── Shadows ── */
-  --shadow-glow-accent:    0 0 24px rgba(200, 146, 42, 0.18);
-  --shadow-panel:          0 8px 32px rgba(0, 0, 0, 0.50);
-  --shadow-card:           0 2px 12px rgba(0, 0, 0, 0.40);
-  --shadow-sm:             0 1px 4px rgba(0, 0, 0, 0.30);
-  --shadow-lg:             0 16px 48px rgba(0, 0, 0, 0.55);
-  --shadow-sidebar:        4px 0 24px rgba(0, 0, 0, 0.40);
+  --shadow-glow-accent:       0 0 24px rgba(103, 111, 157, 0.20);
+  --shadow-panel:             0 12px 40px rgba(0, 0, 0, 0.45);
+  --shadow-card:              0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-sm:                0 2px 6px rgba(0, 0, 0, 0.20);
+  --shadow-lg:                0 20px 56px rgba(0, 0, 0, 0.50);
+  --shadow-sidebar:           4px 0 24px rgba(0, 0, 0, 0.35);
 
   /* ── Shape / Motion ── */
-  --radius-card:           14px;
-  --radius-panel:          18px;
-  --radius-input:          10px;
-  --radius-badge:          6px;
-  --radius-btn:            10px;
-  --transition-smooth:     all 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast:       all 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-card:              12px;
+  --radius-panel:             16px;
+  --radius-input:             8px;
+  --radius-badge:             5px;
+  --radius-btn:               8px;
+  --transition-smooth:        all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast:          all 120ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 
 /* ─────────────────────────────────────────────────────────────
    LIGHT MODE — [data-theme="light"]
-───────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────── */
 [data-theme="light"] {
   /* ── Core Backgrounds ── */
-  --color-bg:              #F2EEE8;
-  --color-surface:         #FDFAF7;
-  --color-surface-2:       #FFFFFF;
-  --color-surface-3:       #EDE9E2;
+  --color-bg:                 #F2EEE8; /* Exact warm page background */
+  --color-surface:            #FBF9F6; /* Warm clean surface */
+  --color-surface-2:          #FFFFFF; /* Pure white layer */
+  --color-surface-3:          #E6E0D5; /* Deepest accent warm layer */
 
-  /* ── Sidebar stays deep navy in both modes ── */
-  --color-sidebar:         #081A33;
-  --color-sidebar-header:  #051528;
-  --color-sidebar-hover:   rgba(255, 255, 255, 0.07);
-  --color-sidebar-active:  rgba(200, 146, 42, 0.16);
-  --color-sidebar-border:  rgba(255, 255, 255, 0.05);
+  /* ── Sidebar remains fixed deep navy #081A33 in both modes ── */
+  --color-sidebar:            #081A33;
+  --color-sidebar-header:     #051528;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.07);
+  --color-sidebar-active:     rgba(103, 111, 157, 0.18);
+  --color-sidebar-border:     rgba(255, 255, 255, 0.05);
 
   /* ── Panel / Module Areas ── */
-  --color-panel:           #EDE8E1;
-  --color-panel-2:         #E6E0D8;
-  --color-muted:           #9E9488;
+  --color-panel:              #EAE4DA;
+  --color-panel-2:            #DDD6CA;
 
-  /* ── Accent — Gold Amber (same in both modes) ── */
-  --color-accent:          #C8922A;
-  --color-accent-hover:    #A87820;
-  --color-accent-active:   #8A6018;
-  --color-accent-subtle:   rgba(200, 146, 42, 0.10);
-  --color-accent-border:   rgba(200, 146, 42, 0.28);
+  /* ── Primary Interaction Colors (Slate family in light mode) ── */
+  --color-primary:            #424769;
+  --color-primary-hover:      #2D3250;
+  --color-primary-active:     #1F223B;
+  --color-primary-subtle:     rgba(66, 71, 105, 0.08);
 
-  /* ── Typography ── */
-  --color-text:            #1A2533;
-  --color-text-muted:      #5C6E82;
-  --color-text-faint:      #9AAAB8;
-  --color-text-inverse:    #FFFFFF;
-  --color-text-sidebar:    #C8D8E8;
+  /* ── Secondary Accent — Gold Amber (Legible contrast on warm bg) ── */
+  --color-accent:             #B47D1C;
+  --color-accent-hover:       #9A6814;
+  --color-accent-active:      #7F540D;
+  --color-accent-subtle:      rgba(180, 125, 28, 0.08);
+  --color-accent-border:      rgba(180, 125, 28, 0.20);
+
+  /* ── Typography (High contrast & readable on light bg) ── */
+  --color-text:               #1C2230; /* Dark slate-navy, extremely legible */
+  --color-text-muted:         #4F5E7B; /* Well-defined contrast */
+  --color-text-faint:         #788AA3; /* Still highly readable secondary text */
+  --color-text-inverse:       #FFFFFF;
+  --color-text-sidebar:       #C8D8E8;
   --color-text-sidebar-muted: rgba(200, 216, 232, 0.45);
 
   /* ── Borders & Dividers ── */
-  --color-border:          rgba(26, 37, 51, 0.10);
-  --color-divider:         rgba(26, 37, 51, 0.06);
-  --color-border-accent:   rgba(200, 146, 42, 0.28);
+  --color-border:             rgba(28, 34, 48, 0.12);
+  --color-divider:            rgba(28, 34, 48, 0.07);
 
-  /* ── Status Colors ── */
-  --color-success:         #1E9E65;
-  --color-success-subtle:  rgba(30, 158, 101, 0.10);
-  --color-warning:         #C07818;
-  --color-warning-subtle:  rgba(192, 120, 24, 0.10);
-  --color-error:           #C43C50;
-  --color-error-subtle:    rgba(196, 60, 80, 0.10);
-  --color-info:            #2878A8;
-  --color-info-subtle:     rgba(40, 120, 168, 0.10);
+  /* ── Status Colors (Calibrated for light background contrast) ── */
+  --color-success:            #1A8F5B;
+  --color-success-subtle:     rgba(26, 143, 91, 0.08);
+  --color-warning:            #B07010;
+  --color-warning-subtle:     rgba(176, 112, 16, 0.08);
+  --color-error:              #BE384A;
+  --color-error-subtle:       rgba(190, 56, 74, 0.08);
+  --color-info:               #237EA8;
+  --color-info-subtle:        rgba(35, 126, 168, 0.08);
 
   /* ── Gradients ── */
-  --grad-sidebar:          linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
-  --grad-sidebar-header:   linear-gradient(135deg, #0D2845 0%, #081A33 100%);
-  --grad-deep:             linear-gradient(135deg, #0D2845 0%, #051528 100%);
-  --grad-accent:           linear-gradient(135deg, #F0C265 0%, #C8922A 60%, #9C6F1E 100%);
-  --grad-warm:             linear-gradient(135deg, #E2B045 0%, #C8922A 50%, #A3721A 100%);
-  --grad-soft:             linear-gradient(135deg, #F2EEE8 0%, #EDE8E1 100%);
-  --grad-card:             linear-gradient(145deg, #FDFAF7 0%, #F5F1EB 100%);
-  --grad-slate-blue:       linear-gradient(135deg, #6FA3B8 0%, #EDE9E2 100%);
-  --grad-plum:             linear-gradient(135deg, #7A5063 0%, #FDFAF7 100%);
-  --grad-warm-highlight:   linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
+  --grad-sidebar:             linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #0D2845 0%, #081A33 100%);
+  --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
+  --grad-plum:                linear-gradient(135deg, #7A5063 0%, #FBF9F6 100%);
+  --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
+  --grad-warm-canvas:         linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
+  --grad-card:                linear-gradient(145deg, #FBF9F6 0%, #F5F1E8 100%);
+  --grad-soft:                linear-gradient(135deg, #F2EEE8 0%, #EAE4DA 100%);
 
-  /* ── Glass & Blur ── */
-  --glass-bg:              rgba(253, 250, 247, 0.80);
-  --glass-border:          rgba(26, 37, 51, 0.10);
-  --glass-blur:            blur(16px);
+  /* ── Glass & Blur (Warm, slightly translucent, matching #F2EEE8) ── */
+  --glass-bg:                 rgba(251, 249, 246, 0.85);
+  --glass-border:             rgba(28, 34, 48, 0.10);
+  --glass-blur:               blur(16px);
 
-  /* ── Shadows ── */
-  --shadow-glow-accent:    0 0 24px rgba(200, 146, 42, 0.14);
-  --shadow-panel:          0 8px 32px rgba(26, 37, 51, 0.10);
-  --shadow-card:           0 2px 12px rgba(26, 37, 51, 0.08);
-  --shadow-sm:             0 1px 4px rgba(26, 37, 51, 0.06);
-  --shadow-lg:             0 16px 48px rgba(26, 37, 51, 0.12);
-  --shadow-sidebar:        4px 0 24px rgba(0, 0, 0, 0.30);
+  /* ── Shadows (Softer, refined, avoiding heavy dark muddy looks) ── */
+  --shadow-glow-accent:       0 0 24px rgba(66, 71, 105, 0.12);
+  --shadow-panel:             0 12px 36px rgba(28, 34, 48, 0.06);
+  --shadow-card:              0 4px 14px rgba(28, 34, 48, 0.04);
+  --shadow-sm:                0 2px 6px rgba(28, 34, 48, 0.03);
+  --shadow-lg:                0 20px 50px rgba(28, 34, 48, 0.08);
+  --shadow-sidebar:           4px 0 24px rgba(0, 0, 0, 0.30);
 }
 
-
 /* ─────────────────────────────────────────────────────────────
-   TAILWIND v4 @theme MAPPING
-───────────────────────────────────────────────────────────── */
+   TAILWIND v4 @theme EXPORT MAPPING
+   ───────────────────────────────────────────────────────────── */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
+  /* Color Palette Maps */
   --color-bg:              var(--color-bg);
   --color-surface:         var(--color-surface);
   --color-surface-2:       var(--color-surface-2);
@@ -196,26 +206,40 @@
   --color-sidebar:         var(--color-sidebar);
   --color-panel:           var(--color-panel);
   --color-panel-2:         var(--color-panel-2);
-  --color-muted:           var(--color-muted);
+
+  --color-primary:         var(--color-primary);
+  --color-primary-hover:   var(--color-primary-hover);
+  --color-primary-active:  var(--color-primary-active);
+  --color-primary-subtle:  var(--color-primary-subtle);
+
   --color-accent:          var(--color-accent);
   --color-accent-hover:    var(--color-accent-hover);
   --color-accent-active:   var(--color-accent-active);
+  --color-accent-subtle:   var(--color-accent-subtle);
+
   --color-text:            var(--color-text);
   --color-text-muted:      var(--color-text-muted);
   --color-text-faint:      var(--color-text-faint);
   --color-text-inverse:    var(--color-text-inverse);
-  --color-border-custom:   var(--color-border);
-  --color-divider-custom:  var(--color-divider);
+
+  --color-border:          var(--color-border);
+  --color-divider:         var(--color-divider);
+
   --color-success:         var(--color-success);
   --color-warning:         var(--color-warning);
   --color-error:           var(--color-error);
   --color-info:            var(--color-info);
+
+  /* Brand Palette Variables */
+  --color-brand-slate:       var(--color-brand-slate);
+  --color-brand-slate-deep:  var(--color-brand-slate-deep);
+  --color-brand-slate-darker:var(--color-brand-slate-darker);
+  --color-brand-peach:       var(--color-brand-peach);
 }
 
-
 /* ─────────────────────────────────────────────────────────────
-   BASE STYLES
-───────────────────────────────────────────────────────────── */
+   BASE GLOBAL STYLES & PERFORMANCE OPTIMIZATION
+   ───────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -224,92 +248,88 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  transition: background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
-              color 250ms cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth theme transition on all key elements */
-*, *::before, *::after {
-  transition: background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
+/* Scoped, performant transitions on interactive and structural state changes */
+body, 
+.glass-card, 
+.panel-card,
+.sidebar-nav-item,
+input, 
+textarea, 
+select {
+  transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-button, a, input, textarea, select {
-  transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              color 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 150ms cubic-bezier(0.16, 1, 0.3, 1);
+/* Separate micro-animations for clicks/hovers */
+button, a {
+  transition: background-color 120ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 120ms cubic-bezier(0.16, 1, 0.3, 1),
+              color 120ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 120ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 
 /* ─────────────────────────────────────────────────────────────
-   GLASS CARD
-───────────────────────────────────────────────────────────── */
+   COMPATIBLE CLASS MODULES
+   ───────────────────────────────────────────────────────────── */
+
+/* --- 1. GLASS CARD --- */
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-card);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.15) inset,
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.12) inset,
     var(--shadow-card);
-  transition: var(--transition-smooth);
 }
 
 .glass-card:hover {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.07) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.20) inset,
-    0 6px 20px rgba(0, 0, 0, 0.35),
-    0 20px 48px rgba(0, 0, 0, 0.40);
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.15) inset,
+    0 6px 20px rgba(0, 0, 0, 0.18),
+    0 20px 48px rgba(0, 0, 0, 0.22);
   transform: translateY(-1px);
 }
 
 [data-theme="light"] .glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
   border-top: 1px solid rgba(255, 255, 255, 0.80);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.90) inset,
+    0 1px 0 rgba(255, 255, 255, 0.80) inset,
     var(--shadow-card);
 }
 
 [data-theme="light"] .glass-card:hover {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.90) inset,
-    0 6px 20px rgba(26, 37, 51, 0.10),
-    0 20px 48px rgba(26, 37, 51, 0.08);
+    0 1px 0 rgba(255, 255, 255, 0.80) inset,
+    0 6px 18px rgba(28, 34, 48, 0.05),
+    0 16px 36px rgba(28, 34, 48, 0.04);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   PANEL CARD
-───────────────────────────────────────────────────────────── */
+/* --- 2. PANEL CARD --- */
 .panel-card {
   background: var(--color-panel);
   border: 1px solid var(--color-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-panel);
-  transition: var(--transition-smooth);
 }
 
 [data-theme="light"] .panel-card {
-  border-top: 1px solid rgba(255, 255, 255, 0.60);
-  box-shadow: var(--shadow-panel);
+  border-top: 1px solid rgba(255, 255, 255, 0.50);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   SIDEBAR SHELL — Always deep navy
-───────────────────────────────────────────────────────────── */
+/* --- 3. SIDEBAR COMPONENTS (FIXED ACCORDING TO BRAND MANDATES) --- */
 .sidebar-shell {
   background: var(--color-sidebar);
   background-image: var(--grad-sidebar);
@@ -335,20 +355,93 @@ button, a, input, textarea, select {
 
 .sidebar-nav-item.active {
   background: var(--color-sidebar-active);
-  color: var(--color-accent);
+  color: var(--color-primary); /* Uses the modern slate brand color */
+  border-left: 2px solid var(--color-primary);
 }
 
+/* --- 4. BUTTONS & ACTIONS --- */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px var(--color-primary-subtle);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 16px var(--color-primary-subtle);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+/* Preserved accent button style in case needed */
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px var(--color-accent-subtle);
+}
+
+.btn-accent:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 4px 16px var(--color-accent-subtle);
+  transform: translateY(-1px);
+}
+
+.btn-accent:active {
+  background: var(--color-accent-active);
+  transform: translateY(0);
+}
 
 /* ─────────────────────────────────────────────────────────────
-   UTILITY CLASSES
-───────────────────────────────────────────────────────────── */
+   INPUTS & SELECTION CONTROLS
+   ───────────────────────────────────────────────────────────── */
+input, textarea, select {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-faint);
+  opacity: 0.75;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   UTILITY HELPER CLASSES
+   ───────────────────────────────────────────────────────────── */
 .accent-glow {
   box-shadow: var(--shadow-glow-accent);
-  border-color: var(--color-accent-border);
+  border-color: var(--color-border);
 }
 
 .gradient-text-accent {
-  background: var(--grad-accent);
+  background: var(--grad-slate-blue);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -364,101 +457,46 @@ button, a, input, textarea, select {
 .surface-2 { background: var(--color-surface-2); }
 .surface-3 { background: var(--color-surface-3); }
 
-.btn-primary {
-  background: var(--grad-accent);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-btn);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgba(200, 146, 42, 0.25);
-  transition: var(--transition-fast);
-}
-.btn-primary:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 4px 16px rgba(200, 146, 42, 0.35);
-  transform: translateY(-1px);
-}
-.btn-primary:active {
-  filter: brightness(0.96);
-  transform: translateY(0);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   INPUTS
-───────────────────────────────────────────────────────────── */
-input, textarea, select {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--color-text-faint);
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--color-accent-border);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-accent-subtle);
-}
-
-[data-theme="light"] input,
-[data-theme="light"] textarea,
-[data-theme="light"] select {
-  background: var(--color-surface-2);
-  border-color: var(--color-border);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   FOCUS RING
-───────────────────────────────────────────────────────────── */
+/* Accessibility focus-visible state */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: var(--radius-input);
 }
 
-
 /* ─────────────────────────────────────────────────────────────
-   SCROLLBARS
-───────────────────────────────────────────────────────────── */
+   SCROLLBAR STYLIZATION
+   ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
 
 .sidebar-shell ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.10);
 }
 .sidebar-shell ::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 146, 42, 0.50);
+  background: var(--color-primary-hover);
 }
 
-
 /* ─────────────────────────────────────────────────────────────
-   LOCK SCREEN ANIMATION
-───────────────────────────────────────────────────────────── */
+   LOCK SCREEN ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
 @keyframes slow-pulse {
   0%, 100% { transform: scale(1);    opacity: 0.8; }
-  50%       { transform: scale(1.05); opacity: 1;   }
+  50%       { transform: scale(1.03); opacity: 1;   }
 }
 
 .lock-bg-pulse {
   animation: slow-pulse 4s ease-in-out infinite;
 }
 
-
 /* ─────────────────────────────────────────────────────────────
-   REDUCED MOTION
-───────────────────────────────────────────────────────────── */
+   REDUCED MOTION INCLUSIVE SUPPORT
+   ───────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
