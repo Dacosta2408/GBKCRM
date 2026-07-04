@@ -285,11 +285,11 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
     <div className="flex flex-col gap-5 text-xs text-slate-300">
       
       {/* 1. CHECKLIST HEADER & METRICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-[#171720]/40 border border-white/5 p-4 rounded-xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] p-4 rounded-xl">
         {/* Progress & Title */}
         <div className="flex flex-col gap-2 justify-center">
           <div className="flex items-center gap-2">
-            <CheckSquare className="h-4.5 w-4.5 text-[#b5a642]" />
+            <CheckSquare className="h-4.5 w-4.5 text-[var(--color-primary)]" />
             <h3 className="text-sm font-black uppercase text-white tracking-wider">File Checklist Engine</h3>
           </div>
           <p className="text-[10px] text-[#8e95a3] font-medium leading-relaxed">
@@ -313,14 +313,14 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
         </div>
 
         {/* Completion Bar */}
-        <div className="bg-[#101014] border border-white/5 p-3 rounded-lg flex flex-col justify-center gap-2">
+        <div className="bg-[var(--color-surface-2)]/80 border border-[var(--color-border)] p-3 rounded-lg flex flex-col justify-center gap-2">
           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
             <span>Workflow Completeness</span>
-            <span className="text-[#b5a642] font-mono">{readiness.checklistScore}%</span>
+            <span className="text-[var(--color-primary)] font-mono">{readiness.checklistScore}%</span>
           </div>
-          <div className="w-full bg-white/[0.03] rounded-full h-2 overflow-hidden border border-white/5">
+          <div className="w-full bg-[var(--color-surface-3)] rounded-full h-2 overflow-hidden border border-[var(--color-border)]">
             <div 
-              className="bg-gradient-to-r from-[#b5a642] to-[#6fa3b8] h-full transition-all duration-500 rounded-full" 
+              className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] h-full transition-all duration-500 rounded-full" 
               style={{ width: `${readiness.checklistScore}%` }}
             />
           </div>
@@ -352,8 +352,8 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
       </div>
 
       {/* 2. OVERALL STAGE READINESS PROGRESS CARDS */}
-      <div className="bg-[#131317] border border-white/5 rounded-xl p-3">
-        <h4 className="text-[9px] text-[#b5a642] uppercase font-black tracking-widest mb-3 flex items-center gap-1">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3">
+        <h4 className="text-[9px] text-[var(--color-accent)] uppercase font-black tracking-widest mb-3 flex items-center gap-1">
           <Sparkles className="w-3 h-3" /> Underwriting Stage Progression Audit
         </h4>
         <div className="flex flex-wrap gap-2 md:grid md:grid-cols-7 text-[9px] font-bold uppercase tracking-wider text-center">
@@ -378,7 +378,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
             if (isCurrent) {
               cardBg = hasActiveBlocker 
                 ? "bg-red-500/10 border-red-500/20 text-red-400 shadow-md ring-1 ring-red-500/10" 
-                : "bg-[#b5a642]/10 border-[#b5a642]/20 text-[#b5a642] shadow-md ring-1 ring-[#b5a642]/10";
+                : "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20 text-[var(--color-primary)] shadow-md ring-1 ring-[var(--color-primary)]/10";
             } else if (isPast) {
               cardBg = "bg-green-500/5 border-green-500/15 text-green-400";
             }
@@ -419,12 +419,12 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
           const totalInCat = categoryItems.length;
 
           return (
-            <div key={category} className="bg-[#131317] border border-white/5 rounded-xl overflow-hidden transition-all">
+            <div key={category} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden transition-all">
               
               {/* Category Subheader */}
               <div 
                 onClick={() => toggleCategory(category)}
-                className="px-4 py-2.5 bg-[#171720]/80 hover:bg-[#1b1b26] cursor-pointer flex items-center justify-between border-b border-white/5 transition-colors select-none"
+                className="px-4 py-2.5 bg-[var(--color-surface-2)]/80 hover:bg-[var(--color-surface-3)] cursor-pointer flex items-center justify-between border-b border-[var(--color-border)] transition-colors select-none"
               >
                 <div className="flex items-center gap-2">
                   {isExpanded ? (
@@ -469,9 +469,9 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                               {item.required ? (
                                 <span className="bg-red-500/10 border border-red-500/25 text-red-400 text-[7.5px] font-black uppercase px-1.5 py-0.2 rounded tracking-widest">REQUIRED</span>
                               ) : (
-                                <span className="bg-zinc-500/10 border border-zinc-500/25 text-zinc-400 text-[7.5px] font-black uppercase px-1.5 py-0.2 rounded tracking-widest">OPTIONAL</span>
+                                <span className="bg-zinc-500/10 border border-zinc-500/25 text-[var(--color-text-muted)] text-[7.5px] font-black uppercase px-1.5 py-0.2 rounded tracking-widest">OPTIONAL</span>
                               )}
-                              <span className="text-white/85 font-bold text-[11.5px]">{item.name}</span>
+                              <span className="text-[var(--color-text)] font-bold text-[11.5px]">{item.name}</span>
                               {isCustom && (
                                 <span className="bg-[#6fa3b8]/15 border border-[#6fa3b8]/25 text-[#6fa3b8] text-[7px] font-black uppercase px-1.5 py-0.2 rounded">Bespoke</span>
                               )}
@@ -524,7 +524,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                             <select 
                               value={item.status}
                               onChange={(e) => handleUpdateStatus(item.id, e.target.value as ChecklistItem["status"])}
-                              className="bg-[#111114] border border-white/5 text-[9px] rounded p-1 font-black uppercase text-white focus:outline-none cursor-pointer"
+                              className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[9px] rounded p-1 font-black uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                             >
                               <option value="Not Started">Not Started</option>
                               <option value="Waiting on Client">Waiting on Client</option>
@@ -571,7 +571,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                                   type="date" 
                                   value={editDueDate}
                                   onChange={(e) => setEditDueDate(e.target.value)}
-                                  className="w-full bg-[#111114] border border-white/5 text-xs rounded p-1.5 text-white focus:outline-none focus:border-[#b5a642]"
+                                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-1.5 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50"
                                 />
                               </div>
 
@@ -581,7 +581,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                                 <select 
                                   value={editOwner}
                                   onChange={(e) => setEditOwner(e.target.value)}
-                                  className="w-full bg-[#111114] border border-white/5 text-xs rounded p-1.5 text-white focus:outline-none focus:border-[#b5a642] font-bold uppercase"
+                                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-1.5 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 font-bold uppercase"
                                 >
                                   <option value="">Unassigned</option>
                                   {agentNames.map(name => (
@@ -599,7 +599,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                                 value={editNotes}
                                 onChange={(e) => setEditNotes(e.target.value)}
                                 placeholder="Log requirements notes, phone conversations, follow-up timelines, or specific clearing details..."
-                                className="w-full bg-[#111114] border border-white/5 text-xs rounded p-1.5 text-white focus:outline-none focus:border-[#b5a642] placeholder-white/20 font-semibold"
+                                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-1.5 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 placeholder-[var(--color-text-faint)]/40 font-semibold"
                               />
                             </div>
 
@@ -607,13 +607,13 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                             <div className="flex justify-end gap-2">
                               <button 
                                 onClick={() => setEditingItemId(null)}
-                                className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded-md text-[9px] font-black uppercase text-white/60"
+                                className="px-2.5 py-1 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] rounded-md text-[9px] font-black uppercase text-[var(--color-text-muted)]"
                               >
                                 Cancel
                               </button>
                               <button 
                                 onClick={() => saveEdits(item.id)}
-                                className="px-2.5 py-1 bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 rounded-md text-[9px] font-black uppercase text-[#b5a642] flex items-center gap-1"
+                                className="px-2.5 py-1 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/20 rounded-md text-[9px] font-black uppercase text-[var(--color-primary)] flex items-center gap-1"
                               >
                                 <Save className="w-3.5 h-3.5" /> Save Changes
                               </button>
@@ -634,44 +634,44 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
       {/* 4. BESPOKE ITEM ADDITION MODAL overlay */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in select-none">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in select-none">
           <form 
             onSubmit={handleAddCustomItem}
-            className="bg-[#131317] border border-white/5 rounded-2xl w-full max-w-md p-5 shadow-2xl relative flex flex-col gap-4 text-xs"
+            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-5 shadow-2xl relative flex flex-col gap-4 text-xs"
           >
             <button 
               type="button"
               onClick={() => setShowAddModal(false)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white p-1 rounded bg-white/5"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded bg-[var(--color-surface-2)]"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest border-b border-white/5 pb-2">
+            <h3 className="text-xs font-black uppercase text-[var(--color-primary)] tracking-widest border-b border-[var(--color-border)] pb-2">
               Add Bespoke Checklist Condition
             </h3>
 
             {/* Task Name */}
             <div className="space-y-1.5">
-              <label className="block text-[8px] text-white/40 uppercase font-black">Item Description / Condition Clause</label>
+              <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black">Item Description / Condition Clause</label>
               <input 
                 type="text" 
                 required
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
                 placeholder="e.g. Verify teacher job contract details with Board of Education"
-                className="w-full bg-[#111114] border border-white/5 text-xs rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-semibold placeholder-white/20"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-2 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold placeholder-[var(--color-text-faint)]/40"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Category */}
               <div className="space-y-1.5">
-                <label className="block text-[8px] text-white/40 uppercase font-black">Workflow Category</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black">Workflow Category</label>
                 <select 
                   value={newItemCategory}
                   onChange={(e) => setNewItemCategory(e.target.value as typeof CHECKLIST_CATEGORIES[number])}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-bold uppercase"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-2 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-bold uppercase"
                 >
                   {CHECKLIST_CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -681,11 +681,11 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
               {/* Linked Stage */}
               <div className="space-y-1.5">
-                <label className="block text-[8px] text-white/40 uppercase font-black">Linked Target File Stage</label>
+                <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black">Linked Target File Stage</label>
                 <select 
                   value={newItemStage}
                   onChange={(e) => setNewItemStage(e.target.value as typeof STAGES_ORDER[number])}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded p-2 text-white focus:outline-none focus:border-[#b5a642] font-bold uppercase"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded p-2 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-bold uppercase"
                 >
                   {STAGES_ORDER.map(st => (
                     <option key={st} value={st}>{st}</option>
@@ -701,25 +701,25 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                 id="newItemRequired"
                 checked={newItemRequired}
                 onChange={(e) => setNewItemRequired(e.target.checked)}
-                className="rounded border-white/10 bg-black/40 text-[#b5a642] focus:ring-0 w-3.5 h-3.5 cursor-pointer"
+                className="rounded border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-accent)] focus:ring-0 w-3.5 h-3.5 cursor-pointer"
               />
-              <label htmlFor="newItemRequired" className="font-black text-white/60 text-[9px] uppercase cursor-pointer">
+              <label htmlFor="newItemRequired" className="font-black text-[var(--color-text-muted)] text-[9px] uppercase cursor-pointer">
                 Strict Underwriting Requirement (Acts as stage progression blocker)
               </label>
             </div>
 
             {/* Submit */}
-            <div className="flex justify-end gap-2.5 pt-2 border-t border-white/5">
+            <div className="flex justify-end gap-2.5 pt-2 border-t border-[var(--color-border)]">
               <button 
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase text-white/60 border border-white/5"
+                className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] rounded-lg text-[9px] font-black uppercase text-[var(--color-text-muted)] border border-[var(--color-border)]"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-3 py-1.5 bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 rounded-lg text-[9px] font-black uppercase text-[#b5a642]"
+                className="px-3 py-1.5 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/20 rounded-lg text-[9px] font-black uppercase text-[var(--color-primary)]"
               >
                 Add Condition
               </button>

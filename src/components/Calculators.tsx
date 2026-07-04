@@ -262,7 +262,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stIncome}
                   onChange={(e) => setStIncome(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$100,000"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
               <div>
@@ -272,7 +272,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stCoIncome}
                   onChange={(e) => setStCoIncome(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
             </div>
@@ -285,7 +285,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stDebts}
                   onChange={(e) => setStDebts(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
               <div>
@@ -295,7 +295,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stCondo}
                   onChange={(e) => setStCondo(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
               <div>
@@ -305,7 +305,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stTax}
                   onChange={(e) => setStTax(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$4,800"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
             </div>
@@ -318,7 +318,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stHeat}
                   onChange={(e) => setStHeat(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$150"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
               <div>
@@ -329,7 +329,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={stRate}
                   onChange={(e) => setStRate(e.target.value)}
                   placeholder="4.79"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
                 />
               </div>
               <div>
@@ -337,7 +337,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <select 
                   value={stAmortization}
                   onChange={(e) => setStAmortization(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/40 font-bold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold"
                 >
                   <option value="25" className="bg-[var(--color-bg)]">25 years</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 years</option>
@@ -351,7 +351,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded ${stressRes.isQualifying ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>
                   {stressRes.isQualifying ? "✓ Qualifies (Stress Test Clear)" : "✗ Over-leveraged Limits"}
                 </span>
-                <div className="text-3xl font-bold font-sans mt-2 text-[#b5a642]">{fd(stressRes.maxQualifiedMortgage)}</div>
+                <div className="text-3xl font-bold font-sans mt-2 text-[var(--color-accent)]">{fd(stressRes.maxQualifiedMortgage)}</div>
                 <div className="text-[10px] uppercase text-[var(--color-text-muted)] tracking-wide mt-0.5 font-semibold">Maximum estimated qualifying mortgage</div>
                 
                 <div className="border-t border-[var(--color-border)] pt-3 mt-3 flex flex-col gap-1.5 text-xs text-[var(--color-text-muted)] font-semibold">
@@ -505,7 +505,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 value={pcAmount}
                 onChange={(e) => setPcAmount(e.target.value.replace(/[^\d.]/g, ""))}
                 placeholder="$500,000"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40"
               />
             </div>
 
@@ -518,7 +518,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={pcRate}
                   onChange={(e) => setPcRate(e.target.value)}
                   placeholder="4.79"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40"
                 />
               </div>
               <div>
@@ -526,7 +526,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <select 
                   value={pcAm}
                   onChange={(e) => setPcAm(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[#b5a642]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)]/40"
                 >
                   <option value="25" className="bg-[var(--color-bg)]">25 yr</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 yr</option>
@@ -538,7 +538,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <select 
                   value={pcFreq}
                   onChange={(e) => setPcFreq(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[#b5a642]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)]/40"
                 >
                   <option value="monthly" className="bg-[var(--color-bg)]">Monthly</option>
                   <option value="biweekly" className="bg-[var(--color-bg)]">Bi-Weekly</option>
@@ -549,7 +549,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 
             {payRes ? (
               <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)]">
-                <div className="text-2xl font-bold text-[#b5a642]">{fd(payRes[pcFreq as "monthly" | "biweekly" | "weekly" | "accelBiweekly"])}</div>
+                <div className="text-2xl font-bold text-[var(--color-accent)]">{fd(payRes[pcFreq as "monthly" | "biweekly" | "weekly" | "accelBiweekly"])}</div>
                 <div className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wide mt-0.5 font-semibold">Calculated {pcFreq} Mortgage Payment</div>
                 
                 <div className="border-t border-[var(--color-border)] pt-3 mt-3 flex flex-col gap-1.5 text-xs text-[var(--color-text-muted)] font-semibold">
@@ -571,33 +571,33 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 
           <div className="p-5 flex flex-col gap-4">
             <div className="border-b border-[var(--color-border)] pb-3">
-              <h4 className="text-[10px] font-bold text-[#b5a642] uppercase tracking-wider mb-2">Hourly To Annual</h4>
+              <h4 className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider mb-2">Hourly To Annual</h4>
               <div className="grid grid-cols-2 gap-3 mb-2.5">
                 <div>
                   <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Hourly rate $</label>
-                  <input type="number" value={hrRate} onChange={(e) => setHrRate(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40" />
+                  <input type="number" value={hrRate} onChange={(e) => setHrRate(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
                 </div>
                 <div>
                   <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Hours / week</label>
-                  <input type="number" value={hrHrs} onChange={(e) => setHrHrs(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40" />
+                  <input type="number" value={hrHrs} onChange={(e) => setHrHrs(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
                 </div>
               </div>
               <div className="text-xs text-[var(--color-text-muted)] font-semibold">Extrapolated Salary: <strong className="text-green-500 font-mono font-bold">{fd(hrResult)}/yr</strong></div>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-bold text-[#b5a642] uppercase tracking-wider mb-2">Self Employed 2yr Net Average</h4>
+              <h4 className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider mb-2">Self Employed 2yr Net Average</h4>
               <div className="grid grid-cols-2 gap-3 mb-2.5">
                 <div>
                   <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Year 1 Net Income</label>
-                  <input type="number" value={seY1} onChange={(e) => setSeY1(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40" />
+                  <input type="number" value={seY1} onChange={(e) => setSeY1(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
                 </div>
                 <div>
                   <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Year 2 Net Income</label>
-                  <input type="number" value={seY2} onChange={(e) => setSeY2(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[#b5a642]/40" />
+                  <input type="number" value={seY2} onChange={(e) => setSeY2(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
                 </div>
               </div>
-              <div className="text-xs text-[var(--color-text-muted)] font-semibold">Underwriting Qualifying Average: <strong className="text-[#b5a642] font-mono font-bold">{fd(seAvg)}/yr</strong></div>
+              <div className="text-xs text-[var(--color-text-muted)] font-semibold">Underwriting Qualifying Average: <strong className="text-[var(--color-accent)] font-mono font-bold">{fd(seAvg)}/yr</strong></div>
             </div>
           </div>
         </div>

@@ -771,7 +771,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         onClick={() => setThemeMode("dark")}
                         className={`p-4 rounded-lg border flex flex-col items-center gap-2 transition-all ${
                           themeMode === "dark" 
-                            ? "bg-[#1b1b20] border-[#b5a642] text-[#b5a642]" 
+                            ? "bg-[#1b1b20] border-[var(--color-primary)] text-[var(--color-primary)]" 
                             : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
                         }`}
                       >
@@ -784,7 +784,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         onClick={() => setThemeMode("light")}
                         className={`p-4 rounded-lg border flex flex-col items-center gap-2 transition-all ${
                           themeMode === "light" 
-                            ? "bg-white/10 border-[#b5a642] text-[#b5a642]" 
+                            ? "bg-white/10 border-[var(--color-primary)] text-[var(--color-primary)]" 
                             : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
                         }`}
                       >
@@ -811,7 +811,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           onClick={() => setAccentTheme(accent.id)}
                           className={`p-2 rounded-lg border flex flex-col items-center gap-1.5 transition-all text-[10px] font-semibold ${
                             accentTheme === accent.id 
-                              ? "bg-[#1b1b20] border-[#b5a642] text-white" 
+                              ? "bg-[#1b1b20] border-[var(--color-primary)] text-white" 
                               : "bg-[#141418]/50 border-white/5 text-[#8e95a3] hover:text-white"
                           }`}
                         >
@@ -832,7 +832,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           onClick={() => setDensity(dens)}
                           className={`p-2.5 rounded-lg border text-xs font-bold capitalize transition-all ${
                             density === dens 
-                              ? "bg-[#1b1b20] border-[#b5a642] text-white" 
+                              ? "bg-[#1b1b20] border-[var(--color-primary)] text-white" 
                               : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
                           }`}
                         >
@@ -850,7 +850,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     </div>
                     <button
                       onClick={() => setEnableAnimations(!enableAnimations)}
-                      className="text-[#b5a642]"
+                      className="text-[var(--color-primary)]"
                     >
                       {enableAnimations ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
@@ -858,7 +858,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSaveAppearance}
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
                   >
                     Apply Theme Changes
                   </button>
@@ -882,7 +882,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Daily Task Reminders</label>
                       <span className="text-[10px] text-[#8e95a3] block">Notify me of uncompleted tasks assigned to me daily at 9:00 AM.</span>
                     </div>
-                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[var(--color-primary)]">
                       {notifTaskReminders ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -892,7 +892,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Client Assigned Alerts</label>
                       <span className="text-[10px] text-[#8e95a3] block">Notify me immediately when an active file is reassigned to my roster.</span>
                     </div>
-                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[var(--color-primary)]">
                       {notifFileUpdates ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -902,7 +902,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Retention &amp; Follow-up Triggers</label>
                       <span className="text-[10px] text-[#8e95a3] block">Notify me when a client's 5-year mortgage renewal is approaching threshold.</span>
                     </div>
-                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[var(--color-primary)]">
                       {notifFollowUps ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -912,7 +912,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Document Vault Submissions</label>
                       <span className="text-[10px] text-[#8e95a3] block">Notify me when a client uploads required checklist PDF in the client portal.</span>
                     </div>
-                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[var(--color-primary)]">
                       {notifDocAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -922,7 +922,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Team Mentions Alerts</label>
                       <span className="text-[10px] text-[#8e95a3] block">Notify me of standard team channel mentions or active chat dialogues.</span>
                     </div>
-                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[var(--color-primary)]">
                       {notifCommsAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -932,14 +932,14 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-white block">Weekly Email Activity Digest</label>
                       <span className="text-[10px] text-[#8e95a3] block">Receive email report of operational pipelines, funded values and metrics.</span>
                     </div>
-                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[var(--color-primary)]">
                       {notifEmailDigest ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
 
                   <button 
                     onClick={handleSaveNotifications}
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
                   >
                     Save Notification Prefs
                   </button>
@@ -979,7 +979,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         value={userPin}
                         maxLength={4}
                         onChange={(e) => setUserPin(e.target.value.replace(/\D/g, ""))}
-                        className="bg-[#0c0c0e] border border-white/5 rounded px-3 py-1.5 text-center text-sm font-mono tracking-widest text-white w-24 focus:outline-none focus:border-[#b5a642]/30"
+                        className="bg-[#0c0c0e] border border-white/5 rounded px-3 py-1.5 text-center text-sm font-mono tracking-widest text-white w-24 focus:outline-none focus:border-[var(--color-primary)]/30"
                       />
                       <span className="text-[10px] text-[#8e95a3] self-center">Used during credentials quick-switching.</span>
                     </div>
@@ -1005,7 +1005,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <span className="text-xs font-bold text-white block">Audit Access Protection</span>
                       <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Require manual PIN reentry when auditing SIN numbers.</span>
                     </div>
-                    <button onClick={() => setRequirePinForSin(!requirePinForSin)} className="shrink-0 text-[#b5a642]">
+                    <button onClick={() => setRequirePinForSin(!requirePinForSin)} className="shrink-0 text-[var(--color-primary)]">
                       {requirePinForSin ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
                     </button>
                   </div>
@@ -1024,7 +1024,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       ) : (
                         <button
                           onClick={() => setShowMfaSetup(true)}
-                          className="px-3 py-1.5 bg-[#b5a642]/10 border border-[#b5a642]/20 hover:bg-[#b5a642]/20 text-xs font-bold text-[#b5a642] rounded-lg transition-colors"
+                          className="px-3 py-1.5 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/20 text-xs font-bold text-[var(--color-primary)] rounded-lg transition-colors"
                         >
                           Enable Setup
                         </button>
@@ -1066,7 +1066,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Active Workspace Login Devices</label>
                     <div className="space-y-2">
                       <div className="flex items-center gap-3 p-3 bg-[#141418] rounded-lg border border-white/5 text-xs text-[#8e95a3]">
-                        <Laptop className="w-5 h-5 text-[#b5a642] shrink-0" />
+                        <Laptop className="w-5 h-5 text-[var(--color-primary)] shrink-0" />
                         <div className="flex-1">
                           <div className="font-bold text-white">Firefox 134.0 on macOS Ventura (Current Session)</div>
                           <div className="text-[10px] mt-0.5">IP: 198.162.24.9 • Ontario, Canada</div>
@@ -1087,7 +1087,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSaveSecurity}
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
                   >
                     Save Security Settings
                   </button>
@@ -1115,7 +1115,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <select
                       value={prefLanding}
                       onChange={(e) => setPrefLanding(e.target.value)}
-                      className="bg-[#141418] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/30 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="dashboard">Dashboard Overview</option>
                       <option value="clients">Client Database</option>
@@ -1133,7 +1133,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <select
                       value={prefDashboard}
                       onChange={(e) => setPrefDashboard(e.target.value)}
-                      className="bg-[#141418] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/30 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="bento">Bento Layout Dashboard</option>
                       <option value="summary">Summary Focus Cards</option>
@@ -1150,7 +1150,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <select
                       value={prefLayout}
                       onChange={(e) => setPrefLayout(e.target.value)}
-                      className="bg-[#141418] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/30 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="table">Table List Layout</option>
                       <option value="cards">Interactive Cards Grid</option>
@@ -1166,7 +1166,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <select
                       value={prefDateFormat}
                       onChange={(e) => setPrefDateFormat(e.target.value)}
-                      className="bg-[#141418] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/30 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="YYYY-MM-DD">YYYY-MM-DD (2026-06-24)</option>
                       <option value="DD/MM/YYYY">DD/MM/YYYY (24/06/2026)</option>
@@ -1183,7 +1183,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <select
                       value={prefTimeFormat}
                       onChange={(e) => setPrefTimeFormat(e.target.value)}
-                      className="bg-[#141418] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#b5a642]/30 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="12">12-hour scale (AM / PM)</option>
                       <option value="24">24-hour military scale</option>
@@ -1192,7 +1192,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSavePreferences}
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
                   >
                     Save Personal Preferences
                   </button>
@@ -1219,7 +1219,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <button
                   onClick={() => setShowAddUserModal(true)}
-                  className="px-4 py-1.5 bg-[#b5a642] text-black text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-1.5 bg-[var(--color-primary)] text-black text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 shrink-0"
                 >
                   <Plus className="w-4 h-4" /> Add New Broker
                 </button>
@@ -1251,7 +1251,7 @@ export const Settings: React.FC<SettingsProps> = ({
                                 referrerPolicy="no-referrer"
                               />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-[#b5a642]/20 border border-[#b5a642]/30 flex items-center justify-center font-bold text-xs text-[#b5a642]">
+                              <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/20 border border-[var(--color-primary)]/30 flex items-center justify-center font-bold text-xs text-[var(--color-primary)]">
                                 {user.first[0]}{user.last[0]}
                               </div>
                             )}
@@ -1286,7 +1286,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           <td className="p-3 text-right">
                             <button
                               onClick={() => handleStartEditUser(user)}
-                              className="px-2.5 py-1 bg-white/5 hover:bg-[#b5a642]/20 hover:text-[#b5a642] text-xs font-semibold rounded border border-white/5 transition-all inline-flex items-center gap-1"
+                              className="px-2.5 py-1 bg-white/5 hover:bg-[var(--color-primary)]/20 hover:text-[var(--color-primary)] text-xs font-semibold rounded border border-white/5 transition-all inline-flex items-center gap-1"
                             >
                               <Edit3 className="w-3.5 h-3.5" /> Edit
                             </button>
@@ -1310,7 +1310,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     </button>
                     
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-[#b5a642]" /> Onboard New CRM Broker Account
+                      <Users className="w-5 h-5 text-[var(--color-primary)]" /> Onboard New CRM Broker Account
                     </h3>
                     <p className="text-[11px] text-[#8e95a3] mb-5">Create a secure profile record, assign operational roles, and record license numbers.</p>
 
@@ -1378,7 +1378,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
 
                       <div className="border-t border-white/5 pt-4 space-y-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#b5a642] block">Licensing &amp; E&amp;O Registry</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Licensing &amp; E&amp;O Registry</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
@@ -1429,7 +1429,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-[#b5a642] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
+                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
                         >
                           Complete Onboarding
                         </button>
@@ -1451,7 +1451,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     </button>
                     
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
-                      <Edit3 className="w-5 h-5 text-[#b5a642]" /> Edit Team Member Profile
+                      <Edit3 className="w-5 h-5 text-[var(--color-primary)]" /> Edit Team Member Profile
                     </h3>
                     <p className="text-[11px] text-[#8e95a3] mb-5">Update details for {editingUser.first} {editingUser.last}.</p>
 
@@ -1530,7 +1530,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
 
                       <div className="border-t border-white/5 pt-4 space-y-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#b5a642] block">Licensing &amp; E&amp;O Registry</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Licensing &amp; E&amp;O Registry</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
@@ -1581,7 +1581,7 @@ export const Settings: React.FC<SettingsProps> = ({
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-[#b5a642] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
+                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
                         >
                           Save Changes
                         </button>
@@ -1625,7 +1625,7 @@ export const Settings: React.FC<SettingsProps> = ({
                   {selectedPermUser ? (
                     <div className="space-y-3.5 pt-2">
                       <div className="text-xs font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/5">
-                        <Key className="w-4 h-4 text-[#b5a642]" /> Override Checklist: {selectedPermUser.first} {selectedPermUser.last}
+                        <Key className="w-4 h-4 text-[var(--color-primary)]" /> Override Checklist: {selectedPermUser.first} {selectedPermUser.last}
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1646,7 +1646,7 @@ export const Settings: React.FC<SettingsProps> = ({
                                 onClick={() => handleTogglePermissionOverride(perm.key)}
                                 className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${
                                   hasCustomOverride 
-                                    ? "bg-[#b5a642] text-black" 
+                                    ? "bg-[var(--color-primary)] text-black" 
                                     : "bg-white/5 hover:bg-white/10 text-[#8e95a3]"
                                 }`}
                               >
@@ -1708,7 +1708,7 @@ export const Settings: React.FC<SettingsProps> = ({
                 <div className="space-y-5">
                   {/* Pipeline Stage Renaming */}
                   <div className="space-y-2.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#b5a642] block">Pipeline Board Stage Labels</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Pipeline Board Stage Labels</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-[#141418]/60 p-4 rounded-lg border border-white/5">
                       {Object.keys(pipelineLabels).map((key) => (
                         <div key={key}>
@@ -1728,7 +1728,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   {/* General Ingestion Defaults */}
                   <div className="space-y-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#b5a642] block">Ingestion &amp; Allocation Defaults</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Ingestion &amp; Allocation Defaults</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#141418]/60 p-4 rounded-lg border border-white/5">
                       <div>
                         <label className="block text-[9px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Default Assigned Agent</label>
@@ -1757,7 +1757,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   {/* Checklist Rules Defaults */}
                   <div className="space-y-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#b5a642] block">Intake Document Rules Checklist</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Intake Document Rules Checklist</span>
                     <div className="bg-[#141418]/60 p-4 rounded-lg border border-white/5 space-y-3.5 text-xs text-[#8e95a3]">
                       
                       <div className="flex items-center justify-between">
@@ -1766,7 +1766,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           <span className="text-[9px] block">Include down payment ledger trigger on all new purchases automatically.</span>
                         </div>
                         <button onClick={() => setRequire90DayBank(!require90DayBank)}>
-                          {require90DayBank ? <ToggleRight className="w-8 h-8 text-[#b5a642]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {require90DayBank ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
                         </button>
                       </div>
 
@@ -1776,7 +1776,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           <span className="text-[9px] block">Trigger property tax bill verification for all refinance intakes.</span>
                         </div>
                         <button onClick={() => setRequireTaxBill(!requireTaxBill)}>
-                          {requireTaxBill ? <ToggleRight className="w-8 h-8 text-[#b5a642]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {requireTaxBill ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
                         </button>
                       </div>
 
@@ -1786,7 +1786,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           <span className="text-[9px] block">Enforce APS document slot immediately on purchase client setup.</span>
                         </div>
                         <button onClick={() => setRequireApsPurchase(!requireApsPurchase)}>
-                          {requireApsPurchase ? <ToggleRight className="w-8 h-8 text-[#b5a642]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {requireApsPurchase ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
                         </button>
                       </div>
 
@@ -1795,7 +1795,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSaveCRMDefaults}
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
                   >
                     Save Corporate Defaults
                   </button>

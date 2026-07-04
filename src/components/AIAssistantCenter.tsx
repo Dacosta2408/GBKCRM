@@ -435,7 +435,7 @@ Could you please let me know what my max qualifying amount is under the stress t
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[var(--color-surface-2)] to-[var(--color-surface)] border border-[var(--color-border)] rounded-xl">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-[#b5a642]/15 text-[#b5a642] rounded-lg">
+            <div className="p-2 bg-[rgba(244,163,132,0.15)] text-[var(--color-primary)] rounded-lg">
               <Sparkles className="w-5 h-5 fill-current animate-pulse" />
             </div>
             <h2 className="text-lg font-black uppercase tracking-wider text-[var(--color-text)]">GBK AI Productivity Workspace</h2>
@@ -446,8 +446,8 @@ Could you please let me know what my max qualifying amount is under the stress t
         </div>
         
         {/* Role-Aware Focus Advisory */}
-        <div className="px-3 py-2 rounded-lg bg-[#b5a642]/5 border border-[#b5a642]/20 flex flex-col gap-0.5 max-w-xs">
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#b5a642] flex items-center gap-1">
+        <div className="px-3 py-2 rounded-lg bg-[rgba(244,163,132,0.05)] border border-[rgba(244,163,132,0.2)] flex flex-col gap-0.5 max-w-xs">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-primary)] flex items-center gap-1">
             <User className="w-3 h-3" /> Focus Advisory Active
           </span>
           <span className="text-[9px] text-[var(--color-text)] font-semibold">
@@ -469,7 +469,7 @@ Could you please let me know what my max qualifying amount is under the stress t
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 shadow-lg space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
-                <Landmark className="w-3.5 h-3.5 text-[#b5a642]" /> 1. Selected Client
+                <Landmark className="w-3.5 h-3.5 text-[var(--color-accent)]" /> 1. Selected Client
               </h3>
               <span className="text-[9px] bg-[var(--color-surface-2)] text-[var(--color-text-faint)] px-1.5 py-0.5 rounded font-mono">CRM-LINKED</span>
             </div>
@@ -481,7 +481,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                 setAiOutput("");
                 setExtractedTasks([]);
               }}
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/50 font-semibold"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
             >
               <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">-- General Knowledge Base (No Client) --</option>
               {clients.map(c => (
@@ -497,7 +497,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     currentClient.status === "approved" || currentClient.status === "funded"
                       ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                       : currentClient.status === "conditional" || currentClient.status === "working"
-                      ? "bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20"
+                      ? "bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] border border-[rgba(244,163,132,0.2)]"
                       : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border border-[var(--color-border)]"
                   }`}>
                     {currentClient.status}
@@ -542,23 +542,23 @@ Could you please let me know what my max qualifying amount is under the stress t
           {/* 3. QUICK AI WORKFLOW LAUNCHERS - Prioritized by User Role */}
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 shadow-lg space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5 border-b border-[var(--color-border)] pb-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#b5a642]" /> 2. Workspace Tools
+              <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)]" /> 2. Workspace Tools
             </h3>
             
             {/* BROKER-FAVORED TOOLS */}
             {isBroker ? (
               <div className="space-y-2">
-                <div className="text-[9px] text-[#b5a642] font-bold uppercase tracking-wider">Broker Top Tools</div>
+                <div className="text-[9px] text-[var(--color-primary)] font-bold uppercase tracking-wider">Broker Top Tools</div>
                 <button 
                   onClick={() => triggerAITool("summary")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "summary" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#b5a642]" /> File Summary Assistant
+                    <FileText className="w-4 h-4 text-[var(--color-accent)]" /> File Summary Assistant
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -567,12 +567,12 @@ Could you please let me know what my max qualifying amount is under the stress t
                   onClick={() => triggerAITool("recommender")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "recommender" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <CheckSquare className="w-4 h-4 text-[#b5a642]" /> Next Step Recommender
+                    <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" /> Next Step Recommender
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -581,12 +581,12 @@ Could you please let me know what my max qualifying amount is under the stress t
                   onClick={() => triggerAITool("follow_up", "outstanding_docs")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "follow_up" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-[#b5a642]" /> Client Follow-Up Drafts
+                    <Mail className="w-4 h-4 text-[var(--color-accent)]" /> Client Follow-Up Drafts
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -594,17 +594,17 @@ Could you please let me know what my max qualifying amount is under the stress t
             ) : (
               /* ADMIN/MANAGER-FAVORED TOOLS */
               <div className="space-y-2">
-                <div className="text-[9px] text-[#b5a642] font-bold uppercase tracking-wider">Manager Top Tools</div>
+                <div className="text-[9px] text-[var(--color-primary)] font-bold uppercase tracking-wider">Manager Top Tools</div>
                 <button 
                   onClick={() => triggerAITool("missing_docs")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "missing_docs" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-[#b5a642]" /> Missing Documents Helper
+                    <FileCheck className="w-4 h-4 text-[var(--color-accent)]" /> Missing Documents Helper
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -613,12 +613,12 @@ Could you please let me know what my max qualifying amount is under the stress t
                   onClick={() => triggerAITool("summary")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "summary" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-[#b5a642]" /> Readiness Audit summary
+                    <FileSpreadsheet className="w-4 h-4 text-[var(--color-accent)]" /> Readiness Audit summary
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -627,12 +627,12 @@ Could you please let me know what my max qualifying amount is under the stress t
                   onClick={() => triggerAITool("partner_comm", "lender")}
                   className={`w-full text-left p-2.5 rounded-lg text-xs font-bold border transition flex items-center justify-between ${
                     activeTool === "partner_comm" 
-                      ? "bg-[#b5a642]/15 border-[#b5a642]/50 text-[var(--color-text)]" 
+                      ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.5)] text-[var(--color-text)]" 
                       : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Landmark className="w-4 h-4 text-[#b5a642]" /> Underwriter/Partner Drafts
+                    <Landmark className="w-4 h-4 text-[var(--color-accent)]" /> Underwriter/Partner Drafts
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -650,7 +650,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     onClick={() => triggerAITool("recommender")}
                     className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                       activeTool === "recommender" 
-                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                        ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                         : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                     }`}
                   >
@@ -663,7 +663,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     onClick={() => triggerAITool("follow_up", "outstanding_docs")}
                     className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                       activeTool === "follow_up" 
-                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                        ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                         : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                     }`}
                   >
@@ -680,7 +680,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     onClick={() => triggerAITool("missing_docs")}
                     className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                       activeTool === "missing_docs" 
-                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                        ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                         : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                     }`}
                   >
@@ -693,7 +693,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     onClick={() => triggerAITool("partner_comm", "lender")}
                     className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                       activeTool === "partner_comm" 
-                        ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                        ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                         : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                     }`}
                   >
@@ -709,7 +709,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                 onClick={() => triggerAITool("tasks")}
                 className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                   activeTool === "tasks" 
-                    ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                    ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                     : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                 }`}
               >
@@ -726,7 +726,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                 }}
                 className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
                   activeTool === "intake_raw" 
-                    ? "bg-[#b5a642]/15 border-[#b5a642]/40 text-[var(--color-text)]" 
+                    ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
                     : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
                 }`}
               >
@@ -748,37 +748,37 @@ Could you please let me know what my max qualifying amount is under the stress t
             
             <button 
               onClick={() => triggerAITool("summary")}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <FileText className="w-3.5 h-3.5 text-[#b5a642]" /> Summarize File
+              <FileText className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Summarize File
             </button>
 
             <button 
               onClick={() => triggerAITool("missing_docs")}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <FileCheck className="w-3.5 h-3.5 text-[#b5a642]" /> List Missing Docs
+              <FileCheck className="w-3.5 h-3.5 text-[var(--color-accent)]" /> List Missing Docs
             </button>
 
             <button 
               onClick={() => triggerAITool("follow_up", "outstanding_docs")}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <Mail className="w-3.5 h-3.5 text-[#b5a642]" /> Draft Follow-Up
+              <Mail className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Draft Follow-Up
             </button>
 
             <button 
               onClick={() => triggerAITool("partner_comm", "lender")}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <Landmark className="w-3.5 h-3.5 text-[#b5a642]" /> Draft Partner Email
+              <Landmark className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Draft Partner Email
             </button>
 
             <button 
               onClick={() => triggerAITool("tasks")}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <CheckSquare className="w-3.5 h-3.5 text-[#b5a642]" /> Tasks from Notes
+              <CheckSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Tasks from Notes
             </button>
 
             <button 
@@ -787,9 +787,9 @@ Could you please let me know what my max qualifying amount is under the stress t
                 setAiOutput("");
                 loadSampleIntake();
               }}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[#b5a642]/10 border border-[var(--color-border)] hover:border-[#b5a642]/30 text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
-              <CornerDownRight className="w-3.5 h-3.5 text-[#b5a642]" /> Summarize Ingest submission
+              <CornerDownRight className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Summarize Ingest submission
             </button>
           </div>
 
@@ -799,9 +799,9 @@ Could you please let me know what my max qualifying amount is under the stress t
             {/* CANVAS WORKSPACE BAR */}
             <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#b5a642] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
                 <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--color-text)] flex items-center gap-1">
-                  Active Assistant Canvas: <span className="text-[#b5a642] font-black font-mono ml-1">{getToolLabel(activeTool)}</span>
+                  Active Assistant Canvas: <span className="text-[var(--color-accent)] font-black font-mono ml-1">{getToolLabel(activeTool)}</span>
                 </h3>
               </div>
               
@@ -864,8 +864,8 @@ Could you please let me know what my max qualifying amount is under the stress t
             {/* SPECIAL SCREEN: INTAKE INGESTION WORKSPACE */}
             {activeTool === "intake_raw" && !aiOutput && !loading && (
               <div className="p-5 flex-1 flex flex-col gap-4">
-                <div className="p-3.5 bg-[#b5a642]/5 border border-[#b5a642]/10 rounded-lg flex gap-3">
-                  <AlertCircle className="w-5 h-5 text-[#b5a642] flex-shrink-0 mt-0.5" />
+                <div className="p-3.5 bg-[rgba(244,163,132,0.05)] border border-[rgba(244,163,132,0.15)] rounded-lg flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
                   <div className="text-[11px] leading-relaxed text-[var(--color-text-muted)]">
                     <span className="text-[var(--color-text)] font-bold uppercase block mb-1">Raw website Application / Email-linked Ingestion</span>
                     Paste unformatted email text, application form notes, or phone intake logs here. GBK AI will digest it into key parameters and output a tidy CRM lead dossier summary.
@@ -878,7 +878,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     value={rawIntakeText}
                     onChange={(e) => setRawIntakeText(e.target.value)}
                     placeholder="Paste unformatted lead email, web form submission payload, or underwriter's manual intake text here..."
-                    className="w-full flex-grow bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-xs font-mono text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[#b5a642]/50 focus:ring-1 focus:ring-[#b5a642]/30 min-h-[220px]"
+                    className="w-full flex-grow bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-xs font-mono text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[rgba(244,163,132,0.3)] min-h-[220px]"
                   />
                   
                   <div className="flex items-center justify-between">
@@ -892,7 +892,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     <button 
                       onClick={() => triggerAITool("intake_raw", rawIntakeText)}
                       disabled={!rawIntakeText.trim()}
-                      className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
+                      className="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5 fill-current" /> Parse Application Digest
                     </button>
@@ -908,8 +908,8 @@ Could you please let me know what my max qualifying amount is under the stress t
                 {loading ? (
                   <div className="h-full flex flex-col items-center justify-center py-20 gap-4">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-full border border-t-[#b5a642] border-[var(--color-border)] animate-spin"></div>
-                      <Sparkles className="w-5 h-5 text-[#b5a642] absolute inset-0 m-auto animate-pulse" />
+                      <div className="w-12 h-12 rounded-full border border-t-[var(--color-primary)] border-[var(--color-border)] animate-spin"></div>
+                      <Sparkles className="w-5 h-5 text-[var(--color-accent)] absolute inset-0 m-auto animate-pulse" />
                     </div>
                     <div className="space-y-1 text-center">
                       <span className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] block">Invoking AI Underwriting Agent</span>
@@ -923,13 +923,13 @@ Could you please let me know what my max qualifying amount is under the stress t
                       {aiOutput.split("\n").map((line, idx) => {
                         const trimmed = line.trim();
                         if (trimmed.startsWith("### ")) {
-                          return <h4 key={idx} className="text-sm font-black text-[#b5a642] uppercase tracking-wider mt-4 border-b border-[var(--color-border)] pb-1">{trimmed.replace("### ", "")}</h4>;
+                          return <h4 key={idx} className="text-sm font-black text-[var(--color-accent)] uppercase tracking-wider mt-4 border-b border-[var(--color-border)] pb-1">{trimmed.replace("### ", "")}</h4>;
                         }
                         if (trimmed.startsWith("## ")) {
-                          return <h3 key={idx} className="text-base font-black text-[#b5a642] uppercase tracking-wide mt-5 border-b border-[var(--color-border)] pb-1">{trimmed.replace("## ", "")}</h3>;
+                          return <h3 key={idx} className="text-base font-black text-[var(--color-accent)] uppercase tracking-wide mt-5 border-b border-[var(--color-border)] pb-1">{trimmed.replace("## ", "")}</h3>;
                         }
                         if (trimmed.startsWith("# ")) {
-                          return <h2 key={idx} className="text-lg font-black text-[var(--color-text)] uppercase tracking-widest mt-6 pb-2 border-b-2 border-[#b5a642]/30">{trimmed.replace("# ", "")}</h2>;
+                          return <h2 key={idx} className="text-lg font-black text-[var(--color-text)] uppercase tracking-widest mt-6 pb-2 border-b-2 border-[rgba(244,163,132,0.3)]">{trimmed.replace("# ", "")}</h2>;
                         }
                         if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
                           return (
@@ -956,7 +956,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     {activeTool === "tasks" && extractedTasks.length > 0 && (
                       <div className="mt-6 border-t border-[var(--color-border)] pt-4 space-y-3">
                         <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">
-                          <CheckSquare className="w-4 h-4 text-[#b5a642]" /> Extracted Actionable Items for CRM Checklist:
+                          <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" /> Extracted Actionable Items for CRM Checklist:
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -968,7 +968,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                                     t.priority === "high" 
                                       ? "bg-rose-500/10 text-rose-400" 
                                       : t.priority === "medium"
-                                      ? "bg-[#b5a642]/10 text-[#b5a642]"
+                                      ? "bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)]"
                                       : "bg-blue-500/10 text-blue-400"
                                   }`}>
                                     {t.priority}
@@ -979,7 +979,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                               </div>
                               <button 
                                 onClick={() => handleAddExtractedTask(t.title, t.priority, t.notes)}
-                                className="p-1 bg-[#b5a642]/10 hover:bg-[#b5a642] text-[#b5a642] hover:text-black rounded transition flex-shrink-0"
+                                className="p-1 bg-[rgba(244,163,132,0.1)] hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white rounded transition flex-shrink-0"
                                 title="Add to CRM Task List"
                               >
                                 <Plus className="w-3.5 h-3.5" />
@@ -998,7 +998,7 @@ Could you please let me know what my max qualifying amount is under the stress t
             {!aiOutput && !loading && activeTool !== "intake_raw" && (
               <div className="flex-grow p-10 flex flex-col items-center justify-center text-center gap-6">
                 <div className="p-4 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-full text-[var(--color-text-muted)]/30">
-                  <MessageSquare className="w-10 h-10 text-[#b5a642]" />
+                  <MessageSquare className="w-10 h-10 text-[var(--color-accent)]" />
                 </div>
                 
                 <div className="space-y-2 max-w-md">
@@ -1011,7 +1011,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                 <div className="flex gap-2">
                   <button 
                     onClick={() => triggerAITool("summary")}
-                    className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition flex items-center gap-1.5"
+                    className="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-xs font-black uppercase rounded-lg transition flex items-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5 fill-current" /> Auto-Summarize Active File
                   </button>
@@ -1040,7 +1040,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                   {currentClient && (
                     <button 
                       onClick={handleSaveToClientNotes}
-                      className="px-3 py-1.5 bg-[#b5a642]/10 hover:bg-[#b5a642]/20 border border-[#b5a642]/20 text-[#b5a642] text-[11px] font-black rounded-lg transition flex items-center gap-1"
+                      className="px-3 py-1.5 bg-[rgba(244,163,132,0.1)] hover:bg-[rgba(244,163,132,0.2)] border border-[rgba(244,163,132,0.2)] text-[var(--color-primary)] text-[11px] font-black rounded-lg transition flex items-center gap-1"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Save to Notes
@@ -1062,12 +1062,12 @@ Could you please let me know what my max qualifying amount is under the stress t
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Ask about CMHC debt service limits, GDS/TDS calculators, or tell the AI to re-write output..."
                 onKeyDown={(e) => { if (e.key === "Enter") triggerAITool("custom"); }}
-                className="flex-grow bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[#b5a642]/50"
+                className="flex-grow bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-primary)]"
               />
               <button 
                 onClick={() => triggerAITool("custom")}
                 disabled={loading || !aiInput.trim()}
-                className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
+                className="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
               >
                 <Send className="w-3.5 h-3.5" /> Ask AI
               </button>
@@ -1079,7 +1079,7 @@ Could you please let me know what my max qualifying amount is under the stress t
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
-                  <History className="w-3.5 h-3.5 text-[#b5a642]" /> Recent AI Invocations Log
+                  <History className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Recent AI Invocations Log
                 </h4>
                 
                 <button 
@@ -1108,7 +1108,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                       <span className="font-bold text-[var(--color-text)] block">{h.toolName}</span>
                       <span className="text-[var(--color-text-muted)]">Client: {h.clientName} | {new Date(h.timestamp).toLocaleTimeString()}</span>
                     </div>
-                    <ArrowRight className="w-3 h-3 text-[#b5a642] opacity-60" />
+                    <ArrowRight className="w-3 h-3 text-[var(--color-primary)] opacity-60" />
                   </div>
                 ))}
               </div>
