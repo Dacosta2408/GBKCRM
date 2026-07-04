@@ -533,8 +533,8 @@ export const Settings: React.FC<SettingsProps> = ({
       <div className="flex-1 flex overflow-hidden min-h-0">
         
         {/* Left Sub-Navigation Navigation (Tabs) */}
-        <aside className="w-64 border-r border-white/5 bg-[#101014]/40 shrink-0 flex flex-col p-4 gap-1 overflow-y-auto select-none">
-          <div className="text-[10px] text-white/30 uppercase tracking-[1.5px] font-bold px-3 py-1.5 mb-1">
+        <aside className="w-64 border-r border-[var(--color-border)]/70 bg-[var(--color-surface)]/40 shrink-0 flex flex-col p-4 gap-1 overflow-y-auto select-none">
+          <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[1.5px] font-bold px-3 py-1.5 mb-1">
             Personal Settings
           </div>
           <button
@@ -584,7 +584,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
           {isAdminOrManager && (
             <>
-              <div className="text-[10px] text-white/30 uppercase tracking-[1.5px] font-bold px-3 py-1.5 mt-5 mb-1 border-t border-white/5 pt-4">
+              <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[1.5px] font-bold px-3 py-1.5 mt-5 mb-1 border-t border-[var(--color-border)]/50 pt-4">
                 Admin Controls
               </div>
               
@@ -754,112 +754,43 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 2: APPEARANCE */}
           {activeTab === "appearance" && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Theme &amp; Appearance</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Adjust visual layouts, interface contrast, density, and animation speeds.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Theme &amp; Appearance</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Visual interface configuration, color system, and design preferences.</p>
                 </div>
 
-                <div className="space-y-5">
-                  {/* Theme Mode Selector */}
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Contrast Mode</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button
-                        onClick={() => setThemeMode("dark")}
-                        className={`p-4 rounded-lg border flex flex-col items-center gap-2 transition-all ${
-                          themeMode === "dark" 
-                            ? "bg-[#1b1b20] border-[var(--color-primary)] text-[var(--color-primary)]" 
-                            : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
-                        }`}
-                      >
-                        <Lock className="w-5 h-5" />
-                        <span className="text-xs font-bold">Deep Slate Dark</span>
-                        <span className="text-[9px] text-white/40">Eye-safe operations mode</span>
-                      </button>
+                <div className="p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0">
+                    <Palette className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1.5 flex-1">
+                    <span className="text-xs font-bold text-[var(--color-text)] block">
+                      Top-Bar Theme Toggle Control
+                    </span>
+                    <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">
+                      Theme switching is controlled from the top navigation sun/moon toggle. Clicking it will seamlessly transition the entire application between <strong className="text-[var(--color-text)] font-semibold">Deep Slate Dark</strong> and <strong className="text-[var(--color-text)] font-semibold">Workspace Light</strong> modes.
+                    </p>
+                  </div>
+                </div>
 
-                      <button
-                        onClick={() => setThemeMode("light")}
-                        className={`p-4 rounded-lg border flex flex-col items-center gap-2 transition-all ${
-                          themeMode === "light" 
-                            ? "bg-white/10 border-[var(--color-primary)] text-[var(--color-primary)]" 
-                            : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
-                        }`}
-                      >
-                        <Palette className="w-5 h-5" />
-                        <span className="text-xs font-bold">Workspace Light</span>
-                        <span className="text-[9px] text-white/40">High-contrast daylight mode</span>
-                      </button>
+                <div className="space-y-4 pt-2">
+                  <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">Active Design Tokens</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs space-y-1">
+                      <span className="font-semibold text-[var(--color-text)] block">Modular Accent Theme</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block leading-normal">
+                        GBK CRM utilizes an elegant, low-contrast olive gold and steel slate color profile, engineered for high legibility and minimal eye-strain.
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs space-y-1">
+                      <span className="font-semibold text-[var(--color-text)] block">Optimized Animations</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block leading-normal">
+                        Micro-interactions, spring animations, and route translations are fully managed automatically to keep the UX highly responsive.
+                      </span>
                     </div>
                   </div>
-
-                  {/* Accent Presets */}
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Brand Accent Theme</label>
-                    <div className="grid grid-cols-5 gap-2">
-                      {([
-                        { id: "gold", label: "Olive Gold", color: "bg-[var(--color-accent)]" },
-                        { id: "blue", label: "Steel Blue", color: "bg-[#6fa3b8]" },
-                        { id: "emerald", label: "Emerald", color: "bg-[#2e7d32]" },
-                        { id: "purple", label: "Velvet", color: "bg-[#7b1fa2]" },
-                        { id: "slate", label: "Slate", color: "bg-[#90a4ae]" }
-                      ]).map((accent) => (
-                        <button
-                          key={accent.id}
-                          onClick={() => setAccentTheme(accent.id)}
-                          className={`p-2 rounded-lg border flex flex-col items-center gap-1.5 transition-all text-[10px] font-semibold ${
-                            accentTheme === accent.id 
-                              ? "bg-[#1b1b20] border-[var(--color-primary)] text-white" 
-                              : "bg-[#141418]/50 border-white/5 text-[#8e95a3] hover:text-white"
-                          }`}
-                        >
-                          <div className={`w-3.5 h-3.5 rounded-full ${accent.color}`} />
-                          <span>{accent.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Interface Density */}
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Interface Density</label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {["compact", "comfortable", "spacious"].map((dens) => (
-                        <button
-                          key={dens}
-                          onClick={() => setDensity(dens)}
-                          className={`p-2.5 rounded-lg border text-xs font-bold capitalize transition-all ${
-                            density === dens 
-                              ? "bg-[#1b1b20] border-[var(--color-primary)] text-white" 
-                              : "bg-[#141418]/60 border-white/5 text-[#8e95a3] hover:text-white"
-                          }`}
-                        >
-                          {dens}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Animations Toggle */}
-                  <div className="flex items-center justify-between bg-[#141418] p-4 rounded-lg border border-white/5">
-                    <div>
-                      <span className="text-xs font-bold text-white block">Subtle UI Animations</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Enable spring transitions, route fades, and micro-interactions.</span>
-                    </div>
-                    <button
-                      onClick={() => setEnableAnimations(!enableAnimations)}
-                      className="text-[var(--color-primary)]"
-                    >
-                      {enableAnimations ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
-                    </button>
-                  </div>
-
-                  <button 
-                    onClick={handleSaveAppearance}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
-                  >
-                    Apply Theme Changes
-                  </button>
                 </div>
               </div>
             </div>
@@ -868,76 +799,76 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 3: NOTIFICATIONS */}
           {activeTab === "notifications" && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Notification Preferences</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Configure automated browser notifications, sound reminders, and email digest logs.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Notification Preferences</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Configure automated browser notifications, sound reminders, and email digest logs.</p>
                 </div>
 
                 <div className="space-y-3.5">
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Daily Task Reminders</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Notify me of uncompleted tasks assigned to me daily at 9:00 AM.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Daily Task Reminders</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me of uncompleted tasks assigned to me daily at 9:00 AM.</span>
                     </div>
-                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifTaskReminders ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifTaskReminders ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Client Assigned Alerts</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Notify me immediately when an active file is reassigned to my roster.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Client Assigned Alerts</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me immediately when an active file is reassigned to my roster.</span>
                     </div>
-                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifFileUpdates ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifFileUpdates ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Retention &amp; Follow-up Triggers</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Notify me when a client's 5-year mortgage renewal is approaching threshold.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Retention &amp; Follow-up Triggers</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me when a client's 5-year mortgage renewal is approaching threshold.</span>
                     </div>
-                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifFollowUps ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifFollowUps ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Document Vault Submissions</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Notify me when a client uploads required checklist PDF in the client portal.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Document Vault Submissions</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me when a client uploads required checklist PDF in the client portal.</span>
                     </div>
-                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifDocAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifDocAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Team Mentions Alerts</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Notify me of standard team channel mentions or active chat dialogues.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Team Mentions Alerts</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me of standard team channel mentions or active chat dialogues.</span>
                     </div>
-                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifCommsAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifCommsAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
-                  <div className="flex items-start justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-start justify-between bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div className="space-y-0.5">
-                      <label className="text-xs font-bold text-white block">Weekly Email Activity Digest</label>
-                      <span className="text-[10px] text-[#8e95a3] block">Receive email report of operational pipelines, funded values and metrics.</span>
+                      <label className="text-xs font-bold text-[var(--color-text)] block">Weekly Email Activity Digest</label>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Receive email report of operational pipelines, funded values and metrics.</span>
                     </div>
-                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[var(--color-primary)]">
-                      {notifEmailDigest ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[var(--color-accent)]">
+                      {notifEmailDigest ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
                   <button 
                     onClick={handleSaveNotifications}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
                   >
                     Save Notification Prefs
                   </button>
@@ -949,23 +880,23 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 4: SECURITY */}
           {activeTab === "security" && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Personal Account Security</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Adjust broker access codes, multi-factor setups, and monitor active sessions.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Personal Account Security</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Adjust broker access codes, multi-factor setups, and monitor active sessions.</p>
                 </div>
 
                 <div className="space-y-5">
                   {/* Access PIN */}
-                  <div className="bg-[#141418] p-4 rounded-lg border border-white/5 space-y-3">
+                  <div className="bg-[var(--color-surface-2)] p-4 rounded-lg border border-[var(--color-border)]/70 space-y-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <span className="text-xs font-bold text-white block">CRM Workstation Access PIN</span>
-                        <span className="text-[10px] text-[#8e95a3] block">The 4-digit code required to unlock your broker session.</span>
+                        <span className="text-xs font-bold text-[var(--color-text)] block">CRM Workstation Access PIN</span>
+                        <span className="text-[10px] text-[var(--color-text-muted)] block">The 4-digit code required to unlock your broker session.</span>
                       </div>
                       <button 
                         onClick={() => setShowPin(!showPin)}
-                        className="text-xs font-bold text-[#6fa3b8] hover:underline"
+                        className="text-xs font-bold text-[var(--color-primary)] hover:underline"
                       >
                         {showPin ? "Hide Code" : "Reveal Code"}
                       </button>
@@ -977,46 +908,46 @@ export const Settings: React.FC<SettingsProps> = ({
                         value={userPin}
                         maxLength={4}
                         onChange={(e) => setUserPin(e.target.value.replace(/\D/g, ""))}
-                        className="bg-[#0c0c0e] border border-white/5 rounded px-3 py-1.5 text-center text-sm font-mono tracking-widest text-white w-24 focus:outline-none focus:border-[var(--color-primary)]/30"
+                        className="bg-[var(--color-surface-3)] border border-[var(--color-border)]/70 rounded px-3 py-1.5 text-center text-sm font-mono tracking-widest text-[var(--color-text)] w-24 focus:outline-none focus:border-[var(--color-accent)]/40"
                       />
-                      <span className="text-[10px] text-[#8e95a3] self-center">Used during credentials quick-switching.</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] self-center">Used during credentials quick-switching.</span>
                     </div>
                   </div>
 
                   {/* Password reset simulation */}
-                  <div className="flex items-center justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-center justify-between bg-[var(--color-surface-2)]/50 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div>
-                      <span className="text-xs font-bold text-white block">Corporate Email Password</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Trigger secure reset flow for portal password.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Corporate Email Password</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Trigger secure reset flow for portal password.</span>
                     </div>
                     <button 
                       onClick={handleSimulateResetPassword}
-                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-xs font-bold rounded-lg border border-white/10 transition-colors"
+                      className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-xs font-bold text-[var(--color-text)] rounded-lg border border-[var(--color-border)]/70 transition-colors"
                     >
                       Reset Password
                     </button>
                   </div>
 
                   {/* Require PIN for SIN */}
-                  <div className="flex items-center justify-between bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-center justify-between bg-[var(--color-surface-2)]/50 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div>
-                      <span className="text-xs font-bold text-white block">Audit Access Protection</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Require manual PIN reentry when auditing SIN numbers.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Audit Access Protection</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Require manual PIN reentry when auditing SIN numbers.</span>
                     </div>
-                    <button onClick={() => setRequirePinForSin(!requirePinForSin)} className="shrink-0 text-[var(--color-primary)]">
-                      {requirePinForSin ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-white/30" />}
+                    <button onClick={() => setRequirePinForSin(!requirePinForSin)} className="shrink-0 text-[var(--color-accent)]">
+                      {requirePinForSin ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
                   {/* Multi Factor Authentication (MFA) Mock */}
-                  <div className="bg-[#141418]/50 p-4 rounded-lg border border-white/5 space-y-4">
+                  <div className="bg-[var(--color-surface-2)]/50 p-4 rounded-lg border border-[var(--color-border)]/70 space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-white block">Two-Factor Authentication (MFA)</span>
-                        <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Require dynamic security codes for administrative tasks.</span>
+                        <span className="text-xs font-bold text-[var(--color-text)] block">Two-Factor Authentication (MFA)</span>
+                        <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Require dynamic security codes for administrative tasks.</span>
                       </div>
                       {mfaEnabled ? (
-                        <span className="text-[9px] uppercase font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/25">
+                        <span className="text-[9px] uppercase font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/25">
                           Active (MFA Secured)
                         </span>
                       ) : (
@@ -1030,8 +961,8 @@ export const Settings: React.FC<SettingsProps> = ({
                     </div>
 
                     {showMfaSetup && (
-                      <div className="bg-[#0c0c0e] p-3 rounded-lg border border-white/5 space-y-3">
-                        <div className="text-[10px] text-[#8e95a3] leading-relaxed">
+                      <div className="bg-[var(--color-surface-3)] p-3 rounded-lg border border-[var(--color-border)]/70 space-y-3">
+                        <div className="text-[10px] text-[var(--color-text-muted)] leading-relaxed">
                           Scan the Authenticator barcode, then input the 6-digit confirmation code below (Use <strong>123456</strong> for testing setup).
                         </div>
                         <div className="flex gap-2">
@@ -1040,17 +971,17 @@ export const Settings: React.FC<SettingsProps> = ({
                             placeholder="000000"
                             value={mfaCode}
                             onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
-                            className="bg-[#141418] border border-white/5 rounded px-2.5 py-1 text-xs font-mono tracking-widest text-white w-24 text-center focus:outline-none"
+                            className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded px-2.5 py-1 text-xs font-mono tracking-widest text-[var(--color-text)] w-24 text-center focus:outline-none"
                           />
                           <button
                             onClick={handleVerifyMfa}
-                            className="px-3 py-1 bg-[#6fa3b8] hover:bg-[#8bc2da] text-black text-xs font-bold rounded"
+                            className="px-3 py-1 bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-text-inverse)] text-xs font-bold rounded"
                           >
                             Verify &amp; Activate
                           </button>
                           <button
                             onClick={() => setShowMfaSetup(false)}
-                            className="px-2 py-1 text-xs text-[#8e95a3] hover:text-white"
+                            className="px-2 py-1 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                           >
                             Cancel
                           </button>
@@ -1061,31 +992,31 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   {/* Active Session logs */}
                   <div className="space-y-2 pt-2">
-                    <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Active Workspace Login Devices</label>
+                    <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">Active Workspace Login Devices</label>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-3 p-3 bg-[#141418] rounded-lg border border-white/5 text-xs text-[#8e95a3]">
+                      <div className="flex items-center gap-3 p-3 bg-[var(--color-surface-2)] rounded-lg border border-[var(--color-border)]/70 text-xs text-[var(--color-text-muted)]">
                         <Laptop className="w-5 h-5 text-[var(--color-primary)] shrink-0" />
                         <div className="flex-1">
-                          <div className="font-bold text-white">Firefox 134.0 on macOS Ventura (Current Session)</div>
+                          <div className="font-bold text-[var(--color-text)]">Firefox 134.0 on macOS Ventura (Current Session)</div>
                           <div className="text-[10px] mt-0.5">IP: 198.162.24.9 • Ontario, Canada</div>
                         </div>
-                        <span className="text-[9px] uppercase font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">Active Now</span>
+                        <span className="text-[9px] uppercase font-bold text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded">Active Now</span>
                       </div>
 
-                      <div className="flex items-center gap-3 p-3 bg-[#141418]/60 rounded-lg border border-white/5 text-xs text-[#8e95a3]">
-                        <Smartphone className="w-5 h-5 text-white/20 shrink-0" />
+                      <div className="flex items-center gap-3 p-3 bg-[var(--color-surface-2)]/60 rounded-lg border border-[var(--color-border)]/70 text-xs text-[var(--color-text-muted)]">
+                        <Smartphone className="w-5 h-5 text-[var(--color-text-faint)]/40 shrink-0" />
                         <div className="flex-1">
-                          <div className="font-bold text-white/70">GBK Mobile iOS Companion App</div>
+                          <div className="font-bold text-[var(--color-text-muted)]">GBK Mobile iOS Companion App</div>
                           <div className="text-[10px] mt-0.5">IP: 24.112.92.122 • Toronto, Canada</div>
                         </div>
-                        <span className="text-[9px] text-white/40">3 hours ago</span>
+                        <span className="text-[9px] text-[var(--color-text-faint)]">3 hours ago</span>
                       </div>
                     </div>
                   </div>
 
                   <button 
                     onClick={handleSaveSecurity}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
                   >
                     Save Security Settings
                   </button>
@@ -1097,23 +1028,23 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 5: PERSONAL PREFERENCES */}
           {activeTab === "preferences" && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Personal Workspace Preferences</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Configure layout modes, metric summaries, date formatting, and default landing views.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Personal Workspace Preferences</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Configure layout modes, metric summaries, date formatting, and default landing views.</p>
                 </div>
 
                 <div className="space-y-4">
                   {/* Landing Screen */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--color-border)]/70 pb-4">
                     <div>
-                      <span className="text-xs font-bold text-white block">Default Landing Page</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">The CRM section displayed immediately after workspace PIN input.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Default Landing Page</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">The CRM section displayed immediately after workspace PIN input.</span>
                     </div>
                     <select
                       value={prefLanding}
                       onChange={(e) => setPrefLanding(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="dashboard">Dashboard Overview</option>
                       <option value="clients">Client Database</option>
@@ -1123,15 +1054,15 @@ export const Settings: React.FC<SettingsProps> = ({
                   </div>
 
                   {/* Dashboard Visual View */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--color-border)]/70 pb-4">
                     <div>
-                      <span className="text-xs font-bold text-white block">Preferred Dashboard View</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Visual layout style used on primary dashboard workspace.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Preferred Dashboard View</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Visual layout style used on primary dashboard workspace.</span>
                     </div>
                     <select
                       value={prefDashboard}
                       onChange={(e) => setPrefDashboard(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="bento">Bento Layout Dashboard</option>
                       <option value="summary">Summary Focus Cards</option>
@@ -1140,15 +1071,15 @@ export const Settings: React.FC<SettingsProps> = ({
                   </div>
 
                   {/* Table vs Cards */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--color-border)]/70 pb-4">
                     <div>
-                      <span className="text-xs font-bold text-white block">Default Client Layout View</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Preferred display configuration in client directory database.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Default Client Layout View</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Preferred display configuration in client directory database.</span>
                     </div>
                     <select
                       value={prefLayout}
                       onChange={(e) => setPrefLayout(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="table">Table List Layout</option>
                       <option value="cards">Interactive Cards Grid</option>
@@ -1156,15 +1087,15 @@ export const Settings: React.FC<SettingsProps> = ({
                   </div>
 
                   {/* Date Formats */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--color-border)]/70 pb-4">
                     <div>
-                      <span className="text-xs font-bold text-white block">Corporate Date Format</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Format representation for checklist limits and maturity dates.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Corporate Date Format</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Format representation for checklist limits and maturity dates.</span>
                     </div>
                     <select
                       value={prefDateFormat}
                       onChange={(e) => setPrefDateFormat(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="YYYY-MM-DD">YYYY-MM-DD (2026-06-24)</option>
                       <option value="DD/MM/YYYY">DD/MM/YYYY (24/06/2026)</option>
@@ -1175,13 +1106,13 @@ export const Settings: React.FC<SettingsProps> = ({
                   {/* Time format */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-xs font-bold text-white block">Calendar Time Layout</span>
-                      <span className="text-[10px] text-[#8e95a3] mt-0.5 block">Hour scale used inside communications and appointment sheets.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Calendar Time Layout</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Hour scale used inside communications and appointment sheets.</span>
                     </div>
                     <select
                       value={prefTimeFormat}
                       onChange={(e) => setPrefTimeFormat(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/50 w-full sm:w-48"
                     >
                       <option value="12">12-hour scale (AM / PM)</option>
                       <option value="24">24-hour military scale</option>
@@ -1190,7 +1121,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSavePreferences}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
                   >
                     Save Personal Preferences
                   </button>
@@ -1211,24 +1142,24 @@ export const Settings: React.FC<SettingsProps> = ({
                     placeholder="Search workspace brokers..."
                     value={teamSearch}
                     onChange={(e) => setTeamSearch(e.target.value)}
-                    className="w-full bg-[#101014] border border-white/5 rounded-lg pl-9 pr-4 py-1.5 text-xs text-white placeholder-white/30 focus:outline-none"
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-lg pl-9 pr-4 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/60 focus:outline-none"
                   />
-                  <Users className="w-4 h-4 text-white/30 absolute left-3 top-2" />
+                  <Users className="w-4 h-4 text-[var(--color-text-faint)] absolute left-3 top-2" />
                 </div>
                 <button
                   onClick={() => setShowAddUserModal(true)}
-                  className="px-4 py-1.5 bg-[var(--color-primary)] text-black text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-1.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 shrink-0"
                 >
                   <Plus className="w-4 h-4" /> Add New Broker
                 </button>
               </div>
 
               {/* Roster Directory Table */}
-              <div className="bg-[#101014] border border-white/5 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-white/5 bg-[#141418] text-[#8e95a3] font-bold text-[10px] uppercase tracking-wider select-none">
+                      <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[10px] uppercase tracking-wider select-none">
                         <th className="p-3">Staff Profile</th>
                         <th className="p-3">License &amp; E&amp;O</th>
                         <th className="p-3">Email &amp; Cell</th>
@@ -1237,15 +1168,15 @@ export const Settings: React.FC<SettingsProps> = ({
                         <th className="p-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-[var(--color-border)]/70">
                       {filteredRoster.map((user) => (
-                        <tr key={user.id} className="hover:bg-white/[0.01] transition-colors">
+                        <tr key={user.id} className="hover:bg-[var(--color-surface-2)]/30 transition-colors">
                           <td className="p-3 flex items-center gap-3">
                             {user.photo ? (
                               <img 
                                 src={user.photo} 
                                 alt="" 
-                                className="w-8 h-8 rounded-full object-cover border border-white/10" 
+                                className="w-8 h-8 rounded-full object-cover border border-[var(--color-border)]" 
                                 referrerPolicy="no-referrer"
                               />
                             ) : (
@@ -1254,19 +1185,19 @@ export const Settings: React.FC<SettingsProps> = ({
                               </div>
                             )}
                             <div>
-                              <div className="font-bold text-white text-xs">{user.first} {user.last}</div>
-                              <div className="text-[10px] text-[#8e95a3] mt-0.5">{user.role}</div>
+                              <div className="font-bold text-[var(--color-text)] text-xs">{user.first} {user.last}</div>
+                              <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5">{user.role}</div>
                             </div>
                           </td>
                           <td className="p-3">
-                            <div className="font-mono text-[10px] text-white">FSRA: {user.fsraNum || "Not Registered"}</div>
-                            <div className="text-[9px] text-[#8e95a3] mt-0.5">E&amp;O Expiry: {user.eoExpiry || "None"}</div>
+                            <div className="font-mono text-[10px] text-[var(--color-text)] font-semibold">FSRA: {user.fsraNum || "Not Registered"}</div>
+                            <div className="text-[9px] text-[var(--color-text-muted)] mt-0.5">E&amp;O Expiry: {user.eoExpiry || "None"}</div>
                           </td>
                           <td className="p-3">
-                            <div className="text-white font-semibold">{user.email}</div>
-                            <div className="text-[10px] text-[#8e95a3] mt-0.5">{user.phone || "No Phone"}</div>
+                            <div className="text-[var(--color-text)] font-semibold">{user.email}</div>
+                            <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5">{user.phone || "No Phone"}</div>
                           </td>
-                          <td className="p-3 font-mono text-xs tracking-widest text-[#6fa3b8] font-bold">
+                          <td className="p-3 font-mono text-xs tracking-widest text-[var(--color-accent)] font-bold">
                             •••• ({user.pin || "0000"})
                           </td>
                           <td className="p-3">
@@ -1274,8 +1205,8 @@ export const Settings: React.FC<SettingsProps> = ({
                               onClick={() => handleToggleUserStatus(user.id)}
                               className={`px-2.5 py-0.5 rounded text-[9px] font-bold uppercase border tracking-wider transition-all ${
                                 user.status === "active" 
-                                  ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20" 
-                                  : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 hover:bg-green-500/20" 
+                                  : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:bg-red-500/20"
                               }`}
                             >
                               {user.status}
@@ -1284,7 +1215,7 @@ export const Settings: React.FC<SettingsProps> = ({
                           <td className="p-3 text-right">
                             <button
                               onClick={() => handleStartEditUser(user)}
-                              className="px-2.5 py-1 bg-white/5 hover:bg-[var(--color-primary)]/20 hover:text-[var(--color-primary)] text-xs font-semibold rounded border border-white/5 transition-all inline-flex items-center gap-1"
+                              className="px-2.5 py-1 bg-[var(--color-surface-2)]/60 hover:bg-[var(--color-primary)]/20 hover:text-[var(--color-primary)] text-[var(--color-text)] text-xs font-semibold rounded border border-[var(--color-border)]/50 transition-all inline-flex items-center gap-1"
                             >
                               <Edit3 className="w-3.5 h-3.5" /> Edit
                             </button>
@@ -1299,45 +1230,45 @@ export const Settings: React.FC<SettingsProps> = ({
               {/* MODAL: ADD TEAM MEMBER */}
               {showAddUserModal && (
                 <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-                  <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
+                  <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
                     <button 
                       onClick={() => setShowAddUserModal(false)}
-                      className="absolute right-4 top-4 text-[#8e95a3] hover:text-white"
+                      className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                     >
                       ✕
                     </button>
                     
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-[var(--color-primary)]" /> Onboard New CRM Broker Account
+                    <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-[var(--color-accent)]" /> Onboard New CRM Broker Account
                     </h3>
-                    <p className="text-[11px] text-[#8e95a3] mb-5">Create a secure profile record, assign operational roles, and record license numbers.</p>
-
+                    <p className="text-[11px] text-[var(--color-text-muted)] mb-5">Create a secure profile record, assign operational roles, and record license numbers.</p>
+ 
                     <form onSubmit={handleCreateUserSubmit} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">First Name</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">First Name</label>
                           <input 
                             type="text" required
                             value={newFirst}
                             onChange={(e) => setNewFirst(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Last Name</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Last Name</label>
                           <input 
                             type="text" required
                             value={newLast}
                             onChange={(e) => setNewLast(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Broker Role</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Broker Role</label>
                           <select 
                             value={newRole}
                             onChange={(e) => setNewRole(e.target.value as any)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           >
                             <option value="Agent">Agent (Standard)</option>
                             <option value="Senior Broker">Senior Broker</option>
@@ -1347,87 +1278,87 @@ export const Settings: React.FC<SettingsProps> = ({
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Security Login PIN (4 Digits)</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Security Login PIN (4 Digits)</label>
                           <input 
                             type="text" maxLength={4} placeholder="0000"
                             value={newPin}
                             onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs font-mono text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Email Address</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Email Address</label>
                           <input 
                             type="email" required
                             value={newEmail}
                             onChange={(e) => setNewEmail(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Phone Number</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Phone Number</label>
                           <input 
                             type="text"
                             value={newPhone}
                             onChange={(e) => setNewPhone(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                       </div>
-
-                      <div className="border-t border-white/5 pt-4 space-y-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Licensing &amp; E&amp;O Registry</span>
+ 
+                      <div className="border-t border-[var(--color-border)]/70 pt-4 space-y-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-accent)] block">Licensing &amp; E&amp;O Registry</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
                             <input 
                               type="text" placeholder="e.g. M18002991"
                               value={newFsra}
                               onChange={(e) => setNewFsra(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Insurance Carrier</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Insurance Carrier</label>
                             <input 
                               type="text" placeholder="e.g. Creechurch / Lloyds"
                               value={newEoCarrier}
                               onChange={(e) => setNewEoCarrier(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Code</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Code</label>
                             <input 
                               type="text" placeholder="e.g. EO-882195"
                               value={newEoPolicy}
                               onChange={(e) => setNewEoPolicy(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Expiry Date</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Expiry Date</label>
                             <input 
                               type="date"
                               value={newEoExpiry}
                               onChange={(e) => setNewEoExpiry(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+ 
+                      <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-border)]/70">
                         <button
                           type="button"
                           onClick={() => setShowAddUserModal(false)}
-                          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-xs font-semibold rounded-lg text-white"
+                          className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-xs font-semibold rounded-lg text-[var(--color-text)] border border-[var(--color-border)]/70"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
+                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-[var(--color-text-inverse)] text-xs font-bold rounded-lg uppercase tracking-wider"
                         >
                           Complete Onboarding
                         </button>
@@ -1440,45 +1371,45 @@ export const Settings: React.FC<SettingsProps> = ({
               {/* MODAL: EDIT TEAM MEMBER */}
               {editingUser && (
                 <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-                  <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
+                  <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
                     <button 
                       onClick={() => setEditingUser(null)}
-                      className="absolute right-4 top-4 text-[#8e95a3] hover:text-white"
+                      className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                     >
                       ✕
                     </button>
                     
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
-                      <Edit3 className="w-5 h-5 text-[var(--color-primary)]" /> Edit Team Member Profile
+                    <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1 flex items-center gap-2">
+                      <Edit3 className="w-5 h-5 text-[var(--color-accent)]" /> Edit Team Member Profile
                     </h3>
-                    <p className="text-[11px] text-[#8e95a3] mb-5">Update details for {editingUser.first} {editingUser.last}.</p>
+                    <p className="text-[11px] text-[var(--color-text-muted)] mb-5">Update details for {editingUser.first} {editingUser.last}.</p>
 
                     <form onSubmit={handleSaveEditUserSubmit} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">First Name</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">First Name</label>
                           <input 
                             type="text" required
                             value={editFirst}
                             onChange={(e) => setEditFirst(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Last Name</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Last Name</label>
                           <input 
                             type="text" required
                             value={editLast}
                             onChange={(e) => setEditLast(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Broker Role</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Broker Role</label>
                           <select 
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value as any)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           >
                             <option value="Agent">Agent (Standard)</option>
                             <option value="Senior Broker">Senior Broker</option>
@@ -1488,38 +1419,38 @@ export const Settings: React.FC<SettingsProps> = ({
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Security PIN (4 Digits)</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Security PIN (4 Digits)</label>
                           <input 
                             type="text" maxLength={4}
                             value={editPin}
                             onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ""))}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs font-mono text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Email Address</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Email Address</label>
                           <input 
                             type="email" required
                             value={editEmail}
                             onChange={(e) => setEditEmail(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Phone Number</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Phone Number</label>
                           <input 
                             type="text"
                             value={editPhone}
                             onChange={(e) => setEditPhone(e.target.value)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Account Active Status</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Account Active Status</label>
                           <select 
                             value={editStatus}
                             onChange={(e) => setEditStatus(e.target.value as any)}
-                            className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           >
                             <option value="active">Active (On Duty)</option>
                             <option value="inactive">Inactive (Deactivated)</option>
@@ -1527,59 +1458,59 @@ export const Settings: React.FC<SettingsProps> = ({
                         </div>
                       </div>
 
-                      <div className="border-t border-white/5 pt-4 space-y-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Licensing &amp; E&amp;O Registry</span>
+                      <div className="border-t border-[var(--color-border)]/70 pt-4 space-y-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-accent)] block">Licensing &amp; E&amp;O Registry</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">FSRA Registry Number</label>
                             <input 
                               type="text" placeholder="M18002991"
                               value={editFsra}
                               onChange={(e) => setEditFsra(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Insurance Carrier</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Insurance Carrier</label>
                             <input 
                               type="text" placeholder="Creechurch / Lloyds"
                               value={editEoCarrier}
                               onChange={(e) => setEditEoCarrier(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Code</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Code</label>
                             <input 
                               type="text" placeholder="EO-882195"
                               value={editEoPolicy}
                               onChange={(e) => setEditEoPolicy(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-[8px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Expiry Date</label>
+                            <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">E&amp;O Policy Expiry Date</label>
                             <input 
                               type="date"
                               value={editEoExpiry}
                               onChange={(e) => setEditEoExpiry(e.target.value)}
-                              className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                             />
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+                      <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-border)]/70">
                         <button
                           type="button"
                           onClick={() => setEditingUser(null)}
-                          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-xs font-semibold rounded-lg text-white"
+                          className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-xs font-semibold rounded-lg text-[var(--color-text)] border border-[var(--color-border)]/70"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black text-xs font-bold rounded-lg uppercase tracking-wider"
+                          className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-[var(--color-text-inverse)] text-xs font-bold rounded-lg uppercase tracking-wider"
                         >
                           Save Changes
                         </button>
@@ -1594,24 +1525,24 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 7: ACCESS & PERMISSIONS (ADMINS/MANAGERS ONLY) */}
           {activeTab === "permissions" && isAdminOrManager && (
             <div className="max-w-3xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Role-Based Override Console</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Inspect corporate permissions by role, or issue individual custom capability overrides.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Role-Based Override Console</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Inspect corporate permissions by role, or issue individual custom capability overrides.</p>
                 </div>
 
                 <div className="space-y-4">
                   {/* Select user to override */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#141418]/50 p-4 rounded-lg border border-white/5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[var(--color-surface-2)]/50 p-4 rounded-lg border border-[var(--color-border)]/70">
                     <div>
-                      <span className="text-xs font-bold text-white block">Target Broker overrides</span>
-                      <span className="text-[10px] text-[#8e95a3] block">Select any team member to customize individual permission overrides.</span>
+                      <span className="text-xs font-bold text-[var(--color-text)] block">Target Broker overrides</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block">Select any team member to customize individual permission overrides.</span>
                     </div>
                     
                     <select
                       value={selectedPermUserId}
                       onChange={(e) => setSelectedPermUserId(e.target.value)}
-                      className="bg-[#0c0c0e] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none w-full sm:w-64"
+                      className="bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none w-full sm:w-64"
                     >
                       <option value="">-- Choose a team member --</option>
                       {userRoster.map(u => (
@@ -1622,8 +1553,8 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   {selectedPermUser ? (
                     <div className="space-y-3.5 pt-2">
-                      <div className="text-xs font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/5">
-                        <Key className="w-4 h-4 text-[var(--color-primary)]" /> Override Checklist: {selectedPermUser.first} {selectedPermUser.last}
+                      <div className="text-xs font-bold text-[var(--color-text)] flex items-center gap-1.5 pb-1 border-b border-[var(--color-border)]/70">
+                        <Key className="w-4 h-4 text-[var(--color-accent)]" /> Override Checklist: {selectedPermUser.first} {selectedPermUser.last}
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1634,18 +1565,18 @@ export const Settings: React.FC<SettingsProps> = ({
                           return (
                             <div 
                               key={perm.key} 
-                              className="p-3 bg-[#141418] border border-white/5 rounded-lg flex items-center justify-between gap-3 text-xs"
+                              className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg flex items-center justify-between gap-3 text-xs"
                             >
                               <div className="space-y-0.5">
-                                <span className="font-bold text-white block">{perm.name}</span>
-                                <span className="text-[9px] text-[#8e95a3] leading-tight block">{perm.desc}</span>
+                                <span className="font-bold text-[var(--color-text)] block">{perm.name}</span>
+                                <span className="text-[9px] text-[var(--color-text-muted)] leading-tight block">{perm.desc}</span>
                               </div>
                               <button
                                 onClick={() => handleTogglePermissionOverride(perm.key)}
                                 className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${
                                   hasCustomOverride 
-                                    ? "bg-[var(--color-primary)] text-black" 
-                                    : "bg-white/5 hover:bg-white/10 text-[#8e95a3]"
+                                    ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)]" 
+                                    : "bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text-muted)] border border-[var(--color-border)]/50"
                                 }`}
                               >
                                 {hasCustomOverride ? "Override ON" : "Default"}
@@ -1656,22 +1587,22 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="p-10 border border-dashed border-white/5 rounded-xl text-center text-xs text-[#8e95a3] bg-[#141418]/10 select-none">
+                    <div className="p-10 border border-dashed border-[var(--color-border)] rounded-xl text-center text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-2)]/10 select-none">
                       Select a staff member above to adjust fine-grained permissions overrides.
                     </div>
                   )}
 
                   {/* Operational lock control */}
-                  <div className="border-t border-white/5 pt-5 space-y-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#eeeef2] block">Role Permissions Hierarchy Overview</span>
-                    <div className="grid grid-cols-5 text-[9px] font-bold bg-[#141418] border border-white/5 rounded p-2 select-none text-center">
-                      <span className="text-left text-[#8e95a3]">OPERATION</span>
-                      <span className="text-white">Owner</span>
-                      <span className="text-[#6fa3b8]">SuperAdmin</span>
-                      <span className="text-[#eeeef2]/60">SrBroker</span>
-                      <span className="text-[#8e95a3]">Agent</span>
+                  <div className="border-t border-[var(--color-border)]/70 pt-5 space-y-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text)] block">Role Permissions Hierarchy Overview</span>
+                    <div className="grid grid-cols-5 text-[9px] font-bold bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded p-2 select-none text-center">
+                      <span className="text-left text-[var(--color-text-muted)]">OPERATION</span>
+                      <span className="text-[var(--color-text)]">Owner</span>
+                      <span className="text-[var(--color-accent)]">SuperAdmin</span>
+                      <span className="text-[var(--color-text-muted)]/90">SrBroker</span>
+                      <span className="text-[var(--color-text-muted)]">Agent</span>
                     </div>
-                    <div className="space-y-1 divide-y divide-white/5">
+                    <div className="space-y-1 divide-y divide-[var(--color-border)]/70">
                       {([
                         { op: "View Clients", owner: "✓", sa: "✓", sb: "✓", ag: "✓" },
                         { op: "Edit Clients", owner: "✓", sa: "✓", sb: "✓", ag: "✓" },
@@ -1679,12 +1610,12 @@ export const Settings: React.FC<SettingsProps> = ({
                         { op: "SIN Decryption", owner: "✓", sa: "✓", sb: "✓", ag: "—" },
                         { op: "Delete Files", owner: "✓", sa: "—", sb: "—", ag: "—" }
                       ]).map((row, idx) => (
-                        <div key={idx} className="grid grid-cols-5 text-[9px] py-1.5 text-center text-[#8e95a3] font-mono">
-                          <span className="text-left font-sans text-white text-[10px]">{row.op}</span>
-                          <span className="text-green-400 font-bold">{row.owner}</span>
-                          <span className="text-green-400 font-bold">{row.sa}</span>
-                          <span className="text-green-400 font-bold">{row.sb}</span>
-                          <span className={row.ag === "✓" ? "text-green-400 font-bold" : "text-white/20"}>{row.ag}</span>
+                        <div key={idx} className="grid grid-cols-5 text-[9px] py-1.5 text-center text-[var(--color-text-muted)] font-mono">
+                          <span className="text-left font-sans text-[var(--color-text)] text-[10px]">{row.op}</span>
+                          <span className="text-green-600 dark:text-green-400 font-bold">{row.owner}</span>
+                          <span className="text-green-600 dark:text-green-400 font-bold">{row.sa}</span>
+                          <span className="text-green-600 dark:text-green-400 font-bold">{row.sb}</span>
+                          <span className={row.ag === "✓" ? "text-green-600 dark:text-green-400 font-bold" : "text-[var(--color-text-muted)]/40"}>{row.ag}</span>
                         </div>
                       ))}
                     </div>
@@ -1697,27 +1628,27 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 8: CRM DEFAULTS (ADMINS/MANAGERS ONLY) */}
           {activeTab === "defaults" && isAdminOrManager && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">CRM Pipeline &amp; Checklist Defaults</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Modify pipeline label names, set default assigned agents, and configure document vaults checkmarks.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">CRM Pipeline &amp; Checklist Defaults</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Modify pipeline label names, set default assigned agents, and configure document vaults checkmarks.</p>
                 </div>
 
                 <div className="space-y-5">
                   {/* Pipeline Stage Renaming */}
                   <div className="space-y-2.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Pipeline Board Stage Labels</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-[#141418]/60 p-4 rounded-lg border border-white/5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                       {Object.keys(pipelineLabels).map((key) => (
                         <div key={key}>
-                          <label className="block text-[9px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">
                             {key} Stage Label
                           </label>
                           <input 
                             type="text"
                             value={pipelineLabels[key]}
                             onChange={(e) => handlePipelineLabelChange(key, e.target.value)}
-                            className="w-full bg-[#0c0c0e] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)]/70 rounded px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
                           />
                         </div>
                       ))}
@@ -1727,13 +1658,13 @@ export const Settings: React.FC<SettingsProps> = ({
                   {/* General Ingestion Defaults */}
                   <div className="space-y-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Ingestion &amp; Allocation Defaults</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#141418]/60 p-4 rounded-lg border border-white/5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70">
                       <div>
-                        <label className="block text-[9px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Default Assigned Agent</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Default Assigned Agent</label>
                         <select 
                           value={defaultAgentId}
                           onChange={(e) => setDefaultAgentId(e.target.value)}
-                          className="w-full bg-[#0c0c0e] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white"
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)]/70 rounded px-2.5 py-1.5 text-xs text-[var(--color-text)]"
                         >
                           {userRoster.map(u => (
                             <option key={u.id} value={u.id}>{u.first} {u.last}</option>
@@ -1742,12 +1673,12 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-[#8e95a3] uppercase font-bold tracking-wider mb-1">Default Ingestion Source</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider mb-1">Default Ingestion Source</label>
                         <input 
                           type="text"
                           value={defaultSource}
                           onChange={(e) => setDefaultSource(e.target.value)}
-                          className="w-full bg-[#0c0c0e] border border-white/5 rounded px-2.5 py-1.5 text-xs text-white"
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)]/70 rounded px-2.5 py-1.5 text-xs text-[var(--color-text)]"
                         />
                       </div>
                     </div>
@@ -1756,35 +1687,35 @@ export const Settings: React.FC<SettingsProps> = ({
                   {/* Checklist Rules Defaults */}
                   <div className="space-y-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-primary)] block">Intake Document Rules Checklist</span>
-                    <div className="bg-[#141418]/60 p-4 rounded-lg border border-white/5 space-y-3.5 text-xs text-[#8e95a3]">
+                    <div className="bg-[var(--color-surface-2)]/60 p-4 rounded-lg border border-[var(--color-border)]/70 space-y-3.5 text-xs text-[var(--color-text-muted)]">
                       
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="font-bold text-white block">Require 90-Day Bank Statement Ledger</span>
+                          <span className="font-bold text-[var(--color-text)] block">Require 90-Day Bank Statement Ledger</span>
                           <span className="text-[9px] block">Include down payment ledger trigger on all new purchases automatically.</span>
                         </div>
                         <button onClick={() => setRequire90DayBank(!require90DayBank)}>
-                          {require90DayBank ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {require90DayBank ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-[var(--color-text-muted)]/30" />}
                         </button>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="font-bold text-white block">Require Municipal Property Tax Statement</span>
+                          <span className="font-bold text-[var(--color-text)] block">Require Municipal Property Tax Statement</span>
                           <span className="text-[9px] block">Trigger property tax bill verification for all refinance intakes.</span>
                         </div>
                         <button onClick={() => setRequireTaxBill(!requireTaxBill)}>
-                          {requireTaxBill ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {requireTaxBill ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-[var(--color-text-muted)]/30" />}
                         </button>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="font-bold text-white block">Require Agreement of Purchase &amp; Sale (APS)</span>
+                          <span className="font-bold text-[var(--color-text)] block">Require Agreement of Purchase &amp; Sale (APS)</span>
                           <span className="text-[9px] block">Enforce APS document slot immediately on purchase client setup.</span>
                         </div>
                         <button onClick={() => setRequireApsPurchase(!requireApsPurchase)}>
-                          {requireApsPurchase ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-white/20" />}
+                          {requireApsPurchase ? <ToggleRight className="w-8 h-8 text-[var(--color-primary)]" /> : <ToggleLeft className="w-8 h-8 text-[var(--color-text-muted)]/30" />}
                         </button>
                       </div>
 
@@ -1793,7 +1724,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
                   <button 
                     onClick={handleSaveCRMDefaults}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-2"
                   >
                     Save Corporate Defaults
                   </button>
