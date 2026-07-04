@@ -91,35 +91,7 @@ export const Settings: React.FC<SettingsProps> = ({
     showToast("Personal profile updated successfully!", "success", "👤");
   };
 
-  // --- 2. APPEARANCE STATE ---
-  const [themeMode, setThemeMode] = useState<"dark" | "light">(() => {
-    return (localStorage.getItem("gbk_app_theme") as "dark" | "light") || "dark";
-  });
-  const [accentTheme, setAccentTheme] = useState(() => {
-    return localStorage.getItem("gbk_accent_theme") || "gold";
-  });
-  const [density, setDensity] = useState(() => {
-    return localStorage.getItem("gbk_interface_density") || "comfortable";
-  });
-  const [enableAnimations, setEnableAnimations] = useState(() => {
-    return localStorage.getItem("gbk_enable_animations") !== "false";
-  });
-
-  const handleSaveAppearance = () => {
-    localStorage.setItem("gbk_app_theme", themeMode);
-    localStorage.setItem("gbk_accent_theme", accentTheme);
-    localStorage.setItem("gbk_interface_density", density);
-    localStorage.setItem("gbk_enable_animations", enableAnimations ? "true" : "false");
-    
-    // Apply changes visually to document element if light/dark mode is updated
-    if (themeMode === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-
-    showToast("Appearance and style preferences saved!", "success", "🎨");
-  };
+  // --- 2. APPEARANCE STATE (Handled via top-bar theme toggle) ---
 
   // --- 3. NOTIFICATIONS STATE ---
   const [notifTaskReminders, setNotifTaskReminders] = useState(true);
@@ -742,7 +714,7 @@ export const Settings: React.FC<SettingsProps> = ({
  
                   <button 
                     type="submit"
-                    className="w-full py-2.5 bg-[var(--color-accent)] text-black font-bold text-xs rounded-lg hover:bg-[var(--color-accent-hover)] transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-accent)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:bg-[var(--color-accent-hover)] transition-all uppercase tracking-wider mt-4"
                   >
                     Save Profile Changes
                   </button>
@@ -780,7 +752,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <div className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs space-y-1">
                       <span className="font-semibold text-[var(--color-text)] block">Modular Accent Theme</span>
                       <span className="text-[10px] text-[var(--color-text-muted)] block leading-normal">
-                        GBK CRM utilizes an elegant, low-contrast olive gold and steel slate color profile, engineered for high legibility and minimal eye-strain.
+                        GBK CRM utilizes an elegant, modern deep slate and workspace light color profile, engineered for high legibility and minimal eye-strain.
                       </span>
                     </div>
 
@@ -1229,7 +1201,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
               {/* MODAL: ADD TEAM MEMBER */}
               {showAddUserModal && (
-                <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+                <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
                   <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
                     <button 
                       onClick={() => setShowAddUserModal(false)}
@@ -1370,7 +1342,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
               {/* MODAL: EDIT TEAM MEMBER */}
               {editingUser && (
-                <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+                <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
                   <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
                     <button 
                       onClick={() => setEditingUser(null)}

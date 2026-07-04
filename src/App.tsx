@@ -664,9 +664,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center flex-col gap-6"
             style={{
-              background: theme === "dark"
-                ? "radial-gradient(circle at center, #19233C 0%, #09101E 60%, #050A14 100%)"
-                : "radial-gradient(circle at center, #FDFCFB 0%, #EAE4DA 60%, #D4C9B5 100%)"
+              background: "var(--grad-soft)"
             }}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,163,132,0.12)_0%,transparent_60%)] animate-pulse pointer-events-none" />
@@ -754,7 +752,7 @@ export default function App() {
         
         {/* Version Mismatch Banner */}
         {versionMismatch && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2 flex items-center gap-2 text-xs text-amber-300 font-medium select-none shrink-0">
+          <div className="bg-[var(--color-warning-subtle)] border-b border-[var(--color-warning)]/20 px-6 py-2 flex items-center gap-2 text-xs text-[var(--color-warning)] font-semibold select-none shrink-0">
             <span>⚠️</span>
             <span>
               Version mismatch detected. Bridge server is running <strong>v{bridgeVersion}</strong> but the app is <strong>v{(import.meta as any).env?.VITE_APP_VERSION || "1.0.0"}</strong>. Please restart the bridge server.
@@ -1481,7 +1479,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px]"
+            className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4"
           >
             <motion.div 
               initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}
@@ -1547,7 +1545,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
           >
             <motion.div 
               initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.95, y: 15 }}

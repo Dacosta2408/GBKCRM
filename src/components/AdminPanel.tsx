@@ -98,19 +98,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--color-bg)] h-full relative overflow-hidden" id="admin-guard-shield">
         {/* Abstract radar sweep or background shield */}
-        <div className="absolute w-96 h-96 rounded-full bg-red-500/5 animate-pulse filter blur-3xl pointer-events-none" />
+        <div className="absolute w-96 h-96 rounded-full bg-[var(--color-error)]/5 animate-pulse filter blur-3xl pointer-events-none" />
         
-        <div className="max-w-md bg-[var(--color-surface)] border border-red-500/25 rounded-2xl p-8 text-center shadow-2xl relative">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto mb-5">
+        <div className="max-w-md bg-[var(--color-surface)] border border-[var(--color-error)]/25 rounded-2xl p-8 text-center shadow-2xl relative">
+          <div className="w-16 h-16 rounded-full bg-[var(--color-error-subtle)] border border-[var(--color-error)]/20 flex items-center justify-center text-[var(--color-error)] mx-auto mb-5">
             <ShieldAlert className="w-8 h-8" />
           </div>
 
           <h2 className="text-lg font-black text-[var(--color-text)] uppercase tracking-wider">Access Breach Intercepted</h2>
           <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mt-3">
-            Your current security profile level (<span className="text-red-400 font-bold">{currentUser.role}</span>) does not possess clearance for the high-level Admin Control Center.
+            Your current security profile level (<span className="text-[var(--color-error)] font-bold">{currentUser.role}</span>) does not possess clearance for the high-level Admin Control Center.
           </p>
 
-          <div className="bg-red-500/5 border border-red-500/15 rounded-lg p-3 mt-4 text-[11px] text-red-300/80 leading-normal text-left font-mono">
+          <div className="bg-[var(--color-error-subtle)] border border-[var(--color-error)]/15 rounded-lg p-3 mt-4 text-[11px] text-[var(--color-error)]/90 leading-normal text-left font-mono">
             ⚠️ WORKSTATION LOGGED: This unauthorized lookup attempt has been recorded in the security logs under user {currentUser.first} {currentUser.last}.
           </div>
 
@@ -166,7 +166,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* Visual Header bar */}
       <div className="h-14 border-b border-[var(--color-border)]/70 bg-[var(--color-surface)]/80 px-6 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center gap-2.5">
-          <ShieldAlert className="w-5 h-5 text-red-400 animate-pulse" />
+          <ShieldAlert className="w-5 h-5 text-[var(--color-error)] animate-pulse" />
           <div>
             <h1 className="text-xs font-black text-[var(--color-text)] uppercase tracking-wider">High-Level Operations Control Center</h1>
             <p className="text-[10px] text-[var(--color-text-muted)] font-semibold leading-none mt-0.5">GBK Internal Mortgage Brokerage Console</p>
@@ -174,7 +174,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[9px] bg-red-500/10 text-red-400 font-mono px-2 py-0.5 rounded border border-red-500/15 uppercase font-black">
+          <span className="text-[9px] bg-[var(--color-error-subtle)] text-[var(--color-error)] font-mono px-2 py-0.5 rounded border border-[var(--color-error)]/15 uppercase font-black">
             System Overseer Access
           </span>
           <span className="text-[10px] text-[var(--color-text-muted)] font-semibold hidden sm:inline">
