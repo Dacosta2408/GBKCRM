@@ -141,7 +141,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
         {/* Role Templates Card */}
         <div className="lg:col-span-1 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col h-[340px]">
           <div className="flex items-center gap-2 border-b border-white/5 pb-3 mb-4">
-            <ShieldCheck className="w-4.5 h-4.5 text-[#b5a642]" />
+            <ShieldCheck className="w-4.5 h-4.5 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Default Role Templates</h4>
           </div>
 
@@ -157,7 +157,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                   onClick={() => setActiveRoleTab(role as User["role"])}
                   className={`px-3 py-2.5 rounded-lg border text-left flex items-center justify-between transition-all ${
                     isSelected 
-                      ? "bg-[#b5a642]/10 border-[#b5a642]/30 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 border-[var(--color-accent)]/30 text-[var(--color-accent)]" 
                       : "bg-[#181820]/40 border-white/5 text-white/60 hover:text-white hover:bg-[#181820]"
                   }`}
                 >
@@ -211,7 +211,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] block">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] block">
                     {Object.keys(selectedUser.permOverrides || {}).length} Overrides
                   </span>
                   <button
@@ -241,7 +241,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
       <div className="bg-[#111115] border border-white/5 rounded-xl overflow-hidden shadow-lg" id="permissions-grid">
         <div className="bg-[#141419] px-5 py-3 border-b border-white/5 flex items-center justify-between">
           <span className="text-[10px] text-white/40 font-black uppercase tracking-wider">CRM Modules Matrix</span>
-          <span className="text-[10px] text-[#b5a642] font-semibold">
+          <span className="text-[10px] text-[var(--color-accent)] font-semibold">
             Configuring override for: <span className="font-bold underline">{selectedUser?.first} {selectedUser?.last}</span>
           </span>
         </div>

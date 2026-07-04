@@ -321,7 +321,7 @@ export const Partners: React.FC<PartnersProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-sm font-black text-[var(--color-text)] uppercase tracking-wider flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#b5a642]" /> GBK Professional Partner Network
+              <Users className="w-5 h-5 text-[var(--color-accent)]" /> GBK Professional Partner Network
             </h1>
             <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">
               Browse, filter, coordinate, and review active lawyers, appraisers, realtors, and inspectors
@@ -330,7 +330,7 @@ export const Partners: React.FC<PartnersProps> = ({
 
           <button
             onClick={handleAddPartner}
-            className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all self-start sm:self-auto"
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all self-start sm:self-auto"
           >
             <Plus className="w-4 h-4 stroke-[3]" /> Add Strategic Partner
           </button>
@@ -357,7 +357,7 @@ export const Partners: React.FC<PartnersProps> = ({
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border ${
                   isActive
-                    ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 shadow-sm shadow-[#b5a642]/5 font-bold"
+                    ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30 shadow-sm shadow-[var(--color-accent)]/5 font-bold"
                     : "bg-[var(--color-surface)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
                 }`}
               >
@@ -379,7 +379,7 @@ export const Partners: React.FC<PartnersProps> = ({
                   "B Lenders",
                   "Credit / Debt Specialists"
                 ].includes(selectedCategory)
-                  ? "bg-[#b5a642]/15 text-[#b5a642] border-[#b5a642]/30 font-bold"
+                  ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30 font-bold"
                   : "bg-[var(--color-surface)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
               }`}
             >
@@ -415,7 +415,7 @@ export const Partners: React.FC<PartnersProps> = ({
                       setMoreOpen(false);
                     }}
                     className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-[var(--color-surface-3)] ${
-                      selectedCategory === cat ? "text-[#b5a642] font-bold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                      selectedCategory === cat ? "text-[var(--color-accent)] font-bold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                     }`}
                   >
                     {cat}
@@ -435,7 +435,7 @@ export const Partners: React.FC<PartnersProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name, company, email, or keyword..."
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg pl-9 pr-8 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-medium"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg pl-9 pr-8 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-medium"
             />
             <Search className="h-3.5 w-3.5 text-[var(--color-text-faint)] absolute left-3 top-2.5" />
             {searchTerm && (
@@ -454,7 +454,7 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold cursor-pointer"
             >
               <option value="All" className="bg-[var(--color-surface)]">All Statuses</option>
               {PARTNER_STATUSES.map(status => (
@@ -466,7 +466,7 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold cursor-pointer"
             >
               <option value="All" className="bg-[var(--color-surface)]">All Cities</option>
               {ONTARIO_REGIONS.map(region => (
@@ -478,7 +478,7 @@ export const Partners: React.FC<PartnersProps> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold cursor-pointer"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold cursor-pointer"
             >
               <option value="name" className="bg-[var(--color-surface)]">Sort: Name</option>
               <option value="company" className="bg-[var(--color-surface)]">Sort: Company</option>
@@ -489,10 +489,10 @@ export const Partners: React.FC<PartnersProps> = ({
             {/* Sort Order Toggle */}
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-2 text-xs text-[var(--color-text)] hover:border-[#b5a642]/20 transition-all"
+              className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-2 text-xs text-[var(--color-text)] hover:border-[var(--color-accent)]/20 transition-all"
               title="Toggle Sort Order"
             >
-              <ArrowUpDown className="w-3.5 h-3.5 text-[#b5a642]" />
+              <ArrowUpDown className="w-3.5 h-3.5 text-[var(--color-accent)]" />
             </button>
 
             {/* Preferred Only Button */}
@@ -533,7 +533,7 @@ export const Partners: React.FC<PartnersProps> = ({
           
           {filteredAndSortedPartners.length === 0 ? (
             <div className="bg-[var(--color-surface-2)]/50 border border-dashed border-[var(--color-border)]/70 rounded-xl p-12 text-center" id="empty-partner-results">
-              <MapPin className="h-10 w-10 text-[#b5a642] opacity-60 mx-auto mb-3 stroke-1 animate-pulse" />
+              <MapPin className="h-10 w-10 text-[var(--color-accent)] opacity-60 mx-auto mb-3 stroke-1 animate-pulse" />
               <h3 className="text-xs font-black text-[var(--color-text)] uppercase tracking-wider">No Partners Located</h3>
               <p className="text-[10px] font-sans font-semibold text-[var(--color-text-muted)] mt-1 max-w-sm mx-auto">
                 No external professional partners match the current search filters or region constraints.
@@ -547,7 +547,7 @@ export const Partners: React.FC<PartnersProps> = ({
                 </button>
                 <button
                   onClick={handleAddPartner}
-                  className="px-3.5 py-1.5 bg-[#b5a642] text-black hover:bg-[#9a8c38] font-bold text-[10px] uppercase rounded-lg transition-all"
+                  className="px-3.5 py-1.5 bg-[var(--color-accent)] text-black hover:bg-[var(--color-accent-hover)] font-bold text-[10px] uppercase rounded-lg transition-all"
                 >
                   Add Strategic Partner
                 </button>
@@ -576,7 +576,7 @@ export const Partners: React.FC<PartnersProps> = ({
         {selectedPartner && (
           <div className="space-y-3.5 pt-4 border-t border-[var(--color-border)]/70 animate-slideUp">
             <div className="flex items-center justify-between px-1">
-              <span className="text-[10px] font-black uppercase text-[#b5a642] tracking-wider">
+              <span className="text-[10px] font-black uppercase text-[var(--color-accent)] tracking-wider">
                 🔬 Active Partner Dossier Workspace
               </span>
               <span className="text-[10px] text-[var(--color-text-faint)] font-semibold uppercase">

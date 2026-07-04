@@ -467,8 +467,8 @@ export const Retention: React.FC<RetentionProps> = ({
       {/* Top Header Panel */}
       <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)] p-4 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" id="retention-header-bar">
         <div>
-          <h2 className="text-sm font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-1.5">
-            <Heart className="h-4 w-4 fill-current text-[#b5a642]" /> CRM Client Retention Desk
+          <h2 className="text-sm font-black uppercase text-[var(--color-accent)] tracking-widest flex items-center gap-1.5">
+            <Heart className="h-4 w-4 fill-current text-[var(--color-accent)]" /> CRM Client Retention Desk
           </h2>
           <p className="text-[10px] text-[var(--color-text-muted)] font-semibold mt-0.5">Post-close lifecycle automation, relationship nurturing, and proactive renewal locks</p>
         </div>
@@ -478,7 +478,7 @@ export const Retention: React.FC<RetentionProps> = ({
           {/* Agent Filter */}
           {isPrivileged ? (
             <div className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-1 rounded-lg text-xs">
-              <Filter className="h-3 w-3 text-[#b5a642]" />
+              <Filter className="h-3 w-3 text-[var(--color-accent)]" />
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
@@ -491,7 +491,7 @@ export const Retention: React.FC<RetentionProps> = ({
               </select>
             </div>
           ) : (
-            <div className="bg-[#b5a642]/10 border border-[#b5a642]/20 text-[10px] text-[#b5a642] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+            <div className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[10px] text-[var(--color-accent)] font-black uppercase px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
               <ShieldAlert className="h-3.5 w-3.5" /> personal client ledger
             </div>
           )}
@@ -578,9 +578,9 @@ export const Retention: React.FC<RetentionProps> = ({
 
         <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl text-left hidden md:block">
           <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-black tracking-wider block">CRM Touchpoint Density</span>
-          <span className="text-lg font-black block mt-1 text-[#b5a642] font-mono">{metrics.outreachCompletionRate}%</span>
+          <span className="text-lg font-black block mt-1 text-[var(--color-accent)] font-mono">{metrics.outreachCompletionRate}%</span>
           <div className="w-full bg-[var(--color-surface)] h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-[#b5a642] h-full" style={{ width: `${metrics.outreachCompletionRate}%` }} />
+            <div className="bg-[var(--color-accent)] h-full" style={{ width: `${metrics.outreachCompletionRate}%` }} />
           </div>
         </div>
       </div>
@@ -591,7 +591,7 @@ export const Retention: React.FC<RetentionProps> = ({
         {/* Stream Banner description */}
         <div className="bg-[var(--color-surface-2)]/45 border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="text-xs">
-            <span className="text-[#b5a642] font-black uppercase tracking-wider block">
+            <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">
               {activeStream === "birthdays" && "🎂 Client Birthday Nurture Engine"}
               {activeStream === "renewals" && "🔄 6-Month Mortgage Renewal Defense Pipeline"}
               {activeStream === "anniversaries" && "🎉 Mortgage Funding Anniversary Touchpoints"}
@@ -604,7 +604,7 @@ export const Retention: React.FC<RetentionProps> = ({
               {activeStream === "reengage" && "Ensure no client goes quiet. Rekindle relationships with personalized market updates."}
             </span>
           </div>
-          <div className="shrink-0 bg-[#b5a642]/10 px-3 py-1 rounded-full text-[10px] font-black text-[#b5a642] border border-[#b5a642]/20">
+          <div className="shrink-0 bg-[var(--color-accent)]/10 px-3 py-1 rounded-full text-[10px] font-black text-[var(--color-accent)] border border-[var(--color-accent)]/20">
             {filteredStreamClients.length} targets identified
           </div>
         </div>
@@ -638,7 +638,7 @@ export const Retention: React.FC<RetentionProps> = ({
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-black text-[var(--color-text)] hover:text-[#b5a642] transition-all cursor-pointer">
+                        <span className="text-sm font-black text-[var(--color-text)] hover:text-[var(--color-accent)] transition-all cursor-pointer">
                           {client.first} {client.last}
                         </span>
                         <span className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[8px] font-black uppercase px-2 py-0.5 rounded border border-[var(--color-border)]">
@@ -713,14 +713,14 @@ export const Retention: React.FC<RetentionProps> = ({
                       </div>
                       <div>
                         <span className="text-[var(--color-text-faint)]/60 mr-1">Next Call:</span>
-                        <span className="text-[#b5a642] font-mono">{client.nextFollowUpDate || "Not Set"}</span>
+                        <span className="text-[var(--color-accent)] font-mono">{client.nextFollowUpDate || "Not Set"}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Outcome indicator summary if present */}
                   {client.retentionOutcome && (
-                    <div className="bg-[var(--color-surface-2)] border-l-2 border-[#b5a642] px-3 py-1.5 rounded-r mt-3 text-[11px] text-[var(--color-text-muted)] italic flex justify-between items-center">
+                    <div className="bg-[var(--color-surface-2)] border-l-2 border-[var(--color-accent)] px-3 py-1.5 rounded-r mt-3 text-[11px] text-[var(--color-text-muted)] italic flex justify-between items-center">
                       <span>Outcome: "{client.retentionOutcome.toUpperCase()}" - {client.retentionNotes}</span>
                       <span className="text-[9px] text-[var(--color-text-faint)] not-italic font-mono">{client.lastContactedDate}</span>
                     </div>
@@ -735,7 +735,7 @@ export const Retention: React.FC<RetentionProps> = ({
                         className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)]"
                         title="Send Email Campaign"
                       >
-                        <Mail className="h-3.5 w-3.5 text-[#b5a642]" /> Email
+                        <Mail className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Email
                       </button>
                       <button 
                         onClick={() => handleOpenOutreach(client, "sms")}
@@ -746,7 +746,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       </button>
                       <button 
                         onClick={() => handleOpenOutreach(client, "outcome")}
-                        className="p-2 bg-[#b5a642]/10 hover:bg-[#b5a642]/20 text-[#b5a642] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[#b5a642]/20"
+                        className="p-2 bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-accent)]/20"
                         title="Log Outreach Action"
                       >
                         <CheckCircle className="h-3.5 w-3.5" /> Log Outcome
@@ -765,7 +765,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       {(activeStream === "renewals" || activeStream === "reengage" || activeStream === "anniversaries") && (
                         <button
                           onClick={() => handleConvertToLead(client)}
-                          className="px-3 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black rounded-lg transition-all text-[11px] font-black uppercase flex items-center gap-1"
+                          className="px-3 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black font-black rounded-lg transition-all text-[11px] font-black uppercase flex items-center gap-1"
                         >
                           <UserPlus className="h-3.5 w-3.5" /> Convert to Lead
                         </button>
@@ -792,7 +792,7 @@ export const Retention: React.FC<RetentionProps> = ({
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-base font-black uppercase tracking-wider text-[#b5a642] flex items-center gap-2 mb-2">
+            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2 mb-2">
               {outreachType === "email" && <Mail className="h-5 w-5" />}
               {outreachType === "sms" && <MessageSquare className="h-5 w-5" />}
               {outreachType === "outcome" && <CheckCircle className="h-5 w-5" />}
@@ -824,20 +824,20 @@ export const Retention: React.FC<RetentionProps> = ({
                       type="text" 
                       value={compSubject} 
                       onChange={(e) => setCompSubject(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-bold"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30 font-bold"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-center">
                       <label className="text-[10px] uppercase text-[var(--color-text-faint)] font-bold">Email Body Content</label>
-                      <span className="text-[9px] text-[#b5a642]">Placeholders resolved</span>
+                      <span className="text-[9px] text-[var(--color-accent)]">Placeholders resolved</span>
                     </div>
                     <textarea 
                       rows={12}
                       value={compBody} 
                       onChange={(e) => setCompBody(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-sans leading-relaxed"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30 font-sans leading-relaxed"
                     />
                   </div>
                 </>
@@ -862,7 +862,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       rows={6}
                       value={customSms} 
                       onChange={(e) => setCustomSms(e.target.value)}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-semibold"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2.5 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30 font-semibold"
                     />
                     <div className="flex justify-between text-[9px] text-[var(--color-text-faint)] mt-1">
                       <span>SMS character limit check (standard length)</span>
@@ -881,7 +881,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       <select
                         value={outcomeType}
                         onChange={(e) => setOutcomeType(e.target.value)}
-                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30"
                       >
                         <option value="contacted" className="bg-[var(--color-bg)] text-[var(--color-text)]">Contacted (Spoke directly)</option>
                         <option value="no response" className="bg-[var(--color-bg)] text-[var(--color-text)]">No Response (Left Voicemail/Text)</option>
@@ -897,7 +897,7 @@ export const Retention: React.FC<RetentionProps> = ({
                         type="date"
                         value={nextFollowUp}
                         onChange={(e) => setNextFollowUp(e.target.value)}
-                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
+                        className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                   </div>
@@ -909,7 +909,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       value={outcomeNotes} 
                       onChange={(e) => setOutcomeNotes(e.target.value)}
                       placeholder="Add summary notes regarding current housing updates, GDS interest rates discussed, or next timeline expectations..."
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[#b5a642]/30 font-medium"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30 font-medium"
                     />
                   </div>
                 </>
@@ -928,7 +928,7 @@ export const Retention: React.FC<RetentionProps> = ({
               {outreachType === "email" && (
                 <button
                   onClick={handleSendEmailSimulation}
-                  className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black rounded-lg text-xs font-black uppercase flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black rounded-lg text-xs font-black uppercase flex items-center gap-1.5 transition-all"
                 >
                   <Send className="h-3.5 w-3.5" /> Deliver Email
                 </button>
@@ -970,7 +970,7 @@ export const Retention: React.FC<RetentionProps> = ({
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-base font-black uppercase tracking-wider text-[#b5a642] flex items-center gap-2 mb-3">
+            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2 mb-3">
               <CheckSquare className="h-5 w-5" /> Create Retention Follow-up Task
             </h3>
             <p className="text-[var(--color-text-faint)] mb-4 border-b border-[var(--color-border)] pb-2 font-semibold">
@@ -984,7 +984,7 @@ export const Retention: React.FC<RetentionProps> = ({
                   type="text"
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg font-bold focus:outline-none focus:border-[#b5a642]/30"
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-2 rounded-lg font-bold focus:outline-none focus:border-[var(--color-accent)]/30"
                 />
               </div>
 
@@ -995,7 +995,7 @@ export const Retention: React.FC<RetentionProps> = ({
                     type="date"
                     value={taskDueDate}
                     onChange={(e) => setTaskDueDate(e.target.value)}
-                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
 
@@ -1004,7 +1004,7 @@ export const Retention: React.FC<RetentionProps> = ({
                   <select
                     value={taskPriority}
                     onChange={(e) => setTaskPriority(e.target.value as any)}
-                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#b5a642]/30"
+                    className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[var(--color-accent)]/30"
                   >
                     <option value="high" className="bg-[var(--color-bg)]">🔴 High Priority</option>
                     <option value="medium" className="bg-[var(--color-bg)]">🟡 Medium Priority</option>
@@ -1023,7 +1023,7 @@ export const Retention: React.FC<RetentionProps> = ({
               </button>
               <button
                 onClick={handleSaveTask}
-                className="px-4 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black rounded-lg text-xs font-black uppercase transition-all"
+                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black rounded-lg text-xs font-black uppercase transition-all"
               >
                 Schedule Task
               </button>

@@ -609,11 +609,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                 className="text-[10px] font-bold uppercase bg-white/5 hover:bg-white/10 border border-white/5 text-white/80 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
                 title="Inject specific lender conditions or bespoke clauses"
               >
-                <Sparkles className="h-3.5 w-3.5 text-[#b5a642]" /> Add Lender Clause
+                <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Add Lender Clause
               </button>
               <button 
                 onClick={() => setRequestModalOpen(true)}
-                className="text-[10px] font-black uppercase bg-[#b5a642] hover:bg-[#9a8c38] text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1 transition-all"
+                className="text-[10px] font-black uppercase bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1 transition-all"
               >
                 <Plus className="h-3.5 w-3.5" /> Issue Doc Request
               </button>
@@ -627,9 +627,9 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               if (categoryDocs.length === 0) return null;
 
               return (
-                <div key={category} className="bg-[#131317] border border-white/5 rounded-2xl overflow-hidden shadow-sm">
-                  <div className="bg-[#171720]/40 px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase text-[#b5a642] tracking-widest">{category} Requirements</span>
+                <div key={category} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl overflow-hidden shadow-sm">
+                  <div className="bg-[var(--color-surface-2)]/40 px-4 py-2.5 border-b border-[var(--color-border)]/70 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-[var(--color-accent)] tracking-widest">{category} Requirements</span>
                     <span className="text-[9px] bg-white/5 text-white/50 px-2 py-0.5 rounded-full font-bold">
                       {categoryDocs.length} items
                     </span>
@@ -665,11 +665,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
         <div className="flex flex-col md:flex-row gap-5 flex-grow overflow-hidden">
           
           {/* Left Hand: Workspace Switchers & Active Filters */}
-          <div className="w-full md:w-64 bg-[#131317] border border-white/5 rounded-2xl p-4 flex flex-col gap-5 shrink-0 overflow-y-auto">
+          <div className="w-full md:w-64 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-4 flex flex-col gap-5 shrink-0 overflow-y-auto">
             
             <div className="space-y-1">
-              <span className="text-[9px] text-white/30 uppercase font-black tracking-widest">Active Workspace</span>
-              <div className="flex items-center gap-2 text-[#b5a642] border-b border-white/5 pb-2">
+              <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-black tracking-widest">Active Workspace</span>
+              <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-[var(--color-border)]/70 pb-2">
                 <Shield className="h-4.5 w-4.5" />
                 <span className="text-xs font-black uppercase tracking-wider">Document Control center</span>
               </div>
@@ -692,8 +692,8 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                   }}
                   className={`flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-lg text-left transition-all ${
                     activeSubTab === sub.id 
-                      ? "bg-[#b5a642]/15 text-[#b5a642] border-l-2 border-[#b5a642] pl-2.5" 
-                      : "text-white/60 hover:bg-white/5"
+                      ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-l-2 border-[var(--color-accent)] pl-2.5" 
+                      : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/50 hover:text-[var(--color-text)]"
                   }`}
                 >
                   <span className="flex items-center gap-2">{sub.icon} {sub.label}</span>
@@ -718,7 +718,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                     placeholder="Search client folder or file..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 text-[11px] rounded-lg pl-8 pr-3 py-1.5 text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642] font-semibold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[11px] rounded-lg pl-8 pr-3 py-1.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   />
                   <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-white/30" />
                 </div>
@@ -782,16 +782,16 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               <div className="flex flex-col h-full overflow-hidden">
                 
                 {/* Header operations bar with smart Queue tabs */}
-                <div className="p-4 border-b border-white/5 bg-[#171720]/40 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+                <div className="p-4 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/40 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
                   <div>
-                    <h3 className="text-xs font-black uppercase text-white tracking-widest flex items-center gap-1.5">
-                      <Layers className="h-4.5 w-4.5 text-[#b5a642]" /> MORTGAGE FOLDER REGULATORY MATRIX
+                    <h3 className="text-xs font-black uppercase text-[var(--color-text)] tracking-widest flex items-center gap-1.5">
+                      <Layers className="h-4.5 w-4.5 text-[var(--color-accent)]" /> MORTGAGE FOLDER REGULATORY MATRIX
                     </h3>
-                    <p className="text-[10px] text-white/40 mt-0.5">Underwriting clearance, document age controls &amp; lender condition checkmarks</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Underwriting clearance, document age controls &amp; lender condition checkmarks</p>
                   </div>
                   
                   {/* Smart manager queue switcher */}
-                  <div className="flex flex-wrap gap-1 bg-[#111114] border border-white/5 p-1 rounded-lg">
+                  <div className="flex flex-wrap gap-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 p-1 rounded-lg">
                     {[
                       { id: "all", label: "All Items" },
                       { id: "awaiting_review", label: "Awaiting Review" },
@@ -804,8 +804,8 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                         onClick={() => setManagerQueueTab(tab.id as any)}
                         className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${
                           managerQueueTab === tab.id 
-                            ? "bg-[#b5a642] text-black shadow" 
-                            : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                            ? "bg-[var(--color-accent)] text-black shadow" 
+                            : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                         }`}
                       >
                         {tab.label}
@@ -824,7 +824,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                   )}
                   <button 
                     onClick={() => setRequestModalOpen(true)}
-                    className="text-[10px] bg-[#b5a642]/10 border border-[#b5a642]/30 text-[#b5a642] hover:bg-[#b5a642]/20 font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1 xl:self-center"
+                    className="text-[10px] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1 xl:self-center"
                   >
                     <Plus className="h-3.5 w-3.5" /> Issue Doc Request
                   </button>
@@ -859,19 +859,19 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                                 <td className="py-3 pr-3">
                                   <button 
                                     onClick={() => onOpenClient(row.client.id)}
-                                    className="hover:text-[#b5a642] hover:underline font-black text-white/90 text-left"
+                                    className="hover:text-[var(--color-accent)] hover:underline font-black text-[var(--color-text)] text-left font-sans"
                                   >
                                     {row.client.first} {row.client.last}
                                   </button>
-                                  <span className="block text-[8px] text-white/30 font-black uppercase mt-0.5">
+                                  <span className="block text-[8px] text-[var(--color-text-faint)] font-black uppercase mt-0.5">
                                     {row.client.type || "Purchase"} | {row.client.emptype || "Salaried"}
                                   </span>
                                 </td>
                                 <td className="py-3 pr-3">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-white/80 font-bold">{row.label}</span>
+                                    <span className="text-[var(--color-text)] font-bold">{row.label}</span>
                                     {row.isCustom && (
-                                      <span className="bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/15 text-[8px] font-black px-1.5 py-0.5 rounded">Custom</span>
+                                      <span className="bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/15 text-[8px] font-black px-1.5 py-0.5 rounded">Custom</span>
                                     )}
                                     {row.warningTag === "expired" && (
                                       <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[8px] font-black uppercase px-1 py-0.5 rounded">Expired</span>
@@ -924,12 +924,12 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             {/* SUBTAB 2: CLIENT REQUEST TRACKER */}
             {activeSubTab === "requests" && (
               <div className="flex flex-col h-full overflow-hidden">
-                <div className="p-4 border-b border-white/5 bg-[#171720]/40 flex justify-between items-center">
+                <div className="p-4 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/40 flex justify-between items-center">
                   <div>
-                    <h3 className="text-xs font-black uppercase text-white tracking-widest flex items-center gap-1.5">
-                      <Clock className="h-4.5 w-4.5 text-[#b5a642]" /> ACTIVE OUTBOUND REQUEST TRACKER
+                    <h3 className="text-xs font-black uppercase text-[var(--color-text)] tracking-widest flex items-center gap-1.5">
+                      <Clock className="h-4.5 w-4.5 text-[var(--color-accent)]" /> ACTIVE OUTBOUND REQUEST TRACKER
                     </h3>
-                    <p className="text-[10px] text-white/40 mt-0.5">Review dispatch logs and confirm delivery milestones</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Review dispatch logs and confirm delivery milestones</p>
                   </div>
                   <button 
                     onClick={() => setRequestModalOpen(true)}
@@ -950,12 +950,12 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                       {docRequests.map(req => {
                         const isOverdue = new Date(req.dueDate).getTime() < Date.now() && req.status === "pending";
                         return (
-                          <div key={req.id} className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3 relative overflow-hidden flex flex-col justify-between">
+                          <div key={req.id} className="bg-[var(--color-surface)] border border-[var(--color-border)] p-4 rounded-xl space-y-3 relative overflow-hidden flex flex-col justify-between">
                             <div className="space-y-2">
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <h5 className="text-xs font-black text-white">{req.name}</h5>
-                                  <span className="text-[9px] text-white/40 block mt-0.5">Linked File Folder: <strong className="text-white/70">{req.clientName}</strong></span>
+                                  <h5 className="text-xs font-black text-[var(--color-text)]">{req.name}</h5>
+                                  <span className="text-[9px] text-[var(--color-text-muted)] block mt-0.5">Linked File Folder: <strong className="text-[var(--color-text)]/80">{req.clientName}</strong></span>
                                 </div>
                                 <span className={`px-2 py-0.5 text-[8px] font-black uppercase rounded border ${
                                   req.status === "received" ? "bg-green-500/10 border-green-500/20 text-green-400" :
@@ -966,14 +966,14 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                                 </span>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2 text-[9px] bg-[#111115] border border-white/5 p-2 rounded-lg font-mono">
+                              <div className="grid grid-cols-2 gap-2 text-[9px] bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 p-2 rounded-lg font-mono">
                                 <div>
-                                  <span className="text-white/30 uppercase font-black block">Dispatched Date</span>
-                                  <span className="text-white/70 mt-0.5">{req.dateRequested}</span>
+                                  <span className="text-[var(--color-text-faint)] uppercase font-black block">Dispatched Date</span>
+                                  <span className="text-[var(--color-text-muted)] mt-0.5">{req.dateRequested}</span>
                                 </div>
                                 <div>
-                                  <span className="text-white/30 uppercase font-black block">Upload Deadline</span>
-                                  <span className={`text-white/70 mt-0.5 ${isOverdue ? "text-red-400 font-bold" : ""}`}>{req.dueDate}</span>
+                                  <span className="text-[var(--color-text-faint)] uppercase font-black block">Upload Deadline</span>
+                                  <span className={`text-[var(--color-text-muted)] mt-0.5 ${isOverdue ? "text-red-400 font-bold" : ""}`}>{req.dueDate}</span>
                                 </div>
                               </div>
 
@@ -1007,11 +1007,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             {/* SUBTAB 3: TIMELINE & AUDIT LEDGERS */}
             {activeSubTab === "timeline" && (
               <div className="flex flex-col h-full overflow-hidden">
-                <div className="p-4 border-b border-white/5 bg-[#171720]/40">
-                  <h3 className="text-xs font-black uppercase text-white tracking-widest flex items-center gap-1.5">
-                    <History className="h-4.5 w-4.5 text-[#b5a642]" /> UNDERWRITING AUDIT ACTIVITY STREAM
+                <div className="p-4 border-b border-[var(--color-border)]/70 bg-[var(--color-surface-2)]/40">
+                  <h3 className="text-xs font-black uppercase text-[var(--color-text)] tracking-widest flex items-center gap-1.5">
+                    <History className="h-4.5 w-4.5 text-[var(--color-accent)]" /> UNDERWRITING AUDIT ACTIVITY STREAM
                   </h3>
-                  <p className="text-[10px] text-white/40 mt-0.5">Secure operations ledger recording compliance triggers and checkmarks</p>
+                  <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Secure operations ledger recording compliance triggers and checkmarks</p>
                 </div>
                 <DocAuditTimeline activities={docActivities} />
               </div>
@@ -1059,57 +1059,57 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
       {/* --- FORM MODAL: BESPOKE LENDER CONDITION CLAUSE --- */}
       {customReqOpen && (
         <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none animate-fade-in">
-          <div className="bg-[#131317] border border-white/5 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => setCustomReqOpen(false)}
-              className="absolute right-4 top-4 text-white/40 hover:text-white p-1 rounded bg-white/5"
+              className="absolute right-4 top-4 text-[var(--color-text-faint)] hover:text-[var(--color-text)] p-1 rounded bg-[var(--color-surface-2)]"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-white/5 pb-2 flex items-center gap-1.5">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2 flex items-center gap-1.5">
               <Sparkles className="h-4 w-4" /> Add Bespoke Lender Condition
             </h3>
 
             <form onSubmit={handleAddCustomRequirement} className="space-y-4 text-xs font-semibold">
               <div className="space-y-1.5">
-                <label className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Condition Clause Title</label>
+                <label className="block text-[9px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider">Condition Clause Title</label>
                 <input 
                   type="text" 
                   placeholder="e.g. TD Bank Gift Letter verification, Scotiabank Appraisal"
                   value={customReqName}
                   onChange={(e) => setCustomReqName(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2.5 text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Underwriting Category</label>
+                <label className="block text-[9px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider">Underwriting Category</label>
                 <select 
                   value={customReqCategory}
                   onChange={(e) => setCustomReqCategory(e.target.value)}
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2.5 font-bold text-white/80 focus:outline-none"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 font-bold text-[var(--color-text)] focus:outline-none"
                 >
                   {DOCUMENT_CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat} className="bg-[var(--color-surface)]">{cat}</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Requirement Clause Details</label>
+                <label className="block text-[9px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider">Requirement Clause Details</label>
                 <textarea 
                   value={customReqDesc}
                   onChange={(e) => setCustomReqDesc(e.target.value)}
                   placeholder="e.g. TD Bank requires signed and stamped Gift Letter confirming funds of $50,000 are non-repayable."
-                  className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2.5 text-white placeholder-white/20 h-24 focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 h-24 focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                 />
               </div>
 
               <button 
                 type="submit"
-                className="w-full bg-[#b5a642] text-black font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[#9a8c38] transition-colors flex items-center justify-center gap-1.5"
+                className="w-full bg-[var(--color-accent)] text-black font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
               >
                 ✓ Embed Custom Condition
               </button>

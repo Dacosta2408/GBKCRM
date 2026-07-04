@@ -410,7 +410,7 @@ export const Messages: React.FC<MessagesProps> = ({
   }, [clients, clientDropdownSearch]);
 
   return (
-    <div className="flex bg-[var(--color-bg)] border border-white/5 rounded-2xl overflow-hidden shadow-2xl h-full min-h-0 divide-x divide-white/5 select-none text-left" id="team-messaging-core">
+    <div className="flex bg-[var(--color-bg)] border border-[var(--color-border)]/70 rounded-2xl overflow-hidden shadow-2xl h-full min-h-0 divide-x divide-[var(--color-border)]/70 select-none text-left" id="team-messaging-core">
       
       {/* ============================================================== */}
       {/* BAR 1: LEFT NAVIGATION INDEX FOR CHANNELS & MEMBERS (WIDTH 56) */}
@@ -540,18 +540,18 @@ export const Messages: React.FC<MessagesProps> = ({
       <div className="flex-1 flex flex-col h-full min-w-0 bg-[var(--color-bg)]">
         
         {/* Dynamic Channel Header with Search bar utilities & indicators */}
-        <div className="px-4 py-3 border-b border-white/5 bg-[var(--color-surface)]/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 shrink-0 select-none">
+        <div className="px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 shrink-0 select-none">
           
           <div className="min-w-0 flex items-center gap-2.5">
             <div className="text-xl shrink-0">{currentChannelDetails.icon}</div>
             <div className="min-w-0">
-              <h3 className="text-[13px] font-black text-white flex items-center gap-1.5 leading-none">
+              <h3 className="text-[13px] font-black text-[var(--color-text)] flex items-center gap-1.5 leading-none">
                 {currentChannelDetails.name}
                 {currentChannelDetails.privacy === "restricted" && (
                   <span className="text-[8.5px] bg-red-500/10 border border-red-500/15 rounded-md px-1.5 py-0.5 text-red-400 font-extrabold uppercase">Audit Mode</span>
                 )}
               </h3>
-              <p className="text-[10px] text-white/35 truncate mt-1 leading-none">{currentChannelDetails.subTitle}</p>
+              <p className="text-[10px] text-[var(--color-text-faint)] truncate mt-1 leading-none">{currentChannelDetails.subTitle}</p>
             </div>
           </div>
 
@@ -564,14 +564,14 @@ export const Messages: React.FC<MessagesProps> = ({
                 placeholder="Search thread..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-[var(--color-panel)] border border-white/5 rounded-xl pl-3 pr-7 py-1.5 text-xs text-white placeholder-white/30 w-full focus:outline-none"
+                className="bg-[var(--color-panel)] border border-[var(--color-border)] rounded-xl pl-3 pr-7 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] w-full focus:outline-none"
               />
               {searchQuery ? (
-                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-2 text-white/30 hover:text-white">
+                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
                   <X className="w-3 h-3" />
                 </button>
               ) : (
-                <Search className="absolute right-2.5 top-2 text-white/20 w-3 h-3" />
+                <Search className="absolute right-2.5 top-2 text-[var(--color-text-faint)] w-3 h-3" />
               )}
             </div>
 
@@ -579,7 +579,7 @@ export const Messages: React.FC<MessagesProps> = ({
             <select
               value={selectedEscalationFilter}
               onChange={(e) => setSelectedEscalationFilter(e.target.value)}
-              className="bg-[var(--color-panel)] border border-white/5 rounded-xl px-2.5 py-1.5 text-[10.5px] text-white/70 focus:outline-none font-bold shrink-0"
+              className="bg-[var(--color-panel)] border border-[var(--color-border)] rounded-xl px-2.5 py-1.5 text-[10.5px] text-[var(--color-text-muted)] focus:outline-none font-bold shrink-0"
             >
               <option value="all">🏷️ All Flags</option>
               <option value="normal">🟢 Normal Updates</option>
@@ -594,7 +594,7 @@ export const Messages: React.FC<MessagesProps> = ({
             <select
               value={selectedClientSearch}
               onChange={(e) => setSelectedClientSearch(e.target.value)}
-              className="bg-[var(--color-panel)] border border-white/5 rounded-xl px-2.5 py-1.5 text-[10.5px] text-white/70 focus:outline-none font-bold shrink-0 max-w-[130px]"
+              className="bg-[var(--color-panel)] border border-[var(--color-border)] rounded-xl px-2.5 py-1.5 text-[10.5px] text-[var(--color-text-muted)] focus:outline-none font-bold shrink-0 max-w-[130px]"
             >
               <option value="">📎 All Deals</option>
               {clients.map(c => (
@@ -609,7 +609,7 @@ export const Messages: React.FC<MessagesProps> = ({
                 className={`p-1.5 rounded-xl border flex items-center justify-center gap-1 text-[10.5px] font-black transition-all ${
                   showPinsPanel 
                     ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" 
-                    : "bg-[var(--color-panel)] border-white/5 text-[var(--color-accent)] hover:bg-white/5"
+                    : "bg-[var(--color-panel)] border-[var(--color-border)]/70 text-[var(--color-accent)] hover:bg-[var(--color-surface-2)]"
                 }`}
               >
                 <Pin className="w-3 h-3" />
@@ -629,23 +629,23 @@ export const Messages: React.FC<MessagesProps> = ({
                 <Pin className="w-3 h-3 animate-bounce" />
                 Pinned Operational Directives ({pinnedChannelMessages.length})
               </span>
-              <button onClick={() => setShowPinsPanel(false)} className="text-white/40 hover:text-white">
+              <button onClick={() => setShowPinsPanel(false)} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
             
             <div className="max-h-28 overflow-y-auto space-y-2 pr-1">
               {pinnedChannelMessages.map(pm => (
-                <div key={pm.id} className="bg-[var(--color-bg)]/60 border border-white/5 p-2 rounded-xl text-left flex items-start justify-between gap-3 text-xs">
+                <div key={pm.id} className="bg-[var(--color-bg)]/60 border border-[var(--color-border)]/70 p-2 rounded-xl text-left flex items-start justify-between gap-3 text-xs">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-[10px] text-white/40">
-                      <b className="text-white/60">{pm.author}</b> · {pm.time}
+                    <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-faint)]">
+                      <b className="text-[var(--color-text-muted)]">{pm.author}</b> · {pm.time}
                     </div>
-                    <p className="text-white/90 mt-1 italic font-medium">"{pm.text}"</p>
+                    <p className="text-[var(--color-text)]/90 mt-1 italic font-medium">"{pm.text}"</p>
                   </div>
                   <button 
                     onClick={() => handleTogglePinMessage(pm.id)}
-                    className="text-white/30 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider shrink-0"
+                    className="text-[var(--color-text-faint)] hover:text-red-400 font-bold text-[10px] uppercase tracking-wider shrink-0"
                   >
                     Unpin
                   </button>
@@ -678,7 +678,7 @@ export const Messages: React.FC<MessagesProps> = ({
                     <div className={`w-8 h-8 rounded-xl font-bold flex items-center justify-center text-[11px] border shadow-md select-none ${
                       isCurrentUserVal 
                         ? "bg-[var(--color-accent)]/20 border-[var(--color-accent)]/30 text-[var(--color-accent)]" 
-                        : "bg-[var(--color-panel)] border-white/5 text-white/70"
+                        : "bg-[var(--color-panel)] border-[var(--color-border)] text-[var(--color-text-muted)]"
                     }`}>
                       {msg.initials}
                     </div>
@@ -694,11 +694,11 @@ export const Messages: React.FC<MessagesProps> = ({
                     
                     {/* Metadata Header line */}
                     <div className={`flex items-center gap-2 mb-1 text-[10px] ${isCurrentUserVal ? "justify-end" : ""}`}>
-                      <span className="font-extrabold text-white/80">{msg.author}</span>
-                      <span className="px-1.5 py-0.2 bg-white/5 text-white/35 rounded-md scale-95 font-semibold text-[8px] tracking-wider uppercase">
+                      <span className="font-extrabold text-[var(--color-text-muted)]">{msg.author}</span>
+                      <span className="px-1.5 py-0.2 bg-[var(--color-surface-2)] text-[var(--color-text-faint)] rounded-md scale-95 font-semibold text-[8px] tracking-wider uppercase border border-[var(--color-border)]/50">
                         {msg.role}
                       </span>
-                      <span className="text-white/30 font-semibold">{msg.time}</span>
+                      <span className="text-[var(--color-text-faint)] font-semibold">{msg.time}</span>
                     </div>
 
                     {/* Content Speech block with gradient borders for mentions */}
@@ -706,8 +706,8 @@ export const Messages: React.FC<MessagesProps> = ({
                       isMentioned 
                         ? "bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/40 rounded-tl-none ring-1 ring-[var(--color-accent)]/50 shadow-[0_0_15px_rgba(181,166,66,0.1)]"
                         : isCurrentUserVal 
-                          ? "bg-[var(--color-accent)]/15 text-[#eeeef2] border border-[var(--color-accent)]/25 rounded-tr-none" 
-                          : "bg-[var(--color-surface)] text-white/90 border border-white/5 rounded-tl-none shadow-md"
+                          ? "bg-[var(--color-accent)]/15 text-[var(--color-text)] border border-[var(--color-accent)]/25 rounded-tr-none" 
+                          : "bg-[var(--color-surface)] text-[var(--color-text)] border border-[var(--color-border)]/70 rounded-tl-none shadow-md"
                     }`}>
                       
                       {/* Priority Warning Header */}
@@ -722,18 +722,18 @@ export const Messages: React.FC<MessagesProps> = ({
 
                       {/* Render mock document links attached */}
                       {msg.attachments && msg.attachments.length > 0 && (
-                        <div className="mt-3 space-y-1 pt-2.5 border-t border-white/5">
+                        <div className="mt-3 space-y-1 pt-2.5 border-t border-[var(--color-border)]/50">
                           <div className="text-[8.5px] uppercase font-black tracking-widest text-[var(--color-accent)] mb-1.5">Attached Deal Documents</div>
                           {msg.attachments.map((at, of) => (
-                            <div key={of} className="flex items-center justify-between p-1.5 bg-black/40 border border-white/5 rounded-xl text-left">
+                            <div key={of} className="flex items-center justify-between p-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)]/60 rounded-xl text-left">
                               <div className="flex items-center gap-2 min-w-0">
-                                <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                                <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                                 <div className="min-w-0">
-                                  <div className="text-[10px] text-white/90 font-bold truncate">{at.name}</div>
-                                  <div className="text-[8.5px] text-white/35">{at.size} · PDF</div>
+                                  <div className="text-[10px] text-[var(--color-text)] font-bold truncate">{at.name}</div>
+                                  <div className="text-[8.5px] text-[var(--color-text-faint)]">{at.size} · PDF</div>
                                 </div>
                               </div>
-                              <Eye className="w-3.5 h-3.5 text-white/3 w-3 h-3 ml-2 hover:text-white cursor-pointer opacity-50 hover:opacity-100 transition-opacity" />
+                              <Eye className="w-3.5 h-3.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer opacity-50 hover:opacity-100 transition-opacity" />
                             </div>
                           ))}
                         </div>
@@ -741,12 +741,12 @@ export const Messages: React.FC<MessagesProps> = ({
 
                       {/* Tied Client File Action Bar tag */}
                       {msg.clientTag && (
-                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between">
+                        <div className="mt-2.5 pt-2 border-t border-[var(--color-border)]/50 flex items-center justify-between">
                           <button 
                             onClick={() => {
                               if (msg.clientId) onOpenClient(msg.clientId);
                             }}
-                            className="px-2 py-1 text-[9.5px] bg-white/5 hover:bg-white/10 rounded-lg font-black text-[var(--color-accent)] flex items-center gap-1.5 transition-colors border border-[var(--color-accent)]/10"
+                            className="px-2 py-1 text-[9.5px] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] rounded-lg font-black text-[var(--color-accent)] flex items-center gap-1.5 transition-colors border border-[var(--color-accent)]/10"
                           >
                             <Link2 className="w-3 h-3 text-[var(--color-accent)]" /> 
                             <span>File Active: {msg.clientTag}</span>
@@ -773,7 +773,7 @@ export const Messages: React.FC<MessagesProps> = ({
 
                       <button
                         onClick={() => handleTogglePinMessage(msg.id)}
-                        className={`text-[9px] font-bold uppercase transition-colors hover:text-[var(--color-accent)] ${msg.pinned ? "text-[var(--color-accent)]" : "text-white/40"}`}
+                        className={`text-[9px] font-bold uppercase transition-colors hover:text-[var(--color-accent)] ${msg.pinned ? "text-[var(--color-accent)]" : "text-[var(--color-text-faint)]"}`}
                       >
                         {msg.pinned ? "Unpin 📌" : "Pin 📌"}
                       </button>
@@ -781,7 +781,7 @@ export const Messages: React.FC<MessagesProps> = ({
                       {isCurrentUserVal && (
                         <button
                           onClick={() => handleDeleteMessage(msg.id)}
-                          className="text-[9px] text-white/40 hover:text-rose-500 font-bold uppercase transition-colors"
+                          className="text-[9px] text-[var(--color-text-faint)] hover:text-rose-500 font-bold uppercase transition-colors"
                         >
                           Delete
                         </button>
@@ -794,9 +794,9 @@ export const Messages: React.FC<MessagesProps> = ({
             })
           ) : (
             <div className="my-auto text-center p-12">
-              <Users className="w-10 h-10 text-white/10 mx-auto mb-2" />
-              <div className="text-xs font-black text-white/50 uppercase tracking-widest">No matching comments</div>
-              <p className="text-[10.5px] text-[#eeeef2]/35 mt-1 max-w-xs mx-auto">
+              <Users className="w-10 h-10 text-[var(--color-text-faint)]/20 mx-auto mb-2" />
+              <div className="text-xs font-black text-[var(--color-text-faint)] uppercase tracking-widest">No matching comments</div>
+              <p className="text-[10.5px] text-[var(--color-text-faint)] mt-1 max-w-xs mx-auto">
                 No pipeline updates found matching criteria inside channel. Discard constraints to review full thread history.
               </p>
             </div>
@@ -804,7 +804,7 @@ export const Messages: React.FC<MessagesProps> = ({
         </div>
 
         {/* Composer Entry Area & Templates */}
-        <div className="p-4 border-t border-white/5 shrink-0 bg-[var(--color-surface)]/65">
+        <div className="p-4 border-t border-[var(--color-border)]/65 shrink-0 bg-[var(--color-surface)]/65">
           
           {/* Active Preset Files or Links Indicators */}
           {(linkedChatClientId || attachedFiles.length > 0) && (
@@ -840,14 +840,14 @@ export const Messages: React.FC<MessagesProps> = ({
           <div className="flex gap-2.5 items-end">
             
             {/* Input wrap */}
-            <div className="flex-grow flex flex-col bg-[var(--color-panel)] border border-white/5 rounded-2xl px-3 py-2 text-left">
+            <div className="flex-grow flex flex-col bg-[var(--color-panel)] border border-[var(--color-border)] rounded-2xl px-3 py-2 text-left">
               
               {/* Top Selector tags */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-2 select-none">
+              <div className="flex items-center justify-between border-b border-[var(--color-border)]/60 pb-2 mb-2 select-none">
                 
                 {/* Level Priority / Urgency marker select */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-white/30 font-black uppercase tracking-wider">Escalation Tag:</span>
+                  <span className="text-[9.5px] text-[var(--color-text-faint)] font-black uppercase tracking-wider">Escalation Tag:</span>
                   <select
                     value={msgPriority}
                     onChange={(e) => setMsgPriority(e.target.value as any)}
@@ -866,21 +866,21 @@ export const Messages: React.FC<MessagesProps> = ({
                 <div className="relative select-none">
                   <button 
                     onClick={() => setShowClientLinkDropdown(!showClientLinkDropdown)}
-                    className="text-[9.5px] text-white/40 hover:text-white flex items-center gap-1 font-bold"
+                    className="text-[9.5px] text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center gap-1 font-bold"
                   >
                     <Link2 className="w-3 h-3 text-[var(--color-accent)]" /> 
                     {linkedChatClientId ? "Linked ☑" : "Link Client File"}
                   </button>
 
                   {showClientLinkDropdown && (
-                    <div className="absolute bottom-full right-0 mb-3 bg-[var(--color-surface-2)] border border-white/10 rounded-2xl p-2.5 max-h-56 overflow-y-auto w-60 z-30 shadow-2xl">
-                      <div className="text-[9.5px] uppercase font-black text-white/30 mb-2">Deal Portfolios</div>
+                    <div className="absolute bottom-full right-0 mb-3 bg-[var(--color-surface-2)] border border-[var(--color-border)]/80 rounded-2xl p-2.5 max-h-56 overflow-y-auto w-60 z-30 shadow-2xl">
+                      <div className="text-[9.5px] uppercase font-black text-[var(--color-text-faint)] mb-2">Deal Portfolios</div>
                       <input
                         type="text"
                         placeholder="Search borrowers..."
                         value={clientDropdownSearch}
                         onChange={(e) => setClientDropdownSearch(e.target.value)}
-                        className="bg-[var(--color-bg)] border border-white/5 rounded-lg px-2 py-1 text-[10.5px] text-white w-full mb-2 focus:outline-none placeholder-white/20"
+                        className="bg-[var(--color-bg)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-[10.5px] text-[var(--color-text)] w-full mb-2 focus:outline-none placeholder-[var(--color-text-faint)]/60"
                       />
                       <div className="space-y-0.5">
                         <button
@@ -888,7 +888,7 @@ export const Messages: React.FC<MessagesProps> = ({
                             setLinkedChatClientId(null);
                             setShowClientLinkDropdown(false);
                           }}
-                          className="w-full text-left p-1.5 hover:bg-white/5 text-[10.5px] text-white/45 rounded font-semibold italic"
+                          className="w-full text-left p-1.5 hover:bg-[var(--color-surface-3)] text-[10.5px] text-[var(--color-text-faint)] rounded font-semibold italic"
                         >
                           -- Clear linked files --
                         </button>
@@ -899,7 +899,7 @@ export const Messages: React.FC<MessagesProps> = ({
                               setLinkedChatClientId(c.id);
                               setShowClientLinkDropdown(false);
                             }}
-                            className="p-1.5 hover:bg-white/5 text-xs text-white/80 hover:text-white rounded-lg cursor-pointer truncate font-bold flex items-center justify-between"
+                            className="p-1.5 hover:bg-[var(--color-surface-3)] text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] rounded-lg cursor-pointer truncate font-bold flex items-center justify-between"
                           >
                             <span>{c.first} {c.last}</span>
                             <span className="text-[8.5px] bg-[var(--color-accent)]/10 text-[var(--color-accent)] px-1 rounded font-mono scale-90">{c.lender || "Prime"}</span>
@@ -918,7 +918,7 @@ export const Messages: React.FC<MessagesProps> = ({
                 onChange={(e) => setMsgInputText(e.target.value)}
                 placeholder={`Message in ${currentChannelDetails.name}... (Standard @mentions supported)`}
                 rows={2}
-                className="bg-transparent border-none text-xs text-[#eeeef2] focus:outline-none w-full outline-none resize-none py-1 h-11"
+                className="bg-transparent border-none text-xs text-[var(--color-text)] focus:outline-none w-full outline-none resize-none py-1 h-11"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -940,25 +940,25 @@ export const Messages: React.FC<MessagesProps> = ({
           </div>
 
           {/* Quick Operational templates & mock file preset selector lines */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 select-none border-t border-white/5 pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 select-none border-t border-[var(--color-border)]/60 pt-3">
             
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[9px] text-[var(--color-accent)] font-black uppercase tracking-widest mr-1.5">Insert Template:</span>
               <button 
                 onClick={() => handleInsertTemplate("follow-up")}
-                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-[10px] font-bold border border-[var(--color-border)] transition-all"
               >
                 📋 Client Follow-Up
               </button>
               <button 
                 onClick={() => handleInsertTemplate("lender-update")}
-                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-[10px] font-bold border border-[var(--color-border)] transition-all"
               >
                 🏦 Lender Notice
               </button>
               <button 
                 onClick={() => handleInsertTemplate("doc-checklist")}
-                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-white/5 text-white/55 hover:text-white text-[10px] font-bold border border-white/5 transition-all"
+                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-[10px] font-bold border border-[var(--color-border)] transition-all"
               >
                 📝 Docs Collector
               </button>
@@ -980,15 +980,15 @@ export const Messages: React.FC<MessagesProps> = ({
             <div className="relative">
               <button 
                 onClick={() => setShowAttachPresets(!showAttachPresets)}
-                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-white/5 text-[#8e95a3] text-[10px] font-extrabold border border-white/5 transition-all flex items-center gap-1"
+                className="px-2.5 py-1.5 rounded-lg bg-[var(--color-panel)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[10px] font-extrabold border border-[var(--color-border)] transition-all flex items-center gap-1"
               >
                 <Paperclip className="w-3.5 h-3.5" />
                 <span>Attach Doc</span>
               </button>
 
               {showAttachPresets && (
-                <div className="absolute bottom-full right-0 mb-2 bg-[var(--color-surface-2)] border border-white/10 rounded-2xl p-1.5 w-60 z-30 shadow-2xl">
-                  <div className="text-[9.5px] uppercase font-black text-white/35 px-2 py-1 select-none">Simulate Brokerage Files</div>
+                <div className="absolute bottom-full right-0 mb-2 bg-[var(--color-surface-2)] border border-[var(--color-border)]/80 rounded-2xl p-1.5 w-60 z-30 shadow-2xl">
+                  <div className="text-[9.5px] uppercase font-black text-[var(--color-text-faint)] px-2 py-1 select-none">Simulate Brokerage Files</div>
                   {[
                     { name: "signed_commitment_summary.pdf", type: "application/pdf", size: "340 KB" },
                     { name: "employment_verification_letter.pdf", type: "application/pdf", size: "1.1 MB" },
@@ -998,7 +998,7 @@ export const Messages: React.FC<MessagesProps> = ({
                     <button
                       key={id}
                       onClick={() => handleAttachPresetAction(pr.name, pr.type, pr.size)}
-                      className="w-full text-left p-2 hover:bg-white/5 text-[11px] font-semibold rounded-lg truncate text-white/70 hover:text-white flex items-center justify-between gap-2"
+                      className="w-full text-left p-2 hover:bg-[var(--color-surface-3)] text-[11px] font-semibold rounded-lg truncate text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center justify-between gap-2"
                     >
                       <span className="truncate">{pr.name}</span>
                       <span className="text-[9px] text-[var(--color-accent)] shrink-0">{pr.size}</span>
@@ -1018,28 +1018,28 @@ export const Messages: React.FC<MessagesProps> = ({
       {/* COLUMN 3: BIDIRECTIONAL MESSAGING-TASK CONVERSION WIZARD SIDEBAR */}
       {/* ============================================================== */}
       {isTaskWizardOpen && wizardDraftTask && (
-        <div className="w-80 shrink-0 bg-[var(--color-surface)] p-4 flex flex-col h-full min-h-0 border-l border-white/5 select-none animate-slide-left">
+        <div className="w-80 shrink-0 bg-[var(--color-surface)] p-4 flex flex-col h-full min-h-0 border-l border-[var(--color-border)]/70 select-none animate-slide-left">
           
-          <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+          <div className="flex items-center justify-between border-b border-[var(--color-border)]/70 pb-3 mb-4">
             <div>
               <div className="text-[10px] text-[var(--color-accent)] font-black uppercase tracking-widest flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-yellow-500 animate-spin" />
+                <Sparkles className="w-3 h-3 text-[var(--color-accent)] animate-pulse" />
                 Tasking Pipeline Engine
               </div>
-              <h3 className="text-xs font-black text-white mt-1">Message Escalation Wizard</h3>
+              <h3 className="text-xs font-black text-[var(--color-text)] mt-1">Message Escalation Wizard</h3>
             </div>
             <button 
               onClick={() => {
                 setIsTaskWizardOpen(false);
                 setWizardDraftTask(null);
               }}
-              className="text-white/40 hover:text-white p-1 rounded-lg"
+              className="text-[var(--color-text-faint)] hover:text-[var(--color-text)] p-1 rounded-lg"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <p className="text-[10.5px] text-white/40 leading-relaxed mb-4">
+          <p className="text-[10.5px] text-[var(--color-text-faint)] leading-relaxed mb-4">
             Convert custom brokerage discussions instantly into a tracked operational milestone for file accountability.
           </p>
 
@@ -1047,22 +1047,22 @@ export const Messages: React.FC<MessagesProps> = ({
             
             {/* Task title input */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Action Milestone Description</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Action Milestone Description</label>
               <textarea
                 value={wizardDraftTask.title}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, title: e.target.value })}
-                className="w-full bg-[var(--color-surface-2)] border border-white/5 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]/20 font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-semibold"
                 rows={2}
               />
             </div>
 
             {/* CRM Client target */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Client File Context</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Client File Context</label>
               <select
                 value={wizardDraftTask.clientId}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, clientId: e.target.value })}
-                className="w-full bg-[var(--color-surface-2)] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               >
                 <option value="">-- No active client tie --</option>
                 {clients.map(c => (
@@ -1073,11 +1073,11 @@ export const Messages: React.FC<MessagesProps> = ({
 
             {/* Task Category */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Organizational Category</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Organizational Category</label>
               <select
                 value={wizardDraftTask.category}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, category: e.target.value })}
-                className="w-full bg-[var(--color-surface-2)] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               >
                 <option value="Client Follow-up">Client Follow-up</option>
                 <option value="Document Collection">Document Collection</option>
@@ -1093,11 +1093,11 @@ export const Messages: React.FC<MessagesProps> = ({
 
             {/* Assigned person */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Assign Responsibility</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Assign Responsibility</label>
               <select
                 value={wizardDraftTask.assignedTo}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, assignedTo: e.target.value })}
-                className="w-full bg-[var(--color-surface-2)] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               >
                 <option value="David Acosta">David Acosta (Me)</option>
                 <option value="Jeff Brown">Jeff Brown (Admin Assistant)</option>
@@ -1109,7 +1109,7 @@ export const Messages: React.FC<MessagesProps> = ({
 
             {/* Risk priority level */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Risk Level Urgency</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Risk Level Urgency</label>
               <div className="grid grid-cols-4 gap-1.5">
                 {(["urgent", "high", "medium", "low"] as const).map(prio => {
                   const isSelect = wizardDraftTask.priority === prio;
@@ -1121,7 +1121,7 @@ export const Messages: React.FC<MessagesProps> = ({
                       className={`py-1.5 text-[10px] font-black uppercase rounded-lg border transition-all ${
                         isSelect 
                           ? "bg-[var(--color-accent)] border-[var(--color-accent)] text-black" 
-                          : "bg-[var(--color-surface-2)] border-white/5 text-white/45 hover:text-white"
+                          : "bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
                       }`}
                     >
                       {prio}
@@ -1133,28 +1133,28 @@ export const Messages: React.FC<MessagesProps> = ({
 
             {/* Scheduling DueDate */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Schedules Due Date</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Schedules Due Date</label>
               <input
                 type="date"
                 value={wizardDraftTask.dueDate}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, dueDate: e.target.value })}
-                className="w-full bg-[var(--color-surface-2)] border border-white/5 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               />
             </div>
 
             {/* Custom Notes */}
             <div>
-              <label className="text-[9.5px] uppercase text-white/35 font-extrabold tracking-wider block mb-1.5">Internal Trail Context Notes</label>
+              <label className="text-[9.5px] uppercase text-[var(--color-text-faint)] font-extrabold tracking-wider block mb-1.5">Internal Trail Context Notes</label>
               <textarea
                 value={wizardDraftTask.notes}
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, notes: e.target.value })}
-                className="w-full bg-[var(--color-panel)] border border-white/5 rounded-xl p-2.5 text-[11px] text-white/50 focus:outline-none focus:border-[var(--color-accent)]/10 leading-relaxed font-semibold h-24"
+                className="w-full bg-[var(--color-panel)] border border-[var(--color-border)]/70 rounded-xl p-2.5 text-[11px] text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]/10 leading-relaxed font-semibold h-24"
               />
             </div>
 
           </div>
 
-          <div className="border-t border-white/5 pt-3 mt-3 shrink-0">
+          <div className="border-t border-[var(--color-border)]/70 pt-3 mt-3 shrink-0">
             <button
               onClick={handleCommitWizardTask}
               className="w-full py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent)] text-black font-extrabold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg select-none"

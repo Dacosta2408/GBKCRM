@@ -114,7 +114,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
         {/* Broadcaster Composition Form */}
         <div className="lg:col-span-1 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col justify-between h-[360px]">
           <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-            <Megaphone className="w-4.5 h-4.5 text-[#b5a642]" />
+            <Megaphone className="w-4.5 h-4.5 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Dispatch Global Notice</h4>
           </div>
 
@@ -165,13 +165,13 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                 value={newMsg}
                 onChange={(e) => setNewMsg(e.target.value)}
                 placeholder="Write an operational notice to stream to all active broker login workspaces..."
-                className="w-full bg-[#181820] border border-white/5 rounded-lg p-3 text-xs text-white outline-none resize-none h-24 focus:border-[#b5a642]/30 transition-all placeholder-white/20"
+                className="w-full bg-[#181820] border border-white/5 rounded-lg p-3 text-xs text-white outline-none resize-none h-24 focus:border-[var(--color-accent)]/30 transition-all placeholder-white/20"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all mt-2"
+              className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all mt-2"
             >
               <Send className="w-3.5 h-3.5 stroke-[2.5]" /> Dispatch Brokerage Notice
             </button>
@@ -230,7 +230,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                     className={`text-[9px] font-bold uppercase border px-2 py-1 rounded transition-all ${
                       b.active 
                         ? "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
-                        : "bg-[#b5a642]/10 border-[#b5a642]/15 text-[#b5a642] hover:bg-[#b5a642]/20"
+                        : "bg-[var(--color-accent)]/10 border-[var(--color-accent)]/15 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20"
                     }`}
                   >
                     {b.active ? "Mute" : "Stream"}

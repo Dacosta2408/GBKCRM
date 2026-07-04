@@ -343,7 +343,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
       <div className="bg-[#111116] border border-white/5 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-[#b5a642]" />
+            <Database className="w-5 h-5 text-[var(--color-accent)]" />
             <span className="font-black text-sm uppercase tracking-widest text-white">CRM DISASTER RECOVERY &amp; BACKUP CENTER</span>
           </div>
           <p className="text-[10px] text-white/40 font-semibold mt-1">
@@ -356,7 +356,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
           <button 
             onClick={() => setPanelTab("dashboard")}
             className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1.5 ${
-              panelTab === "dashboard" ? "bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/15" : "text-white/40 hover:text-white/80"
+              panelTab === "dashboard" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/15" : "text-white/40 hover:text-white/80"
             }`}
           >
             <Server className="w-3.5 h-3.5" /> Recovery Console
@@ -364,7 +364,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
           <button 
             onClick={() => setPanelTab("policy")}
             className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1.5 ${
-              panelTab === "policy" ? "bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/15" : "text-white/40 hover:text-white/80"
+              panelTab === "policy" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/15" : "text-white/40 hover:text-white/80"
             }`}
           >
             <Settings className="w-3.5 h-3.5" /> Retention Policy
@@ -372,7 +372,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
           <button 
             onClick={() => setPanelTab("logs")}
             className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1.5 ${
-              panelTab === "logs" ? "bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/15" : "text-white/40 hover:text-white/80"
+              panelTab === "logs" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/15" : "text-white/40 hover:text-white/80"
             }`}
           >
             <Clock className="w-3.5 h-3.5" /> Recovery Audits
@@ -506,7 +506,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                   placeholder="Filter backups by comment/author..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#161622]/80 border border-white/5 rounded-lg pl-9 pr-4 py-2 text-[11px] text-white focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[#161622]/80 border border-white/5 rounded-lg pl-9 pr-4 py-2 text-[11px] text-white focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                 />
               </div>
 
@@ -554,13 +554,13 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                       key={bk.id} 
                       className={`p-5 bg-[#121217] border rounded-2xl flex flex-col justify-between gap-4 transition-all hover:border-white/15 relative overflow-hidden ${
                         bk.isCritical 
-                          ? "border-[#b5a642]/30 bg-[#b5a642]/[0.005]" 
+                          ? "border-[var(--color-accent)]/30 bg-[var(--color-accent)]/[0.005]" 
                           : "border-white/5"
                       }`}
                     >
                       {/* Critical visual flare edge */}
                       {bk.isCritical && (
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#b5a642]/50" title="Protected backup" />
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-[var(--color-accent)]/50" title="Protected backup" />
                       )}
 
                       {/* Line 1: Metadata, status, lock indicators */}
@@ -623,7 +623,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                             onClick={() => handleToggleCritical(bk.id)}
                             className={`p-1.5 rounded-lg border transition-all ${
                               bk.isCritical 
-                                ? "bg-[#b5a642]/10 border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20" 
+                                ? "bg-[var(--color-accent)]/10 border-[var(--color-accent)]/20 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20" 
                                 : "bg-white/5 border-white/5 text-white/40 hover:text-white"
                             }`}
                             title={bk.isCritical ? "Remove immutable lock protection" : "Flag archive as CRITICAL (exempt from future retention purges)"}
@@ -646,7 +646,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                           {isSuccess && (
                             <button
                               onClick={() => handleStartRestoreWizard(bk)}
-                              className="p-1.5 rounded-lg bg-[#b5a642]/10 border border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20 transition-all flex items-center gap-1 text-[9px] uppercase font-black"
+                              className="p-1.5 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-all flex items-center gap-1 text-[9px] uppercase font-black"
                               title="Restore system using this snapshot"
                             >
                               <RefreshCw className="w-3.5 h-3.5" /> Restore...
@@ -680,8 +680,8 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
             
             {/* MANUAL CREATION CONSOLE CARD */}
             <form onSubmit={handleCreateBackup} className="bg-[#121217] border border-white/5 rounded-2xl p-5 space-y-4 shadow-lg">
-              <h4 className="text-[10px] text-[#b5a642] uppercase font-black tracking-widest flex items-center gap-1.5 border-b border-white/5 pb-3">
-                <Plus className="w-4 h-4 text-[#b5a642]" /> COMPILE RECOVERY ARCHIVE
+              <h4 className="text-[10px] text-[var(--color-accent)] uppercase font-black tracking-widest flex items-center gap-1.5 border-b border-white/5 pb-3">
+                <Plus className="w-4 h-4 text-[var(--color-accent)]" /> COMPILE RECOVERY ARCHIVE
               </h4>
 
               {/* Step 1: Choose Type */}
@@ -690,7 +690,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                 <select
                   value={newBackupType}
                   onChange={(e) => setNewBackupType(e.target.value as BackupType)}
-                  className="w-full bg-[#101014] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[#101014] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                 >
                   <option value="full">🏡 Complete System Snapshot</option>
                   <option value="database">🥇 Core Database Collections Only</option>
@@ -716,7 +716,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                   placeholder="Explain why this backup is being compiled (e.g. Prior to loading corporate regulation policies v1.2, pre-migration)"
                   value={newBackupNotes}
                   onChange={(e) => setNewBackupNotes(e.target.value)}
-                  className="w-full bg-[#101014] border border-white/5 rounded-lg p-3 text-xs text-white placeholder-white/25 focus:outline-none focus:border-[#b5a642]/50 font-semibold"
+                  className="w-full bg-[#101014] border border-white/5 rounded-lg p-3 text-xs text-white placeholder-white/25 focus:outline-none focus:border-[var(--color-accent)]/50 font-semibold"
                 />
               </div>
 
@@ -743,15 +743,15 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
               <button
                 type="submit"
                 disabled={isCreating}
-                className="w-full bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 text-[#b5a642] py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                className="w-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-40"
               >
                 {isCreating ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-[#b5a642]" /> Compiling CRM Snapshot...
+                    <RefreshCw className="w-4 h-4 animate-spin text-[var(--color-accent)]" /> Compiling CRM Snapshot...
                   </>
                 ) : (
                   <>
-                    <Play className="w-3.5 h-3.5 text-[#b5a642]" /> Execute Backup Snapshot
+                    <Play className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Execute Backup Snapshot
                   </>
                 )}
               </button>
@@ -764,15 +764,15 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
               </h4>
               <ul className="space-y-2.5 text-[10px] text-white/50 leading-relaxed font-medium">
                 <li className="flex gap-2">
-                  <span className="text-[#b5a642] font-black">01.</span>
+                  <span className="text-[var(--color-accent)] font-black">01.</span>
                   <span>Compile full backups prior to any roster pin code override or CSV roster database alterations.</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-[#b5a642] font-black">02.</span>
+                  <span className="text-[var(--color-accent)] font-black">02.</span>
                   <span>We advise testing restores periodically by performing a dry run simulation inside the Recovery tab.</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-[#b5a642] font-black">03.</span>
+                  <span className="text-[var(--color-accent)] font-black">03.</span>
                   <span>Never share or email downloaded .json archives unless transmitting via secure encrypted brokerage portals.</span>
                 </li>
               </ul>
@@ -788,7 +788,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
         <form onSubmit={handleSavePolicy} className="bg-[#121217] border border-white/5 rounded-2xl p-6 space-y-6 max-w-3xl shadow-lg">
           
           <div>
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest flex items-center gap-2">
               <Settings className="w-4 h-4" /> CRM Archive &amp; Retention Policies
             </h3>
             <p className="text-[10px] text-white/40 font-semibold mt-1">Configure automated history cleanups, active memory caps, S3/Drive cloud triggers, and warning thresholds.</p>
@@ -826,7 +826,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                       name="overflow_strat"
                       checked={policy.archiveOlder}
                       onChange={() => setPolicy({ ...policy, archiveOlder: true })}
-                      className="mt-0.5 rounded text-[#b5a642] focus:ring-[#b5a642]" 
+                      className="mt-0.5 rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)]" 
                     />
                     <div>
                       <span>Archive Older Backups</span>
@@ -840,7 +840,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                       name="overflow_strat"
                       checked={!policy.archiveOlder}
                       onChange={() => setPolicy({ ...policy, archiveOlder: false })}
-                      className="mt-0.5 rounded text-[#b5a642] focus:ring-[#b5a642]" 
+                      className="mt-0.5 rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)]" 
                     />
                     <div>
                       <span>Purge Payload &amp; History Data</span>
@@ -865,7 +865,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                   type="button"
                   onClick={() => setPolicy({ ...policy, enableAutoScheduling: !policy.enableAutoScheduling })}
                   className={`w-9 h-5 rounded-full p-0.5 transition-colors focus:outline-none ${
-                    policy.enableAutoScheduling ? "bg-[#b5a642]" : "bg-white/10"
+                    policy.enableAutoScheduling ? "bg-[var(--color-accent)]" : "bg-white/10"
                   }`}
                 >
                   <div className={`w-4 h-4 bg-black rounded-full transition-transform ${
@@ -899,7 +899,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                     placeholder="it-compliance@gbkfinancial.ca"
                     value={policy.notifyEmail}
                     onChange={(e) => setPolicy({ ...policy, notifyEmail: e.target.value })}
-                    className="w-full bg-[#101014] border border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]"
+                    className="w-full bg-[#101014] border border-white/5 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-[var(--color-accent)]"
                   />
                 </div>
                 <span className="text-[8.5px] text-white/30 block">Receive instant emails on backup failures, storage issues, or restore events.</span>
@@ -911,7 +911,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
           <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
             <button
               type="submit"
-              className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-[10px] uppercase font-black px-5 py-2.5 rounded-lg transition-colors shadow-md"
+              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-[10px] uppercase font-black px-5 py-2.5 rounded-lg transition-colors shadow-md"
             >
               ✓ Save Recovery Policy Config
             </button>
@@ -928,7 +928,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
               <span className="text-[9px] text-white/35 block font-semibold">Accountability record of backup generation, restores, schema tests, and policy changes.</span>
             </div>
             
-            <span className="text-[10px] text-[#b5a642] font-black uppercase font-mono tracking-wider bg-[#b5a642]/10 border border-[#b5a642]/15 px-2.5 py-1 rounded-md">
+            <span className="text-[10px] text-[var(--color-accent)] font-black uppercase font-mono tracking-wider bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/15 px-2.5 py-1 rounded-md">
               {logs.length} Events Logged
             </span>
           </div>
@@ -1026,7 +1026,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
 
                 {/* Inspect Target Snapshot Details */}
                 <div className="bg-black/35 border border-white/[0.02] p-4 rounded-xl space-y-2.5">
-                  <span className="text-[9px] text-[#b5a642] uppercase font-black tracking-widest block">INTEGRITY &amp; SCHEMA INSPECTION REPORT</span>
+                  <span className="text-[9px] text-[var(--color-accent)] uppercase font-black tracking-widest block">INTEGRITY &amp; SCHEMA INSPECTION REPORT</span>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                     <div className="bg-white/[0.02] border border-white/5 p-2 rounded-lg">
@@ -1068,7 +1068,7 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
                       <span className="text-[8px] text-white/35 uppercase font-black tracking-widest block">SYSTEM COMPLIANCE WARNINGS ({validationResult.warnings.length})</span>
                       <div className="space-y-1 max-h-[75px] overflow-y-auto">
                         {validationResult.warnings.map((warn, i) => (
-                          <div key={i} className="text-[9.5px] text-[#b5a642] font-semibold flex items-center gap-1">
+                          <div key={i} className="text-[9.5px] text-[var(--color-accent)] font-semibold flex items-center gap-1">
                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                             <span>{warn}</span>
                           </div>
@@ -1200,8 +1200,8 @@ export const BackupRecoveryPanel: React.FC<BackupRecoveryPanelProps> = ({
               <div className="space-y-4">
                 
                 <div className="text-center py-4 space-y-2">
-                  <RefreshCw className="w-10 h-10 text-[#b5a642] animate-spin mx-auto" />
-                  <span className="block font-black uppercase tracking-widest text-[#b5a642] text-[10px]">
+                  <RefreshCw className="w-10 h-10 text-[var(--color-accent)] animate-spin mx-auto" />
+                  <span className="block font-black uppercase tracking-widest text-[var(--color-accent)] text-[10px]">
                     {restoreDryRun ? "TEST RESTORE IN PROCESS" : "PRODUCTION DATABASE OVERRIDE SCRIPT RUNNING"}
                   </span>
                   <span className="text-[9px] text-white/40 block font-semibold">Do not refresh your browser or close this modal viewport.</span>

@@ -76,7 +76,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                   key={partner.id}
                   onClick={() => onSelectPartner(partner.id)}
                   className={`group cursor-pointer transition-all hover:bg-[var(--color-surface-2)]/40 ${
-                    isSelected ? "bg-[var(--color-surface-3)] border-l-2 border-[#b5a642]" : ""
+                    isSelected ? "bg-[var(--color-surface-3)] border-l-2 border-[var(--color-accent)]" : ""
                   }`}
                 >
                   {/* Preferred Status Star Toggle */}
@@ -85,8 +85,8 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                       onClick={(e) => onTogglePreferred(partner.id, e)}
                       className={`transition-colors duration-200 focus:outline-none ${
                         partner.isPreferred || partner.status === "Preferred"
-                          ? "text-[#b5a642] hover:text-[#9a8c38]"
-                          : "text-[var(--color-text-faint)]/40 hover:text-[#b5a642]/50"
+                          ? "text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]"
+                          : "text-[var(--color-text-faint)]/40 hover:text-[var(--color-accent)]/50"
                       }`}
                       title={partner.isPreferred ? "Preferred Partner" : "Mark as Preferred"}
                     >
@@ -97,10 +97,10 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                   {/* Partner Name with initial avatar */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-black text-[#b5a642] flex items-center justify-center uppercase shrink-0">
+                      <div className="w-7 h-7 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-black text-[var(--color-accent)] flex items-center justify-center uppercase shrink-0">
                         {partner.first[0]}{partner.last[0]}
                       </div>
-                      <div className="font-semibold text-[var(--color-text)] group-hover:text-[#b5a642] transition-colors">
+                      <div className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
                         {partner.first} {partner.last}
                         {partner.role && (
                           <span className="block text-[9px] text-[var(--color-text-faint)] font-medium">
@@ -141,7 +141,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                     {partner.email ? (
                       <button
                         onClick={(e) => onQuickEmail(partner.email!, e)}
-                        className="text-[#6fa3b8] hover:text-[#b5a642] hover:underline font-medium block truncate max-w-[140px]"
+                        className="text-[#6fa3b8] hover:text-[var(--color-accent)] hover:underline font-medium block truncate max-w-[140px]"
                         title="Send outreach email"
                       >
                         {partner.email}

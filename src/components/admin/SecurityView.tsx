@@ -119,7 +119,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
         {/* Core Policy Switches */}
         <div className="bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg space-y-5">
           <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-            <Lock className="w-4.5 h-4.5 text-[#b5a642]" />
+            <Lock className="w-4.5 h-4.5 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Operational Guard Policies</h4>
           </div>
 
@@ -158,7 +158,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
                 logActivity("Auto-Lock Flag Toggled", `Station idle protection ${nextVal ? "enabled" : "disabled"}`);
                 showToast(`Session auto-lock ${nextVal ? "enabled" : "disabled"}.`, "success");
               }}
-              className="text-[#b5a642]"
+              className="text-[var(--color-accent)]"
             >
               {sessionAutoLock ? (
                 <ToggleRight className="w-8 h-8 stroke-[1.5]" />
@@ -186,7 +186,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
                 logActivity("Audit Log Stream Toggled", `Global administrative logging pipeline turned ${nextVal ? "ON" : "OFF"}`);
                 showToast(`Process audit log pipeline ${nextVal ? "active" : "dormant"}.`, "success");
               }}
-              className="text-[#b5a642]"
+              className="text-[var(--color-accent)]"
             >
               {auditLoggingEnabled ? (
                 <ToggleRight className="w-8 h-8 stroke-[1.5]" />
@@ -297,7 +297,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({
       <div className="bg-[#111115] border border-white/5 rounded-xl overflow-hidden shadow-lg">
         <div className="bg-[#141419] px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-[#b5a642]" />
+            <Terminal className="w-4 h-4 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">Authentication &amp; Device Session Registry</h4>
           </div>
           <span className="text-[10px] text-white/40 font-semibold font-mono">5 Connection Handles</span>

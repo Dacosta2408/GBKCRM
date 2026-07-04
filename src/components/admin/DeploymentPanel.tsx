@@ -419,7 +419,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
       <div className="bg-[#111115] border border-white/5 rounded-xl p-5 shadow-sm">
         <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#b5a642]" />
+            <ShieldCheck className="w-5 h-5 text-[var(--color-accent)]" />
             <div>
               <h3 className="text-xs font-bold text-white uppercase tracking-wider">Production Readiness Matrix</h3>
               <p className="text-[10px] text-white/40 font-semibold leading-none mt-0.5">Automated workspace integrity checks for regulatory standard deployment</p>
@@ -428,7 +428,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
           <button
             onClick={runAllChecks}
             disabled={checking}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1b1b20] border border-white/5 hover:border-white/10 text-xs font-bold text-[#b5a642] hover:text-white transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1b1b20] border border-white/5 hover:border-white/10 text-xs font-bold text-[var(--color-accent)] hover:text-white transition-all disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${checking ? 'animate-spin' : ''}`} />
             Re-run Diagnostics
@@ -511,7 +511,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
       {/* ─── Local Database Migration Utility ─── */}
       <div className="bg-[#111115] border border-white/5 rounded-xl p-5 shadow-sm">
         <div className="flex items-center gap-2 border-b border-white/5 pb-3 mb-4">
-          <Database className="w-5 h-5 text-[#b5a642]" />
+          <Database className="w-5 h-5 text-[var(--color-accent)]" />
           <div>
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">Local Storage to Network Z Drive Data Migration</h3>
             <p className="text-[10px] text-white/40 font-semibold leading-none mt-0.5">Secure one-time data transfer to sync browser caches into the shared drive Bridge server folders</p>
@@ -538,7 +538,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
             <button
               onClick={handleStartMigration}
               disabled={!bridgeOnlineState || !pathValid}
-              className="flex items-center gap-2 bg-[#b5a642] text-black hover:bg-[#9a8c38] px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
+              className="flex items-center gap-2 bg-[var(--color-accent)] text-black hover:bg-[var(--color-accent-hover)] px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
             >
               <Play className="w-4 h-4" />
               Migrate Local Data to Z Drive
@@ -555,7 +555,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
         {migrating && (
           <div className="bg-[#16161c] border border-white/5 rounded-lg p-4 space-y-3">
             <div className="flex justify-between text-xs font-bold">
-              <span className="text-[#b5a642] flex items-center gap-2">
+              <span className="text-[var(--color-accent)] flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 {migrationStep}
               </span>
@@ -563,7 +563,7 @@ export const DeploymentPanel: React.FC<DeploymentPanelProps> = ({
             </div>
             <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-[#b5a642] to-[#6fa3b8] h-full transition-all duration-300"
+                className="bg-gradient-to-r from-[var(--color-accent)] to-[#6fa3b8] h-full transition-all duration-300"
                 style={{ width: `${migrationProgress}%` }}
               />
             </div>

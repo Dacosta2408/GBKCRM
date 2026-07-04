@@ -371,7 +371,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
       {/* 1. OPERATIONS HEADER */}
       <div className="flex flex-col gap-1.5 border-b border-[var(--color-border)]/70 pb-4 bg-gradient-to-r from-[var(--color-surface)] to-transparent p-4 rounded-xl">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-[#b5a642]" />
+          <ShieldCheck className="h-5 w-5 text-[var(--color-accent)]" />
           <h2 className="text-sm font-black uppercase text-[var(--color-text)] tracking-wider">File Readiness Dashboard</h2>
         </div>
         <p className="text-[10px] text-[var(--color-text-muted)] font-medium">
@@ -415,7 +415,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                   placeholder="Search borrower name or folder ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg pl-8 pr-3 py-2 text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg pl-8 pr-3 py-2 text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                 />
                 <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--color-text-faint)]" />
               </div>
@@ -524,7 +524,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     type="checkbox" 
                     checked={staleOnly} 
                     onChange={(e) => setStaleOnly(e.target.checked)}
-                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
+                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[var(--color-accent)] focus:ring-0 w-3 h-3 cursor-pointer"
                   />
                   <span className="font-bold text-[var(--color-text-faint)] text-[10px] uppercase">Stale / Expired Only</span>
                 </label>
@@ -534,7 +534,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     type="checkbox" 
                     checked={complianceOnly} 
                     onChange={(e) => setComplianceOnly(e.target.checked)}
-                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[#b5a642] focus:ring-0 w-3 h-3 cursor-pointer"
+                    className="rounded border-[var(--color-border)]/70 bg-[var(--color-surface-2)] text-[var(--color-accent)] focus:ring-0 w-3 h-3 cursor-pointer"
                   />
                   <span className="font-bold text-[var(--color-text-faint)] text-[10px] uppercase">Compliance Issues Only</span>
                 </label>
@@ -546,7 +546,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
           <div className="flex-grow overflow-auto p-4">
             {filteredList.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--color-border)]/70 rounded-2xl bg-[var(--color-surface-2)]/30">
-                <AlertCircle className="h-8 w-8 text-[#b5a642]/40 mb-2" />
+                <AlertCircle className="h-8 w-8 text-[var(--color-accent)]/40 mb-2" />
                 <span className="text-xs text-[var(--color-text-muted)] font-bold">No portfolio files found matching the search and filter constraints.</span>
               </div>
             ) : (
@@ -583,7 +583,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                               <div>
                                 <button 
                                   onClick={() => onOpenClient(item.client.id, "overview")}
-                                  className="hover:text-[#b5a642] hover:underline font-black text-[var(--color-text)] text-left text-xs"
+                                  className="hover:text-[var(--color-accent)] hover:underline font-black text-[var(--color-text)] text-left text-xs"
                                 >
                                   {item.client.first} {item.client.last}
                                 </button>
@@ -600,7 +600,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                               <span>{item.client.agent || "Unassigned"}</span>
                               <button 
                                 onClick={() => setAssigningClientId(item.client.id)}
-                                className="text-[var(--color-text-faint)] hover:text-[#b5a642] p-1 rounded hover:bg-[var(--color-surface-2)] transition-all"
+                                className="text-[var(--color-text-faint)] hover:text-[var(--color-accent)] p-1 rounded hover:bg-[var(--color-surface-2)] transition-all"
                                 title="Reassign Broker"
                               >
                                 <UserPlus className="h-3 w-3" />
@@ -692,7 +692,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                               
                               <button 
                                 onClick={() => onOpenClient(item.client.id, "documents")}
-                                className="px-2 py-1 bg-[#b5a642]/10 border border-[#b5a642]/20 hover:bg-[#b5a642]/20 rounded-lg text-[9px] font-black uppercase text-[#b5a642]"
+                                className="px-2 py-1 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 rounded-lg text-[9px] font-black uppercase text-[var(--color-accent)]"
                                 title="Open Detailed Document Vault"
                               >
                                 Vault
@@ -742,12 +742,12 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
         <div className="w-full lg:w-72 bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-4 flex flex-col gap-5 shrink-0 overflow-y-auto">
           <div>
             <h4 className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest">Manager Action Center</h4>
-            <div className="h-0.5 bg-[#b5a642]/20 mt-1.5 rounded" />
+            <div className="h-0.5 bg-[var(--color-accent)]/20 mt-1.5 rounded" />
           </div>
 
           {/* 1. REVIEW NEEDED ITEMS */}
           <div className="space-y-2.5">
-            <span className="text-[9px] text-[#b5a642] uppercase font-black tracking-wider flex items-center gap-1">
+            <span className="text-[9px] text-[var(--color-accent)] uppercase font-black tracking-wider flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> Awaiting Review ({sidebarWorkflow.reviewNeeded.length})
             </span>
             {sidebarWorkflow.reviewNeeded.length === 0 ? (
@@ -761,7 +761,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     className="p-2.5 bg-blue-500/[0.02] hover:bg-blue-500/[0.06] border border-blue-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
                       <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 uppercase tracking-wide">Broker: {f.client.agent || "None"}</p>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
@@ -787,7 +787,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     className="p-2.5 bg-rose-500/[0.01] hover:bg-rose-500/[0.04] border border-rose-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
                       <p className="text-[9px] text-rose-500 font-mono mt-0.5 uppercase tracking-wide">{f.missingCount} Missing Checklist Items</p>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
@@ -813,7 +813,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     className="p-2.5 bg-orange-500/[0.01] hover:bg-orange-500/[0.04] border border-orange-500/20 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
                   >
                     <div>
-                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[#b5a642] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
+                      <h5 className="font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] text-[11px] truncate w-40">{f.client.first} {f.client.last}</h5>
                       <p className="text-[9px] text-orange-500 font-mono mt-0.5 uppercase tracking-wide">{f.staleExpiredCount} Outdated Records</p>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5" />
@@ -839,7 +839,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                     <h5 className="font-semibold text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] text-[10.5px] truncate">{f.client.first} {f.client.last}</h5>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[8px] text-[var(--color-text-faint)] font-mono">{new Date(f.lastUpdated).toLocaleDateString("en-CA")}</span>
-                      <span className="text-[8.5px] font-black uppercase text-[#b5a642]">{f.score}% ready</span>
+                      <span className="text-[8.5px] font-black uppercase text-[var(--color-accent)]">{f.score}% ready</span>
                     </div>
                   </div>
                   <ArrowRight className="h-3 w-3 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-all transform group-hover:translate-x-0.5 shrink-0" />
@@ -863,7 +863,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
               Assign Broker to File
             </h3>
 
@@ -894,7 +894,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest mb-4 border-b border-[var(--color-border)]/70 pb-2">
               Log Manager Internal Review Action
             </h3>
 
@@ -914,7 +914,7 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                       onClick={() => setReviewAction(act.id as any)}
                       className={`py-2 rounded-lg text-[10px] font-black uppercase border text-center transition-colors ${
                         reviewAction === act.id 
-                          ? "bg-[#b5a642] text-black border-[#b5a642]" 
+                          ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" 
                           : "bg-[var(--color-surface-2)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/80"
                       }`}
                     >
@@ -930,14 +930,14 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Specify review findings, checklists approved, or rejection details..."
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)] h-24 focus:outline-none focus:border-[#b5a642] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)] h-24 focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   required={reviewAction !== "approve"}
                 />
               </div>
 
               <button 
                 type="submit"
-                className="w-full bg-[#b5a642] text-black font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[#9a8c38] transition-colors flex items-center justify-center gap-1.5"
+                className="w-full bg-[var(--color-accent)] text-black font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
               >
                 ✓ Register Review Action
               </button>

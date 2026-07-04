@@ -178,7 +178,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             System Overseer Access
           </span>
           <span className="text-[10px] text-[var(--color-text-muted)] font-semibold hidden sm:inline">
-            Active Operator: <span className="text-[#b5a642] font-black">{currentUser.first} {currentUser.last}</span>
+            Active Operator: <span className="text-[var(--color-accent)] font-black">{currentUser.first} {currentUser.last}</span>
           </span>
         </div>
       </div>
@@ -198,7 +198,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("overview")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "overview" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -210,7 +210,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("users")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "users" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -222,7 +222,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("permissions")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "permissions" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -234,7 +234,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("security")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "security" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -252,7 +252,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("backup")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "backup" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -265,11 +265,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     onClick={() => setActiveTab("deployment")}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                       activeTab === "deployment" 
-                        ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                        ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                         : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                     }`}
                   >
-                    <ShieldCheck className="w-4 h-4 shrink-0 text-[#b5a642]" /> Deployment Readiness
+                    <ShieldCheck className="w-4 h-4 shrink-0 text-[var(--color-accent)]" /> Deployment Readiness
                   </button>
                 )}
 
@@ -278,7 +278,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("audit")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "audit" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -290,7 +290,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   onClick={() => setActiveTab("alerts")}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === "alerts" 
-                      ? "bg-[#b5a642]/10 text-[#b5a642]" 
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                   }`}
                 >
@@ -321,7 +321,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <select
                 value={activeTab}
                 onChange={(e) => setActiveTab(e.target.value as AdminTab)}
-                className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[11px] text-[#b5a642] px-2.5 py-1 rounded outline-none cursor-pointer font-bold"
+                className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[11px] text-[var(--color-accent)] px-2.5 py-1 rounded outline-none cursor-pointer font-bold"
               >
                 <option value="overview">Tower Overview</option>
                 <option value="users">Roster Control</option>

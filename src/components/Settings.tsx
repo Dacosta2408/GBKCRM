@@ -503,19 +503,19 @@ export const Settings: React.FC<SettingsProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0c0c0e] text-white">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[var(--color-bg)] text-[var(--color-text)]">
       {/* Title Header */}
-      <div className="p-6 border-b border-white/5 bg-[#101014] shrink-0 flex items-center justify-between">
+      <div className="p-6 border-b border-[var(--color-border)]/70 bg-[var(--color-surface)] shrink-0 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-[#eeeef2] to-[#b5a642] bg-clip-text text-transparent font-sans">
+          <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[var(--color-text)] via-[var(--color-text-muted)] to-[var(--color-accent)] bg-clip-text text-transparent font-sans">
             CRM Workspace Settings
           </h1>
-          <p className="text-xs text-[#8e95a3] mt-1">
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">
             Configure personal client workspace layouts, notification channels, security override matrices, and corporate pipeline defaults.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase font-bold text-[#b5a642] bg-[#b5a642]/10 border border-[#b5a642]/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+          <span className="text-[10px] uppercase font-bold text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5" /> {currentUser.role}
           </span>
           {onLockApp && (
@@ -537,11 +537,10 @@ export const Settings: React.FC<SettingsProps> = ({
           <div className="text-[10px] text-white/30 uppercase tracking-[1.5px] font-bold px-3 py-1.5 mb-1">
             Personal Settings
           </div>
-          
           <button
             onClick={() => setActiveTab("profile")}
             className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "profile" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+              activeTab === "profile" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
             }`}
           >
             <UserIcon className="w-4 h-4" /> My Profile
@@ -550,7 +549,7 @@ export const Settings: React.FC<SettingsProps> = ({
           <button
             onClick={() => setActiveTab("appearance")}
             className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "appearance" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+              activeTab === "appearance" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
             }`}
           >
             <Palette className="w-4 h-4" /> Appearance
@@ -559,7 +558,7 @@ export const Settings: React.FC<SettingsProps> = ({
           <button
             onClick={() => setActiveTab("notifications")}
             className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "notifications" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+              activeTab === "notifications" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
             }`}
           >
             <Bell className="w-4 h-4" /> Notifications
@@ -568,7 +567,7 @@ export const Settings: React.FC<SettingsProps> = ({
           <button
             onClick={() => setActiveTab("security")}
             className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "security" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+              activeTab === "security" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
             }`}
           >
             <Shield className="w-4 h-4" /> Security
@@ -577,7 +576,7 @@ export const Settings: React.FC<SettingsProps> = ({
           <button
             onClick={() => setActiveTab("preferences")}
             className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "preferences" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+              activeTab === "preferences" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
             }`}
           >
             <Sliders className="w-4 h-4" /> Personal Preferences
@@ -592,7 +591,7 @@ export const Settings: React.FC<SettingsProps> = ({
               <button
                 onClick={() => setActiveTab("team")}
                 className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-                  activeTab === "team" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+                  activeTab === "team" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                 }`}
               >
                 <Users className="w-4 h-4" /> Team Management
@@ -601,7 +600,7 @@ export const Settings: React.FC<SettingsProps> = ({
               <button
                 onClick={() => setActiveTab("permissions")}
                 className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-                  activeTab === "permissions" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+                  activeTab === "permissions" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                 }`}
               >
                 <Key className="w-4 h-4" /> Access &amp; Permissions
@@ -610,7 +609,7 @@ export const Settings: React.FC<SettingsProps> = ({
               <button
                 onClick={() => setActiveTab("defaults")}
                 className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-                  activeTab === "defaults" ? "bg-[#b5a642]/10 text-[#b5a642]" : "text-[#8e95a3] hover:text-white hover:bg-white/5"
+                  activeTab === "defaults" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
                 }`}
               >
                 <Settings2 className="w-4 h-4" /> CRM Defaults
@@ -618,53 +617,52 @@ export const Settings: React.FC<SettingsProps> = ({
             </>
           )}
         </aside>
-
-        {/* Right Settings Content Section Workspace */}
-        <section className="flex-1 bg-[#09090c] p-6 overflow-y-auto select-text">
+                   {/* Right Settings Content Section Workspace */}
+        <section className="flex-1 bg-[var(--color-bg)] p-6 overflow-y-auto select-text">
           
           {/* TAB 1: MY PROFILE */}
           {activeTab === "profile" && (
             <div className="max-w-2xl space-y-6">
-              <div className="bg-[#101014] border border-white/5 p-6 rounded-xl shadow-sm space-y-6">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">My Account Profile</h3>
-                  <p className="text-[11px] text-[#8e95a3]">Update your broker bio details, contact lines, job title, and active photo avatar.</p>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">My Account Profile</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Update your broker bio details, contact lines, job title, and active photo avatar.</p>
                 </div>
-
+ 
                 <form onSubmit={handleSaveProfile} className="space-y-4">
                   {/* Photo / Avatar Section */}
-                  <div className="flex items-center gap-4 border-b border-white/5 pb-5">
+                  <div className="flex items-center gap-4 border-b border-[var(--color-border)]/70 pb-5">
                     <div className="relative group shrink-0">
                       {profilePhoto ? (
                         <img 
                           src={profilePhoto} 
                           alt="Avatar" 
                           referrerPolicy="no-referrer"
-                          className="w-16 h-16 rounded-full object-cover border border-[#b5a642]/40"
+                          className="w-16 h-16 rounded-full object-cover border border-[var(--color-accent)]/40"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-full bg-[#b5a642]/20 border border-[#b5a642]/40 flex items-center justify-center font-bold text-xl text-[#b5a642]">
+                        <div className="w-16 h-16 rounded-full bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center font-bold text-xl text-[var(--color-accent)]">
                           {profileFirst[0]}{profileLast[0]}
                         </div>
                       )}
                     </div>
                     <div className="space-y-2 flex-1">
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Profile Photo Avatar URL</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">Profile Photo Avatar URL</label>
                       <input 
                         type="text"
                         value={profilePhoto}
                         onChange={(e) => setProfilePhoto(e.target.value)}
                         placeholder="https://images.unsplash.com/..."
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642]/40"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-accent)]/40"
                       />
                       <div className="flex gap-2 items-center mt-1">
-                        <span className="text-[9px] text-[#8e95a3]">Or choose a preset:</span>
+                        <span className="text-[9px] text-[var(--color-text-muted)]">Or choose a preset:</span>
                         {avatarPresets.map((preset, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => setProfilePhoto(preset)}
-                            className="w-6 h-6 rounded-full overflow-hidden border border-white/10 hover:border-[#b5a642] transition-colors"
+                            className="w-6 h-6 rounded-full overflow-hidden border border-[var(--color-border)]/70 hover:border-[var(--color-accent)] transition-colors"
                           >
                             <img src={preset} alt="" className="w-full h-full object-cover" />
                           </button>
@@ -672,79 +670,79 @@ export const Settings: React.FC<SettingsProps> = ({
                       </div>
                     </div>
                   </div>
-
+ 
                   {/* Grid Fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">First Name</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">First Name</label>
                       <input 
                         type="text"
                         value={profileFirst}
                         onChange={(e) => setProfileFirst(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">Last Name</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Last Name</label>
                       <input 
                         type="text"
                         value={profileLast}
                         onChange={(e) => setProfileLast(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">Display Name</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Display Name</label>
                       <input 
                         type="text"
                         value={profileDisplayName}
                         onChange={(e) => setProfileDisplayName(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">Job Title</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Job Title</label>
                       <input 
                         type="text"
                         value={profileJobTitle}
                         onChange={(e) => setProfileJobTitle(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">Email Address</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Email Address</label>
                       <input 
                         type="email"
                         value={profileEmail}
                         onChange={(e) => setProfileEmail(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider mb-1.5">Cellular Phone</label>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1.5">Cellular Phone</label>
                       <input 
                         type="text"
                         value={profilePhone}
                         onChange={(e) => setProfilePhone(e.target.value)}
-                        className="w-full bg-[#141418] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#b5a642]/30"
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30"
                       />
                     </div>
                   </div>
-
+ 
                   {/* Read Only Role display */}
-                  <div className="bg-[#141418] p-3.5 rounded-lg border border-white/5 flex items-center justify-between mt-6">
+                  <div className="bg-[var(--color-surface-2)] p-3.5 rounded-lg border border-[var(--color-border)]/70 flex items-center justify-between mt-6">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#8e95a3] block">Internal Workspace Role</span>
-                      <span className="text-xs font-semibold text-white mt-0.5 block">{currentUser.role}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] block">Internal Workspace Role</span>
+                      <span className="text-xs font-semibold text-[var(--color-text)] mt-0.5 block">{currentUser.role}</span>
                     </div>
-                    <span className="text-[9px] font-bold uppercase text-white/30 bg-white/5 border border-white/10 px-2.5 py-1 rounded">
+                    <span className="text-[9px] font-bold uppercase text-[var(--color-text-muted)] bg-white/5 border border-[var(--color-border)]/70 px-2.5 py-1 rounded">
                       Contact Admin to Modify
                     </span>
                   </div>
-
+ 
                   <button 
                     type="submit"
-                    className="w-full py-2.5 bg-[#b5a642] text-black font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-accent)] text-black font-bold text-xs rounded-lg hover:bg-[var(--color-accent-hover)] transition-all uppercase tracking-wider mt-4"
                   >
                     Save Profile Changes
                   </button>
@@ -800,7 +798,7 @@ export const Settings: React.FC<SettingsProps> = ({
                     <label className="block text-[10px] font-bold text-[#8e95a3] uppercase tracking-wider">Brand Accent Theme</label>
                     <div className="grid grid-cols-5 gap-2">
                       {([
-                        { id: "gold", label: "Olive Gold", color: "bg-[#b5a642]" },
+                        { id: "gold", label: "Olive Gold", color: "bg-[var(--color-accent)]" },
                         { id: "blue", label: "Steel Blue", color: "bg-[#6fa3b8]" },
                         { id: "emerald", label: "Emerald", color: "bg-[#2e7d32]" },
                         { id: "purple", label: "Velvet", color: "bg-[#7b1fa2]" },

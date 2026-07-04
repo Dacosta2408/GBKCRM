@@ -114,7 +114,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
         
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           {/* Search */}
-          <div className="bg-[#181820] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[#b5a642]/30 transition-all">
+          <div className="bg-[#181820] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[var(--color-accent)]/30 transition-all">
             <Search className="w-3.5 h-3.5 text-white/30" />
             <input 
               type="text" 
@@ -172,7 +172,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
 
           <button
             onClick={handleExportCSV}
-            className="w-full sm:w-auto bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-bold uppercase px-3.5 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
+            className="w-full sm:w-auto bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-bold uppercase px-3.5 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
           >
             <Download className="w-4 h-4" /> Export CSV Logs
           </button>

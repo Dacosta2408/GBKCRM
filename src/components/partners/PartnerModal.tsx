@@ -133,7 +133,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
         {/* Header banner */}
         <div className="h-14 border-b border-[var(--color-border)]/70 px-6 flex items-center justify-between bg-[var(--color-surface-2)] shrink-0">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-[#b5a642]" />
+            <UserPlus className="w-5 h-5 text-[var(--color-accent)]" />
             <div>
               <h2 className="text-sm font-black text-[var(--color-text)] uppercase tracking-wider">
                 {editingPartner ? "Modify Relationship Profile" : "Onboard Strategic Partner"}
@@ -166,7 +166,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={first}
                 onChange={(e) => setFirst(e.target.value)}
                 placeholder="Sarah"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -179,7 +179,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={last}
                 onChange={(e) => setLast(e.target.value)}
                 placeholder="Johnson"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -189,7 +189,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
               >
                 {PARTNER_CATEGORIES.map(category => (
                   <option key={category} value={category} className="bg-[var(--color-surface)]">{category}</option>
@@ -209,7 +209,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="Royal LePage Barrie"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -221,7 +221,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="Lead Real Estate Agent"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -231,7 +231,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
               >
                 {ONTARIO_REGIONS.map(region => (
                   <option key={region} value={region} className="bg-[var(--color-surface)]">{region}</option>
@@ -251,7 +251,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(705) 555-0810"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-mono font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-mono font-semibold"
               />
             </div>
             <div>
@@ -263,7 +263,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="sarah.johnson@royallepage.ca"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -275,7 +275,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="royallepagebarrie.ca"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
           </div>
@@ -291,7 +291,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="112 Bayfield St, Barrie, ON L4M 3B1"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[#b5a642]/30 transition-all font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-semibold"
               />
             </div>
             <div>
@@ -301,7 +301,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               <select
                 value={assignedOwner}
                 onChange={(e) => setAssignedOwner(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[#b5a642] focus:outline-none focus:border-[#b5a642]/30 transition-all font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
               >
                 {userRoster.map(user => (
                   <option key={user.id} value={`${user.first} ${user.last}`} className="bg-[var(--color-surface)]">{user.first} {user.last}</option>
@@ -321,7 +321,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/30 transition-all font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
               >
                 {PARTNER_STATUSES.map(stat => (
                   <option key={stat} value={stat} className="bg-[var(--color-surface)]">{stat}</option>
@@ -333,7 +333,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
             <div className="md:col-span-4">
               <div className="flex justify-between text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider mb-1">
                 <span>Health Index</span>
-                <span className="text-[#b5a642]">{healthScore}%</span>
+                <span className="text-[var(--color-accent)]">{healthScore}%</span>
               </div>
               <input
                 type="range"
@@ -341,7 +341,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 max="100"
                 value={healthScore}
                 onChange={(e) => setHealthScore(Number(e.target.value))}
-                className="w-full accent-[#b5a642] bg-[var(--color-surface-2)] rounded-lg h-2 cursor-pointer border border-[var(--color-border)]/70"
+                className="w-full accent-[var(--color-accent)] bg-[var(--color-surface-2)] rounded-lg h-2 cursor-pointer border border-[var(--color-border)]/70"
               />
             </div>
 
@@ -356,7 +356,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                 />
                 <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
                   isPreferred 
-                    ? "bg-[#b5a642] border-[#b5a642] text-black" 
+                    ? "bg-[var(--color-accent)] border-[var(--color-accent)] text-black" 
                     : "border-[var(--color-border)] bg-[var(--color-surface-2)]"
                 }`}>
                   {isPreferred && <Check className="w-3 h-3 stroke-[3]" />}
@@ -407,7 +407,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
                     handleAddTag();
                   }
                 }}
-                className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-semibold placeholder-[var(--color-text-faint)]/40"
+                className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-semibold placeholder-[var(--color-text-faint)]/40"
               />
               <button
                 type="button"
@@ -428,7 +428,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               placeholder="Record any general notes, reputation audits, or initial collaboration parameters..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 h-24 resize-none font-medium placeholder-[var(--color-text-faint)]/40"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 h-24 resize-none font-medium placeholder-[var(--color-text-faint)]/40"
             />
           </div>
 
@@ -445,7 +445,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-2 bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase tracking-wider rounded-lg shadow-md transition-all flex items-center gap-1.5"
+            className="px-6 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase tracking-wider rounded-lg shadow-md transition-all flex items-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[2.5]" />
             {editingPartner ? "Update Partner" : "Register Partner"}

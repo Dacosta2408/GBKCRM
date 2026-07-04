@@ -527,13 +527,13 @@ Assigned Broker: Sarah Jenkins`
 
                     {selectedFile.isIntakeReady ? (
                       <>
-                        <div className="flex items-center gap-2 text-[10px] text-[#8e95a3]">
-                          <Sparkles className="w-3.5 h-3.5 text-[#b5a642]" />
+                        <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">
+                          <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)]" />
                           <span>Gemini AI is ready to parse this raw text directly into the database.</span>
                         </div>
                         <button
                           onClick={() => handleSendToAIIntake(selectedFile)}
-                          className="w-full py-2.5 bg-gradient-to-r from-[#b5a642] to-[#5d9bb1] hover:opacity-95 text-black font-black text-xs uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#b5a642]/5"
+                          className="w-full py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[#5d9bb1] hover:opacity-95 text-black font-black text-xs uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-accent)]/5"
                         >
                           <Sparkles className="w-4 h-4" />
                           <span>✦ Send to AI Application Intake</span>

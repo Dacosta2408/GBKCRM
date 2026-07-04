@@ -102,13 +102,13 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         
         {/* Metric 1 */}
         <div className="bg-[#111115] border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-1 h-full bg-[#b5a642]" />
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-accent)]" />
           <div>
             <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider"> Roster Strength</p>
             <h3 className="text-2xl font-black text-white mt-1 font-mono">{activeUsers}<span className="text-xs text-white/40 font-normal">/{totalUsers} Active</span></h3>
-            <p className="text-[10px] text-[#b5a642] font-semibold mt-1">Ontario FSRA Compliant</p>
+            <p className="text-[10px] text-[var(--color-accent)] font-semibold mt-1">Ontario FSRA Compliant</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-[#b5a642]/10 border border-[#b5a642]/20 flex items-center justify-center text-[#b5a642] group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center text-[var(--color-accent)] group-hover:scale-105 transition-transform">
             <Users className="w-5 h-5" />
           </div>
         </div>
@@ -209,7 +209,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                       else if (alert.type === "integrity") setActiveTab("backup");
                       else showToast("Navigating to target control node...", "success");
                     }}
-                    className="shrink-0 text-[10px] font-black uppercase text-[#b5a642] hover:text-[#9a8c38] px-2 py-1 bg-white/5 rounded border border-white/5 hover:bg-[#b5a642]/10 transition-all self-center"
+                    className="shrink-0 text-[10px] font-black uppercase text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] px-2 py-1 bg-white/5 rounded border border-white/5 hover:bg-[var(--color-accent)]/10 transition-all self-center"
                   >
                     {alert.actionLabel}
                   </button>
@@ -242,8 +242,8 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
               </div>
 
               {/* Email Extractor */}
-              <div className="bg-[#17171e] border border-white/5 p-3.5 rounded-xl text-center relative group hover:border-[#b5a642]/30 transition-all">
-                <Mail className="w-5 h-5 mx-auto text-[#b5a642] mb-1.5" />
+              <div className="bg-[#17171e] border border-white/5 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-accent)]/30 transition-all">
+                <Mail className="w-5 h-5 mx-auto text-[var(--color-accent)] mb-1.5" />
                 <h5 className="text-[11px] font-bold text-white uppercase tracking-wider">Email IMAP Sync</h5>
                 <p className="text-[9px] text-emerald-400 font-bold mt-1 uppercase">● Operational</p>
                 <div className="text-[10px] text-white/40 mt-2 border-t border-white/5 pt-1.5 font-mono">
@@ -291,12 +291,12 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
           <div className="bg-[#121216] border border-white/5 rounded-xl p-5 shadow-lg flex flex-col h-[340px]" id="admin-timeline-panel">
             <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#b5a642]" />
+                <Clock className="w-4 h-4 text-[var(--color-accent)]" />
                 <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider font-sans">Recent Log Trajectory</h4>
               </div>
               <button 
                 onClick={() => setActiveTab("audit")}
-                className="text-[10px] font-bold text-[#b5a642] hover:underline"
+                className="text-[10px] font-bold text-[var(--color-accent)] hover:underline"
               >
                 View All
               </button>
@@ -306,7 +306,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             <div className="flex-1 overflow-y-auto space-y-3.5 pr-1" id="admin-dashboard-compact-audit">
               {auditLogs.slice(0, 5).map((log, index) => (
                 <div key={log.id || index} className="flex gap-2.5 text-left text-[11px]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#b5a642] shrink-0 mt-1.5" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] shrink-0 mt-1.5" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-bold text-white/90 truncate capitalize">{log.action || log.event}</span>

@@ -158,12 +158,12 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
         {/* Profile Card */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 flex flex-col items-center text-center relative overflow-hidden">
           {/* Subtle accent color top */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#b5a642]" />
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--color-accent)]" />
           
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#b5a642]/20 to-[#6fa3b8]/20 border border-[var(--color-border)] flex items-center justify-center text-[#b5a642] font-black text-2xl mt-4 relative">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[var(--color-accent)]/20 to-[#6fa3b8]/20 border border-[var(--color-border)] flex items-center justify-center text-[var(--color-accent)] font-black text-2xl mt-4 relative">
             {partner.first[0]}{partner.last[0]}
             {partner.isPreferred && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#b5a642] text-black p-0.5 rounded-full" title="Preferred Partner">
+              <span className="absolute -top-1.5 -right-1.5 bg-[var(--color-accent)] text-black p-0.5 rounded-full" title="Preferred Partner">
                 <Star className="w-3.5 h-3.5 fill-current" />
               </span>
             )}
@@ -181,7 +181,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
             {partner.role || "Professional Associate"}
           </p>
 
-          <p className="text-xs text-[var(--color-text-muted)] font-bold hover:text-[#b5a642] transition-all cursor-pointer mt-1">
+          <p className="text-xs text-[var(--color-text-muted)] font-bold hover:text-[var(--color-accent)] transition-all cursor-pointer mt-1">
             {partner.company || "Independent Office"}
           </p>
 
@@ -194,7 +194,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
             </div>
             <div>
               <span className="block text-[9px] text-[var(--color-text-faint)] uppercase font-bold">Health Index</span>
-              <span className="text-[#b5a642] font-mono font-bold block mt-1">
+              <span className="text-[var(--color-accent)] font-mono font-bold block mt-1">
                 {partner.healthScore || 85}%
               </span>
             </div>
@@ -207,7 +207,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               {partner.phone ? (
                 <button
                   onClick={() => handleCopyClipboard(partner.phone!, "Phone")}
-                  className="font-mono font-bold text-[var(--color-text)]/90 hover:text-[#b5a642] transition-colors"
+                  className="font-mono font-bold text-[var(--color-text)]/90 hover:text-[var(--color-accent)] transition-colors"
                 >
                   {partner.phone}
                 </button>
@@ -237,7 +237,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
                   href={`https://${partner.website}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-bold text-[#b5a642] hover:underline flex items-center gap-1.5"
+                  className="font-bold text-[var(--color-accent)] hover:underline flex items-center gap-1.5"
                 >
                   {partner.website}
                 </a>
@@ -304,7 +304,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
         {/* Descriptive notes & specialties block */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 border-b border-[var(--color-border)]/50 pb-2.5">
-            <FileText className="w-4.5 h-4.5 text-[#b5a642]" />
+            <FileText className="w-4.5 h-4.5 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Internal Intelligence</h4>
           </div>
 
@@ -316,7 +316,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               value={partner.notes || ""}
               onChange={(e) => onUpdatePartnerField(partner.id, { notes: e.target.value })}
               placeholder="Record strategic directions, key contacts, or deal-structuring preferences for this partner..."
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 h-28 resize-none font-medium placeholder-[var(--color-text-faint)]/40"
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 h-28 resize-none font-medium placeholder-[var(--color-text-faint)]/40"
             />
           </div>
 
@@ -355,7 +355,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
                 placeholder="Add specialty tag..."
                 value={customTag}
                 onChange={(e) => setCustomTag(e.target.value)}
-                className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1 text-[11px] text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-medium placeholder-[var(--color-text-faint)]/40"
+                className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1 text-[11px] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-medium placeholder-[var(--color-text-faint)]/40"
               />
               <button
                 type="submit"
@@ -385,7 +385,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
                 placeholder="e.g. Call to pitch private lending rates sheets..."
                 value={taskTitle}
                 onChange={(e) => setTaskTitle(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-semibold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-semibold"
               />
             </div>
 
@@ -429,7 +429,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
         {/* Quick Email Template Shortcuts */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center gap-2 border-b border-[var(--color-border)]/50 pb-2.5">
-            <Mail className="w-4.5 h-4.5 text-[#b5a642]" />
+            <Mail className="w-4.5 h-4.5 text-[var(--color-accent)]" />
             <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Outreach Templates</h4>
           </div>
 
@@ -441,7 +441,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               <select
                 value={emailTemplateType}
                 onChange={(e) => setEmailTemplateType(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#b5a642]/20 font-bold"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               >
                 <option value="rate_update" className="bg-[var(--color-surface)]">📊 Current Lending Rate Sheet</option>
                 <option value="thank_you" className="bg-[var(--color-surface)]">🙏 Mortgage Referral Appreciation</option>
@@ -451,7 +451,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
 
             <button
               onClick={handleSendEmailShortcut}
-              className="w-full bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
+              className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
             >
               <Send className="w-3.5 h-3.5 stroke-[2.5]" /> Launch Outreach Email
             </button>
@@ -540,7 +540,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               let iconElement = <MessageCircle className="w-3.5 h-3.5 text-[var(--color-text-faint)]" />;
               if (entry.type === "call") iconElement = <Phone className="w-3.5 h-3.5 text-[#6fa3b8]" />;
               else if (entry.type === "coffee") iconElement = <Sparkles className="w-3.5 h-3.5 text-amber-400" />;
-              else if (entry.type === "rate_update") iconElement = <FileText className="w-3.5 h-3.5 text-[#b5a642]" />;
+              else if (entry.type === "rate_update") iconElement = <FileText className="w-3.5 h-3.5 text-[var(--color-accent)]" />;
               else if (entry.type === "referral_received") iconElement = <Award className="w-3.5 h-3.5 text-emerald-400" />;
               else if (entry.type === "thank_you") iconElement = <Heart className="w-3.5 h-3.5 text-rose-400 fill-current" />;
 
