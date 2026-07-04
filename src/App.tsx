@@ -102,10 +102,14 @@ export default function App() {
   const [globalSearch, setGlobalSearch] = useState<string>("");
   const [detailTab, setDetailTab] = useState<string>("overview");
 
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("gbk_theme");
+    return (saved === "light" || saved === "dark") ? saved : "dark";
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("gbk_theme", theme);
   }, [theme]);
 
   // Z Drive Bridge online state
@@ -660,7 +664,9 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center flex-col gap-6"
             style={{
-              background: "radial-gradient(circle at center, #23131F 0%, #081525 60%, #050E18 100%)"
+              background: theme === "dark"
+                ? "radial-gradient(circle at center, #19233C 0%, #09101E 60%, #050A14 100%)"
+                : "radial-gradient(circle at center, #FDFCFB 0%, #EAE4DA 60%, #D4C9B5 100%)"
             }}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,163,132,0.12)_0%,transparent_60%)] animate-pulse pointer-events-none" />
@@ -724,7 +730,7 @@ export default function App() {
             }}
           >
             <div className="text-base select-none shrink-0">{toastMessage.icon || "✓"}</div>
-            <span className="text-[11px] font-bold text-white leading-tight">{toastMessage.msg}</span>
+            <span className="text-[11px] font-bold text-[var(--color-text)] leading-tight">{toastMessage.msg}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -836,7 +842,7 @@ export default function App() {
             <div className="flex items-center gap-1.5 shrink-0">
               <button 
                 onClick={() => setZDriveOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_15px_rgba(72,109,131,0.25)] hover:border-[#486D83]"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold rounded-full transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_15px_rgba(103,111,157,0.15)] hover:border-[var(--color-primary)]"
                 style={{
                   background: "var(--glass-bg)",
                   backdropFilter: "var(--glass-blur)",
@@ -874,18 +880,18 @@ export default function App() {
             {/* Theme Toggle Button */}
             <button
               onClick={() => setTheme(prev => prev === "dark" ? "light" : "dark")}
-              className="p-1.5 rounded-full hover:bg-white/5 transition-all cursor-pointer text-[var(--color-text-muted)] hover:text-white shrink-0"
+              className="p-1.5 rounded-full hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)] transition-all cursor-pointer text-[var(--color-text-muted)] shrink-0"
               title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
             >
               {theme === "dark" ? (
                 <Sun className="w-4 h-4 text-[var(--color-accent)]" />
               ) : (
-                <Moon className="w-4 h-4 text-[#7A5063]" />
+                <Moon className="w-4 h-4 text-[var(--color-primary)]" />
               )}
             </button>
 
             {/* Vertical Divider */}
-            <div className="w-px h-5 bg-white/5 shrink-0 mx-0.5" />
+            <div className="w-px h-5 bg-[var(--color-divider)] shrink-0 mx-0.5" />
 
             {/* Top Header Profile Section */}
             <div className="relative shrink-0" id="header-profile-dropdown-container">
@@ -909,8 +915,8 @@ export default function App() {
                   />
                 ) : (
                   <div 
-                    className="w-5.5 h-5.5 rounded-full flex items-center justify-center font-bold text-[9px] text-[#12131a] shrink-0"
-                    style={{ background: "var(--grad-warm)" }}
+                    className="w-5.5 h-5.5 rounded-full flex items-center justify-center font-bold text-[9px] text-white shrink-0"
+                    style={{ background: "var(--grad-warm-highlight)" }}
                   >
                     {currentUser.first[0]}{currentUser.last[0]}
                   </div>
@@ -990,10 +996,10 @@ export default function App() {
         {/* Persistent Z Drive Offline Banner */}
         {!bridgeOnline && (
           <div 
-            className="px-6 py-2.5 text-[10px] flex items-center gap-2.5 text-[#e05c6e] font-bold uppercase tracking-wider select-none shrink-0 border-b animate-pulse"
+            className="px-6 py-2.5 text-[10px] flex items-center gap-2.5 text-[var(--color-error)] font-bold uppercase tracking-wider select-none shrink-0 border-b animate-pulse"
             style={{
-              background: "rgba(224,92,110,0.06)",
-              borderColor: "rgba(224,92,110,0.15)",
+              background: "var(--color-error-subtle)",
+              borderColor: "var(--color-border)",
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)"
             }}
@@ -1007,9 +1013,17 @@ export default function App() {
         {broadcastBanners.filter(b => b.active).map((banner) => {
           const isCritical = banner.type === "critical";
           const isWarning = banner.type === "warning";
-          const colorClass = isCritical ? "text-[#e05c6e]" : isWarning ? "text-[#F4A384]" : "text-[#34D399]";
-          const bgVal = isCritical ? "rgba(224,92,110,0.06)" : isWarning ? "rgba(244,163,132,0.06)" : "rgba(52,211,153,0.06)";
-          const borderVal = isCritical ? "rgba(224,92,110,0.15)" : isWarning ? "rgba(244,163,132,0.15)" : "rgba(52,211,153,0.15)";
+          const colorClass = isCritical 
+            ? "text-[var(--color-error)]" 
+            : isWarning 
+              ? "text-[var(--color-warning)]" 
+              : "text-[var(--color-success)]";
+          const bgVal = isCritical 
+            ? "var(--color-error-subtle)" 
+            : isWarning 
+              ? "var(--color-warning-subtle)" 
+              : "var(--color-success-subtle)";
+          const borderVal = "var(--color-border)";
           
           return (
             <div 
@@ -1030,14 +1044,14 @@ export default function App() {
                 )}
                 <span className="truncate">
                   <strong className="mr-1.5 font-black">[{banner.type} broadcast]:</strong>
-                  <span className="text-white normal-case font-semibold">{banner.message}</span>
+                  <span className="text-[var(--color-text)] normal-case font-semibold">{banner.message}</span>
                 </span>
               </div>
               <button 
                 onClick={() => {
                   setBroadcastBanners(prev => prev.map(b => b.id === banner.id ? { ...b, active: false } : b));
                 }}
-                className="text-white/40 hover:text-white shrink-0 font-black px-2 py-1 bg-white/5 hover:bg-white/10 rounded-full transition-all text-[8px] tracking-widest cursor-pointer border border-white/5"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] shrink-0 font-black px-2.5 py-1 rounded-full transition-all text-[8px] tracking-widest cursor-pointer"
               >
                 ✕ Dismiss
               </button>
@@ -1516,7 +1530,7 @@ export default function App() {
                     showToast("Configuration safely saved!", "success");
                   }}
                   className="w-full mt-2 text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.25)]"
-                  style={{ background: "var(--grad-warm)" }}
+                  style={{ background: "var(--grad-warm-highlight)" }}
                 >
                   Save and Dismiss
                 </button>
@@ -1708,8 +1722,8 @@ export default function App() {
                           showToast("Workspace Credentials Sync Enabled!", "success", "🔐");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 text-[#12131a] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.25)]"
-                        style={{ background: "var(--grad-warm)" }}
+                        className="flex-1 text-white font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.15)]"
+                        style={{ background: "var(--grad-warm-highlight)" }}
                       >
                         ✓ Save & Sync
                       </button>
@@ -1868,7 +1882,7 @@ export default function App() {
                   <button 
                     type="submit"
                     className="w-full mt-2 text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.25)]"
-                    style={{ background: "var(--grad-warm)" }}
+                    style={{ background: "var(--grad-warm-highlight)" }}
                   >
                     Register and Login as Agent
                   </button>
@@ -1890,15 +1904,15 @@ export default function App() {
                         }}
                         className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                           swTargetId === u.id 
-                            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5' 
-                            : 'border-white/5 bg-white/[0.01] hover:bg-white/5'
+                            ? 'border-[var(--color-accent)] bg-[var(--color-accent-subtle)]' 
+                            : 'border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]'
                         }`}
                       >
                         <div>
-                          <div className={`text-xs font-black ${swTargetId === u.id ? 'text-[var(--color-accent)]' : 'text-white'}`}>{u.first} {u.last}</div>
+                          <div className={`text-xs font-black ${swTargetId === u.id ? 'text-[var(--color-accent)]' : 'text-[var(--color-text)]'}`}>{u.first} {u.last}</div>
                           <div className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider mt-0.5">{u.role}</div>
                         </div>
-                        <div className="text-[10px] text-white/30 truncate font-mono max-w-[140px] font-bold">{u.email}</div>
+                        <div className="text-[10px] text-[var(--color-text-faint)] truncate font-mono max-w-[140px] font-bold">{u.email}</div>
                       </button>
                     ))}
                   </div>
