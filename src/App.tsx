@@ -678,7 +678,7 @@ export default function App() {
               }}
             >
               <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "var(--grad-warm-highlight)", boxShadow: "0 4px 14px rgba(244, 163, 132, 0.3)" }}>
-                <Lock className="w-6 h-6 text-white" />
+                <Lock className="w-6 h-6 text-[var(--color-text-inverse)]" />
               </div>
               <h3 className="text-sm font-black uppercase tracking-widest text-[var(--color-text)] mb-1">Workstation Locked</h3>
               <p className="text-[10px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider mb-6">Enter 4-digit security PIN to resume</p>
@@ -704,7 +704,7 @@ export default function App() {
               </button>
 
               {pinError && (
-                <div className="text-xs text-red-400 mt-4 font-bold uppercase tracking-wide">{pinError}</div>
+                <div className="text-xs text-[var(--color-error)] mt-4 font-bold uppercase tracking-wide">{pinError}</div>
               )}
             </motion.div>
           </motion.div>
@@ -865,7 +865,7 @@ export default function App() {
             {/* New Client Button */}
             <button 
               onClick={openManualIntake}
-              className="flex items-center gap-1 px-4 py-1.5 text-[11px] font-extrabold text-white transition-all shrink-0 hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] duration-200 active:scale-95 cursor-pointer"
+              className="flex items-center gap-1 px-4 py-1.5 text-[11px] font-extrabold text-[var(--color-text-inverse)] transition-all shrink-0 hover:shadow-[0_0_20px_rgba(244,163,132,0.3)] duration-200 active:scale-95 cursor-pointer"
               style={{
                 background: "var(--grad-warm-highlight)",
                 borderRadius: "10px"
@@ -913,7 +913,7 @@ export default function App() {
                   />
                 ) : (
                   <div 
-                    className="w-5.5 h-5.5 rounded-full flex items-center justify-center font-bold text-[9px] text-white shrink-0"
+                    className="w-5.5 h-5.5 rounded-full flex items-center justify-center font-bold text-[9px] text-[var(--color-text-inverse)] shrink-0"
                     style={{ background: "var(--grad-warm-highlight)" }}
                   >
                     {currentUser.first[0]}{currentUser.last[0]}
@@ -979,7 +979,7 @@ export default function App() {
                         setAppLocked(true);
                         setHeaderProfileOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all text-left cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-[var(--color-error)] hover:text-[var(--color-error)] hover:bg-[var(--color-error-subtle)] rounded-lg transition-all text-left cursor-pointer"
                     >
                       <Lock className="w-4 h-4" />
                       <span>Lock Workstation</span>
@@ -1683,7 +1683,7 @@ export default function App() {
                           showToast("Workspace credentials disconnected successfully.", "success", "🔓");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 bg-red-600/10 hover:bg-red-600/25 border border-red-500/25 text-red-400 font-bold text-[10px] py-3 rounded-xl transition-all cursor-pointer"
+                        className="flex-1 bg-[var(--color-error-subtle)] hover:bg-[var(--color-error)]/20 border border-[var(--color-error)]/25 text-[var(--color-error)] font-bold text-[10px] py-3 rounded-xl transition-all cursor-pointer"
                       >
                         Disconnect Sync
                       </button>
@@ -1720,7 +1720,7 @@ export default function App() {
                           showToast("Workspace Credentials Sync Enabled!", "success", "🔐");
                           setProfileModalOpen(false);
                         }}
-                        className="flex-1 text-white font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.15)]"
+                        className="flex-1 text-[var(--color-text-inverse)] font-black uppercase tracking-wider text-[10px] py-3 rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200,146,42,0.15)]"
                         style={{ background: "var(--grad-warm-highlight)" }}
                       >
                         ✓ Save & Sync
@@ -1976,7 +1976,7 @@ export default function App() {
                       </div>
 
                       {swError && (
-                        <span className="text-[10px] text-red-400 mt-1 font-bold uppercase tracking-wider">{swError}</span>
+                        <span className="text-[10px] text-[var(--color-error)] mt-1 font-bold uppercase tracking-wider">{swError}</span>
                       )}
                     </form>
                   )}

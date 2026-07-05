@@ -29,7 +29,7 @@ export const Settings: React.FC<SettingsProps> = ({
   clients
 }) => {
   // Navigation tabs
-  type SettingsTab = "profile" | "appearance" | "notifications" | "security" | "preferences" | "team" | "permissions" | "defaults";
+  type SettingsTab = "profile" | "notifications" | "security" | "preferences" | "team" | "permissions" | "defaults";
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 
   // --- 1. PROFILE STATE ---
@@ -493,7 +493,7 @@ export const Settings: React.FC<SettingsProps> = ({
           {onLockApp && (
             <button 
               onClick={onLockApp}
-              className="text-xs font-semibold px-3 py-1.5 bg-white/5 hover:bg-red-500/10 hover:text-red-300 border border-white/10 rounded-lg transition-all flex items-center gap-1.5"
+              className="text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-border)]/70 hover:bg-[var(--color-error-subtle)] hover:text-[var(--color-error)] hover:border-[var(--color-error)]/30 rounded-lg transition-all flex items-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5" /> Lock Workstation
             </button>
@@ -516,15 +516,6 @@ export const Settings: React.FC<SettingsProps> = ({
             }`}
           >
             <UserIcon className="w-4 h-4" /> My Profile
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("appearance")}
-            className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
-              activeTab === "appearance" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
-            }`}
-          >
-            <Palette className="w-4 h-4" /> Appearance
           </button>
           
           <button
@@ -719,51 +710,6 @@ export const Settings: React.FC<SettingsProps> = ({
                     Save Profile Changes
                   </button>
                 </form>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: APPEARANCE */}
-          {activeTab === "appearance" && (
-            <div className="max-w-2xl space-y-6">
-              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
-                <div>
-                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Theme &amp; Appearance</h3>
-                  <p className="text-[11px] text-[var(--color-text-muted)]">Visual interface configuration, color system, and design preferences.</p>
-                </div>
-
-                <div className="p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center shrink-0">
-                    <Palette className="w-5 h-5" />
-                  </div>
-                  <div className="space-y-1.5 flex-1">
-                    <span className="text-xs font-bold text-[var(--color-text)] block">
-                      Top-Bar Theme Toggle Control
-                    </span>
-                    <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">
-                      Theme switching is controlled from the top navigation sun/moon toggle. Clicking it will seamlessly transition the entire application between <strong className="text-[var(--color-text)] font-semibold">Deep Slate Dark</strong> and <strong className="text-[var(--color-text)] font-semibold">Workspace Light</strong> modes.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-2">
-                  <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">Active Design Tokens</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs space-y-1">
-                      <span className="font-semibold text-[var(--color-text)] block">Modular Accent Theme</span>
-                      <span className="text-[10px] text-[var(--color-text-muted)] block leading-normal">
-                        GBK CRM utilizes an elegant, modern deep slate and workspace light color profile, engineered for high legibility and minimal eye-strain.
-                      </span>
-                    </div>
-
-                    <div className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs space-y-1">
-                      <span className="font-semibold text-[var(--color-text)] block">Optimized Animations</span>
-                      <span className="text-[10px] text-[var(--color-text-muted)] block leading-normal">
-                        Micro-interactions, spring animations, and route translations are fully managed automatically to keep the UX highly responsive.
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -1177,8 +1123,8 @@ export const Settings: React.FC<SettingsProps> = ({
                               onClick={() => handleToggleUserStatus(user.id)}
                               className={`px-2.5 py-0.5 rounded text-[9px] font-bold uppercase border tracking-wider transition-all ${
                                 user.status === "active" 
-                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 hover:bg-green-500/20" 
-                                  : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:bg-red-500/20"
+                                  ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20 hover:bg-[var(--color-success)]/20" 
+                                  : "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20 hover:bg-[var(--color-error)]/20"
                               }`}
                             >
                               {user.status}
