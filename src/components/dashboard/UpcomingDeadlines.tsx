@@ -36,8 +36,8 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
           type: "Maturity / Renewal",
           date: c.maturityDate,
           daysLeft: diffDays,
-          color: diffDays <= 7 ? "text-red-400" : diffDays <= 30 ? "text-orange-400" : "text-blue-400",
-          statusColor: "bg-blue-500/10 border-blue-500/15 text-blue-400"
+          color: diffDays <= 7 ? "text-[var(--color-error)]" : diffDays <= 30 ? "text-[var(--color-warning)]" : "text-[var(--color-info)]",
+          statusColor: "bg-[var(--color-info-subtle)] border-[var(--color-info)]/15 text-[var(--color-info)]"
         });
       }
     }
@@ -54,8 +54,8 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
           type: "Closing / Funding",
           date: c.fundedDate,
           daysLeft: diffDays,
-          color: diffDays <= 7 ? "text-red-400" : "text-green-400",
-          statusColor: "bg-green-500/10 border-green-500/15 text-green-400"
+          color: diffDays <= 7 ? "text-[var(--color-error)]" : "text-[var(--color-success)]",
+          statusColor: "bg-[var(--color-success-subtle)] border-[var(--color-success)]/15 text-[var(--color-success)]"
         });
       }
     }
@@ -74,8 +74,8 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
           type: "Condition Removal",
           date: condDate.toISOString().split("T")[0],
           daysLeft: diffDays,
-          color: diffDays <= 3 ? "text-red-400 blink" : "text-yellow-500",
-          statusColor: "bg-red-500/10 border-red-500/15 text-red-400"
+          color: diffDays <= 3 ? "text-[var(--color-error)] blink" : "text-[var(--color-warning)]",
+          statusColor: "bg-[var(--color-error-subtle)] border-[var(--color-error)]/15 text-[var(--color-error)]"
         });
       }
     }
@@ -127,9 +127,9 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
 
                 <div className="text-right shrink-0">
                   {dl.daysLeft === 0 ? (
-                    <span className="text-xs font-bold text-red-400 font-mono">TODAY</span>
+                    <span className="text-xs font-bold text-[var(--color-error)] font-mono">TODAY</span>
                   ) : dl.daysLeft === 1 ? (
-                    <span className="text-xs font-bold text-red-400 font-mono">TOMORROW</span>
+                    <span className="text-xs font-bold text-[var(--color-error)] font-mono">TOMORROW</span>
                   ) : dl.daysLeft < 0 ? (
                     <span className="text-xs font-bold text-[var(--color-text-faint)] font-mono">Passed</span>
                   ) : (

@@ -139,10 +139,10 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Role Templates Card */}
-        <div className="lg:col-span-1 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col h-[340px]">
-          <div className="flex items-center gap-2 border-b border-white/5 pb-3 mb-4">
+        <div className="lg:col-span-1 bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-5 rounded-xl shadow-lg flex flex-col h-[340px]">
+          <div className="flex items-center gap-2 border-b border-[var(--color-border)]/70 pb-3 mb-4">
             <ShieldCheck className="w-4.5 h-4.5 text-[var(--color-accent)]" />
-            <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Default Role Templates</h4>
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Default Role Templates</h4>
           </div>
 
           {/* Role selector list */}
@@ -155,10 +155,10 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                 <button
                   key={role}
                   onClick={() => setActiveRoleTab(role as User["role"])}
-                  className={`px-3 py-2.5 rounded-lg border text-left flex items-center justify-between transition-all ${
+                  className={`px-3 py-2.5 rounded-lg border text-left flex items-center justify-between transition-all cursor-pointer ${
                     isSelected 
                       ? "bg-[var(--color-accent)]/10 border-[var(--color-accent)]/30 text-[var(--color-accent)]" 
-                      : "bg-[#181820]/40 border-white/5 text-white/60 hover:text-white hover:bg-[#181820]"
+                      : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)]/50 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
                   }`}
                 >
                   <div>
@@ -173,24 +173,24 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
         </div>
 
         {/* Override Inspector User selector */}
-        <div className="lg:col-span-2 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col h-[340px]">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+        <div className="lg:col-span-2 bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-5 rounded-xl shadow-lg flex flex-col h-[340px]">
+          <div className="flex items-center justify-between border-b border-[var(--color-border)]/70 pb-3 mb-4">
             <div className="flex items-center gap-2">
-              <Users className="w-4.5 h-4.5 text-[#6fa3b8]" />
-              <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Custom Override Selector</h4>
+              <Users className="w-4.5 h-4.5 text-[var(--color-info)]" />
+              <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Custom Override Selector</h4>
             </div>
-            <span className="text-[9px] bg-[#6fa3b8]/15 text-[#6fa3b8] font-mono px-2 py-0.5 rounded border border-[#6fa3b8]/20">
+            <span className="text-[9px] bg-[var(--color-info)]/15 text-[var(--color-info)] font-mono px-2 py-0.5 rounded border border-[var(--color-info)]/20">
               User-Specific Adjustments
             </span>
           </div>
 
           <div className="space-y-4 flex-1 flex flex-col justify-between">
             <div>
-              <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-2">Select Target Broker Account</label>
+              <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-2">Select Target Broker Account</label>
               <select
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
-                className="w-full bg-[#181820] border border-white/5 rounded-lg px-3 py-2.5 text-xs text-white outline-none cursor-pointer focus:border-[#6fa3b8]/30 transition-all"
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2.5 text-xs text-[var(--color-text)] outline-none cursor-pointer focus:border-[var(--color-info)]/30 transition-all"
               >
                 {userRoster.map(u => (
                   <option key={u.id} value={u.id}>{u.first} {u.last} ({u.role})</option>
@@ -199,14 +199,14 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
             </div>
 
             {selectedUser && (
-              <div className="bg-[#181822]/40 border border-white/5 rounded-xl p-4 flex items-center justify-between">
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/50 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#6fa3b8]/10 border border-[#6fa3b8]/30 flex items-center justify-center font-bold text-sm text-[#6fa3b8]">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-info)]/10 border border-[var(--color-info)]/30 flex items-center justify-center font-bold text-sm text-[var(--color-info)]">
                     {selectedUser.first[0]}{selectedUser.last[0]}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">{selectedUser.first} {selectedUser.last}</p>
-                    <p className="text-[10px] text-white/40 font-semibold">{selectedUser.jobTitle || selectedUser.role} • {selectedUser.email}</p>
+                    <p className="text-xs font-bold text-[var(--color-text)]">{selectedUser.first} {selectedUser.last}</p>
+                    <p className="text-[10px] text-[var(--color-text-faint)] font-semibold">{selectedUser.jobTitle || selectedUser.role} • {selectedUser.email}</p>
                   </div>
                 </div>
 
@@ -229,7 +229,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
               </div>
             )}
 
-            <div className="text-[11px] text-white/30 italic">
+            <div className="text-[11px] text-[var(--color-text-faint)] italic">
               💡 Select any module below to override the default access permissions. Red-labeled overrides are denied, green are authorized.
             </div>
           </div>
@@ -238,39 +238,39 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
       </div>
 
       {/* Permissions Matrix Layout */}
-      <div className="bg-[#111115] border border-white/5 rounded-xl overflow-hidden shadow-lg" id="permissions-grid">
-        <div className="bg-[#141419] px-5 py-3 border-b border-white/5 flex items-center justify-between">
-          <span className="text-[10px] text-white/40 font-black uppercase tracking-wider">CRM Modules Matrix</span>
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl overflow-hidden shadow-lg" id="permissions-grid">
+        <div className="bg-[var(--color-surface-2)] px-5 py-3 border-b border-[var(--color-border)]/50 flex items-center justify-between">
+          <span className="text-[10px] text-[var(--color-text-faint)] font-black uppercase tracking-wider">CRM Modules Matrix</span>
           <span className="text-[10px] text-[var(--color-accent)] font-semibold">
             Configuring override for: <span className="font-bold underline">{selectedUser?.first} {selectedUser?.last}</span>
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--color-border)]/40">
           
           {/* Col 1 */}
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[var(--color-border)]/40">
             {crmModules.slice(0, 6).map((mod) => {
               const allowed = selectedUser ? isModuleAllowedForUser(selectedUser, mod.key) : false;
               const isOverridden = selectedUser?.permOverrides?.[mod.key] !== undefined;
 
               return (
-                <div key={mod.key} className="p-4 flex items-center justify-between gap-4 hover:bg-white/[0.01] transition-all">
+                <div key={mod.key} className="p-4 flex items-center justify-between gap-4 hover:bg-[var(--color-surface-2)]/20 transition-all">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-[#eeeef2]">{mod.name}</span>
+                      <span className="text-xs font-bold text-[var(--color-text)]">{mod.name}</span>
                       {isOverridden && (
-                        <span className="text-[8px] bg-[#6fa3b8]/15 text-[#6fa3b8] font-mono px-1.5 py-0.5 rounded border border-[#6fa3b8]/20 uppercase">
+                        <span className="text-[8px] bg-[var(--color-info)]/15 text-[var(--color-info)] font-mono px-1.5 py-0.5 rounded border border-[var(--color-info)]/20 uppercase">
                           Override
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-white/40 font-semibold leading-relaxed mt-1">{mod.description}</p>
+                    <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed mt-1">{mod.description}</p>
                   </div>
 
                   <button
                     onClick={() => handleToggleOverride(mod.key)}
-                    className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all ${
+                    className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all cursor-pointer ${
                       allowed
                         ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
                         : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
@@ -284,28 +284,28 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
           </div>
 
           {/* Col 2 */}
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[var(--color-border)]/40">
             {crmModules.slice(6, 12).map((mod) => {
               const allowed = selectedUser ? isModuleAllowedForUser(selectedUser, mod.key) : false;
               const isOverridden = selectedUser?.permOverrides?.[mod.key] !== undefined;
 
               return (
-                <div key={mod.key} className="p-4 flex items-center justify-between gap-4 hover:bg-white/[0.01] transition-all">
+                <div key={mod.key} className="p-4 flex items-center justify-between gap-4 hover:bg-[var(--color-surface-2)]/20 transition-all">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-[#eeeef2]">{mod.name}</span>
+                      <span className="text-xs font-bold text-[var(--color-text)]">{mod.name}</span>
                       {isOverridden && (
-                        <span className="text-[8px] bg-[#6fa3b8]/15 text-[#6fa3b8] font-mono px-1.5 py-0.5 rounded border border-[#6fa3b8]/20 uppercase">
+                        <span className="text-[8px] bg-[var(--color-info)]/15 text-[var(--color-info)] font-mono px-1.5 py-0.5 rounded border border-[var(--color-info)]/20 uppercase">
                           Override
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-white/40 font-semibold leading-relaxed mt-1">{mod.description}</p>
+                    <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed mt-1">{mod.description}</p>
                   </div>
 
                   <button
                     onClick={() => handleToggleOverride(mod.key)}
-                    className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all ${
+                    className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all cursor-pointer ${
                       allowed
                         ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
                         : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"

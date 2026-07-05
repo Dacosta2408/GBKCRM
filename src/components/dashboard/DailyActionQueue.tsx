@@ -116,10 +116,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         title: `${c.first} ${c.last}`,
         desc: `Missing critical files: ${missingFields.join(", ")}.`,
         badge: `${missingFields.length} Missing Fields`,
-        badgeColor: "bg-yellow-500/10 text-[#b5a642] border-[#b5a642]/20",
+        badgeColor: "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20",
         date: "Incomplete Profile",
         icon: AlertTriangle,
-        iconColor: "text-[#b5a642]",
+        iconColor: "text-[var(--color-warning)]",
         actionLabel: "Complete Profile",
         onAction: () => onOpenClient(c.id),
         onNavigate: () => onOpenClient(c.id)
@@ -201,15 +201,15 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
   return (
     <div className="glass-card flex flex-col h-[480px]" id="daily-action-queue">
       {/* Queue Header */}
-      <div className="p-4 border-b border-[var(--color-divider)] bg-[rgba(18,19,26,0.3)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+      <div className="p-4 border-b border-[var(--color-divider)] bg-[var(--color-primary-subtle)]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-[#b5a642]/10 rounded-lg text-[#b5a642]">
+          <div className="p-1.5 bg-[var(--color-accent-subtle)] rounded-lg text-[var(--color-accent)]">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-2">
               My Daily Action Queue 
-              <span className="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full border border-red-500/15">
+              <span className="text-[10px] bg-[var(--color-error-subtle)] text-[var(--color-error)] px-2 py-0.5 rounded-full border border-[var(--color-error)]/15">
                 {queueItems.length} alerts
               </span>
             </h3>
@@ -284,14 +284,14 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                 className="flex items-center justify-between p-3.5 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)]/80 rounded-xl transition-all group"
               >
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                  <div className={`p-2.5 rounded-lg bg-black/30 border border-[var(--color-border)] ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>
+                  <div className={`p-2.5 rounded-lg bg-[var(--color-bg)]/50 border border-[var(--color-border)] ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h4 
                         onClick={item.onNavigate}
-                        className="text-xs font-semibold text-[var(--color-text)] hover:text-[#b5a642] cursor-pointer transition-colors truncate"
+                        className="text-xs font-semibold text-[var(--color-text)] hover:text-[var(--color-accent)] cursor-pointer transition-colors truncate"
                       >
                         {item.title}
                       </h4>
@@ -313,7 +313,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                 <div className="flex items-center gap-2 shrink-0 pl-4">
                   <button
                     onClick={item.onAction}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#b5a642]/10 border border-[#b5a642]/20 text-[#b5a642] hover:bg-[#b5a642]/20 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[var(--color-accent-subtle)] border border-[var(--color-accent)]/20 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-all cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />

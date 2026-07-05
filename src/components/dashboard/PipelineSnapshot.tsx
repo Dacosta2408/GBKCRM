@@ -82,16 +82,16 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
           </div>
 
           {isManager && (
-            <div className="bg-black/25 border border-white/5 rounded-full p-0.5 flex">
+            <div className="bg-[var(--color-bg)]/50 border border-[var(--color-border)] rounded-full p-0.5 flex">
               <button
                 onClick={() => setPipelineMode("personal")}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer ${pipelineMode === "personal" ? "bg-[var(--color-accent)] text-[#12131a]" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer ${pipelineMode === "personal" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]" : "text-white/60 hover:text-white"}`}
               >
                 My Volume
               </button>
               <button
                 onClick={() => setPipelineMode("team")}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer flex items-center gap-1 ${pipelineMode === "team" ? "bg-[var(--color-accent)] text-[#12131a]" : "text-white/60 hover:text-white"}`}
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all duration-200 cursor-pointer flex items-center gap-1 ${pipelineMode === "team" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]" : "text-white/60 hover:text-white"}`}
               >
                 <Users className="w-3 h-3" /> Team
               </button>

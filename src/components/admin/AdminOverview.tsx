@@ -101,11 +101,11 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="admin-overview-stats">
         
         {/* Metric 1 */}
-        <div className="bg-[#111115] border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-accent)]" />
           <div>
-            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider"> Roster Strength</p>
-            <h3 className="text-2xl font-black text-white mt-1 font-mono">{activeUsers}<span className="text-xs text-white/40 font-normal">/{totalUsers} Active</span></h3>
+            <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider"> Roster Strength</p>
+            <h3 className="text-2xl font-black text-[var(--color-text)] mt-1 font-mono">{activeUsers}<span className="text-xs text-[var(--color-text-faint)] font-normal">/{totalUsers} Active</span></h3>
             <p className="text-[10px] text-[var(--color-accent)] font-semibold mt-1">Ontario FSRA Compliant</p>
           </div>
           <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center text-[var(--color-accent)] group-hover:scale-105 transition-transform">
@@ -114,25 +114,25 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         </div>
 
         {/* Metric 2 */}
-        <div className="bg-[#111115] border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-1 h-full bg-[#6fa3b8]" />
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-info)]" />
           <div>
-            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Audit Security Logs</p>
-            <h3 className="text-2xl font-black text-white mt-1 font-mono">{recentLogsCount}</h3>
+            <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider">Audit Security Logs</p>
+            <h3 className="text-2xl font-black text-[var(--color-text)] mt-1 font-mono">{recentLogsCount}</h3>
             <p className="text-[10px] text-emerald-400 font-semibold mt-1">● Pipeline Active &amp; Guarded</p>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-[#6fa3b8]/10 border border-[#6fa3b8]/20 flex items-center justify-center text-[#6fa3b8] group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-lg bg-[var(--color-info-subtle)] border border-[var(--color-info)]/20 flex items-center justify-center text-[var(--color-info)] group-hover:scale-105 transition-transform">
             <Terminal className="w-5 h-5" />
           </div>
         </div>
 
         {/* Metric 3 */}
-        <div className="bg-[#111115] border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
           <div>
-            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Storage Integrity</p>
-            <h3 className="text-2xl font-black text-white mt-1 font-mono">100%</h3>
-            <p className="text-[10px] text-white/40 font-semibold mt-1">Last Backup: Today 11:45 AM</p>
+            <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider">Storage Integrity</p>
+            <h3 className="text-2xl font-black text-[var(--color-text)] mt-1 font-mono">100%</h3>
+            <p className="text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">Last Backup: Today 11:45 AM</p>
           </div>
           <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
             <Database className="w-5 h-5" />
@@ -140,11 +140,11 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         </div>
 
         {/* Metric 4 */}
-        <div className="bg-[#111115] border border-white/5 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
+        <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
           <div>
-            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Unresolved Threats</p>
-            <h3 className="text-2xl font-black text-white mt-1 font-mono">{systemAlerts.filter(a => a.severity === "high" || a.severity === "medium").length}</h3>
+            <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider">Unresolved Threats</p>
+            <h3 className="text-2xl font-black text-[var(--color-text)] mt-1 font-mono">{systemAlerts.filter(a => a.severity === "high" || a.severity === "medium").length}</h3>
             <p className="text-[10px] text-red-400 font-semibold mt-1">Needs Admin Review</p>
           </div>
           <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform">
@@ -161,13 +161,13 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         <div className="lg:col-span-2 space-y-6">
           
           {/* Active System Warnings Banners */}
-          <div className="bg-[#121216] border border-white/5 rounded-xl p-5 shadow-lg" id="admin-system-warnings-panel">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 shadow-lg" id="admin-system-warnings-panel">
+            <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-red-400" />
-                <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">System Control Warnings</h4>
+                <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">System Control Warnings</h4>
               </div>
-              <span className="text-[9px] bg-red-500/10 text-red-400 font-mono px-2 py-0.5 rounded border border-red-500/15">
+              <span className="text-[9px] bg-[var(--color-error-subtle)] text-[var(--color-error)] font-mono px-2 py-0.5 rounded border border-[var(--color-error)]/15">
                 Real-Time Diagnostics
               </span>
             </div>
@@ -178,10 +178,10 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                   key={alert.id}
                   className={`p-3.5 rounded-lg border flex items-start gap-3 transition-all ${
                     alert.severity === "high" 
-                      ? "bg-red-500/5 border-red-500/20 text-red-200" 
+                      ? "bg-red-500/5 border-red-500/20 text-[var(--color-text)]" 
                       : alert.severity === "medium"
-                      ? "bg-amber-500/5 border-amber-500/20 text-amber-200"
-                      : "bg-[#18181f] border-white/5 text-white/70"
+                      ? "bg-amber-500/5 border-amber-500/20 text-[var(--color-text)]"
+                      : "bg-[var(--color-surface-2)] border-[var(--color-border)]/50 text-[var(--color-text-muted)]"
                   }`}
                 >
                   {alert.severity === "high" ? (
@@ -195,7 +195,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                   <div className="flex-1 min-w-0">
                     <p className="text-xs leading-relaxed font-semibold">{alert.message}</p>
                     <div className="flex items-center gap-4 mt-2">
-                      <span className="text-[9px] uppercase font-bold text-white/40">Category: {alert.type}</span>
+                      <span className="text-[9px] uppercase font-bold text-[var(--color-text-faint)]">Category: {alert.type}</span>
                       <span className={`text-[9px] uppercase font-bold ${
                         alert.severity === "high" ? "text-red-400" : alert.severity === "medium" ? "text-amber-400" : "text-emerald-400"
                       }`}>Severity: {alert.severity}</span>
@@ -209,7 +209,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                       else if (alert.type === "integrity") setActiveTab("backup");
                       else showToast("Navigating to target control node...", "success");
                     }}
-                    className="shrink-0 text-[10px] font-black uppercase text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] px-2 py-1 bg-white/5 rounded border border-white/5 hover:bg-[var(--color-accent)]/10 transition-all self-center"
+                    className="shrink-0 text-[10px] font-black uppercase text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] px-2 py-1 bg-[var(--color-surface-3)] rounded border border-[var(--color-border)]/40 hover:bg-[var(--color-accent)]/10 transition-all self-center"
                   >
                     {alert.actionLabel}
                   </button>
@@ -219,63 +219,63 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
           </div>
 
           {/* Intake Pipelines Status Overseer */}
-          <div className="bg-[#121216] border border-white/5 rounded-xl p-5 shadow-lg" id="admin-intake-control">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 shadow-lg" id="admin-intake-control">
+            <div className="flex items-center justify-between border-b border-[var(--color-border)]/70 pb-3 mb-4">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-[#6fa3b8]" />
-                <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Intake Source &amp; Extraction Oversight</h4>
+                <Globe className="w-4 h-4 text-[var(--color-info)]" />
+                <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Intake Source &amp; Extraction Oversight</h4>
               </div>
-              <div className="flex items-center gap-1.5 text-[9px] text-white/40 font-semibold">
+              <div className="flex items-center gap-1.5 text-[9px] text-[var(--color-text-faint)] font-semibold">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live Listeners Enabled
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Web Forms */}
-              <div className="bg-[#17171e] border border-white/5 p-3.5 rounded-xl text-center relative group hover:border-[#6fa3b8]/30 transition-all">
-                <Globe className="w-5 h-5 mx-auto text-[#6fa3b8] mb-1.5" />
-                <h5 className="text-[11px] font-bold text-white uppercase tracking-wider">Website Portal API</h5>
+              <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-info)]/30 transition-all">
+                <Globe className="w-5 h-5 mx-auto text-[var(--color-info)] mb-1.5" />
+                <h5 className="text-[11px] font-bold text-[var(--color-text)] uppercase tracking-wider">Website Portal API</h5>
                 <p className="text-[9px] text-emerald-400 font-bold mt-1 uppercase">● Operational</p>
-                <div className="text-[10px] text-white/40 mt-2 border-t border-white/5 pt-1.5 font-mono">
+                <div className="text-[10px] text-[var(--color-text-faint)] mt-2 border-t border-[var(--color-border)]/50 pt-1.5 font-mono">
                   12 Intake Syncs / 24h
                 </div>
               </div>
 
               {/* Email Extractor */}
-              <div className="bg-[#17171e] border border-white/5 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-accent)]/30 transition-all">
+              <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-accent)]/30 transition-all">
                 <Mail className="w-5 h-5 mx-auto text-[var(--color-accent)] mb-1.5" />
-                <h5 className="text-[11px] font-bold text-white uppercase tracking-wider">Email IMAP Sync</h5>
+                <h5 className="text-[11px] font-bold text-[var(--color-text)] uppercase tracking-wider">Email IMAP Sync</h5>
                 <p className="text-[9px] text-emerald-400 font-bold mt-1 uppercase">● Operational</p>
-                <div className="text-[10px] text-white/40 mt-2 border-t border-white/5 pt-1.5 font-mono">
+                <div className="text-[10px] text-[var(--color-text-faint)] mt-2 border-t border-[var(--color-border)]/50 pt-1.5 font-mono">
                   info@gbkfinancial.ca
                 </div>
               </div>
 
               {/* AI Extraction Engine */}
-              <div className="bg-[#17171e] border border-white/5 p-3.5 rounded-xl text-center relative group hover:border-violet-500/30 transition-all">
+              <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-3.5 rounded-xl text-center relative group hover:border-violet-500/30 transition-all">
                 <Sparkles className="w-5 h-5 mx-auto text-violet-400 mb-1.5 animate-pulse" />
-                <h5 className="text-[11px] font-bold text-white uppercase tracking-wider">AI Parsing Model</h5>
+                <h5 className="text-[11px] font-bold text-[var(--color-text)] uppercase tracking-wider">AI Parsing Model</h5>
                 <p className="text-[9px] text-violet-400 font-bold mt-1 uppercase">✦ Active (Pro v1.5)</p>
-                <div className="text-[10px] text-white/40 mt-2 border-t border-white/5 pt-1.5 font-mono">
+                <div className="text-[10px] text-[var(--color-text-faint)] mt-2 border-t border-[var(--color-border)]/50 pt-1.5 font-mono">
                   Confidence: 94.2%
                 </div>
               </div>
             </div>
 
             {/* Ingestion Issue Oversight Status */}
-            <div className="bg-[#181822] border border-white/5 rounded-lg p-3 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-3 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                   <AlertCircle className="w-4 h-4" />
                 </div>
                 <div>
-                  <h6 className="text-[11px] font-bold text-white uppercase">Duplicate &amp; Ingestion Errors Log</h6>
-                  <p className="text-[10px] text-white/40 font-semibold">1 duplicate application rejected, 2 OCR extractions require verification.</p>
+                  <h6 className="text-[11px] font-bold text-[var(--color-text)] uppercase">Duplicate &amp; Ingestion Errors Log</h6>
+                  <p className="text-[10px] text-[var(--color-text-faint)] font-semibold">1 duplicate application rejected, 2 OCR extractions require verification.</p>
                 </div>
               </div>
               <button 
                 onClick={() => showToast("Scanning intake pipelines for newer payloads...", "success")}
-                className="bg-[#15151c] hover:bg-[#1f1f2a] text-white text-[9px] font-bold uppercase px-2.5 py-1.5 rounded border border-white/5 flex items-center gap-1 transition-all"
+                className="bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] text-[9px] font-bold uppercase px-2.5 py-1.5 rounded border border-[var(--color-border)]/70 flex items-center gap-1 transition-all"
               >
                 <RefreshCw className="w-3 h-3 animate-spin" /> Audit Pipelines
               </button>
@@ -288,11 +288,11 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         <div className="space-y-6">
           
           {/* Recent Operations Audit Board */}
-          <div className="bg-[#121216] border border-white/5 rounded-xl p-5 shadow-lg flex flex-col h-[340px]" id="admin-timeline-panel">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 shadow-lg flex flex-col h-[340px]" id="admin-timeline-panel">
+            <div className="flex items-center justify-between border-b border-[var(--color-border)]/70 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[var(--color-accent)]" />
-                <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider font-sans">Recent Log Trajectory</h4>
+                <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider font-sans">Recent Log Trajectory</h4>
               </div>
               <button 
                 onClick={() => setActiveTab("audit")}
@@ -309,18 +309,18 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                   <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] shrink-0 mt-1.5" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-white/90 truncate capitalize">{log.action || log.event}</span>
-                      <span className="text-[9px] text-white/30 font-mono shrink-0">
+                      <span className="font-bold text-[var(--color-text)] truncate capitalize">{log.action || log.event}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] font-mono shrink-0">
                         {log.timestamp ? new Date(log.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Now"}
                       </span>
                     </div>
-                    <p className="text-white/50 leading-tight mt-0.5 truncate">{log.summary || log.details || "System automated status check"}</p>
-                    <p className="text-[9px] text-white/30 font-semibold mt-1">Operator: {log.user || log.operator || "System Daemon"}</p>
+                    <p className="text-[var(--color-text-muted)] leading-tight mt-0.5 truncate">{log.summary || log.details || "System automated status check"}</p>
+                    <p className="text-[9px] text-[var(--color-text-faint)] font-semibold mt-1">Operator: {log.user || log.operator || "System Daemon"}</p>
                   </div>
                 </div>
               ))}
               {auditLogs.length === 0 && (
-                <div className="h-full flex flex-col items-center justify-center text-center text-white/20">
+                <div className="h-full flex flex-col items-center justify-center text-center text-[var(--color-text-faint)]">
                   <FileText className="w-10 h-10 mb-2 stroke-1" />
                   <p className="text-xs italic">No activity audits written to disk yet.</p>
                 </div>
@@ -329,13 +329,13 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
           </div>
 
           {/* Secure Control Room Actions */}
-          <div className="bg-gradient-to-br from-[#121216] to-[#0c0c0e] border border-white/5 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div className="bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl p-5 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
               <Lock className="w-20 h-20" />
             </div>
 
-            <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider mb-2">Emergency Guard Panel</h4>
-            <p className="text-[10px] text-white/40 font-semibold mb-4 leading-relaxed">
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider mb-2">Emergency Guard Panel</h4>
+            <p className="text-[10px] text-[var(--color-text-faint)] font-semibold mb-4 leading-relaxed">
               If workstation compliance is breached or an external threat is suspected, lock down current sessions instantly.
             </p>
 

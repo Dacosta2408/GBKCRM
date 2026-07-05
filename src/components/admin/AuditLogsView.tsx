@@ -110,12 +110,12 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
     <div className="space-y-6" id="audit-logs-view">
       
       {/* Filtering Header bar */}
-      <div className="bg-[#121216] border border-white/5 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
         
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           {/* Search */}
-          <div className="bg-[#181820] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[var(--color-accent)]/30 transition-all">
-            <Search className="w-3.5 h-3.5 text-white/30" />
+          <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[var(--color-accent)]/30 transition-all">
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-faint)]" />
             <input 
               type="text" 
               placeholder="Search actions, operators, payloads..." 
@@ -124,7 +124,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-transparent text-xs text-white placeholder-white/30 outline-none w-full"
+              className="bg-transparent text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] outline-none w-full"
             />
           </div>
 
@@ -135,7 +135,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+            className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-xs text-[var(--color-text)] px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[var(--color-surface-3)] transition-all"
           >
             <option value="all">All Categories</option>
             <option value="security">Security Policy</option>
@@ -152,7 +152,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
               setSeverityFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+            className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-xs text-[var(--color-text)] px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[var(--color-surface-3)] transition-all"
           >
             <option value="all">All Severities</option>
             <option value="high">High Risk 🔴</option>
@@ -172,7 +172,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
 
           <button
             onClick={handleExportCSV}
-            className="w-full sm:w-auto bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-bold uppercase px-3.5 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
+            className="w-full sm:w-auto bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] text-xs font-bold uppercase px-3.5 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
           >
             <Download className="w-4 h-4" /> Export CSV Logs
           </button>
@@ -181,11 +181,11 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
       </div>
 
       {/* Audit Logs Table */}
-      <div className="bg-[#111115] border border-white/5 rounded-xl overflow-hidden shadow-md" id="audit-table-holder">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl overflow-hidden shadow-md" id="audit-table-holder">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
-              <tr className="border-b border-white/5 bg-[#141419] text-[10px] text-white/40 uppercase font-black tracking-wider select-none">
+              <tr className="border-b border-[var(--color-border)]/50 bg-[var(--color-surface-2)] text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-wider select-none">
                 <th className="px-5 py-3">Timestamp</th>
                 <th className="px-5 py-3">Category</th>
                 <th className="px-5 py-3">Action Description</th>
@@ -194,7 +194,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
                 <th className="px-5 py-3 text-right">Severity</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-xs">
+            <tbody className="divide-y divide-[var(--color-border)]/40 text-xs">
               {paginatedLogs.map((log, idx) => {
                 const category = log.category || log.type || "System";
                 const severity = log.severity || "info";
@@ -204,10 +204,10 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
                   : new Date().toLocaleString("en-US", { hour12: true });
 
                 return (
-                  <tr key={log.id || idx} className="hover:bg-white/[0.01] transition-all">
+                  <tr key={log.id || idx} className="hover:bg-[var(--color-surface-2)]/30 transition-all">
                     
                     {/* Timestamp */}
-                    <td className="px-5 py-3.5 text-white/40 font-mono text-[10px] whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-[var(--color-text-faint)] font-mono text-[10px] whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5" />
                         <span>{timestampStr}</span>
@@ -216,26 +216,26 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
 
                     {/* Category */}
                     <td className="px-5 py-3.5">
-                      <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded bg-white/5 text-white/60 border border-white/5">
+                      <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]/50">
                         {category}
                       </span>
                     </td>
 
                     {/* Action Description */}
-                    <td className="px-5 py-3.5 font-bold text-[#eeeef2] whitespace-nowrap">
+                    <td className="px-5 py-3.5 font-bold text-[var(--color-text)] whitespace-nowrap">
                       {log.action || log.event || "Audit Event"}
                     </td>
 
                     {/* Operator */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1.5">
-                        <UserCheck className="w-3.5 h-3.5 text-white/30" />
-                        <span className="font-semibold text-white/70">{log.user || log.operator || "System Daemon"}</span>
+                        <UserCheck className="w-3.5 h-3.5 text-[var(--color-text-faint)]" />
+                        <span className="font-semibold text-[var(--color-text-muted)]">{log.user || log.operator || "System Daemon"}</span>
                       </div>
                     </td>
 
                     {/* Details */}
-                    <td className="px-5 py-3.5 text-white/50 max-w-sm truncate" title={details}>
+                    <td className="px-5 py-3.5 text-[var(--color-text-muted)]/80 max-w-sm truncate" title={details}>
                       {details}
                     </td>
 
@@ -243,9 +243,9 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
                     <td className="px-5 py-3.5 text-right">
                       <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded border ${
                         severity.toLowerCase() === "high"
-                          ? "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20"
                           : severity.toLowerCase() === "medium"
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          ? "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20"
                           : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                       }`}>
                         {severity}
@@ -258,7 +258,7 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
 
               {paginatedLogs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-white/30">
+                  <td colSpan={6} className="px-5 py-12 text-center text-[var(--color-text-faint)]">
                     <Terminal className="w-10 h-10 mx-auto mb-2 stroke-1" />
                     <p className="italic">No operational audit logs met the active filters.</p>
                   </td>
@@ -270,8 +270,8 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="bg-[#141419] px-5 py-3 border-t border-white/5 flex items-center justify-between select-none">
-            <span className="text-[10px] text-white/40 font-semibold">
+          <div className="bg-[var(--color-surface-2)] px-5 py-3 border-t border-[var(--color-border)]/50 flex items-center justify-between select-none">
+            <span className="text-[10px] text-[var(--color-text-faint)] font-semibold">
               Showing logs {(currentPage - 1) * logsPerPage + 1}-{Math.min(currentPage * logsPerPage, filteredLogs.length)} of {filteredLogs.length}
             </span>
             
@@ -279,19 +279,19 @@ export const AuditLogsView: React.FC<AuditLogsViewProps> = ({
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="p-1 hover:bg-white/5 rounded border border-white/5 text-white/60 disabled:opacity-40"
+                className="p-1 hover:bg-[var(--color-surface-3)] rounded border border-[var(--color-border)]/50 text-[var(--color-text-muted)] disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               
-              <span className="text-xs text-white/80 font-mono font-bold px-2">
+              <span className="text-xs text-[var(--color-text)] font-mono font-bold px-2">
                 Page {currentPage} of {totalPages}
               </span>
 
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="p-1 hover:bg-white/5 rounded border border-white/5 text-white/60 disabled:opacity-40"
+                className="p-1 hover:bg-[var(--color-surface-3)] rounded border border-[var(--color-border)]/50 text-[var(--color-text-muted)] disabled:opacity-40 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

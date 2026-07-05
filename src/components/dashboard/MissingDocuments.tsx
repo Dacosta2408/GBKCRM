@@ -92,7 +92,7 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
                 <div className="flex items-center justify-between gap-2">
                   <span
                     onClick={() => onOpenClient(client.id)}
-                    className="text-xs font-bold text-[var(--color-text)] hover:text-[#b5a642] cursor-pointer transition-colors truncate"
+                    className="text-xs font-bold text-[var(--color-text)] hover:text-[var(--color-accent)] cursor-pointer transition-colors truncate"
                   >
                     {client.first} {client.last}
                   </span>
@@ -102,17 +102,17 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
                 </div>
 
                 {/* Missing checklist grid */}
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-black/25 p-2 rounded-md">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-[var(--color-bg)]/50 p-2 rounded-md">
                   {REQUIRED_DOCS.map(doc => {
                     const isMissing = missing.includes(doc.label);
                     return (
                       <div key={doc.id} className="flex items-center gap-1.5 text-[9px] min-w-0">
                         {isMissing ? (
-                          <AlertCircle className="w-3 h-3 text-red-400 shrink-0" />
+                          <AlertCircle className="w-3 h-3 text-[var(--color-error)] shrink-0" />
                         ) : (
                           <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
                         )}
-                        <span className={`truncate ${isMissing ? "text-red-400/80" : "text-[var(--color-text-muted)]/60"}`}>
+                        <span className={`truncate ${isMissing ? "text-[var(--color-error)]/80" : "text-[var(--color-text-muted)]/60"}`}>
                           {doc.label}
                         </span>
                       </div>
@@ -128,7 +128,7 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
                       onOpenClient(client.id);
                       setActiveTab("emails");
                     }}
-                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#b5a642]/10 text-[#b5a642] border border-[#b5a642]/20 hover:bg-[#b5a642]/20 font-bold transition-all cursor-pointer"
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 font-bold transition-all cursor-pointer"
                   >
                     <Mail className="w-2.5 h-2.5" /> Request Docs
                   </button>

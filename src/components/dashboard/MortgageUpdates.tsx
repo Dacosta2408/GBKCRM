@@ -106,11 +106,11 @@ export const MortgageUpdates: React.FC = () => {
 
   const getCategoryColor = (cat: string) => {
     switch (cat) {
-      case "Rate Update": return "bg-red-500/10 text-red-400 border-red-500/15";
+      case "Rate Update": return "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/15";
       case "Lender Policy": return "bg-orange-500/10 text-orange-400 border-orange-500/15";
       case "Regulatory": return "bg-purple-500/10 text-purple-400 border-purple-500/15";
       case "CMHC": return "bg-blue-500/10 text-blue-400 border-blue-500/15";
-      default: return "bg-[#b5a642]/10 text-[#b5a642] border-[#b5a642]/15";
+      default: return "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border-[var(--color-accent)]/15";
     }
   };
 
@@ -119,13 +119,13 @@ export const MortgageUpdates: React.FC = () => {
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-divider)] pb-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-[#b5a642]/10 rounded-lg text-[var(--color-accent)]">
+          <div className="p-1.5 bg-[var(--color-accent-subtle)] rounded-lg text-[var(--color-accent)]">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-2">
               GBK Market Intelligence Report
-              <span className="text-[9px] bg-[#b5a642]/15 text-[var(--color-accent)] px-2 py-0.5 rounded-full border border-[#b5a642]/20 animate-pulse">
+              <span className="text-[9px] bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-2 py-0.5 rounded-full border border-[var(--color-accent)]/20 animate-pulse">
                 AI Powered
               </span>
             </h3>
@@ -138,7 +138,7 @@ export const MortgageUpdates: React.FC = () => {
         <button
           onClick={handleFetchAINews}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg bg-[var(--color-accent)] text-black hover:bg-[#d68b4f] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer font-sans"
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg bg-[var(--color-accent)] text-[var(--color-text-inverse)] hover:bg-[var(--color-accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer font-sans"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
           {loading ? "Re-Analyzing Market..." : "Refresh AI Intel Update"}

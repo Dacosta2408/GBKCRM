@@ -143,21 +143,21 @@ export const KPICards: React.FC<KPICardsProps> = ({
             {/* Top Border Color Strip */}
             <div 
               className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl"
-              style={{ background: card.alert ? "linear-gradient(135deg, #e05c6e 0%, #7A5063 100%)" : card.isPrimary ? "var(--grad-warm-highlight)" : "var(--grad-slate-blue)" }}
+              style={{ background: card.alert ? "linear-gradient(135deg, var(--color-error) 0%, var(--color-primary) 100%)" : card.isPrimary ? "var(--grad-warm-highlight)" : "var(--grad-slate-blue)" }}
             />
 
             <div className="flex items-center justify-between gap-1">
               <span className="text-[10px] text-[var(--color-text-muted)] font-black uppercase tracking-wider truncate">
                 {card.title}
               </span>
-              <Icon className={`w-3.5 h-3.5 shrink-0 ${card.alert ? 'text-red-400' : 'text-[#676F9D]'}`} />
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${card.alert ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`} />
             </div>
 
             <div className="mt-2.5 flex items-baseline justify-between">
               <span className="text-2xl font-black tracking-tight" style={{ color: "var(--color-accent)" }}>
                 {card.value}
               </span>
-              <span className="text-[10px] text-white/20 group-hover:text-white/50 transition-colors">
+              <span className="text-[10px] text-[var(--color-text-faint)]/40 group-hover:text-[var(--color-text-faint)] transition-colors">
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>

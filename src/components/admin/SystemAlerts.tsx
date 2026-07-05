@@ -112,23 +112,23 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Broadcaster Composition Form */}
-        <div className="lg:col-span-1 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col justify-between h-[360px]">
-          <div className="flex items-center gap-2 border-b border-white/5 pb-3">
+        <div className="lg:col-span-1 bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-5 rounded-xl shadow-lg flex flex-col justify-between h-[360px]">
+          <div className="flex items-center gap-2 border-b border-[var(--color-border)]/50 pb-3">
             <Megaphone className="w-4.5 h-4.5 text-[var(--color-accent)]" />
-            <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Dispatch Global Notice</h4>
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Dispatch Global Notice</h4>
           </div>
 
           <form onSubmit={handleSendBroadcast} className="space-y-4 mt-3 flex-1 flex flex-col justify-between">
             <div>
-              <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Notice Classification</label>
+              <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Notice Classification</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setMsgType("info")}
-                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all ${
+                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all cursor-pointer ${
                     msgType === "info" 
                       ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" 
-                      : "bg-[#181820] border-white/5 text-white/40 hover:text-white"
+                      : "bg-[var(--color-surface-2)] border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
                   }`}
                 >
                   🟢 Info Banner
@@ -136,10 +136,10 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                 <button
                   type="button"
                   onClick={() => setMsgType("warning")}
-                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all ${
+                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all cursor-pointer ${
                     msgType === "warning" 
                       ? "bg-amber-500/10 text-amber-400 border-amber-500/30" 
-                      : "bg-[#181820] border-white/5 text-white/40 hover:text-white"
+                      : "bg-[var(--color-surface-2)] border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
                   }`}
                 >
                   🟡 Warning Notice
@@ -147,10 +147,10 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                 <button
                   type="button"
                   onClick={() => setMsgType("critical")}
-                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all ${
+                  className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all cursor-pointer ${
                     msgType === "critical" 
                       ? "bg-red-500/10 text-red-400 border-red-500/30" 
-                      : "bg-[#181820] border-white/5 text-white/40 hover:text-white"
+                      : "bg-[var(--color-surface-2)] border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
                   }`}
                 >
                   🔴 Critical Alert
@@ -159,19 +159,19 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
             </div>
 
             <div className="flex-1 mt-3">
-              <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Compose Broadcast Message</label>
+              <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Compose Broadcast Message</label>
               <textarea
                 required
                 value={newMsg}
                 onChange={(e) => setNewMsg(e.target.value)}
-                placeholder="Write an operational notice to stream to all active broker login workspaces..."
-                className="w-full bg-[#181820] border border-white/5 rounded-lg p-3 text-xs text-white outline-none resize-none h-24 focus:border-[var(--color-accent)]/30 transition-all placeholder-white/20"
+                placeholder="Write an operational notice to stream to all active brokerage login workspaces..."
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg p-3 text-xs text-[var(--color-text)] outline-none resize-none h-24 focus:border-[var(--color-accent)]/30 transition-all placeholder-[var(--color-text-faint)]/60"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all mt-2"
+              className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] text-xs font-black uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all mt-2 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5 stroke-[2.5]" /> Dispatch Brokerage Notice
             </button>
@@ -179,13 +179,13 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
         </div>
 
         {/* Live Active Banners Directory */}
-        <div className="lg:col-span-2 bg-[#121216] border border-white/5 p-5 rounded-xl shadow-lg flex flex-col h-[360px]">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+        <div className="lg:col-span-2 bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-5 rounded-xl shadow-lg flex flex-col h-[360px]">
+          <div className="flex items-center justify-between border-b border-[var(--color-border)]/50 pb-3 mb-4">
             <div className="flex items-center gap-2">
-              <Bell className="w-4.5 h-4.5 text-[#6fa3b8]" />
-              <h4 className="text-xs font-bold text-[#eeeef2] uppercase tracking-wider">Active Broadcast Banner Streams</h4>
+              <Bell className="w-4.5 h-4.5 text-[var(--color-info)]" />
+              <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Active Broadcast Banner Streams</h4>
             </div>
-            <span className="text-[10px] text-white/40 font-mono font-bold">
+            <span className="text-[10px] text-[var(--color-text-faint)] font-mono font-bold">
               {broadcasts.filter(b => b.active).length} Active Channels
             </span>
           </div>
@@ -201,7 +201,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                       : b.type === "warning"
                       ? "bg-amber-500/5 border-amber-500/20 text-amber-200"
                       : "bg-emerald-500/5 border-emerald-500/20 text-emerald-200"
-                    : "bg-[#181820]/40 border-white/5 text-white/40"
+                    : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)]/50 text-[var(--color-text-faint)]"
                 }`}
               >
                 {b.type === "critical" ? (
@@ -215,7 +215,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                 <div className="flex-1 min-w-0 text-left text-xs">
                   <p className="leading-relaxed font-medium">{b.message}</p>
                   
-                  <div className="flex items-center gap-3.5 mt-2.5 text-[9px] font-semibold text-white/30 uppercase">
+                  <div className="flex items-center gap-3.5 mt-2.5 text-[9px] font-semibold text-[var(--color-text-faint)] uppercase">
                     <span>Sender: {b.sender} ({b.senderRole})</span>
                     <span>•</span>
                     <span className="font-mono">
@@ -227,9 +227,9 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
                 <div className="flex items-center gap-2 self-center shrink-0">
                   <button
                     onClick={() => handleToggleActive(b.id)}
-                    className={`text-[9px] font-bold uppercase border px-2 py-1 rounded transition-all ${
+                    className={`text-[9px] font-bold uppercase border px-2 py-1 rounded transition-all cursor-pointer ${
                       b.active 
-                        ? "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                        ? "bg-[var(--color-surface-2)] border-[var(--color-border)]/50 text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)]"
                         : "bg-[var(--color-accent)]/10 border-[var(--color-accent)]/15 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20"
                     }`}
                   >
@@ -238,7 +238,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
 
                   <button
                     onClick={() => handleDeleteBroadcast(b.id)}
-                    className="p-1 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 text-white/20 hover:text-red-400 rounded transition-all"
+                    className="p-1 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 text-[var(--color-text-faint)]/40 hover:text-red-400 rounded transition-all cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -247,7 +247,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
             ))}
 
             {broadcasts.length === 0 && (
-              <div className="h-full flex flex-col items-center justify-center text-center text-white/20">
+              <div className="h-full flex flex-col items-center justify-center text-center text-[var(--color-text-faint)]">
                 <Megaphone className="w-10 h-10 mb-2 stroke-1" />
                 <p className="text-xs italic">No system broadcasts deployed yet.</p>
               </div>

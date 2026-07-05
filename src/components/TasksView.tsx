@@ -34,7 +34,7 @@ interface TasksViewProps {
 }
 
 export const TASK_CATEGORIES = [
-  { value: "Client Follow-up", color: "bg-amber-500", border: "border-amber-500/25", text: "text-amber-400", lightBg: "bg-amber-500/10", glow: "shadow-[0_0_12px_rgba(245,158,11,0.15)]" },
+  { value: "Client Follow-up", color: "bg-[var(--color-warning)]", border: "border-[var(--color-warning)]/25", text: "text-[var(--color-warning)]", lightBg: "bg-[var(--color-warning-subtle)]", glow: "shadow-[0_0_12px_rgba(200,146,42,0.15)]" },
   { value: "Document Collection", color: "bg-violet-500", border: "border-violet-500/25", text: "text-violet-400", lightBg: "bg-violet-500/10", glow: "shadow-[0_0_12px_rgba(139,92,246,0.15)]" },
   { value: "Lender Follow-up", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
   { value: "Underwriting Review", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
@@ -47,8 +47,8 @@ export const TASK_CATEGORIES = [
 ];
 
 export const PRIORITY_SCHEME = {
-  urgent: { label: "Urgent 🌋", text: "text-red-400", border: "border-red-500/30", bg: "bg-red-500/10" },
-  high: { label: "High 🌋", text: "text-amber-400", border: "border-amber-500/30", bg: "bg-amber-500/10" },
+  urgent: { label: "Urgent 🌋", text: "text-[var(--color-error)]", border: "border-[var(--color-error)]/30", bg: "bg-[var(--color-error-subtle)]" },
+  high: { label: "High 🌋", text: "text-[var(--color-warning)]", border: "border-[var(--color-warning)]/30", bg: "bg-[var(--color-warning-subtle)]" },
   medium: { label: "Medium ⚠️", text: "text-blue-400", border: "border-blue-300/25", bg: "bg-blue-500/10" },
   low: { label: "Low ☕", text: "text-slate-400", border: "border-slate-500/25", bg: "bg-slate-500/10" }
 };
@@ -623,12 +623,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
             <div 
               onClick={() => setActiveFilter("today")}
               className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                activeFilter === "today" ? "bg-red-500/10 border-red-500/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
+                activeFilter === "today" ? "bg-[var(--color-error-subtle)] border-[var(--color-error)]/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
               }`}
             >
-              <span className="text-[9px] text-[#f87171] font-bold block uppercase tracking-wider mb-1">Today Due</span>
+              <span className="text-[9px] text-[var(--color-error)] font-bold block uppercase tracking-wider mb-1">Today Due</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-xl font-mono font-black text-red-400">{sanitizedTasks.filter(t => t.extendedStatus !== "done" && t.dueDate === todayStr).length}</span>
+                <span className="text-xl font-mono font-black text-[var(--color-error)]">{sanitizedTasks.filter(t => t.extendedStatus !== "done" && t.dueDate === todayStr).length}</span>
                 <span className="text-[8.5px] text-[var(--color-text-faint)] font-medium">outstanding</span>
               </div>
             </div>
@@ -636,12 +636,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
             <div 
               onClick={() => setActiveFilter("overdue")}
               className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                activeFilter === "overdue" ? "bg-amber-500/10 border-amber-500/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
+                activeFilter === "overdue" ? "bg-[var(--color-warning-subtle)] border-[var(--color-warning)]/30" : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:bg-[var(--color-surface-2)]/40"
               }`}
             >
-              <span className="text-[9px] text-[#fbbf24] font-bold block uppercase tracking-wider mb-1">Overdue alert</span>
+              <span className="text-[9px] text-[var(--color-warning)] font-bold block uppercase tracking-wider mb-1">Overdue alert</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-xl font-mono font-black text-amber-400">{stats.overdue}</span>
+                <span className="text-xl font-mono font-black text-[var(--color-warning)]">{stats.overdue}</span>
                 <span className="text-[8.5px] text-[var(--color-text-faint)] font-medium">unresolved</span>
               </div>
             </div>
@@ -960,7 +960,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
             {viewLayout === "board" && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-full select-none" id="kanban-scaffolding-box">
                 {[
-                  { key: "todo", label: "To Do Actions", border: "border-amber-500/20", colorText: "text-amber-400/80" },
+                  { key: "todo", label: "To Do Actions", border: "border-[var(--color-warning)]/20", colorText: "text-[var(--color-warning)]/80" },
                   { key: "in_progress", label: "In active flow", border: "border-cyan-500/20", colorText: "text-cyan-400" },
                   { key: "waiting", label: "Waiting On Info", border: "border-orange-500/20", colorText: "text-orange-400" },
                   { key: "done", label: "Done / Completed", border: "border-emerald-500/20", colorText: "text-emerald-400" }
@@ -1491,7 +1491,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
       {/* ✦ DYNAMIC POPUP DIALOG CREATE ACTION MODAL (MODAL) ✦ */}
       <AnimatePresence>
         {isAddingTask && (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}

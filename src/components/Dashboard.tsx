@@ -84,7 +84,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text)]">{getGreeting()}</h2>
-            <span className="text-[10px] font-bold bg-[#b5a642]/10 text-[#b5a642] px-2.5 py-0.5 rounded-full border border-[#b5a642]/15 flex items-center gap-1">
+            <span className="text-[10px] font-bold bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-2.5 py-0.5 rounded-full border border-[var(--color-accent)]/15 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
               {currentUser.role} Session Active
             </span>
@@ -105,7 +105,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <button 
             onClick={onAddEvent}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-[#b5a642]/10 border border-[#b5a642]/30 hover:bg-[#b5a642]/20 text-[#b5a642] transition-all cursor-pointer font-sans"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-[var(--color-accent-subtle)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] transition-all cursor-pointer font-sans"
           >
             <Clock className="w-3.5 h-3.5" /> Log Outreach Event
           </button>

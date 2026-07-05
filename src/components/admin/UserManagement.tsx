@@ -221,17 +221,17 @@ export const UserManagement: React.FC<UserManagementProps> = ({
     <div className="space-y-6" id="user-management-panel">
       
       {/* Search and Filters Header bar */}
-      <div className="bg-[#121216] border border-white/5 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           {/* Search box */}
-          <div className="bg-[#181820] border border-white/5 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[#b5a642]/30 transition-all">
-            <Search className="w-3.5 h-3.5 text-white/30" />
+          <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-2.5 py-1.5 flex items-center gap-2 w-full sm:w-64 focus-within:border-[var(--color-accent)]/30 transition-all">
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-faint)]" />
             <input 
               type="text" 
               placeholder="Search by name, email, role..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-transparent text-xs text-white placeholder-white/30 outline-none w-full"
+              className="bg-transparent text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] outline-none w-full"
             />
           </div>
 
@@ -239,7 +239,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
           <select 
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+            className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-xs text-[var(--color-text)] px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[var(--color-surface-3)] transition-all"
           >
             <option value="all">All Roles</option>
             <option value="Owner / Master Admin">Owner / Master Admin</option>
@@ -253,7 +253,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
           <select 
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[#181820] border border-white/5 text-xs text-white px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[#20202c] transition-all"
+            className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-xs text-[var(--color-text)] px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[var(--color-surface-3)] transition-all"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -264,17 +264,17 @@ export const UserManagement: React.FC<UserManagementProps> = ({
         {/* Onboard recruiting button */}
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-bold uppercase px-4 py-2 rounded-lg flex items-center gap-1.5 shrink-0 transition-all"
+          className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] text-xs font-bold uppercase px-4 py-2 rounded-lg flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
         >
           <UserPlus className="w-4 h-4 stroke-[2.5]" /> Onboard Broker Staff
         </button>
       </div>
 
       {/* Roster Main Table grid layout */}
-      <div className="bg-[#111115] border border-white/5 rounded-xl overflow-x-auto shadow-md" id="roster-table-container">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl overflow-x-auto shadow-md" id="roster-table-container">
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
-            <tr className="border-b border-white/5 bg-[#141419] text-[10px] text-white/40 uppercase font-black tracking-wider select-none">
+            <tr className="border-b border-[var(--color-border)]/50 bg-[var(--color-surface-2)] text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-wider select-none">
               <th className="px-5 py-3">Broker Profile</th>
               <th className="px-5 py-3">System Access Role</th>
               <th className="px-5 py-3">Compliance Documents</th>
@@ -283,14 +283,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({
               <th className="px-5 py-3 text-right">Administrative Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5 text-xs">
+          <tbody className="divide-y divide-[var(--color-border)]/40 text-xs">
             {filteredRoster.map((user) => {
               const fileCount = brokerFileCount[user.id] || 0;
               const hasDocs = user.fsraNum || user.eoInsurer;
               const isSelf = user.id === currentUser.id;
 
               return (
-                <tr key={user.id} className="hover:bg-white/[0.01] transition-all">
+                <tr key={user.id} className="hover:bg-[var(--color-surface-2)]/25 transition-all">
                   
                   {/* Avatar & Profile */}
                   <td className="px-5 py-4">
@@ -300,23 +300,23 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                           src={user.photo} 
                           alt={user.first} 
                           referrerPolicy="no-referrer"
-                          className="w-9 h-9 rounded-full object-cover border border-[#b5a642]/40" 
+                          className="w-9 h-9 rounded-full object-cover border border-[var(--color-accent)]/40" 
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-[#b5a642]/10 border border-[#b5a642]/30 flex items-center justify-center text-xs font-bold text-[#b5a642] uppercase">
+                        <div className="w-9 h-9 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 flex items-center justify-center text-xs font-bold text-[var(--color-accent)] uppercase">
                           {user.first[0]}{user.last[0]}
                         </div>
                       )}
                       <div>
-                        <div className="font-bold text-[#eeeef2] flex items-center gap-1.5">
+                        <div className="font-bold text-[var(--color-text)] flex items-center gap-1.5">
                           {user.first} {user.last}
                           {isSelf && (
-                            <span className="text-[8px] bg-[#b5a642]/15 text-[#b5a642] font-mono px-1.5 py-0.5 rounded uppercase border border-[#b5a642]/25">
+                            <span className="text-[8px] bg-[var(--color-accent)]/15 text-[var(--color-accent)] font-mono px-1.5 py-0.5 rounded uppercase border border-[var(--color-accent)]/25">
                               You
                             </span>
                           )}
                         </div>
-                        <div className="text-[10px] text-white/40 leading-normal font-semibold">
+                        <div className="text-[10px] text-[var(--color-text-faint)] leading-normal font-semibold">
                           {user.jobTitle || user.role} • {user.email}
                         </div>
                       </div>
@@ -328,7 +328,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                     <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border ${
                       user.role.includes("Owner") || user.role.includes("Super Admin") || user.role.includes("IT")
                         ? "bg-red-500/10 text-red-400 border-red-500/20"
-                        : "bg-[#6fa3b8]/15 text-[#6fa3b8] border-[#6fa3b8]/20"
+                        : "bg-[var(--color-info)]/15 text-[var(--color-info)] border-[var(--color-info)]/20"
                     }`}>
                       {user.role}
                     </span>
@@ -340,7 +340,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                       {hasDocs ? (
                         <button
                           onClick={() => setReviewingUser(user)}
-                          className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border transition-all ${
+                          className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border transition-all cursor-pointer ${
                             user.docsStatus === "verified"
                               ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                               : "bg-amber-500/10 text-amber-400 border-amber-500/20"
@@ -360,14 +360,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   {/* Client roster load status */}
                   <td className="px-5 py-4">
                     <div className="flex flex-col">
-                      <span className="font-bold text-white/80">{fileCount} Pipeline Files</span>
-                      <span className="text-[10px] text-white/40 font-semibold mt-0.5">Active Files Assigned</span>
+                      <span className="font-bold text-[var(--color-text-muted)]">{fileCount} Pipeline Files</span>
+                      <span className="text-[10px] text-[var(--color-text-faint)] font-semibold mt-0.5">Active Files Assigned</span>
                     </div>
                   </td>
 
                   {/* Account PIN */}
-                  <td className="px-5 py-4 font-mono text-[11px] text-[#b5a642] font-black">
-                    •••• <span className="text-white/30 text-[10px] ml-1">({user.pin ? "Defined" : "Not Set"})</span>
+                  <td className="px-5 py-4 font-mono text-[11px] text-[var(--color-accent)] font-black">
+                    •••• <span className="text-[var(--color-text-faint)] text-[10px] ml-1">({user.pin ? "Defined" : "Not Set"})</span>
                   </td>
 
                   {/* Actions */}
@@ -378,7 +378,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                       <button
                         onClick={() => handleToggleStatus(user)}
                         title={user.status === "active" ? "Deactivate User" : "Activate User"}
-                        className={`transition-all ${user.status === "active" ? "text-emerald-400" : "text-white/20"}`}
+                        className={`transition-all cursor-pointer ${user.status === "active" ? "text-emerald-400" : "text-[var(--color-text-faint)]/40"}`}
                       >
                         {user.status === "active" ? (
                           <ToggleRight className="w-6.5 h-6.5 stroke-[1.5]" />
@@ -391,7 +391,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                       <button
                         onClick={() => handleResetPin(user)}
                         title="Generate Random Pin Tokens"
-                        className="p-1 hover:bg-white/5 rounded border border-transparent hover:border-white/5 text-white/40 hover:text-[#b5a642] transition-all"
+                        className="p-1 hover:bg-[var(--color-surface-2)] rounded border border-transparent hover:border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-accent)] transition-all cursor-pointer"
                       >
                         <Key className="w-3.5 h-3.5" />
                       </button>
@@ -400,7 +400,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                       <button
                         onClick={() => loadEditUser(user)}
                         title="Edit Broker Fields"
-                        className="p-1 hover:bg-white/5 rounded border border-transparent hover:border-white/5 text-white/40 hover:text-white transition-all"
+                        className="p-1 hover:bg-[var(--color-surface-2)] rounded border border-transparent hover:border-[var(--color-border)]/50 text-[var(--color-text-faint)] hover:text-[var(--color-text)] transition-all cursor-pointer"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -414,7 +414,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
 
             {filteredRoster.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-white/30">
+                <td colSpan={6} className="px-5 py-12 text-center text-[var(--color-text-faint)]">
                   <Users className="w-10 h-10 mx-auto mb-2 stroke-1" />
                   <p className="italic">No brokers matched the search parameters.</p>
                 </td>
@@ -426,73 +426,73 @@ export const UserManagement: React.FC<UserManagementProps> = ({
 
       {/* ─── ONBOARD RECRUIT MODAL ─── */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
-          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="onboard-modal-form">
-            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/45 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="onboard-modal-form">
+            <div className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]/50 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-4 h-4 text-[#b5a642]" />
-                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Onboard New Broker Staff Member</h3>
+                <UserPlus className="w-4 h-4 text-[var(--color-accent)]" />
+                <h3 className="font-bold text-[var(--color-text)] uppercase tracking-wider text-xs">Onboard New Broker Staff Member</h3>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="text-white/40 hover:text-white">✕</button>
+              <button onClick={() => setShowAddModal(false)} className="text-[var(--color-text-faint)] hover:text-[var(--color-text)] cursor-pointer">✕</button>
             </div>
 
             <form onSubmit={handleOnboardUser} className="p-6 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">First Name</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">First Name</label>
                   <input 
                     type="text" 
                     required
                     value={newFirst}
                     onChange={(e) => setNewFirst(e.target.value)}
                     placeholder="David"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Last Name</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Last Name</label>
                   <input 
                     type="text" 
                     required
                     value={newLast}
                     onChange={(e) => setNewLast(e.target.value)}
                     placeholder="Acosta"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Email Address</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Email Address</label>
                   <input 
                     type="email" 
                     required
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="vdacosta@gbkfinancial.ca"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Phone Number</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Phone Number</label>
                   <input 
                     type="text" 
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
                     placeholder="(705) 555-0100"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Role Group</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Role Group</label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as User["role"])}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none cursor-pointer"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none cursor-pointer"
                   >
                     <option value="Agent">Agent / Broker</option>
                     <option value="Senior Broker">Senior Broker</option>
@@ -502,7 +502,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Security PIN (4 digits)</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Security PIN (4 digits)</label>
                   <input 
                     type="password" 
                     required
@@ -510,95 +510,95 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                     value={newPin}
                     onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
                     placeholder="1234"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30 font-mono tracking-widest"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30 font-mono tracking-widest"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Job Title</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Job Title</label>
                   <input 
                     type="text" 
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="Mortgage Underwriter"
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                   />
                 </div>
               </div>
 
               {/* Compliance documents credentials subheaders */}
-              <div className="border-t border-white/5 pt-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-[#b5a642] mb-3">Ontario Compliance Registrations</p>
+              <div className="border-t border-[var(--color-border)]/50 pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3">Ontario Compliance Registrations</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">FSRA Licence Number</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">FSRA Licence Number</label>
                     <input 
                       type="text" 
                       value={newFsra}
                       onChange={(e) => setNewFsra(e.target.value)}
                       placeholder="M1900XXXX"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Licence Expiry Date</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Licence Expiry Date</label>
                     <input 
                       type="date" 
                       value={newFsraExpiry}
                       onChange={(e) => setNewFsraExpiry(e.target.value)}
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                   <div className="sm:col-span-1">
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Insurer</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">E&amp;O Insurer</label>
                     <input 
                       type="text" 
                       value={newEoCarrier}
                       onChange={(e) => setNewEoCarrier(e.target.value)}
                       placeholder="Trisura"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Policy Number</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">E&amp;O Policy Number</label>
                     <input 
                       type="text" 
                       value={newEoPolicy}
                       onChange={(e) => setNewEoPolicy(e.target.value)}
                       placeholder="EO-88992-XX"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#b5a642]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Policy Expiry</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Policy Expiry</label>
                     <input 
                       type="date" 
                       value={newEoExpiry}
                       onChange={(e) => setNewEoExpiry(e.target.value)}
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white/5 border border-white/5 p-3.5 rounded-lg text-[11px] text-white/50 leading-relaxed">
-                🚨 <span className="text-white font-bold">Onboarding Consent:</span> Newly created staff credentials must be shared with the broker directly. PIN codes are stored in local secure memory nodes.
+              <div className="bg-[var(--color-surface-3)] border border-[var(--color-border)]/50 p-3.5 rounded-lg text-[11px] text-[var(--color-text-muted)] leading-relaxed">
+                🚨 <span className="text-[var(--color-text)] font-bold">Onboarding Consent:</span> Newly created staff credentials must be shared with the broker directly. PIN codes are stored in local secure memory nodes.
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+              <div className="flex justify-end gap-3 border-t border-[var(--color-border)]/50 pt-4 mt-4">
                 <button 
                   type="button" 
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-[var(--color-border)]/50 rounded-lg text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)] transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-[#b5a642] hover:bg-[#9a8c38] text-black text-xs font-black uppercase px-5 py-2 rounded-lg transition-all"
+                  className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] text-xs font-black uppercase px-5 py-2 rounded-lg transition-all cursor-pointer"
                 >
                   Commit Onboarding
                 </button>
@@ -610,69 +610,69 @@ export const UserManagement: React.FC<UserManagementProps> = ({
 
       {/* ─── EDIT USER MODAL ─── */}
       {editingUser && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
-          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="edit-user-modal">
-            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/45 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden text-left" id="edit-user-modal">
+            <div className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]/50 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-[#6fa3b8]" />
-                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Modify Broker Credentials: {editingUser.first} {editingUser.last}</h3>
+                <Edit3 className="w-4 h-4 text-[var(--color-info)]" />
+                <h3 className="font-bold text-[var(--color-text)] uppercase tracking-wider text-xs">Modify Broker Credentials: {editingUser.first} {editingUser.last}</h3>
               </div>
-              <button onClick={() => setEditingUser(null)} className="text-white/40 hover:text-white">✕</button>
+              <button onClick={() => setEditingUser(null)} className="text-[var(--color-text-faint)] hover:text-[var(--color-text)] cursor-pointer">✕</button>
             </div>
 
             <form onSubmit={handleEditUserSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">First Name</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">First Name</label>
                   <input 
                     type="text" 
                     required
                     value={editFirst}
                     onChange={(e) => setEditFirst(e.target.value)}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Last Name</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Last Name</label>
                   <input 
                     type="text" 
                     required
                     value={editLast}
                     onChange={(e) => setEditLast(e.target.value)}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Email Address</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Email Address</label>
                   <input 
                     type="email" 
                     required
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Phone Number</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Phone Number</label>
                   <input 
                     type="text" 
                     value={editPhone}
                     onChange={(e) => setEditPhone(e.target.value)}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Role Group</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Role Group</label>
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value as User["role"])}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none cursor-pointer"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none cursor-pointer"
                   >
                     <option value="Agent">Agent / Broker</option>
                     <option value="Senior Broker">Senior Broker</option>
@@ -682,42 +682,42 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Security PIN (4 digits)</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Security PIN (4 digits)</label>
                   <input 
                     type="password" 
                     required
                     maxLength={4}
                     value={editPin}
                     onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ""))}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30 font-mono tracking-widest"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30 font-mono tracking-widest"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Job Title</label>
+                  <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Job Title</label>
                   <input 
                     type="text" 
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                   />
                 </div>
               </div>
 
               {/* Status */}
               <div>
-                <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">System Status Flag</label>
-                <div className="flex items-center gap-4 bg-[#14141a] p-2 rounded-lg border border-white/5">
-                  <label className="flex items-center gap-2 text-xs text-[#eeeef2] cursor-pointer">
+                <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">System Status Flag</label>
+                <div className="flex items-center gap-4 bg-[var(--color-surface-2)] p-2 rounded-lg border border-[var(--color-border)]/50">
+                  <label className="flex items-center gap-2 text-xs text-[var(--color-text)] cursor-pointer">
                     <input 
                       type="radio" 
                       name="status"
                       checked={editStatus === "active"}
                       onChange={() => setEditStatus("active")}
-                      className="text-[#6fa3b8]"
+                      className="text-[var(--color-info)]"
                     />
                     <span>Active Broker Node</span>
                   </label>
-                  <label className="flex items-center gap-2 text-xs text-[#eeeef2] cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs text-[var(--color-text)] cursor-pointer">
                     <input 
                       type="radio" 
                       name="status"
@@ -731,75 +731,75 @@ export const UserManagement: React.FC<UserManagementProps> = ({
               </div>
 
               {/* Compliance documents credentials subheaders */}
-              <div className="border-t border-white/5 pt-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-[#6fa3b8] mb-3">Ontario Compliance Registrations</p>
+              <div className="border-t border-[var(--color-border)]/50 pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-info)] mb-3">Ontario Compliance Registrations</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">FSRA Licence Number</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">FSRA Licence Number</label>
                     <input 
                       type="text" 
                       value={editFsra}
                       onChange={(e) => setEditFsra(e.target.value)}
                       placeholder="M1900XXXX"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Licence Expiry Date</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Licence Expiry Date</label>
                     <input 
                       type="date" 
                       value={editFsraExpiry}
                       onChange={(e) => setEditFsraExpiry(e.target.value)}
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                   <div className="sm:col-span-1">
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Insurer</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">E&amp;O Insurer</label>
                     <input 
                       type="text" 
                       value={editEoCarrier}
                       onChange={(e) => setEditEoCarrier(e.target.value)}
                       placeholder="Trisura"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">E&amp;O Policy Number</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">E&amp;O Policy Number</label>
                     <input 
                       type="text" 
                       value={editEoPolicy}
                       onChange={(e) => setEditEoPolicy(e.target.value)}
                       placeholder="EO-88992-XX"
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#6fa3b8]/30"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none focus:border-[var(--color-info)]/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase text-white/40 tracking-wider mb-1.5">Policy Expiry</label>
+                    <label className="block text-[10px] font-black uppercase text-[var(--color-text-faint)] tracking-wider mb-1.5">Policy Expiry</label>
                     <input 
                       type="date" 
                       value={editEoExpiry}
                       onChange={(e) => setEditEoExpiry(e.target.value)}
-                      className="w-full bg-[#16161c] border border-white/5 rounded-lg px-3 py-2 text-xs text-white outline-none"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+              <div className="flex justify-end gap-3 border-t border-[var(--color-border)]/50 pt-4 mt-4">
                 <button 
                   type="button" 
                   onClick={() => setEditingUser(null)}
-                  className="px-4 py-2 border border-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-[var(--color-border)]/50 rounded-lg text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)] transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="bg-[#6fa3b8] hover:bg-[#598ca1] text-black text-xs font-black uppercase px-5 py-2 rounded-lg transition-all"
+                  className="bg-[var(--color-info)] hover:bg-[var(--color-info)]/80 text-[var(--color-text-inverse)] text-xs font-black uppercase px-5 py-2 rounded-lg transition-all cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -811,64 +811,64 @@ export const UserManagement: React.FC<UserManagementProps> = ({
 
       {/* ─── COMPLIANCE ID REVIEW POPUP ─── */}
       {reviewingUser && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
-          <div className="bg-[#101014] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden text-left" id="review-modal">
-            <div className="bg-[#15151b] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/45 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-100">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden text-left" id="review-modal">
+            <div className="bg-[var(--color-surface-2)] border-b border-[var(--color-border)]/50 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#b5a642]" />
-                <h3 className="font-bold text-white uppercase tracking-wider text-xs">Verify Broker Registrations: {reviewingUser.first}</h3>
+                <Award className="w-4 h-4 text-[var(--color-accent)]" />
+                <h3 className="font-bold text-[var(--color-text)] uppercase tracking-wider text-xs">Verify Broker Registrations: {reviewingUser.first}</h3>
               </div>
-              <button onClick={() => setReviewingUser(null)} className="text-white/40 hover:text-white">✕</button>
+              <button onClick={() => setReviewingUser(null)} className="text-[var(--color-text-faint)] hover:text-[var(--color-text)] cursor-pointer">✕</button>
             </div>
 
             <div className="p-6 space-y-4">
               {/* Document Info Cards */}
-              <div className="bg-[#15151b] border border-white/5 p-4 rounded-xl space-y-3.5">
+              <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-4 rounded-xl space-y-3.5">
                 <div className="flex gap-2.5">
-                  <FileText className="w-5 h-5 text-[#b5a642] shrink-0" />
+                  <FileText className="w-5 h-5 text-[var(--color-accent)] shrink-0" />
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-wider">FSRA Licencing Dossier</p>
-                    <p className="text-xs font-bold text-[#eeeef2] mt-0.5">Licence No: {reviewingUser.fsraNum || "Not Entered"}</p>
-                    <p className="text-[10px] text-white/50">Expiry: {reviewingUser.fsraExpiry || "None"}</p>
+                    <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-wider">FSRA Licencing Dossier</p>
+                    <p className="text-xs font-bold text-[var(--color-text)] mt-0.5">Licence No: {reviewingUser.fsraNum || "Not Entered"}</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)]">Expiry: {reviewingUser.fsraExpiry || "None"}</p>
                   </div>
                 </div>
 
-                <div className="border-t border-white/5 pt-3.5 flex gap-2.5">
-                  <Shield className="w-5 h-5 text-[#6fa3b8] shrink-0" />
+                <div className="border-t border-[var(--color-border)]/50 pt-3.5 flex gap-2.5">
+                  <Shield className="w-5 h-5 text-[var(--color-info)] shrink-0" />
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-wider">Errors &amp; Omissions Liability Policy</p>
-                    <p className="text-xs font-bold text-[#eeeef2] mt-0.5">Insurer: {reviewingUser.eoInsurer || "Not Entered"}</p>
-                    <p className="text-[10px] text-white/50">Policy: {reviewingUser.eoPolicy || "None"}</p>
-                    <p className="text-[10px] text-white/50">Expiry: {reviewingUser.eoExpiry || "None"}</p>
+                    <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-wider">Errors &amp; Omissions Liability Policy</p>
+                    <p className="text-xs font-bold text-[var(--color-text)] mt-0.5">Insurer: {reviewingUser.eoInsurer || "Not Entered"}</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)]">Policy: {reviewingUser.eoPolicy || "None"}</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)]">Expiry: {reviewingUser.eoExpiry || "None"}</p>
                   </div>
                 </div>
               </div>
 
               {/* Simulated ID Attachment View */}
-              <div className="bg-[#0b0b0e] border border-white/5 rounded-xl h-44 flex flex-col items-center justify-center text-center p-4">
-                <FileCheck className="w-8 h-8 text-[#b5a642] mb-2 animate-bounce" />
-                <span className="text-xs font-bold text-white/80 uppercase">FSRA_LICENCE_PROOF_M19.PDF</span>
-                <span className="text-[10px] text-white/30 font-semibold mt-1">Uploaded securely on {reviewingUser.created}</span>
+              <div className="bg-[var(--color-surface-3)] border border-[var(--color-border)]/50 rounded-xl h-44 flex flex-col items-center justify-center text-center p-4">
+                <FileCheck className="w-8 h-8 text-[var(--color-accent)] mb-2 animate-bounce" />
+                <span className="text-xs font-bold text-[var(--color-text)]/80 uppercase">FSRA_LICENCE_PROOF_M19.PDF</span>
+                <span className="text-[10px] text-[var(--color-text-faint)] font-semibold mt-1">Uploaded securely on {reviewingUser.created}</span>
                 <button 
                   onClick={() => showToast("Opening simulated secure PDF attachment...", "success")}
-                  className="text-[9px] text-[#b5a642] font-black uppercase mt-3 tracking-widest hover:underline"
+                  className="text-[9px] text-[var(--color-accent)] font-black uppercase mt-3 tracking-widest hover:underline cursor-pointer"
                 >
                   View Original Dossier Document
                 </button>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-white/5 pt-4 mt-4">
+              <div className="flex justify-end gap-3 border-t border-[var(--color-border)]/50 pt-4 mt-4">
                 <button 
                   type="button" 
                   onClick={() => handleVerifyDocs(reviewingUser, false)}
-                  className="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-[10px] font-black uppercase transition-all"
+                  className="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
                 >
                   Reject &amp; Force Re-upload
                 </button>
                 <button 
                   type="button" 
                   onClick={() => handleVerifyDocs(reviewingUser, true)}
-                  className="px-4 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase transition-all"
+                  className="px-4 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
                 >
                   Approve Credentials
                 </button>

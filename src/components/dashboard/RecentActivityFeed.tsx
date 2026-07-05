@@ -39,22 +39,22 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
       };
     }
 
-    // 2. Soft coral for alerts / configs
+    // 2. Soft warning color for alerts / configs
     if (act.includes("setting") || act.includes("config") || act.includes("lock") || act.includes("security") || act.includes("warning") || act.includes("overdue") || act.includes("alert")) {
       return {
         icon: Settings,
-        borderColor: "#7A5063", // --grad-warm color / soft coral
-        iconColor: "text-[#F4A384]",
-        bg: "rgba(122, 80, 99, 0.08)"
+        borderColor: "var(--color-warning)",
+        iconColor: "text-[var(--color-warning)]",
+        bg: "var(--color-warning-subtle)"
       };
     }
 
     // 3. Muted blue/slate for updates
     return {
       icon: act.includes("email") || act.includes("mail") ? Mail : act.includes("doc") ? FileText : RefreshCw,
-      borderColor: "#676F9D", // --color-muted
-      iconColor: "text-[#9a9db8]",
-      bg: "rgba(103, 111, 157, 0.08)"
+      borderColor: "var(--color-border)",
+      iconColor: "text-[var(--color-text-muted)]",
+      bg: "var(--color-primary-subtle)"
     };
   };
 
@@ -62,7 +62,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
     <div className="glass-card shadow-md p-5 flex flex-col gap-4" id="recent-activity-feed">
       <div className="flex items-center justify-between border-b border-white/5 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-[#676F9D]/10 rounded-lg text-[#9a9db8]">
+          <div className="p-2 bg-[var(--color-primary-subtle)] rounded-lg text-[var(--color-text-muted)]">
             <ListFilter className="w-4 h-4" />
           </div>
           <div>
@@ -106,7 +106,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
                     <span className="font-extrabold text-[var(--color-accent)] mr-1">{log.user || "System"}</span>
                     <span className="text-[var(--color-text)] font-medium opacity-90">{log.action || ""}</span>
                     {log.target && (
-                      <span className="font-bold text-blue-300 ml-1.5 bg-[#486D83]/20 px-1.5 py-0.5 rounded border border-[#486D83]/30 text-[10px]">
+                      <span className="font-bold text-[var(--color-info)] ml-1.5 bg-[var(--color-info-subtle)] px-1.5 py-0.5 rounded border border-[var(--color-info)]/20 text-[10px]">
                         {log.target}
                       </span>
                     )}
