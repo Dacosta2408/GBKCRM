@@ -644,6 +644,40 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
               {/* Tab Scrollable Contents */}
               <div className="flex-1 overflow-y-auto p-6 bg-[var(--color-bg)]">
+                {/* ℹ️ Premium Dynamic Contextual Helper Banner */}
+                <div className="mb-6 p-4 rounded-xl border bg-[var(--color-surface-2)]/60 backdrop-blur-sm shadow-sm flex items-start gap-3"
+                  style={{
+                    borderColor: "rgba(124, 58, 237, 0.15)",
+                    borderLeft: "3px solid var(--color-accent)"
+                  }}
+                >
+                  <div className="p-1.5 rounded-lg bg-[var(--color-accent-subtle)] text-[var(--color-accent)] shrink-0 mt-0.5">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h5 className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                      {activeTab === "personal" && "1. Client & Co-Applicant Verification"}
+                      {activeTab === "address" && "2. Residential History Logging"}
+                      {activeTab === "employment" && "3. Professional & Active Employment tenure"}
+                      {activeTab === "income" && "4. Supplemental Income & Cashflows"}
+                      {activeTab === "property" && "5. Real Estate Collateral parameters"}
+                      {activeTab === "mortgage" && "6. Loan Structure & Underwriting terms"}
+                      {activeTab === "submit" && "7. Final Submission Checklist"}
+                    </h5>
+                    <p className="text-[10px] text-[var(--color-text-muted)] mt-1 font-medium leading-relaxed max-w-2xl">
+                      {activeTab === "personal" && "Enter authentic details for the primary borrower and co-borrower. Date of Birth and contact channels are required to generate automated email workflows."}
+                      {activeTab === "address" && "Input three contiguous years of residency. If the applicant has lived at their current address for less than 36 months, make sure to populate the previous address fields to prevent credit bureau check failures."}
+                      {activeTab === "employment" && "Detail primary professional records. Mortgages require a steady income baseline; include complete salary or guaranteed hours with accurate employer contacts."}
+                      {activeTab === "income" && "Verify all secondary income sources such as active rental property leases, military pensions, investment dividends, or legal child support records."}
+                      {activeTab === "property" && "Define the physical property address, estimated valuation, and tax rolls. For pre-approvals without a specific subject property, check the 'Pre-Approval / No Address' flag."}
+                      {activeTab === "mortgage" && "Specify the desired principal requested, loan amortization timeline, and current interest rates to calculate real-time debt ratios and pricing options."}
+                      {activeTab === "submit" && "Review parsed data fields side-by-side with your client file. Confirm accuracy and resolve missing records prior to synchronizing this deal to the central workspace."}
+                    </p>
+                  </div>
+                </div>
+
                 {/* 1. PERSONAL INFORMATION */}
                 {activeTab === "personal" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-personal-form">

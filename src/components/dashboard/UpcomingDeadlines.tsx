@@ -145,11 +145,13 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <Clock className="w-8 h-8 text-[var(--color-text-faint)]/40 mb-2" />
-            <h5 className="text-xs font-semibold text-[var(--color-text-muted)]">Schedule Uncluttered</h5>
-            <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 max-w-[200px]">
-              No approaching term maturities or condition removals in the next 30 days.
+          <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-[var(--color-border)]/60 rounded-xl bg-[var(--color-surface-2)]/25 text-center my-auto">
+            <div className="w-9 h-9 rounded-full bg-[var(--color-surface-2)]/50 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2.5">
+              <Clock className="w-4 h-4 text-[var(--color-accent)] opacity-80" />
+            </div>
+            <h5 className="text-[10px] font-black uppercase text-[var(--color-text)] tracking-wider">Schedule Uncluttered</h5>
+            <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[210px] font-medium">
+              No approaching mortgage term maturities, condition removal dates, or closing deadlines registered in the next 30 days.
             </p>
           </div>
         )}

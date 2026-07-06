@@ -137,11 +137,13 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <CheckCircle2 className="w-8 h-8 text-green-400/40 mb-2" />
-            <h5 className="text-xs font-semibold text-[var(--color-text-muted)]">All Documents Cleared</h5>
-            <p className="text-[9px] text-[var(--color-text-faint)] mt-0.5 max-w-[200px]">
-              No active files in working, lender, or conditional stage are missing critical paperwork!
+          <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-[var(--color-border)]/60 rounded-xl bg-[var(--color-surface-2)]/25 text-center my-auto">
+            <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400 mb-2.5">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <h5 className="text-[10px] font-black uppercase text-[var(--color-text)] tracking-wider">All Paperwork Cleared</h5>
+            <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[210px] font-medium">
+              Excellent! No active folders in working, lender, or conditional stage are currently missing critical underwriting paperwork.
             </p>
           </div>
         )}

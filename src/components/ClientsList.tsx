@@ -325,13 +325,33 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 ) : (
                   <tr>
                     <td colSpan={9} className="p-16 text-center">
-                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto space-y-4">
-                        <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] flex items-center justify-center border border-[var(--color-border)]">
-                          <Search className="h-5 w-5 text-[var(--color-accent)]" />
+                      <div className="flex flex-col items-center justify-center max-w-md mx-auto p-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)]/40 backdrop-blur-md shadow-lg space-y-5">
+                        <div className="w-14 h-14 rounded-full bg-[var(--color-surface-3)]/60 flex items-center justify-center border border-[var(--color-border)]/80 text-[var(--color-accent)] shadow-inner">
+                          <Search className="h-6 w-6 stroke-[2]" />
                         </div>
-                        <div className="space-y-1">
-                          <h4 className="text-xs font-black uppercase text-[var(--color-text)] tracking-widest">No Clients Found</h4>
-                          <p className="text-[10px] text-[var(--color-text-faint)] leading-relaxed font-sans font-semibold">No active client files match your search criteria.</p>
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-black uppercase text-[var(--color-text)] tracking-wider">No matching clients found</h4>
+                          <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed font-sans max-w-xs mx-auto">
+                            We couldn't find any file matching your criteria. Try loosening your filter settings or search query.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 justify-center pt-2">
+                          <button
+                            onClick={() => {
+                              handleSearchChange("");
+                              setDbFilter("all");
+                              setAgentFilter("");
+                            }}
+                            className="px-4 py-1.5 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] border border-[var(--color-border)] text-[10px] font-extrabold uppercase tracking-wider rounded-full cursor-pointer transition-all active:scale-95 shadow-sm"
+                          >
+                            Reset filters
+                          </button>
+                          <button
+                            onClick={onAddClient}
+                            className="px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90 text-[var(--color-text-inverse)] text-[10px] font-extrabold uppercase tracking-wider rounded-full cursor-pointer transition-all active:scale-95 shadow-md"
+                          >
+                            + Onboard Client
+                          </button>
                         </div>
                       </div>
                     </td>
@@ -416,7 +436,13 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         </div>
                       );
                     }) : (
-                      <div className="h-24 flex items-center justify-center text-[10px] text-[var(--color-text-faint)]/50 uppercase tracking-widest font-black italic">No Files</div>
+                      <div className="flex-1 flex flex-col items-center justify-center min-h-[140px] border border-dashed border-[var(--color-border)]/75 rounded-xl p-4 bg-[var(--color-surface)]/20 text-center m-1.5 shadow-inner">
+                        <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)]/50 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2">
+                          <Landmark className="w-4 h-4 opacity-70 text-[var(--color-accent)]" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">Empty stage</span>
+                        <p className="text-[9px] text-[var(--color-text-faint)] leading-tight mt-1 max-w-[150px]">No active files are currently in this underwriting phase.</p>
+                      </div>
                     )}
                   </div>
                 </div>

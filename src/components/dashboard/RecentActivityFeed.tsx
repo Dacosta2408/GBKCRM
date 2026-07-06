@@ -121,8 +121,14 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
             );
           })
         ) : (
-          <div className="text-center py-12 text-xs text-[var(--color-text-faint)] italic font-bold">
-            No recent activity recorded in this session.
+          <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-[var(--color-border)]/60 rounded-xl bg-[var(--color-surface-2)]/25 text-center">
+            <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)]/50 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2.5">
+              <Shield className="w-4 h-4 opacity-70 text-[var(--color-accent)]" />
+            </div>
+            <h5 className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">No recent actions</h5>
+            <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[190px] font-medium">
+              No workstation logs have been generated during your active dashboard session yet.
+            </p>
           </div>
         )}
       </div>

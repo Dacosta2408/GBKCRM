@@ -323,13 +323,13 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
             );
           })
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
-              <Check className="w-6 h-6" />
+          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-[var(--color-border)]/60 rounded-2xl bg-[var(--color-surface-2)]/25 text-center my-auto">
+            <div className="w-11 h-11 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3.5 shadow-sm">
+              <Check className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <h4 className="text-xs font-semibold text-[var(--color-text)]">Daily Queue Cleared!</h4>
-            <p className="text-[10px] text-[var(--color-text-muted)] mt-1 max-w-xs">
-              Excellent work! There are no high-priority action alerts matching your current selection filter.
+            <h4 className="text-xs font-black uppercase text-[var(--color-text)] tracking-wider">Operational Queue Clear</h4>
+            <p className="text-[11px] text-[var(--color-text-muted)] mt-1.5 max-w-xs leading-relaxed font-medium">
+              Excellent work! There are no critical tasks, stale folders, or urgent calendar alerts matching your active filter.
             </p>
           </div>
         )}

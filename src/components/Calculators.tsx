@@ -387,8 +387,14 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-[var(--color-surface-2)]/60 rounded-xl text-center text-xs text-[var(--color-text-muted)] italic font-semibold border border-[var(--color-border)]">
-                Enter income data above to estimate underwriting limit.
+              <div className="p-6 rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]/25 flex flex-col items-center text-center justify-center min-h-[140px]">
+                <div className="w-8 h-8 rounded-full bg-[var(--color-surface-3)]/60 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2.5">
+                  <ShieldAlert className="w-4 h-4 text-[var(--color-accent)] opacity-85" />
+                </div>
+                <h5 className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">Awaiting Input Data</h5>
+                <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[190px] font-medium">
+                  Enter borrower gross annual income above to run automated underwriting stress rate calculations.
+                </p>
               </div>
             )}
           </div>
@@ -521,8 +527,14 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-[var(--color-surface-2)]/60 rounded-xl text-center text-xs text-[var(--color-text-muted)] italic font-semibold border border-[var(--color-border)]">
-                Enter gross income & payment to plot ratios.
+              <div className="p-6 rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]/25 flex flex-col items-center text-center justify-center min-h-[140px]">
+                <div className="w-8 h-8 rounded-full bg-[var(--color-surface-3)]/60 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2.5">
+                  <Percent className="w-4 h-4 text-[var(--color-accent)] opacity-85" />
+                </div>
+                <h5 className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">Awaiting Input Data</h5>
+                <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[190px] font-medium">
+                  Enter borrower gross income and mortgage debt figures to evaluate GDS and TDS ratios.
+                </p>
               </div>
             )}
           </div>
@@ -605,7 +617,17 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   <div className="flex justify-between"><span>Paid Interest Over Amortization</span><span className="font-extrabold text-[var(--color-warning)]">{fd(payRes.totalInterest)}</span></div>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className="p-6 rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]/25 flex flex-col items-center text-center justify-center min-h-[140px]">
+                <div className="w-8 h-8 rounded-full bg-[var(--color-surface-3)]/60 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2.5">
+                  <Calculator className="w-4 h-4 text-[var(--color-accent)] opacity-85" />
+                </div>
+                <h5 className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">Awaiting Input Data</h5>
+                <p className="text-[9px] text-[var(--color-text-faint)] leading-relaxed mt-1 max-w-[190px] font-medium">
+                  Enter desired mortgage loan amount, contract rate, and term to build payment schedules.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
