@@ -282,18 +282,18 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-5 text-xs text-slate-300">
+    <div className="flex flex-col gap-5 text-xs text-[var(--color-text-muted)]">
       
       {/* 1. CHECKLIST HEADER & METRICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] p-4 rounded-xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 bg-[var(--color-surface-2)]/45 border border-[var(--color-border)] p-4 rounded-xl">
         {/* Progress & Title */}
         <div className="flex flex-col gap-2 justify-center">
           <div className="flex items-center gap-2">
             <CheckSquare className="h-4.5 w-4.5 text-[var(--color-primary)]" />
-            <h3 className="text-sm font-black uppercase text-white tracking-wider">File Checklist Engine</h3>
+            <h3 className="text-sm font-black uppercase text-[var(--color-text)] tracking-wider">File Checklist Engine</h3>
           </div>
-          <p className="text-[10px] text-[#8e95a3] font-medium leading-relaxed">
-            Dynamic file workflow generated for <strong className="text-white">{(client.type || "Purchase").toUpperCase()}</strong> file &amp; <strong className="text-white">{(client.emptype || "Salaried").toUpperCase()}</strong> situation.
+          <p className="text-[10px] text-[var(--color-text-faint)] font-semibold leading-relaxed">
+            Dynamic file workflow generated for <strong className="text-[var(--color-text)]">{(client.type || "Purchase").toUpperCase()}</strong> file &amp; <strong className="text-[var(--color-text)]">{(client.emptype || "Salaried").toUpperCase()}</strong> situation.
           </p>
           <div className="flex items-center gap-2 mt-1.5">
             <button
@@ -304,7 +304,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
             </button>
             <button
               onClick={handleResetChecklist}
-              className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white/50 border border-white/5 rounded-md font-bold uppercase tracking-wider flex items-center gap-1 transition-colors text-[9px]"
+              className="px-2.5 py-1 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)] rounded-md font-bold uppercase tracking-wider flex items-center gap-1 transition-colors text-[9px]"
               title="Reset items checklist back to standard system templates"
             >
               <RefreshCw className="w-3 h-3" /> Reset Rules
@@ -324,7 +324,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
               style={{ width: `${readiness.checklistScore}%` }}
             />
           </div>
-          <div className="flex items-center justify-between text-[8px] text-white/40 uppercase font-black tracking-widest mt-0.5">
+          <div className="flex items-center justify-between text-[8px] text-[var(--color-text-faint)] uppercase font-black tracking-widest mt-0.5">
             <span>{syncedItems.filter(i => i.status === "Completed" || i.status === "Waived").length} Completed</span>
             <span>{syncedItems.filter(i => i.required).length} Required Steps</span>
           </div>
@@ -342,10 +342,10 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>File Readiness Status</span>
           </div>
-          <div className="font-bold text-white text-xs">
+          <div className="font-bold text-[var(--color-text)] text-xs">
             {readiness.readinessState === "Blocked" ? "File is BLOCKED from stage progression" : readiness.readinessState}
           </div>
-          <p className="text-[9px] text-white/50 italic line-clamp-2">
+          <p className="text-[9px] text-[var(--color-text-muted)] italic font-medium line-clamp-2">
             {readiness.blockerReason}
           </p>
         </div>
@@ -356,7 +356,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
         <h4 className="text-[9px] text-[var(--color-accent)] uppercase font-black tracking-widest mb-3 flex items-center gap-1">
           <Sparkles className="w-3 h-3" /> Underwriting Stage Progression Audit
         </h4>
-        <div className="flex flex-wrap gap-2 md:grid md:grid-cols-7 text-[9px] font-bold uppercase tracking-wider text-center">
+        <div className="flex flex-wrap gap-2 md:grid md:grid-cols-7 text-[9px] font-black uppercase tracking-wider text-center">
           {STAGES_ORDER.map((stage) => {
             const isCurrent = client.status === stage;
             const stageIndex = STAGES_ORDER.indexOf(stage);
@@ -374,7 +374,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
             const isPast = stageIndex < currentStageIndex;
             const isFuture = stageIndex > currentStageIndex;
 
-            let cardBg = "bg-white/[0.02] border-white/5 text-white/40";
+            let cardBg = "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-faint)]/65";
             if (isCurrent) {
               cardBg = hasActiveBlocker 
                 ? "bg-red-500/10 border-red-500/20 text-red-400 shadow-md ring-1 ring-red-500/10" 
@@ -391,7 +391,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
               >
                 <span className="font-black truncate w-full">{stage}</span>
                 {isCurrent && (
-                  <span className="text-[7px] bg-white/10 px-1 py-0.2 rounded mt-1 text-white block">ACTIVE</span>
+                  <span className="text-[7px] bg-[var(--color-surface-3)] px-1 py-0.2 rounded mt-1 text-[var(--color-text)] block font-extrabold">ACTIVE</span>
                 )}
                 {hasActiveBlocker && (
                   <span className="text-[7px] text-red-400 mt-1 block">⚠️ {stageBlockers.length} BLOCKED</span>
@@ -400,7 +400,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                   <span className="text-green-500 text-[8px] mt-1 block">✓ CLEARED</span>
                 )}
                 {isFuture && stageBlockers.length > 0 && (
-                  <span className="text-white/20 text-[7px] mt-1 block">{stageBlockers.length} Pending</span>
+                  <span className="text-[var(--color-text-faint)]/45 text-[7px] mt-1 block font-semibold">{stageBlockers.length} Pending</span>
                 )}
               </div>
             );
@@ -428,12 +428,12 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
               >
                 <div className="flex items-center gap-2">
                   {isExpanded ? (
-                    <ChevronDown className="h-3.5 w-3.5 text-white/40" />
+                    <ChevronDown className="h-3.5 w-3.5 text-[var(--color-text-faint)]" />
                   ) : (
-                    <ChevronRight className="h-3.5 w-3.5 text-white/40" />
+                    <ChevronRight className="h-3.5 w-3.5 text-[var(--color-text-faint)]" />
                   )}
-                  <span className="font-black uppercase tracking-wider text-white/80">{category}</span>
-                  <span className="text-[8px] px-1.5 py-0.2 bg-white/5 text-white/40 rounded font-black font-mono">
+                  <span className="font-black uppercase tracking-wider text-[var(--color-text)]">{category}</span>
+                  <span className="text-[8px] px-1.5 py-0.2 bg-[var(--color-surface-3)] text-[var(--color-text-muted)] rounded font-black font-mono">
                     {completedInCat}/{totalInCat}
                   </span>
                 </div>
@@ -445,21 +445,20 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                   ) : categoryItems.some(i => i.status === "Blocked") ? (
                     <span className="text-[8px] text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded-full uppercase">Blocked</span>
                   ) : (
-                    <span className="text-[8px] text-white/30 font-bold uppercase">Pending</span>
+                    <span className="text-[8px] text-[var(--color-text-faint)] font-black uppercase">Pending</span>
                   )}
                 </div>
               </div>
-
-              {/* Category Items List */}
+               {/* Category Items List */}
               {isExpanded && (
-                <div className="divide-y divide-white/[0.02]">
+                <div className="divide-y divide-[var(--color-border)]">
                   {categoryItems.map(item => {
                     const statusStyle = itemStatusStyles[item.status] || itemStatusStyles["Not Started"];
                     const isEditing = editingItemId === item.id;
                     const isCustom = item.id.startsWith("custom_");
 
                     return (
-                      <div key={item.id} className="p-3.5 hover:bg-white/[0.01] transition-colors flex flex-col gap-2.5">
+                      <div key={item.id} className="p-3.5 hover:bg-[var(--color-surface-2)]/30 transition-colors flex flex-col gap-2.5">
                         
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
                           
@@ -478,8 +477,8 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                             </div>
 
                             {/* Linked stage / Linked document tags */}
-                            <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[8.5px] font-black uppercase tracking-wider text-white/40">
-                              <span>Required for Stage: <strong className="text-white/70">{item.linkedStage}</strong></span>
+                            <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[8.5px] font-black uppercase tracking-wider text-[var(--color-text-faint)]">
+                              <span>Required for Stage: <strong className="text-[var(--color-text-muted)] font-black">{item.linkedStage}</strong></span>
                               {item.linkedDocId && (
                                 <span className="flex items-center gap-1 bg-[#6fa3b8]/5 border border-[#6fa3b8]/10 text-[#6fa3b8] px-2 py-0.5 rounded">
                                   <FileText className="w-2.5 h-2.5" /> Direct Doc Link: {item.linkedDocId}
@@ -489,7 +488,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
                             {/* Item notes */}
                             {item.notes && !isEditing && (
-                              <p className="text-[10px] text-white/45 mt-1.5 pl-3 border-l-2 border-white/5 leading-relaxed italic">
+                              <p className="text-[10px] text-[var(--color-text-muted)] mt-1.5 pl-3 border-l-2 border-[var(--color-border)] leading-relaxed italic font-medium">
                                 {item.notes}
                               </p>
                             )}
@@ -499,12 +498,12 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                               <div className="flex items-center gap-3 mt-1.5 text-[9px] text-[#8e95a3]">
                                 {item.dueDate && (
                                   <span className="flex items-center gap-1 font-mono">
-                                    <Calendar className="w-3 h-3 text-white/20" /> Due: {item.dueDate}
+                                    <Calendar className="w-3 h-3 text-[var(--color-text-faint)]" /> Due: {item.dueDate}
                                   </span>
                                 )}
                                 {item.assignedOwner && (
                                   <span className="flex items-center gap-1 font-medium uppercase">
-                                    <User className="w-3 h-3 text-white/20" /> Owner: {item.assignedOwner}
+                                    <User className="w-3 h-3 text-[var(--color-text-faint)]" /> Owner: {item.assignedOwner}
                                   </span>
                                 )}
                               </div>
@@ -540,7 +539,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
                             {!isEditing && (
                               <button 
                                 onClick={() => startEditing(item)}
-                                className="p-1 bg-white/5 hover:bg-white/10 rounded border border-white/5 text-white/60 hover:text-white"
+                                className="p-1.5 text-[9px] uppercase bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] rounded border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-bold transition-colors"
                                 title="Edit item details"
                               >
                                 Edit
@@ -562,11 +561,11 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
                         {/* Expandable Editing Panel */}
                         {isEditing && (
-                          <div className="bg-[#181822]/60 border border-white/5 p-3 rounded-lg flex flex-col gap-3 mt-2">
+                          <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] p-3 rounded-lg flex flex-col gap-3 mt-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {/* Due Date */}
                               <div className="space-y-1">
-                                <label className="block text-[8px] text-white/30 uppercase font-black">Due Date</label>
+                                <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-black">Due Date</label>
                                 <input 
                                   type="date" 
                                   value={editDueDate}
@@ -577,7 +576,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
                               {/* Owner */}
                               <div className="space-y-1">
-                                <label className="block text-[8px] text-white/30 uppercase font-black">Assigned Owner</label>
+                                <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-black">Assigned Owner</label>
                                 <select 
                                   value={editOwner}
                                   onChange={(e) => setEditOwner(e.target.value)}
@@ -593,7 +592,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
                             {/* Notes */}
                             <div className="space-y-1">
-                              <label className="block text-[8px] text-white/30 uppercase font-black">Internal Underwriter Notes / Blockers</label>
+                              <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-black">Internal Underwriter Notes / Blockers</label>
                               <textarea 
                                 rows={2}
                                 value={editNotes}
@@ -634,7 +633,7 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
 
       {/* 4. BESPOKE ITEM ADDITION MODAL overlay */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in select-none">
+        <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none">
           <form 
             onSubmit={handleAddCustomItem}
             className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-5 shadow-2xl relative flex flex-col gap-4 text-xs"

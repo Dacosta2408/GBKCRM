@@ -200,7 +200,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             onClick={onAddClient}
             className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-[var(--color-text-inverse)] transition-all cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 duration-200"
             style={{
-              background: "var(--grad-warm)",
+              background: "var(--grad-warm-highlight)",
               borderRadius: "999px"
             }}
           >
@@ -283,14 +283,14 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-text-inverse)] group-hover:scale-105 transition-transform"
-                            style={{ background: "var(--grad-soft)" }}
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-text-inverse)] group-hover:scale-105 transition-transform shadow-sm"
+                            style={{ background: "var(--color-primary)" }}
                           >
                             {avatar}
                           </div>
                           <div>
                             <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</div>
-                            {c.cell && <div className="text-[10px] text-[var(--color-text-faint)] font-bold">{c.cell}</div>}
+                            {c.cell && <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold">{c.cell}</div>}
                           </div>
                         </td>
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
@@ -390,14 +390,14 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div 
-                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)]"
-                                style={{ background: "var(--grad-soft)" }}
+                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)] shadow-sm"
+                                style={{ background: "var(--color-primary)" }}
                               >
                                 {initials}
                               </div>
                               <div className="min-w-0">
                                 <h5 className="text-xs font-bold text-[var(--color-text)] truncate">{c.first} {c.last}</h5>
-                                <div className="text-[10px] text-[var(--color-text-faint)] font-bold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
+                                <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
                               </div>
                             </div>
                             <div className="text-xs font-mono font-bold text-[var(--color-accent)] whitespace-nowrap mt-0.5">

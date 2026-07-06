@@ -130,7 +130,7 @@ export function ClientDetailPanel({
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-lg font-black text-sm text-[var(--color-text-inverse)] flex items-center justify-center shadow-inner"
-                style={{ background: "var(--grad-warm)" }}
+                style={{ background: "var(--grad-warm-highlight)" }}
               >
                 {currentClient.first[0]}{currentClient.last[0]}
               </div>
@@ -394,7 +394,7 @@ export function ClientDetailPanel({
                   onClick={() => triggerUnderwritingAnalysis(currentClient)}
                   disabled={underwritingLoading}
                   className="w-full text-[var(--color-text-inverse)] disabled:opacity-50 font-black uppercase text-[10px] tracking-wider py-3 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.2)]"
-                  style={{ background: "var(--grad-warm)" }}
+                  style={{ background: "var(--grad-warm-highlight)" }}
                 >
                   <Sparkles className="w-3.5 h-3.5 fill-current" /> {underwritingLoading ? "Analyzing File..." : "Run Deep Underwrite Analysis (Gemini)"}
                 </button>

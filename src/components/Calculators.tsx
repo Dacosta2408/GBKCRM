@@ -374,7 +374,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
             {/* Results card */}
             {stressRes ? (
               <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] mt-2 shadow-sm transition-all duration-200">
-                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded border ${stressRes.isQualifying ? "badge-success border-[var(--color-success)]/10" : "badge-error border-[var(--color-error)]/10"}`}>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded border ${stressRes.isQualifying ? "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20" : "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20"}`}>
                   {stressRes.isQualifying ? "✓ Qualifies (Stress Test Clear)" : "✗ Over-leveraged Limits"}
                 </span>
                 <div className="text-3xl font-extrabold font-sans mt-2.5 text-[var(--color-accent)] tracking-tight">{fd(stressRes.maxQualifiedMortgage)}</div>
@@ -506,7 +506,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 {/* Status summary */}
                 <div className="p-3.5 bg-[var(--color-surface-2)] rounded-lg border border-[var(--color-border)] text-xs flex items-center justify-between text-[var(--color-text-muted)] font-semibold shadow-sm">
                   <span>Qualifies for prime A-Lender files?</span>
-                  <span className={`font-extrabold px-2.5 py-1 rounded text-[10px] uppercase tracking-wide border ${ratioRes.passed ? "badge-success border-[var(--color-success)]/10" : "badge-error border-[var(--color-error)]/10"}`}>
+                  <span className={`font-extrabold px-2.5 py-1 rounded text-[10px] uppercase tracking-wide border ${ratioRes.passed ? "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20" : "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20"}`}>
                     {ratioRes.passed ? "✓ YES (Pass)" : "✗ NO (Alt-A Only)"}
                   </span>
                 </div>
