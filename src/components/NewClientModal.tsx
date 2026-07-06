@@ -147,7 +147,7 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-white/50 hover:text-white transition-all"
+            className="p-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all"
             id="close-new-client-modal-btn"
           >
             <X className="w-4 h-4" />
@@ -155,48 +155,48 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
         </div>
 
         {/* Content Form Scroll area */}
-        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-6 scrollbar-thin scrollbar-thumb-white/10">
+        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-6 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
           
           {/* Section 1: Core Applicant Profile */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-white/5 pb-1 text-xs font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-[var(--color-border)] pb-1 text-xs font-black uppercase tracking-wider">
               <User className="w-3.5 h-3.5" />
               <span>Primary Applicant Profile</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">First Name <span className="text-[var(--color-accent)]">*</span></label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">First Name <span className="text-[var(--color-accent)]">*</span></label>
                 <input 
                   type="text"
                   required
                   placeholder="e.g. Sarah"
                   value={first}
                   onChange={(e) => setFirst(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   id="client-first-name"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Last Name <span className="text-[var(--color-accent)]">*</span></label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Last Name <span className="text-[var(--color-accent)]">*</span></label>
                 <input 
                   type="text"
                   required
                   placeholder="e.g. Jenkins"
                   value={last}
                   onChange={(e) => setLast(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   id="client-last-name"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Email Address <span className="text-[var(--color-accent)]">*</span></label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Email Address <span className="text-[var(--color-accent)]">*</span></label>
                 <input 
                   type="email"
                   required
                   placeholder="sarah.j@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   id="client-email"
                 />
               </div>
@@ -204,30 +204,30 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Cell Phone</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Cell Phone</label>
                 <input 
                   type="text"
                   placeholder="e.g. (416) 555-0199"
                   value={cell}
                   onChange={(e) => setCell(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Date of Birth</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Date of Birth</label>
                 <input 
                   type="date"
                   value={dob}
                   onChange={(e) => setDob(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Marital Status</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Marital Status</label>
                 <select 
                   value={marital}
                   onChange={(e) => setMarital(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="">-- Select Status --</option>
                   <option value="Single">Single</option>
@@ -239,11 +239,11 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Employment Type</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Employment Type</label>
                 <select 
                   value={emptype}
                   onChange={(e) => setEmptype(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="Salaried">Salaried</option>
                   <option value="BFS / Self-Employed">BFS / Self-Employed</option>
@@ -257,23 +257,23 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
 
           {/* Section 2: Financial Strength */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-white/5 pb-1 text-xs font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-[var(--color-border)] pb-1 text-xs font-black uppercase tracking-wider">
               <DollarSign className="w-3.5 h-3.5" />
               <span>Financial Qualification Profile</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Annual Personal Income ($)</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Annual Personal Income ($)</label>
                 <input 
                   type="text"
                   placeholder="e.g. 120000"
                   value={income}
                   onChange={(e) => setIncome(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Credit Score (Beacon Score)</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Credit Score (Beacon Score)</label>
                 <input 
                   type="number"
                   placeholder="e.g. 740"
@@ -281,18 +281,18 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
                   max="900"
                   value={beacon}
                   onChange={(e) => setBeacon(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div className="flex items-end pb-1">
-                <label className="flex items-center gap-2.5 px-3 py-2 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg w-full cursor-pointer hover:bg-white/[0.01] transition-all">
+                <label className="flex items-center gap-2.5 px-3 py-2 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg w-full cursor-pointer hover:bg-[var(--color-surface-3)]/40 transition-all">
                   <input 
                     type="checkbox"
                     checked={hasCoApplicant}
                     onChange={(e) => setHasCoApplicant(e.target.checked)}
-                    className="rounded border-white/10 bg-transparent text-[var(--color-accent)] focus:ring-[var(--color-accent)]/20"
+                    className="rounded border-[var(--color-border)] bg-transparent text-[var(--color-accent)] focus:ring-[var(--color-accent)]/20"
                   />
-                  <span className="text-[11px] font-bold text-white/70">Include Co-Applicant?</span>
+                  <span className="text-[11px] font-bold text-[var(--color-text)]">Include Co-Applicant?</span>
                 </label>
               </div>
             </div>
@@ -301,36 +301,36 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="p-4 bg-white/[0.01] border border-white/5 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 mt-2"
+                className="p-4 bg-[var(--color-surface-2)]/30 border border-[var(--color-border)] rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 mt-2"
               >
                 <div>
-                  <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">Co-Applicant Name</label>
+                  <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Co-Applicant Name</label>
                   <input 
                     type="text"
                     placeholder="e.g. David Jenkins"
                     value={co}
                     onChange={(e) => setCo(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">Co-Applicant Email</label>
+                  <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Co-Applicant Email</label>
                   <input 
                     type="email"
                     placeholder="david.j@example.com"
                     value={coEmail}
                     onChange={(e) => setCoEmail(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">Co-Applicant Income ($)</label>
+                  <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Co-Applicant Income ($)</label>
                   <input 
                     type="text"
                     placeholder="e.g. 85000"
                     value={coIncome}
                     onChange={(e) => setCoIncome(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                   />
                 </div>
               </motion.div>
@@ -339,27 +339,27 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
 
           {/* Section 3: Subject Property Details */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-white/5 pb-1 text-xs font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-[var(--color-border)] pb-1 text-xs font-black uppercase tracking-wider">
               <Home className="w-3.5 h-3.5" />
               <span>Subject Property &amp; Financing Request</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Property Street Address</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Property Street Address</label>
                 <input 
                   type="text"
                   placeholder="e.g. 154 Simcoe Street, Unit 201, Toronto ON"
                   value={addr}
                   onChange={(e) => setAddr(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Property Type</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Property Type</label>
                 <select 
                   value={proptype}
                   onChange={(e) => setProptype(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="">-- Select Type --</option>
                   <option value="Detached">Detached Single Family</option>
@@ -374,31 +374,31 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Estimated Property Value ($)</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Estimated Property Value ($)</label>
                 <input 
                   type="text"
                   placeholder="e.g. 750000"
                   value={propval}
                   onChange={(e) => setPropval(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Mortgage Amount Requested ($)</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Mortgage Amount Requested ($)</label>
                 <input 
                   type="text"
                   placeholder="e.g. 525000"
                   value={mtgamt}
                   onChange={(e) => setMtgamt(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Property Tenure</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Property Tenure</label>
                 <select 
                   value={tenure}
                   onChange={(e) => setTenure(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="">-- Select Tenure --</option>
                   <option value="Freehold">Freehold</option>
@@ -412,17 +412,17 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
 
           {/* Section 4: System Assignment & Stage */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-white/5 pb-1 text-xs font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[var(--color-accent)] border-b border-[var(--color-border)] pb-1 text-xs font-black uppercase tracking-wider">
               <Landmark className="w-3.5 h-3.5" />
               <span>Pipeline &amp; Brokerage Assignment</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Preferred Lender</label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Preferred Lender</label>
                 <select 
                   value={lender}
                   onChange={(e) => setLender(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="">-- No Preferred Lender --</option>
                   {lenders.map((l, i) => (
@@ -431,11 +431,11 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Assigned Agent <span className="text-[var(--color-accent)]">*</span></label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Assigned Agent <span className="text-[var(--color-accent)]">*</span></label>
                 <select 
                   value={agent}
                   onChange={(e) => setAgent(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   {agentNames.map((name, i) => (
                     <option key={`${name || 'agent'}-${i}`} value={name}>{name}</option>
@@ -443,11 +443,11 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-[10px] font-bold text-white/50 uppercase mb-1">Workstation Pipeline Stage <span className="text-[var(--color-accent)]">*</span></label>
+                <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Workstation Pipeline Stage <span className="text-[var(--color-accent)]">*</span></label>
                 <select 
                   value={status}
                   onChange={(e) => setStatus(e.target.value as Client["status"])}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
                 >
                   <option value="lead">📁 Lead Generation Stage</option>
                   <option value="open">📁 New/Open Mortgage Application</option>
@@ -464,18 +464,18 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="border-t border-white/5 pt-4 mt-5 flex items-center justify-end gap-3 shrink-0">
+        <div className="border-t border-[var(--color-border)] pt-4 mt-5 flex items-center justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-white/70 hover:text-white font-bold text-xs rounded-xl transition-all"
+            className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-bold text-xs rounded-xl transition-all cursor-pointer"
             id="cancel-new-client-modal-btn"
           >
             Cancel Intake
           </button>
           <button
             onClick={handleSubmit}
-            className="px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black font-extrabold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-lg shadow-[var(--color-accent)]/10"
+            className="px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] font-extrabold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-lg shadow-[var(--color-accent)]/10 cursor-pointer"
             id="submit-new-client-modal-btn"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" /> Commission New File
