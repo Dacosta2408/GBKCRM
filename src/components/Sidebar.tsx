@@ -186,8 +186,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <motion.button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.01, x: 2 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.99 }}
+                  whileHover={{}}
+                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   className="group relative flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg outline-none cursor-pointer w-full text-left"
                   style={{
                     color: isActive

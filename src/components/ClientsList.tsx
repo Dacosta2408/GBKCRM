@@ -198,7 +198,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onAddClient}
-            className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-[var(--color-text-inverse)] transition-all cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 duration-200"
+            className="flex items-center gap-1 px-4 py-1.5 text-xs font-extrabold text-[var(--color-text-inverse)] transition-all cursor-pointer hover:shadow-md hover:opacity-95 active:scale-95 duration-200"
             style={{
               background: "var(--grad-warm-highlight)",
               borderRadius: "999px"
@@ -283,7 +283,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-text-inverse)] group-hover:scale-105 transition-transform shadow-sm"
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-text-inverse)] shadow-sm"
                             style={{ background: "var(--color-primary)" }}
                           >
                             {avatar}
