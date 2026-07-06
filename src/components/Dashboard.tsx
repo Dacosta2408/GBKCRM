@@ -88,10 +88,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-2xl font-black tracking-tight text-[var(--color-text)] font-sans">{getGreeting()}</h2>
-              <span className="text-[9px] font-black uppercase tracking-wider bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-3 py-1 rounded-full border border-[var(--color-accent)]/20 flex items-center gap-1.5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
-                {currentUser.role} Security Clearance
-              </span>
             </div>
             <p className="text-xs text-[var(--color-text-muted)] font-medium flex flex-wrap items-center gap-2">
               <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
@@ -107,14 +103,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-[8px] text-[var(--color-text-muted)] uppercase tracking-widest font-black block">Total Asset Portfolio</span>
               <div className="text-sm font-black text-[var(--color-text)] font-mono mt-0.5">{clients.length} Active Accounts</div>
             </div>
-            
-            <button 
-              onClick={onAddEvent}
-              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-[var(--color-accent-subtle)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/15 text-[var(--color-accent)] transition-all duration-200 cursor-pointer shadow-sm active:scale-95 font-sans"
-            >
-              <Clock className="w-4 h-4 group-hover:rotate-12 transition-transform" /> 
-              <span>Log Outreach Event</span>
-            </button>
           </div>
         </div>
       </div>

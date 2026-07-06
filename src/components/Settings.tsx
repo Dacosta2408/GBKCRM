@@ -17,6 +17,7 @@ interface SettingsProps {
   showToast: (msg: string, type?: "success" | "error", icon?: string) => void;
   onLockApp?: () => void;
   clients: Client[];
+  bridgeOnline: boolean;
 }
 
 export const Settings: React.FC<SettingsProps> = ({
@@ -26,7 +27,8 @@ export const Settings: React.FC<SettingsProps> = ({
   setUserRoster,
   showToast,
   onLockApp,
-  clients
+  clients,
+  bridgeOnline
 }) => {
   // Navigation tabs
   type SettingsTab = "profile" | "notifications" | "security" | "preferences" | "team" | "permissions" | "defaults";
@@ -717,6 +719,57 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* TAB 3: NOTIFICATIONS */}
           {activeTab === "notifications" && (
             <div className="max-w-2xl space-y-6">
+              {/* Active System Alerts & Status */}
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">System Alerts &amp; Status</h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">Real-time status updates, critical system alerts, and workspace connection notices.</p>
+                </div>
+
+                <div className="space-y-3">
+                  {!bridgeOnline ? (
+                    <div 
+                      className="p-4 rounded-lg border flex items-start gap-3 select-none animate-pulse bg-[var(--color-error-subtle)]"
+                      style={{
+                        borderColor: "rgba(224,92,110,0.35)",
+                      }}
+                    >
+                      <div className="text-xl shrink-0 mt-0.5">🔌</div>
+                      <div className="space-y-1">
+                        <span className="text-xs font-extrabold text-[var(--color-error)] uppercase tracking-wider block">Z Drive Offline Alert</span>
+                        <span className="text-[11px] text-[var(--color-text)] font-semibold block leading-normal">
+                          Z Drive Offline — Working from local browser sandbox storage. Changes will automatically sync upon reconnecting the bridge.
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div 
+                      className="p-4 rounded-lg border flex items-start gap-3 select-none"
+                      style={{
+                        background: "rgba(16,185,129,0.06)",
+                        borderColor: "rgba(16,185,129,0.3)",
+                      }}
+                    >
+                      <div className="text-xl shrink-0 mt-0.5 text-emerald-500">🟢</div>
+                      <div className="space-y-1">
+                        <span className="text-xs font-extrabold text-emerald-500 uppercase tracking-wider block">Z Drive Operational</span>
+                        <span className="text-[11px] text-[var(--color-text)] font-semibold block leading-normal">
+                          All systems connected. The Z-Drive local backup storage is fully sync-connected and operational.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-3.5 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-surface-2)]/40 flex items-center gap-2.5">
+                    <Info className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                    <span className="text-[10px] text-[var(--color-text-muted)] font-medium leading-normal">
+                      No other system notices or core infrastructure failures are pending at this time.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Preferences */}
               <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
                 <div>
                   <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-1">Notification Preferences</h3>
@@ -729,7 +782,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Daily Task Reminders</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me of uncompleted tasks assigned to me daily at 9:00 AM.</span>
                     </div>
-                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifTaskReminders(!notifTaskReminders)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifTaskReminders ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
@@ -739,7 +792,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Client Assigned Alerts</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me immediately when an active file is reassigned to my roster.</span>
                     </div>
-                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifFileUpdates(!notifFileUpdates)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifFileUpdates ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
@@ -749,7 +802,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Retention &amp; Follow-up Triggers</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me when a client's 5-year mortgage renewal is approaching threshold.</span>
                     </div>
-                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifFollowUps(!notifFollowUps)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifFollowUps ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
@@ -759,7 +812,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Document Vault Submissions</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me when a client uploads required checklist PDF in the client portal.</span>
                     </div>
-                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifDocAlerts(!notifDocAlerts)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifDocAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
@@ -769,7 +822,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Team Mentions Alerts</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Notify me of standard team channel mentions or active chat dialogues.</span>
                     </div>
-                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifCommsAlerts(!notifCommsAlerts)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifCommsAlerts ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
@@ -779,14 +832,14 @@ export const Settings: React.FC<SettingsProps> = ({
                       <label className="text-xs font-bold text-[var(--color-text)] block">Weekly Email Activity Digest</label>
                       <span className="text-[10px] text-[var(--color-text-muted)] block">Receive email report of operational pipelines, funded values and metrics.</span>
                     </div>
-                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[var(--color-accent)]">
+                    <button onClick={() => setNotifEmailDigest(!notifEmailDigest)} className="shrink-0 text-[var(--color-accent)] cursor-pointer">
                       {notifEmailDigest ? <ToggleRight className="w-9 h-9" /> : <ToggleLeft className="w-9 h-9 text-[var(--color-text-faint)]/40" />}
                     </button>
                   </div>
 
                   <button 
                     onClick={handleSaveNotifications}
-                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4"
+                    className="w-full py-2.5 bg-[var(--color-primary)] text-[var(--color-text-inverse)] font-bold text-xs rounded-lg hover:opacity-90 transition-all uppercase tracking-wider mt-4 cursor-pointer"
                   >
                     Save Notification Prefs
                   </button>

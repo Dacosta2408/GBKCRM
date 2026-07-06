@@ -762,7 +762,7 @@ export default function App() {
         
         {/* Top Header */}
         <header 
-          className="relative z-40 h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
+          className="relative z-40 h-14 flex items-center justify-between px-6 shrink-0 select-none"
           style={{
             background: "var(--glass-bg)",
             backdropFilter: "var(--glass-blur)",
@@ -990,22 +990,6 @@ export default function App() {
             </div>
           </div>
         </header>
-
-        {/* Persistent Z Drive Offline Banner */}
-        {!bridgeOnline && (
-          <div 
-            className="px-6 py-2.5 text-[10px] flex items-center gap-2.5 text-[var(--color-error)] font-bold uppercase tracking-wider select-none shrink-0 border-b animate-pulse"
-            style={{
-              background: "var(--color-error-subtle)",
-              borderColor: "var(--color-border)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)"
-            }}
-          >
-            <span>🔌</span>
-            <span>Z Drive Offline — Working from local browser sandbox storage. Changes will automatically sync upon reconnecting the bridge.</span>
-          </div>
-        )}
 
         {/* Active System Broadcast Banners */}
         {broadcastBanners.filter(b => b.active).map((banner) => {
@@ -1389,6 +1373,7 @@ export default function App() {
               showToast={showToast}
               onLockApp={() => setAppLocked(true)}
               clients={clients}
+              bridgeOnline={bridgeOnline}
             />
           )}
             </motion.div>
