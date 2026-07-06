@@ -284,7 +284,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                 className="flex items-center justify-between p-4 bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/75 rounded-2xl transition-all duration-200 group shadow-sm hover:shadow-md"
               >
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                  <div className={`p-2.5 rounded-xl bg-[var(--color-surface-3)]/60 border border-[var(--color-border)]/60 ${item.iconColor} shrink-0 mt-0.5 group-hover:scale-105 transition-transform duration-200`}>
+                  <div className={`p-2.5 rounded-xl bg-[var(--color-surface-3)]/60 border border-[var(--color-border)]/60 ${item.iconColor} shrink-0 mt-0.5 transition-transform duration-200`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
