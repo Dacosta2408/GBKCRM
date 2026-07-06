@@ -119,7 +119,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
           <div>
             <p className="text-[10px] text-[var(--color-text-faint)] uppercase font-bold tracking-wider">Audit Security Logs</p>
             <h3 className="text-2xl font-black text-[var(--color-text)] mt-1 font-mono">{recentLogsCount}</h3>
-            <p className="text-[10px] text-emerald-400 font-semibold mt-1">● Pipeline Active &amp; Guarded</p>
+            <p className="text-[10px] text-[var(--color-success)] font-semibold mt-1">● Pipeline Active &amp; Guarded</p>
           </div>
           <div className="w-10 h-10 rounded-lg bg-[var(--color-info-subtle)] border border-[var(--color-info)]/20 flex items-center justify-center text-[var(--color-info)] group-hover:scale-105 transition-transform">
             <Terminal className="w-5 h-5" />
@@ -164,7 +164,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 shadow-lg" id="admin-system-warnings-panel">
             <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-3 mb-4">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-red-400" />
+                <Shield className="w-4 h-4 text-[var(--color-error)]" />
                 <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">System Control Warnings</h4>
               </div>
               <span className="text-[9px] bg-[var(--color-error-subtle)] text-[var(--color-error)] font-mono px-2 py-0.5 rounded border border-[var(--color-error)]/15">
@@ -185,11 +185,11 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                   }`}
                 >
                   {alert.severity === "high" ? (
-                    <AlertCircle className="w-4.5 h-4.5 text-red-400 shrink-0 mt-0.5" />
+                    <AlertCircle className="w-4.5 h-4.5 text-[var(--color-error)] shrink-0 mt-0.5" />
                   ) : alert.severity === "medium" ? (
-                    <AlertTriangle className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-4.5 h-4.5 text-[var(--color-warning)] shrink-0 mt-0.5" />
                   ) : (
-                    <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4.5 h-4.5 text-[var(--color-success)] shrink-0 mt-0.5" />
                   )}
                   
                   <div className="flex-1 min-w-0">
@@ -197,7 +197,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-[9px] uppercase font-bold text-[var(--color-text-faint)]">Category: {alert.type}</span>
                       <span className={`text-[9px] uppercase font-bold ${
-                        alert.severity === "high" ? "text-red-400" : alert.severity === "medium" ? "text-amber-400" : "text-emerald-400"
+                        alert.severity === "high" ? "text-[var(--color-error)]" : alert.severity === "medium" ? "text-[var(--color-warning)]" : "text-[var(--color-success)]"
                       }`}>Severity: {alert.severity}</span>
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-info)]/30 transition-all">
                 <Globe className="w-5 h-5 mx-auto text-[var(--color-info)] mb-1.5" />
                 <h5 className="text-[11px] font-bold text-[var(--color-text)] uppercase tracking-wider">Website Portal API</h5>
-                <p className="text-[9px] text-emerald-400 font-bold mt-1 uppercase">● Operational</p>
+                <p className="text-[9px] text-[var(--color-success)] font-bold mt-1 uppercase">● Operational</p>
                 <div className="text-[10px] text-[var(--color-text-faint)] mt-2 border-t border-[var(--color-border)]/50 pt-1.5 font-mono">
                   12 Intake Syncs / 24h
                 </div>
@@ -245,7 +245,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 p-3.5 rounded-xl text-center relative group hover:border-[var(--color-accent)]/30 transition-all">
                 <Mail className="w-5 h-5 mx-auto text-[var(--color-accent)] mb-1.5" />
                 <h5 className="text-[11px] font-bold text-[var(--color-text)] uppercase tracking-wider">Email IMAP Sync</h5>
-                <p className="text-[9px] text-emerald-400 font-bold mt-1 uppercase">● Operational</p>
+                <p className="text-[9px] text-[var(--color-success)] font-bold mt-1 uppercase">● Operational</p>
                 <div className="text-[10px] text-[var(--color-text-faint)] mt-2 border-t border-[var(--color-border)]/50 pt-1.5 font-mono">
                   info@gbkfinancial.ca
                 </div>
@@ -265,7 +265,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             {/* Ingestion Issue Oversight Status */}
             <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg p-3 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+                <div className="w-8 h-8 rounded-full bg-[var(--color-error-subtle)] border border-[var(--color-error)]/20 flex items-center justify-center text-[var(--color-error)]">
                   <AlertCircle className="w-4 h-4" />
                 </div>
                 <div>
@@ -345,7 +345,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                   onLockApp();
                   showToast("Workstation workstation locked instantly for compliance security.", "success");
                 }}
-                className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-black text-[10px] uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all"
+                className="w-full bg-[var(--color-error-subtle)] hover:bg-[var(--color-error-subtle)]/80 text-[var(--color-error)] border border-[var(--color-error)]/25 font-black text-[10px] uppercase py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all"
               >
                 <Lock className="w-3.5 h-3.5" /> Lock Workstation Desk
               </button>
@@ -354,7 +354,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                 onClick={() => {
                   showToast("Security keys updated across Ontario endpoints.", "success");
                 }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white/80 font-black text-[10px] uppercase py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
+                className="w-full bg-[var(--color-surface-3)]/40 hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50 font-black text-[10px] uppercase py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all"
               >
                 <RefreshCw className="w-3 h-3" /> Re-seed Security Keys
               </button>

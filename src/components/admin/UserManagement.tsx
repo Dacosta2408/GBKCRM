@@ -327,7 +327,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   <td className="px-5 py-4">
                     <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border ${
                       user.role.includes("Owner") || user.role.includes("Super Admin") || user.role.includes("IT")
-                        ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20"
                         : "bg-[var(--color-info)]/15 text-[var(--color-info)] border-[var(--color-info)]/20"
                     }`}>
                       {user.role}
@@ -342,15 +342,15 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                           onClick={() => setReviewingUser(user)}
                           className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border transition-all cursor-pointer ${
                             user.docsStatus === "verified"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                              ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20"
+                              : "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20"
                           }`}
                         >
                           <Eye className="w-3 h-3" /> 
                           {user.docsStatus === "verified" ? "Verified" : "Pending Verification"}
                         </button>
                       ) : (
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border bg-red-500/10 text-red-400 border-red-500/20">
+                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20">
                           <ShieldAlert className="w-3 h-3 animate-pulse" /> Missing Uploads
                         </span>
                       )}
@@ -378,7 +378,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                       <button
                         onClick={() => handleToggleStatus(user)}
                         title={user.status === "active" ? "Deactivate User" : "Activate User"}
-                        className={`transition-all cursor-pointer ${user.status === "active" ? "text-emerald-400" : "text-[var(--color-text-faint)]/40"}`}
+                        className={`transition-all cursor-pointer ${user.status === "active" ? "text-[var(--color-success)]" : "text-[var(--color-text-faint)]/40"}`}
                       >
                         {user.status === "active" ? (
                           <ToggleRight className="w-6.5 h-6.5 stroke-[1.5]" />

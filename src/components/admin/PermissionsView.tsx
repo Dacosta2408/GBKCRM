@@ -221,7 +221,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                       showToast(`Cleared all access overrides for ${selectedUser.first}.`, "success");
                     }}
                     disabled={!selectedUser.permOverrides || Object.keys(selectedUser.permOverrides).length === 0}
-                    className="text-[9px] text-red-400 hover:text-red-300 font-bold uppercase mt-1 tracking-wider block disabled:opacity-40 disabled:no-underline hover:underline cursor-pointer"
+                    className="text-[9px] text-[var(--color-error)] hover:text-[var(--color-error)]/80 font-bold uppercase mt-1 tracking-wider block disabled:opacity-40 disabled:no-underline hover:underline cursor-pointer"
                   >
                     Reset to defaults
                   </button>
@@ -272,8 +272,8 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                     onClick={() => handleToggleOverride(mod.key)}
                     className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all cursor-pointer ${
                       allowed
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
-                        : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                        ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20 hover:bg-[var(--color-success-subtle)]/80"
+                        : "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20 hover:bg-[var(--color-error-subtle)]/80"
                     }`}
                   >
                     {allowed ? "Allowed" : "Denied"}
@@ -307,8 +307,8 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
                     onClick={() => handleToggleOverride(mod.key)}
                     className={`shrink-0 w-20 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border text-center transition-all cursor-pointer ${
                       allowed
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
-                        : "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                        ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20 hover:bg-[var(--color-success-subtle)]/80"
+                        : "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20 hover:bg-[var(--color-error-subtle)]/80"
                     }`}
                   >
                     {allowed ? "Allowed" : "Denied"}

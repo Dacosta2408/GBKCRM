@@ -35,7 +35,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
         icon: UserPlus,
         borderColor: "var(--color-accent)", // --color-accent
         iconColor: "text-[var(--color-accent)]",
-        bg: "rgba(200, 146, 42, 0.08)"
+        bg: "var(--color-accent-subtle)"
       };
     }
 
@@ -60,7 +60,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
 
   return (
     <div className="glass-card shadow-md p-5 flex flex-col gap-4" id="recent-activity-feed">
-      <div className="flex items-center justify-between border-b border-white/5 pb-3">
+      <div className="flex items-center justify-between border-b border-[var(--color-divider)] pb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-2 bg-[var(--color-primary-subtle)] rounded-lg text-[var(--color-text-muted)]">
             <ListFilter className="w-4 h-4" />

@@ -33,35 +33,35 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Detailed application",
       icon: FileCheck,
       onClick: onOpenNewClientIntake,
-      iconColor: "text-blue-400"
+      iconColor: "text-[var(--color-info)]"
     },
     {
       label: "AI Smart Extractor",
       desc: "Extract from PDF / email",
       icon: Search,
       onClick: onOpenAIIntake,
-      iconColor: "text-purple-400"
+      iconColor: "text-[var(--color-accent)]"
     },
     {
       label: "Log Task / Action",
       desc: "Add to daily list",
       icon: CheckSquare,
       onClick: onAddTask,
-      iconColor: "text-emerald-400"
+      iconColor: "text-[var(--color-success)]"
     },
     {
       label: "Onboard Partner",
       desc: "Professional contact",
       icon: Handshake,
       onClick: onAddPartner,
-      iconColor: "text-orange-400"
+      iconColor: "text-[var(--color-warning)]"
     },
     {
       label: "Open Calendar",
       desc: "Book client meeting",
       icon: Calendar,
       onClick: () => setActiveTab("calendar"),
-      iconColor: "text-slate-300"
+      iconColor: "text-[var(--color-text-muted)]"
     }
   ];
 
@@ -79,7 +79,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               onClick={act.onClick}
               className="glass-card flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.15)] group"
             >
-              <div className="p-2 rounded-lg bg-black/20 shrink-0 group-hover:bg-black/40 transition-colors">
+              <div className="p-2 rounded-lg bg-[var(--color-surface-3)]/30 shrink-0 group-hover:bg-[var(--color-surface-3)]/60 transition-colors">
                 <Icon className={`w-4 h-4 ${act.iconColor}`} />
               </div>
               <div className="min-w-0">

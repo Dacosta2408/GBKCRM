@@ -204,7 +204,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             <select 
               value={agentFilter}
               onChange={(e) => setAgentFilter(e.target.value)}
-              className="ml-auto bg-black/25 border border-[var(--color-border)] rounded-full px-4 py-1 text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer"
+              className="ml-auto bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-full px-4 py-1 text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer hover:border-[var(--color-accent)]/30 transition-all"
             >
               <option value="" className="bg-[var(--color-bg)]">All Advising Agents</option>
               {agentNames.map(name => <option key={name} value={name} className="bg-[var(--color-bg)]">{name}</option>)}
@@ -256,11 +256,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            c.status === "funded" ? "bg-yellow-500/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20" :
-                            c.status === "approved" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
-                            c.status === "conditional" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
-                            c.status === "lender" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" :
-                            "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            c.status === "funded" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border border-[var(--color-accent)]/20" :
+                            c.status === "approved" ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border border-[var(--color-success)]/20" :
+                            c.status === "conditional" ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border border-[var(--color-error)]/20" :
+                            c.status === "lender" ? "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border border-[var(--color-warning)]/20" :
+                            "bg-[var(--color-info-subtle)] text-[var(--color-info)] border border-[var(--color-info)]/20"
                            }`}>
                             {c.status}
                           </span>
@@ -270,12 +270,12 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           {ltv > 0 ? `${ltv.toFixed(0)}%` : "—"}
                         </td>
                         <td className="p-3.5 text-xs font-mono font-bold">
-                          <span className={pn(c.beacon) >= 680 ? "text-green-400" : pn(c.beacon) >= 600 ? "text-orange-400" : "text-red-400"}>
+                          <span className={pn(c.beacon) >= 680 ? "text-[var(--color-success)]" : pn(c.beacon) >= 600 ? "text-[var(--color-warning)]" : "text-[var(--color-error)]"}>
                             {c.beacon || "—"}
                           </span>
                         </td>
                         <td className="p-3.5 text-xs font-mono font-bold">
-                          <span className={gds <= 39 && gds > 0 ? "text-green-400" : gds > 39 ? "text-red-400" : "text-[var(--color-text-faint)]"}>
+                          <span className={gds <= 39 && gds > 0 ? "text-[var(--color-success)]" : gds > 39 ? "text-[var(--color-error)]" : "text-[var(--color-text-faint)]"}>
                             {gds > 0 ? `${gds.toFixed(1)}%` : "—"}
                           </span>
                         </td>
@@ -335,7 +335,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   </div>
 
                   {/* Column Body Cards Area */}
-                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-black/5">
+                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/30">
                     {colClients.length > 0 ? colClients.map(c => {
                       const initials = (c.first[0] + c.last[0]).toUpperCase();
                       const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
@@ -345,9 +345,13 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${isStale ? "border-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(224,92,110,0.15)]" : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_rgba(200, 146, 42, 0.1)]"}`}
+                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${
+                            isStale 
+                              ? "border-[var(--color-error)]/25 hover:border-[var(--color-error)]/55 hover:shadow-[0_0_15px_var(--color-error-subtle)]" 
+                              : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)]"
+                          }`}
                           style={{
-                            background: isStale ? "rgba(122, 80, 99, 0.04)" : "var(--color-surface)"
+                            background: isStale ? "var(--color-error-subtle)" : "var(--color-surface)"
                           }}
                         >
                           <div className="flex justify-between items-start gap-2 mb-2">
@@ -372,7 +376,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                             <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[120px] truncate">
                               👤 {(c.agent || "Unassigned").split(" ")[0]}
                             </span>
-                            <span className={`font-mono font-bold uppercase text-[8px] tracking-wider ${isStale ? "text-red-400" : "text-[var(--color-text-faint)]"}`}>
+                            <span className={`font-mono font-bold uppercase text-[8px] tracking-wider ${isStale ? "text-[var(--color-error)]" : "text-[var(--color-text-faint)]"}`}>
                               {daysStale === 0 ? "today" : `${daysStale}d idle`}
                             </span>
                           </div>

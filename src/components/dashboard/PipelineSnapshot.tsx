@@ -60,8 +60,8 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
       
       {/* Header section styled with deep gradient bar */}
       <div 
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/5"
-        style={{ background: "var(--grad-deep)" }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/10 shadow-inner"
+        style={{ background: "var(--grad-sidebar)" }}
       >
         <div className="flex items-center gap-2.5">
           <div className="p-2 bg-white/5 rounded-lg text-white">

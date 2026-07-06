@@ -788,7 +788,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   placeholder="Query actions ..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl pl-3 pr-8 py-1.5 text-xs text-[var(--color-text)] placeholder-white/30 w-full focus:outline-none"
+                  className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl pl-3 pr-8 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 w-full focus:outline-none"
                 />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-2.5 text-[var(--color-text-faint)] hover:text-[var(--color-text)]">
@@ -1399,7 +1399,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       value={newSubtaskText}
                       onChange={(e) => setNewSubtaskText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleAddSubtask()}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-white/25 flex-1 focus:outline-none focus:border-[var(--color-primary)]/30"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 flex-1 focus:outline-none focus:border-[var(--color-primary)]/30"
                     />
                     <button
                       type="button"
@@ -1468,7 +1468,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       value={newAuditLogMsg}
                       onChange={(e) => setNewAuditLogMsg(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleAddAuditLogComment()}
-                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-white/20 flex-1 focus:outline-none"
+                      className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 flex-1 focus:outline-none"
                     />
                     <button
                       type="button"
@@ -1667,7 +1667,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                     placeholder="Provide specific notes regarding document verification criteria, or instructions..."
                     value={newNotes}
                     onChange={(e) => setNewNotes(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-white/30 focus:outline-none focus:border-[var(--color-primary)]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)]/30"
                   />
                 </div>
 

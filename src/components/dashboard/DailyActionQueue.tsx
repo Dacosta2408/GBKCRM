@@ -53,10 +53,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         title: t.title,
         desc: t.notes || (t.clientName ? `Task regarding client ${t.clientName}` : "General task"),
         badge: isOverdue ? "Overdue" : "High Priority",
-        badgeColor: isOverdue ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20",
+        badgeColor: isOverdue ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20" : "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20",
         date: t.dueDate ? `Due: ${t.dueDate}` : "Immediate Action",
         icon: CheckSquare,
-        iconColor: "text-blue-400",
+        iconColor: "text-[var(--color-info)]",
         actionLabel: "Complete Task",
         onAction: () => {
           if (onCompleteTask) {
@@ -89,10 +89,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         title: `${c.first} ${c.last}`,
         desc: `No updates on this ${c.status.toUpperCase()} file for ${inactiveDays} days.`,
         badge: `${inactiveDays}d Inactive`,
-        badgeColor: "bg-red-500/10 text-red-400 border-red-500/20",
+        badgeColor: "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20",
         date: `Last Touch: ${new Date(c.updatedAt || c.createdAt).toLocaleDateString("en-CA")}`,
         icon: UserMinus,
-        iconColor: "text-red-400",
+        iconColor: "text-[var(--color-error)]",
         actionLabel: "Open File",
         onAction: () => onOpenClient(c.id),
         onNavigate: () => onOpenClient(c.id)
@@ -147,10 +147,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
           title: `Birthday: ${c.first} ${c.last}`,
           desc: `Client's birthday is in ${diffDays} days (${bDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}). Send an outreach card!`,
           badge: "Birthday 🎂",
-          badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+          badgeColor: "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20",
           date: `Birthday in ${diffDays}d`,
           icon: Cake,
-          iconColor: "text-pink-400",
+          iconColor: "text-[var(--color-accent)]",
           actionLabel: "Client Outreach",
           onAction: () => onOpenClient(c.id),
           onNavigate: () => onOpenClient(c.id)
@@ -173,10 +173,10 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
           title: `Maturity: ${c.first} ${c.last}`,
           desc: `Mortgage term maturing in ${diffDays} days (${c.maturityDate}). High retention value renewal opportunity!`,
           badge: `Renewal in ${diffDays}d`,
-          badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+          badgeColor: "bg-[var(--color-info-subtle)] text-[var(--color-info)] border-[var(--color-info)]/20",
           date: `Matures: ${c.maturityDate}`,
           icon: CalendarClock,
-          iconColor: "text-blue-400",
+          iconColor: "text-[var(--color-info)]",
           actionLabel: "Secure Renewal",
           onAction: () => onOpenClient(c.id),
           onNavigate: () => onOpenClient(c.id)
@@ -222,7 +222,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         {/* Toggles and Filter controls */}
         <div className="flex items-center gap-2">
           {isManager && (
-            <div className="bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5 flex">
+            <div className="bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg p-0.5 flex">
               <button
                 onClick={() => setQueueMode("personal")}
                 className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${queueMode === "personal" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
@@ -238,7 +238,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
             </div>
           )}
 
-          <div className="flex items-center gap-1 bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg p-0.5">
             <button
               onClick={() => setFilterType("all")}
               className={`px-2 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${filterType === "all" ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/50" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}

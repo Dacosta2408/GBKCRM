@@ -249,11 +249,11 @@ export function ClientDetailPanel({
                         <div>
                           <div className="flex justify-between items-center text-[10px] mb-1">
                             <span className="text-[var(--color-text-muted)] font-bold">Gross Debt Service (GDS)</span>
-                            <span className={`font-mono font-black ${gds > 39 ? "text-red-400" : "text-green-400"}`}>{gds > 0 ? `${gds.toFixed(1)}%` : "0.0%"}</span>
+                            <span className={`font-mono font-black ${gds > 39 ? "text-[var(--color-error)]" : "text-[var(--color-success)]"}`}>{gds > 0 ? `${gds.toFixed(1)}%` : "0.0%"}</span>
                           </div>
                           <div className="h-1.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                             <div 
-                              className={`h-full rounded-full transition-all duration-500 ${gds > 39 ? "bg-red-500" : "bg-emerald-500"}`} 
+                              className={`h-full rounded-full transition-all duration-500 ${gds > 39 ? "bg-[var(--color-error)]" : "bg-[var(--color-success)]"}`} 
                               style={{ width: `${Math.min(gds, 100)}%` }}
                             ></div>
                           </div>
@@ -262,11 +262,11 @@ export function ClientDetailPanel({
                         <div>
                           <div className="flex justify-between items-center text-[10px] mb-1">
                             <span className="text-[var(--color-text-muted)] font-bold">Total Debt Service (TDS)</span>
-                            <span className={`font-mono font-black ${tds > 44 ? "text-red-400" : "text-green-400"}`}>{tds > 0 ? `${tds.toFixed(1)}%` : "0.0%"}</span>
+                            <span className={`font-mono font-black ${tds > 44 ? "text-[var(--color-error)]" : "text-[var(--color-success)]"}`}>{tds > 0 ? `${tds.toFixed(1)}%` : "0.0%"}</span>
                           </div>
                           <div className="h-1.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden">
                             <div 
-                              className={`h-full rounded-full transition-all duration-500 ${tds > 44 ? "bg-red-500" : "bg-emerald-500"}`} 
+                              className={`h-full rounded-full transition-all duration-500 ${tds > 44 ? "bg-[var(--color-error)]" : "bg-[var(--color-success)]"}`} 
                               style={{ width: `${Math.min(tds, 100)}%` }}
                             ></div>
                           </div>
@@ -410,11 +410,11 @@ export function ClientDetailPanel({
                     <div className="h-4 bg-[var(--color-surface-2)] rounded w-1/2"></div>
                   </div>
                 ) : underwritingError ? (
-                  <div className="p-4 bg-red-950/20 border border-red-500/15 rounded-xl flex flex-col gap-2">
-                    <div className="text-[9px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <div className="p-4 bg-[var(--color-error-subtle)] border border-[var(--color-error)]/20 rounded-xl flex flex-col gap-2">
+                    <div className="text-[9px] font-black text-[var(--color-error)] uppercase tracking-widest flex items-center gap-1.5">
                       ⚠️ Diagnostics Error
                     </div>
-                    <p className="text-xs text-red-300 leading-relaxed font-sans bg-red-900/10 p-2.5 rounded border border-red-500/10 font-mono">
+                    <p className="text-xs text-[var(--color-text)] leading-relaxed font-sans bg-[var(--color-surface-2)] p-2.5 rounded border border-[var(--color-error)]/15 font-mono">
                       {underwritingError}
                     </p>
                     <p className="text-[9px] text-[var(--color-text-muted)] font-bold">
@@ -437,7 +437,7 @@ export function ClientDetailPanel({
               <div className="flex flex-col gap-6">
                 <div className="glass-card p-5 flex flex-col gap-3.5">
                   <div className="flex items-start gap-3">
-                    <div className="p-2.5 bg-emerald-500/15 rounded-xl text-emerald-400 mt-0.5 animate-pulse">
+                    <div className="p-2.5 bg-[var(--color-success-subtle)] rounded-xl text-[var(--color-success)] mt-0.5 animate-pulse">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
@@ -458,23 +458,23 @@ export function ClientDetailPanel({
                   </div>
                 </div>
 
-                <div className="bg-red-500/5 border border-red-500/15 rounded-xl p-5 flex flex-col gap-3.5">
+                <div className="bg-[var(--color-error-subtle)]/30 border border-[var(--color-error)]/20 rounded-xl p-5 flex flex-col gap-3.5">
                   <div className="flex items-start gap-3">
-                    <div className="p-2.5 bg-red-500/10 rounded-xl text-red-400 mt-0.5">
+                    <div className="p-2.5 bg-[var(--color-error-subtle)] rounded-xl text-[var(--color-error)] mt-0.5">
                       <ShieldAlert className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-black text-red-500 uppercase tracking-wider">Absolute Erasure under PIPEDA</h4>
+                      <h4 className="text-xs font-black text-[var(--color-error)] uppercase tracking-wider">Absolute Erasure under PIPEDA</h4>
                       <p className="text-[10px] text-[var(--color-text-muted)] font-semibold leading-relaxed mt-1">
                         Permanently destroy this client folder, including all uploaded electronic assets, checklist states, and logs from local storage. This erasure is binding, permanent, and completely irreversible.
                       </p>
                     </div>
                   </div>
 
-                  <div className="border-t border-red-500/10 pt-3.5 mt-1 flex justify-end">
+                  <div className="border-t border-[var(--color-error)]/15 pt-3.5 mt-1 flex justify-end">
                     <button
                       onClick={() => setShowDeleteConfirmModal(true)}
-                      className="bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="bg-[var(--color-error-subtle)] hover:bg-[var(--color-error-subtle)]/80 text-[var(--color-error)] border border-[var(--color-error)]/25 font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" /> Request Absolute erasure
                     </button>
@@ -489,7 +489,7 @@ export function ClientDetailPanel({
       {/* Absolute PIPEDA Delete Confirmation Modal */}
       {showDeleteConfirmModal && (
         <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 flex items-center justify-center p-4 backdrop-blur-[8px]">
-          <div className="panel-card border border-red-500/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+          <div className="panel-card border border-[var(--color-error)]/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => {
                 setShowDeleteConfirmModal(false);
@@ -499,14 +499,14 @@ export function ClientDetailPanel({
             >
               ✕
             </button>
-            <div className="flex items-center gap-2 text-red-400 font-black text-xs uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-[var(--color-error)] font-black text-xs uppercase tracking-wider mb-2">
               <ShieldAlert className="w-4 h-4" /> Absolute Deletion Request
             </div>
             <p className="text-[11px] text-[var(--color-text-muted)] font-semibold leading-relaxed mb-4">
-              This erasure operation is <span className="text-red-400 font-bold">PERMANENT and IRREVERSIBLE</span>. All personal records, uploaded mortgage documents, checklist states, and notes associated with <strong>{currentClient.first} {currentClient.last}</strong> will be wiped forever.
+              This erasure operation is <span className="text-[var(--color-error)] font-bold">PERMANENT and IRREVERSIBLE</span>. All personal records, uploaded mortgage documents, checklist states, and notes associated with <strong>{currentClient.first} {currentClient.last}</strong> will be wiped forever.
             </p>
             
-            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3.5 mb-4 text-[11px] text-red-300 font-bold">
+            <div className="bg-[var(--color-error-subtle)] border border-[var(--color-error)]/15 rounded-xl p-3.5 mb-4 text-[11px] text-[var(--color-error)] font-bold">
               To authorize this request, please type the client's full name exactly: <strong className="text-[var(--color-text)] select-all">{currentClient.first} {currentClient.last}</strong>
             </div>
 
@@ -515,7 +515,7 @@ export function ClientDetailPanel({
               placeholder="Type client's full name to authorize"
               value={deleteConfirmInput}
               onChange={(e) => setDeleteConfirmInput(e.target.value)}
-              className="w-full bg-[var(--color-bg)] border border-red-500/20 rounded-xl px-4 py-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50 mb-4 text-center font-bold tracking-wide"
+              className="w-full bg-[var(--color-bg)] border border-[var(--color-error)]/25 rounded-xl px-4 py-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-error)]/50 mb-4 text-center font-bold tracking-wide"
             />
 
             <div className="flex gap-3">
@@ -547,7 +547,7 @@ export function ClientDetailPanel({
                     setDeleteConfirmInput("");
                   }
                 }}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-30 text-white font-black uppercase text-[10px] tracking-wider py-3 rounded-xl transition-all cursor-pointer"
+                className="flex-1 bg-[var(--color-error)] hover:opacity-90 disabled:opacity-30 text-white font-black uppercase text-[10px] tracking-wider py-3 rounded-xl transition-all cursor-pointer"
               >
                 {isDeleting ? "Processing Erasure..." : "Absolute Erasure"}
               </button>
