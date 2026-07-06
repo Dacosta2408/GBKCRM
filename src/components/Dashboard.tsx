@@ -79,36 +79,43 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-6 text-sans" id="gbk-crm-dashboard">
       
-      {/* Dynamic Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--color-divider)] pb-4 bg-gradient-to-r from-[var(--color-surface)] to-transparent p-4 rounded-xl">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text)]">{getGreeting()}</h2>
-            <span className="text-[10px] font-bold bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-2.5 py-0.5 rounded-full border border-[var(--color-accent)]/15 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
-              {currentUser.role} Session Active
-            </span>
+      {/* Dynamic Executive Console Header Section */}
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-gradient-to-r from-[var(--color-surface-2)]/85 via-[var(--color-surface)]/70 to-[var(--color-surface-2)]/40 p-6 shadow-xl backdrop-blur-md">
+        {/* Subtle upper light reflection bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-white/15 via-white/5 to-transparent" />
+        
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-2xl font-black tracking-tight text-[var(--color-text)] font-sans">{getGreeting()}</h2>
+              <span className="text-[9px] font-black uppercase tracking-wider bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-3 py-1 rounded-full border border-[var(--color-accent)]/20 flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
+                {currentUser.role} Security Clearance
+              </span>
+            </div>
+            <p className="text-xs text-[var(--color-text-muted)] font-medium flex flex-wrap items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+              <span>{getFormattedDate()}</span>
+              <span className="text-[var(--color-border)]">•</span>
+              <span className="font-mono text-[var(--color-accent)] font-bold tracking-wide bg-[var(--color-surface-3)]/40 px-2 py-0.5 rounded border border-[var(--color-border)]/50">{liveTime} EST</span>
+            </p>
           </div>
-          <p className="text-xs text-[var(--color-text-muted)] mt-1 flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{getFormattedDate()}</span>
-            <span>•</span>
-            <span className="font-mono text-[var(--color-accent)]">{liveTime} EST</span>
-          </p>
-        </div>
 
-        {/* Calendar outreach reminder / stats indicator */}
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <span className="text-[9px] text-[var(--color-text-muted)] uppercase tracking-wider font-semibold">Total Portfolios Managed</span>
-            <div className="text-sm font-bold text-[var(--color-text)] font-mono">{clients.length} Active Records</div>
+          {/* Portfolio Metrics & Control Panel */}
+          <div className="flex items-center gap-4">
+            <div className="px-4 py-2 bg-[var(--color-surface-3)]/30 border border-[var(--color-border)]/70 rounded-xl text-right shrink-0 shadow-sm backdrop-blur-sm">
+              <span className="text-[8px] text-[var(--color-text-muted)] uppercase tracking-widest font-black block">Total Asset Portfolio</span>
+              <div className="text-sm font-black text-[var(--color-text)] font-mono mt-0.5">{clients.length} Active Accounts</div>
+            </div>
+            
+            <button 
+              onClick={onAddEvent}
+              className="group flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-[var(--color-accent-subtle)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/15 text-[var(--color-accent)] transition-all duration-200 cursor-pointer shadow-sm active:scale-95 font-sans"
+            >
+              <Clock className="w-4 h-4 group-hover:rotate-12 transition-transform" /> 
+              <span>Log Outreach Event</span>
+            </button>
           </div>
-          <button 
-            onClick={onAddEvent}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-[var(--color-accent-subtle)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] transition-all cursor-pointer font-sans"
-          >
-            <Clock className="w-3.5 h-3.5" /> Log Outreach Event
-          </button>
         </div>
       </div>
 

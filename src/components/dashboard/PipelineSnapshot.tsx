@@ -115,13 +115,13 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                 <div 
                   key={s.id}
                   onClick={() => setActiveTab("pipeline")}
-                  className="glass-card p-3 flex flex-col justify-between hover:border-[var(--color-accent)]/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                  className="glass-card p-3 flex flex-col justify-between hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/45 transition-all duration-200 cursor-pointer relative overflow-hidden group shadow-sm hover:shadow-md"
                 >
                   <div className="flex flex-col gap-1.5">
                     <span className={`text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded border self-start ${s.color}`}>
                       {s.label}
                     </span>
-                    <span className="text-xl font-black mt-1 text-[var(--color-text)] group-hover:text-[var(--color-accent)] origin-left transition-colors">
+                    <span className="text-xl font-black mt-1 text-[var(--color-text)] group-hover:text-[var(--color-accent)] origin-left transition-colors duration-200">
                       {stageFiles.length}
                     </span>
                   </div>
@@ -138,7 +138,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                   {/* Micro bottom progress bar bar */}
                   <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white/5">
                     <div 
-                      className={`h-full ${s.progressColor}`} 
+                       className={`h-full ${s.progressColor}`} 
                       style={{ width: `${percent}%` }}
                     />
                   </div>
@@ -188,7 +188,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
                   <div 
                     key={deal.id}
                     onClick={() => onOpenClient(deal.id)}
-                    className="p-2.5 rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-between gap-2 group hover:-translate-y-0.5"
+                    className="p-3 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between gap-2 group hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/50"
                     style={{
                       background: "var(--glass-bg)",
                       border: "1px solid var(--glass-border)"

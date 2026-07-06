@@ -60,7 +60,7 @@ export const IntakeOverview: React.FC<IntakeOverviewProps> = ({
               <div
                 key={client.id}
                 onClick={() => onOpenClient(client.id)}
-                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)] rounded-lg transition-all cursor-pointer flex items-center justify-between gap-2 group"
+                className="p-3.5 bg-[var(--color-surface)] border border-[var(--color-border)]/70 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)] rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-between gap-2.5 group shadow-sm hover:shadow"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">

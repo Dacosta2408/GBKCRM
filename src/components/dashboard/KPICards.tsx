@@ -135,34 +135,39 @@ export const KPICards: React.FC<KPICardsProps> = ({
           <motion.div
             key={card.id}
             onClick={() => setActiveTab(card.tab)}
-            whileHover={shouldReduceMotion ? {} : { scale: 1.02, y: -2 }}
+            whileHover={shouldReduceMotion ? {} : { scale: 1.015 }}
             whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="glass-card relative overflow-hidden pt-5 pb-3 px-3 flex flex-col justify-between cursor-pointer group hover:border-[var(--color-accent)]/30"
+            className="glass-card relative overflow-hidden pt-5 pb-3.5 px-3.5 flex flex-col justify-between cursor-pointer group border border-[var(--color-border)]/80 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/40 hover:shadow-[inset_0_1px_3px_rgba(255,255,255,0.05),0_10px_20px_-5px_rgba(0,0,0,0.15)] shadow-md transition-all duration-200"
           >
-            {/* Top Border Color Strip */}
+            {/* Top Border Color Strip with Glass Glow effect */}
             <div 
               className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl"
               style={{ background: card.alert ? "linear-gradient(135deg, var(--color-error) 0%, var(--color-primary) 100%)" : card.isPrimary ? "var(--grad-warm-highlight)" : "var(--grad-slate-blue)" }}
             />
 
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-[10px] text-[var(--color-text-muted)] font-black uppercase tracking-wider truncate">
+            {/* Inner top lighting reflection */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-widest truncate">
                 {card.title}
               </span>
-              <Icon className={`w-3.5 h-3.5 shrink-0 ${card.alert ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`} />
+              <div className={`p-1.5 rounded-lg shrink-0 ${card.alert ? 'bg-[var(--color-error)]/10 text-[var(--color-error)]' : 'bg-[var(--color-surface-3)]/60 text-[var(--color-primary)] border border-[var(--color-border)]/40'} group-hover:scale-105 transition-transform duration-200`}>
+                <Icon className="w-3.5 h-3.5" />
+              </div>
             </div>
 
-            <div className="mt-2.5 flex items-baseline justify-between">
-              <span className="text-2xl font-black tracking-tight" style={{ color: "var(--color-accent)" }}>
+            <div className="mt-3 flex items-baseline justify-between">
+              <span className="text-2xl font-black tracking-tight font-sans" style={{ color: "var(--color-accent)" }}>
                 {card.value}
               </span>
-              <span className="text-[10px] text-[var(--color-text-faint)]/40 group-hover:text-[var(--color-text-faint)] transition-colors">
+              <span className="text-[10px] text-[var(--color-text-faint)]/40 group-hover:text-[var(--color-accent)]/80 transition-colors">
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>
 
-            <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-1 font-bold">
+            <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-1.5 font-bold bg-[var(--color-surface-3)]/25 px-1.5 py-0.5 rounded border border-[var(--color-border)]/20 self-start">
               {card.sub}
             </div>
           </motion.div>

@@ -77,13 +77,16 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             <button
               key={i}
               onClick={act.onClick}
-              className="glass-card flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_20px_rgba(200, 146, 42, 0.15)] group"
+              className="glass-card relative overflow-hidden flex items-center gap-3.5 p-3.5 rounded-2xl border border-[var(--color-border)] text-left transition-all duration-200 cursor-pointer hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/40 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.06)] group"
             >
-              <div className="p-2 rounded-lg bg-[var(--color-surface-3)]/30 shrink-0 group-hover:bg-[var(--color-surface-3)]/60 transition-colors">
-                <Icon className={`w-4 h-4 ${act.iconColor}`} />
+              {/* Top ambient highlight reflection overlay */}
+              <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />
+
+              <div className="p-2.5 rounded-xl bg-[var(--color-surface-3)]/45 border border-[var(--color-border)]/50 shrink-0 group-hover:bg-[var(--color-surface-3)]/75 group-hover:border-[var(--color-accent)]/20 transition-all duration-200 shadow-sm">
+                <Icon className={`w-4 h-4 ${act.iconColor} group-hover:scale-105 transition-transform duration-200`} />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-black text-[var(--color-text)] truncate leading-tight">
+                <div className="text-xs font-black text-[var(--color-text)] truncate leading-tight group-hover:text-[var(--color-accent)] transition-colors">
                   {act.label}
                 </div>
                 <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-0.5 font-bold">

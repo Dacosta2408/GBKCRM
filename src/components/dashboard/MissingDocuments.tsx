@@ -87,7 +87,7 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
             return (
               <div
                 key={client.id}
-                className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg flex flex-col gap-2 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-surface-2)] transition-all"
+                className="p-3.5 bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl flex flex-col gap-2.5 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)] transition-all duration-200 shadow-sm hover:shadow"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span
