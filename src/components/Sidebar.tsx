@@ -217,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         className="absolute inset-0 rounded-lg pointer-events-none"
                         style={{
                           background: "var(--color-sidebar-active)",
-                          border: "1px solid rgba(103, 111, 157, 0.25)",
+                          border: "1px solid rgba(249, 177, 122, 0.20)",
                           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)"
                         }}
                       />

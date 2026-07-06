@@ -27,21 +27,21 @@
   --color-brand-peach:        #F9B17A;
 
   /* ── Core Backgrounds ── */
-  --color-bg:                 #0D1525; /* Sleek deep navy slate background, not pitch black */
-  --color-surface:            #142137; /* Layered container surface */
-  --color-surface-2:          #1C2E4C; /* Elevated inner containers */
-  --color-surface-3:          #243C61; /* High contrast interactive surfaces */
+  --color-bg:                 #0A111E; /* Deeper, sleeker slate-navy canvas background */
+  --color-surface:            #121D2F; /* Rich atmospheric layered container */
+  --color-surface-2:          #19283F; /* Beautifully elevated inner containers */
+  --color-surface-3:          #21334F; /* High-contrast interactive surfaces & items */
 
-  /* ── Fixed Sidebar (Same deep navy #081A33 in both modes) ── */
-  --color-sidebar:            #081A33;
-  --color-sidebar-header:     #051528;
-  --color-sidebar-hover:      rgba(255, 255, 255, 0.06);
-  --color-sidebar-active:     rgba(103, 111, 157, 0.16); /* Switched to a refined slate-based active highlight */
-  --color-sidebar-border:     rgba(255, 255, 255, 0.05);
+  /* ── Fixed Sidebar (Same deep navy #001D39 in both modes) ── */
+  --color-sidebar:            #001D39;
+  --color-sidebar-header:     #001326;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.05);
+  --color-sidebar-active:     rgba(249, 177, 122, 0.12); /* Switched to a refined warm highlight / peach active */
+  --color-sidebar-border:     rgba(255, 255, 255, 0.04);
 
   /* ── Panel / Module Areas ── */
-  --color-panel:              #121F35;
-  --color-panel-2:            #192B48;
+  --color-panel:              #101A2B;
+  --color-panel-2:            #17253D;
 
   /* ── Primary Interaction Colors (Slate-driven direction) ── */
   --color-primary:            #676F9D;
@@ -79,8 +79,8 @@
   --color-info-subtle:        rgba(61, 151, 201, 0.12);
 
   /* ── Gradients ── */
-  --grad-sidebar:             linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
-  --grad-sidebar-header:      linear-gradient(135deg, #0D2845 0%, #081A33 100%);
+  --grad-sidebar:             linear-gradient(180deg, #00284e 0%, #001D39 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #00305d 0%, #001D39 100%);
   --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
   --grad-plum:                linear-gradient(135deg, #4A2C3F 0%, #1C111A 100%);
   --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
@@ -89,21 +89,21 @@
   --grad-soft:                linear-gradient(135deg, #142137 0%, #1C2E4C 100%);
 
   /* ── Glass & Blur (Layered & premium) ── */
-  --glass-bg:                 rgba(20, 33, 55, 0.75);
+  --glass-bg:                 rgba(13, 21, 37, 0.70); /* Stronger liquid glass blend */
   --glass-border:             rgba(255, 255, 255, 0.08);
-  --glass-blur:               blur(16px);
+  --glass-blur:               blur(20px);
 
   /* ── Shadows ── */
-  --shadow-glow-accent:       0 0 24px rgba(103, 111, 157, 0.20);
-  --shadow-panel:             0 12px 40px rgba(0, 0, 0, 0.45);
-  --shadow-card:              0 4px 16px rgba(0, 0, 0, 0.25);
-  --shadow-sm:                0 2px 6px rgba(0, 0, 0, 0.20);
-  --shadow-lg:                0 20px 56px rgba(0, 0, 0, 0.50);
-  --shadow-sidebar:           4px 0 24px rgba(0, 0, 0, 0.35);
+  --shadow-glow-accent:       0 0 32px rgba(103, 111, 157, 0.22), 0 0 4px rgba(103, 111, 157, 0.12);
+  --shadow-panel:             inset 0 1px 1px rgba(255, 255, 255, 0.10), 0 20px 40px -12px rgba(0, 0, 0, 0.50), 0 10px 20px -8px rgba(0, 0, 0, 0.35);
+  --shadow-card:              inset 0 1px 1px rgba(255, 255, 255, 0.06), 0 8px 24px -6px rgba(0, 0, 0, 0.30), 0 4px 12px -3px rgba(0, 0, 0, 0.15);
+  --shadow-sm:                inset 0 1px 0.5px rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.20);
+  --shadow-lg:                inset 0 1px 1.5px rgba(255, 255, 255, 0.14), 0 32px 64px -16px rgba(0, 0, 0, 0.60), 0 16px 32px -8px rgba(0, 0, 0, 0.40);
+  --shadow-sidebar:           inset -1px 0 0 rgba(255, 255, 255, 0.03), 12px 0 32px -8px rgba(0, 0, 0, 0.45);
 
   /* ── Shape / Motion ── */
-  --radius-card:              12px;
-  --radius-panel:             16px;
+  --radius-card:              14px;
+  --radius-panel:             20px;
   --radius-input:             8px;
   --radius-badge:             5px;
   --radius-btn:               8px;
@@ -116,21 +116,21 @@
    ───────────────────────────────────────────────────────────── */
 [data-theme="light"] {
   /* ── Core Backgrounds ── */
-  --color-bg:                 #F2EEE8; /* Exact warm page background */
-  --color-surface:            #FBF9F6; /* Warm clean surface */
-  --color-surface-2:          #FFFFFF; /* Pure white layer */
-  --color-surface-3:          #E6E0D5; /* Deepest accent warm layer */
+  --color-bg:                 #F3F5F9; /* Atmospheric, ultra-clean slate grey-white canvas */
+  --color-surface:            #FFFFFF; /* Premium clean paper white container surface */
+  --color-surface-2:          #F8FAFC; /* Softer lighter slate grey-white elevated */
+  --color-surface-3:          #E2E8F0; /* Deepest contrast panel elements */
 
-  /* ── Sidebar remains fixed deep navy #081A33 in both modes ── */
-  --color-sidebar:            #081A33;
-  --color-sidebar-header:     #051528;
-  --color-sidebar-hover:      rgba(255, 255, 255, 0.07);
-  --color-sidebar-active:     rgba(103, 111, 157, 0.18);
-  --color-sidebar-border:     rgba(255, 255, 255, 0.05);
+  /* ── Sidebar remains fixed deep navy #001D39 in both modes ── */
+  --color-sidebar:            #001D39;
+  --color-sidebar-header:     #001326;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.05);
+  --color-sidebar-active:     rgba(249, 177, 122, 0.12);
+  --color-sidebar-border:     rgba(255, 255, 255, 0.04);
 
   /* ── Panel / Module Areas ── */
-  --color-panel:              #EAE4DA;
-  --color-panel-2:            #DDD6CA;
+  --color-panel:              #EDF2F7;
+  --color-panel-2:            #E2E8F0;
 
   /* ── Primary Interaction Colors (Slate family in light mode) ── */
   --color-primary:            #424769;
@@ -168,27 +168,27 @@
   --color-info-subtle:        rgba(35, 126, 168, 0.08);
 
   /* ── Gradients ── */
-  --grad-sidebar:             linear-gradient(180deg, #0A1F38 0%, #081A33 100%);
-  --grad-sidebar-header:      linear-gradient(135deg, #0D2845 0%, #081A33 100%);
+  --grad-sidebar:             linear-gradient(180deg, #00284e 0%, #001D39 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #00305d 0%, #001D39 100%);
   --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
-  --grad-plum:                linear-gradient(135deg, #7A5063 0%, #FBF9F6 100%);
+  --grad-plum:                linear-gradient(135deg, #7A5063 0%, #FFFFFF 100%);
   --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
   --grad-warm-canvas:         linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
-  --grad-card:                linear-gradient(145deg, #FBF9F6 0%, #F5F1E8 100%);
-  --grad-soft:                linear-gradient(135deg, #F2EEE8 0%, #EAE4DA 100%);
+  --grad-card:                linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
+  --grad-soft:                linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
 
   /* ── Glass & Blur (Warm, slightly translucent, matching #F2EEE8) ── */
-  --glass-bg:                 rgba(251, 249, 246, 0.85);
-  --glass-border:             rgba(28, 34, 48, 0.10);
-  --glass-blur:               blur(16px);
+  --glass-bg:                 rgba(255, 255, 255, 0.75);
+  --glass-border:             rgba(28, 34, 48, 0.06);
+  --glass-blur:               blur(20px);
 
   /* ── Shadows (Softer, refined, avoiding heavy dark muddy looks) ── */
-  --shadow-glow-accent:       0 0 24px rgba(66, 71, 105, 0.12);
-  --shadow-panel:             0 12px 36px rgba(28, 34, 48, 0.06);
-  --shadow-card:              0 4px 14px rgba(28, 34, 48, 0.04);
-  --shadow-sm:                0 2px 6px rgba(28, 34, 48, 0.03);
-  --shadow-lg:                0 20px 50px rgba(28, 34, 48, 0.08);
-  --shadow-sidebar:           4px 0 24px rgba(0, 0, 0, 0.30);
+  --shadow-glow-accent:       0 0 32px rgba(66, 71, 105, 0.12), 0 0 4px rgba(66, 71, 105, 0.06);
+  --shadow-panel:             inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 14px 32px -8px rgba(15, 23, 42, 0.06), 0 6px 16px -4px rgba(15, 23, 42, 0.03);
+  --shadow-card:              inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 6px 18px -4px rgba(15, 23, 42, 0.03), 0 3px 10px -2px rgba(15, 23, 42, 0.02);
+  --shadow-sm:                inset 0 1px 1px rgba(255, 255, 255, 0.95), 0 2px 6px rgba(15, 23, 42, 0.015);
+  --shadow-lg:                inset 0 1px 2px rgba(255, 255, 255, 0.95), 0 24px 48px -12px rgba(15, 23, 42, 0.08), 0 10px 24px -6px rgba(15, 23, 42, 0.04);
+  --shadow-sidebar:           inset -1px 0 0 rgba(255, 255, 255, 0.1), 12px 0 32px -8px rgba(15, 23, 42, 0.04);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -285,48 +285,55 @@ button, a {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.12); /* Subtle premium highlight edge */
   border-radius: var(--radius-card);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.12) inset,
+    inset 0 1px 1px rgba(255, 255, 255, 0.06), /* 3D Inner Top Highlight */
+    inset 0 -1px 2px rgba(0, 0, 0, 0.10),
     var(--shadow-card);
 }
 
 .glass-card:hover {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.15) inset,
-    0 6px 20px rgba(0, 0, 0, 0.18),
-    0 20px 48px rgba(0, 0, 0, 0.22);
-  transform: translateY(-1px);
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.09),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px); /* Slightly more prominent floating lift */
 }
 
 [data-theme="light"] .glass-card {
-  border-top: 1px solid rgba(255, 255, 255, 0.80);
+  border-top: 1px solid rgba(255, 255, 255, 0.90);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.80) inset,
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 2px rgba(15, 23, 42, 0.02),
     var(--shadow-card);
 }
 
 [data-theme="light"] .glass-card:hover {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.80) inset,
-    0 6px 18px rgba(28, 34, 48, 0.05),
-    0 16px 36px rgba(28, 34, 48, 0.04);
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.90),
+    0 10px 24px rgba(15, 23, 42, 0.04),
+    0 4px 10px rgba(15, 23, 42, 0.02);
+  transform: translateY(-2px);
 }
 
 /* --- 2. PANEL CARD --- */
 .panel-card {
   background: var(--color-panel);
   border: 1px solid var(--color-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-panel);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    var(--shadow-panel);
 }
 
 [data-theme="light"] .panel-card {
-  border-top: 1px solid rgba(255, 255, 255, 0.50);
+  border-top: 1px solid rgba(255, 255, 255, 0.80);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.90),
+    var(--shadow-panel);
 }
 
 /* --- 3. SIDEBAR COMPONENTS (FIXED ACCORDING TO BRAND MANDATES) --- */
