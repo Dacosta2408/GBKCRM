@@ -130,7 +130,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
       </div>
 
       {/* 2. Interactive Control Center */}
-      <div className="flex flex-wrap items-center gap-2 shrink-0 self-start md:self-center">
+      <div className="flex flex-wrap items-end gap-2 shrink-0 self-start md:self-center">
         
         {/* Status Dropdown Picker */}
         <div className="flex flex-col gap-0.5">
@@ -138,7 +138,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
           <select 
             value={doc.status}
             onChange={(e) => onStatusChange(client.id, doc.id, e.target.value)}
-            className="bg-[var(--color-surface-2)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] text-[10px] font-bold uppercase rounded p-1.5 text-[var(--color-text)] focus:outline-none cursor-pointer transition-colors"
+            className="bg-[var(--color-surface-2)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] text-[10px] font-bold uppercase rounded p-1.5 text-[var(--color-text)] focus:outline-none cursor-pointer transition-colors h-[33px]"
           >
             {Object.keys(STATUS_STYLING).map(k => (
               <option key={k} value={k}>{STATUS_STYLING[k].label}</option>
@@ -150,7 +150,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
         {doc.status !== "approved" && doc.files.length > 0 && (
           <button
             onClick={() => onStatusChange(client.id, doc.id, "approved")}
-            className="h-[33px] px-2.5 bg-[var(--color-success-subtle)] border border-[var(--color-success)]/20 hover:bg-[var(--color-success)]/10 text-[var(--color-success)] text-[9px] font-black uppercase rounded-lg flex items-center gap-1 self-end transition-colors"
+            className="h-[33px] px-2.5 bg-[var(--color-success-subtle)] border border-[var(--color-success)]/20 hover:bg-[var(--color-success)]/10 text-[var(--color-success)] text-[9px] font-black uppercase rounded-lg flex items-center gap-1 transition-colors"
             title="Fast approve document and clear conditions"
           >
             <CheckCircle2 className="h-3 w-3" /> Approve
@@ -161,7 +161,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
         {doc.status !== "waived" && (
           <button
             onClick={() => onStatusChange(client.id, doc.id, "waived")}
-            className="h-[33px] px-2 bg-[var(--color-success-subtle)]/50 hover:bg-[var(--color-success-subtle)] border border-[var(--color-success)]/15 text-[var(--color-success)]/85 text-[9px] font-black uppercase rounded-lg flex items-center gap-1 self-end transition-colors"
+            className="h-[33px] px-2 bg-[var(--color-success-subtle)]/50 hover:bg-[var(--color-success-subtle)] border border-[var(--color-success)]/15 text-[var(--color-success)]/85 text-[9px] font-black uppercase rounded-lg flex items-center gap-1 transition-colors"
             title="Waive requirement for this client"
           >
             <ShieldCheck className="h-3 w-3" /> Waive
@@ -171,7 +171,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
         {/* View / Upload Secure Drawer */}
         <button 
           onClick={() => onOpenUploadDrawer(client, doc.id, doc.label || doc.id, doc.category || "Other")}
-          className="h-[33px] px-3 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/25 text-[var(--color-accent)] text-[10px] font-black uppercase rounded-lg flex items-center gap-1.5 self-end transition-all shadow-sm"
+          className="h-[33px] px-3 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/25 text-[var(--color-accent)] text-[10px] font-black uppercase rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
           title="Manage Uploads, Add Versions and Comments"
         >
           <UploadCloud className="h-3.5 w-3.5" /> Secure Vault
@@ -181,7 +181,7 @@ export const DocChecklistCard: React.FC<DocChecklistCardProps> = ({
         {isOwnerOrManager && (
           <button 
             onClick={() => onDeleteDocument(client.id, doc.id, doc.label || doc.id)}
-            className="h-[33px] px-2.5 bg-[var(--color-error-subtle)] hover:bg-[var(--color-error-subtle)]/80 border border-[var(--color-error)]/10 text-[var(--color-error)] rounded-lg self-end transition-colors"
+            className="h-[33px] px-2.5 bg-[var(--color-error-subtle)] hover:bg-[var(--color-error-subtle)]/80 border border-[var(--color-error)]/10 text-[var(--color-error)] rounded-lg transition-colors"
             title="Wipe files & reset state to required"
           >
             <Trash2 className="h-3.5 w-3.5" />

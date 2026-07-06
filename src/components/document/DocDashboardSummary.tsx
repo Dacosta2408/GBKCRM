@@ -17,9 +17,10 @@ interface DocMetrics {
 
 interface DocDashboardSummaryProps {
   metrics: DocMetrics;
+  isEmbedded?: boolean;
 }
 
-export const DocDashboardSummary: React.FC<DocDashboardSummaryProps> = ({ metrics }) => {
+export const DocDashboardSummary: React.FC<DocDashboardSummaryProps> = ({ metrics, isEmbedded = false }) => {
   // Calculate file readiness percentage
   const totalRelevant = metrics.totalRequired - metrics.waived;
   const readinessPercentage = totalRelevant > 0 
@@ -27,7 +28,11 @@ export const DocDashboardSummary: React.FC<DocDashboardSummaryProps> = ({ metric
     : 0;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 shrink-0">
+    <div className={`grid gap-3 shrink-0 ${
+      isEmbedded 
+        ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4" 
+        : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
+    }`}>
       
       {/* 1. Readiness Score Gauge */}
       <div className="bg-gradient-to-br from-[#1b1b22] to-[#131317] border border-[#b5a642]/20 col-span-2 p-3.5 rounded-xl flex items-center justify-between shadow-md relative overflow-hidden group">

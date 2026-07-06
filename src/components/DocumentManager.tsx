@@ -576,20 +576,20 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-hidden select-none">
+    <div className={`flex flex-col gap-6 select-none ${embeddedClientId ? "" : "h-full overflow-hidden"}`}>
       
       {/* 1. Dashboard summary header (KPI bento grid) */}
-      <DocDashboardSummary metrics={documentMetrics} />
+      <DocDashboardSummary metrics={documentMetrics} isEmbedded={!!embeddedClientId} />
 
       {embeddedClientId ? (
         // --- VIEW MODE A: CLIENT DETAIL DRAWER EMBEDDED CHECKLIST ---
-        <div className="flex flex-col gap-4 overflow-hidden h-full flex-grow">
+        <div className="flex flex-col gap-4">
           
           {/* Subheader details */}
           <div className="flex justify-between items-center bg-[#131317] p-4 border border-white/5 rounded-xl">
             <div>
               <h4 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
-                📂 Mortgage Folder Checklist Checklist 
+                📂 Mortgage Folder Checklist 
               </h4>
               <p className="text-[10px] text-white/40 mt-1">Automatic matching against self-employed, joint borrower, or purchase/refinance triggers</p>
             </div>
@@ -620,8 +620,8 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             </div>
           </div>
 
-          {/* Checklist Categories scrollable content */}
-          <div className="flex-grow overflow-y-auto pr-1 space-y-5">
+          {/* Checklist Categories content */}
+          <div className="space-y-5">
             {DOCUMENT_CATEGORIES.map(category => {
               const categoryDocs = allDocRows.filter(row => row.category === category);
               if (categoryDocs.length === 0) return null;
