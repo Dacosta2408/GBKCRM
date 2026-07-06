@@ -32,12 +32,12 @@
   --color-surface-2:          #19283F; /* Beautifully elevated inner containers */
   --color-surface-3:          #21334F; /* High-contrast interactive surfaces & items */
 
-  /* ── Fixed Sidebar (Same deep navy #001D39 in both modes) ── */
-  --color-sidebar:            #001D39;
-  --color-sidebar-header:     #001326;
-  --color-sidebar-hover:      rgba(255, 255, 255, 0.05);
-  --color-sidebar-active:     rgba(249, 177, 122, 0.12); /* Switched to a refined warm highlight / peach active */
-  --color-sidebar-border:     rgba(255, 255, 255, 0.04);
+  /* ── Fixed Sidebar (Same deep navy #061429 in both modes) ── */
+  --color-sidebar:            #061429;
+  --color-sidebar-header:     #030d1a;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.04);
+  --color-sidebar-active:     rgba(249, 177, 122, 0.14); /* Refined warm highlight / peach active */
+  --color-sidebar-border:     rgba(255, 255, 255, 0.035);
 
   /* ── Panel / Module Areas ── */
   --color-panel:              #101A2B;
@@ -79,8 +79,8 @@
   --color-info-subtle:        rgba(61, 151, 201, 0.12);
 
   /* ── Gradients ── */
-  --grad-sidebar:             linear-gradient(180deg, #00284e 0%, #001D39 100%);
-  --grad-sidebar-header:      linear-gradient(135deg, #00305d 0%, #001D39 100%);
+  --grad-sidebar:             linear-gradient(180deg, #0c203d 0%, #061429 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #0f274a 0%, #061429 100%);
   --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
   --grad-plum:                linear-gradient(135deg, #4A2C3F 0%, #1C111A 100%);
   --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
@@ -121,12 +121,12 @@
   --color-surface-2:          #F8FAFC; /* Softer lighter slate grey-white elevated */
   --color-surface-3:          #E2E8F0; /* Deepest contrast panel elements */
 
-  /* ── Sidebar remains fixed deep navy #001D39 in both modes ── */
-  --color-sidebar:            #001D39;
-  --color-sidebar-header:     #001326;
-  --color-sidebar-hover:      rgba(255, 255, 255, 0.05);
-  --color-sidebar-active:     rgba(249, 177, 122, 0.12);
-  --color-sidebar-border:     rgba(255, 255, 255, 0.04);
+  /* ── Sidebar remains fixed deep navy #061429 in both modes ── */
+  --color-sidebar:            #061429;
+  --color-sidebar-header:     #030d1a;
+  --color-sidebar-hover:      rgba(255, 255, 255, 0.04);
+  --color-sidebar-active:     rgba(249, 177, 122, 0.14);
+  --color-sidebar-border:     rgba(255, 255, 255, 0.035);
 
   /* ── Panel / Module Areas ── */
   --color-panel:              #EDF2F7;
@@ -168,8 +168,8 @@
   --color-info-subtle:        rgba(35, 126, 168, 0.08);
 
   /* ── Gradients ── */
-  --grad-sidebar:             linear-gradient(180deg, #00284e 0%, #001D39 100%);
-  --grad-sidebar-header:      linear-gradient(135deg, #00305d 0%, #001D39 100%);
+  --grad-sidebar:             linear-gradient(180deg, #0c203d 0%, #061429 100%);
+  --grad-sidebar-header:      linear-gradient(135deg, #0f274a 0%, #061429 100%);
   --grad-slate-blue:          linear-gradient(135deg, #486D83 0%, #4A2C3F 100%);
   --grad-plum:                linear-gradient(135deg, #7A5063 0%, #FFFFFF 100%);
   --grad-warm-highlight:      linear-gradient(135deg, #F4A384 0%, #7A5063 100%);
