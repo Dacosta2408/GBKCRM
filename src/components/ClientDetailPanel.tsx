@@ -117,7 +117,7 @@ export function ClientDetailPanel({
           exit={{ x: "100%" }}
           transition={{ type: "spring", damping: 25, stiffness: 180 }}
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-0 bottom-0 w-full max-w-[850px] border-l flex flex-col shadow-2xl h-full select-none"
+          className="absolute right-0 top-0 bottom-0 w-full max-w-[1050px] border-l flex flex-col shadow-2xl h-full select-none"
           style={{
             background: "var(--color-surface)",
             backdropFilter: "blur(24px)",

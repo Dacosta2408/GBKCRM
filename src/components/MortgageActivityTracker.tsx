@@ -473,13 +473,6 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                   <option value="lawyer">Solicitor/Lawyer</option>
                   <option value="partner">Partners/BDMs</option>
                 </select>
-
-                <button 
-                  onClick={() => setShowLogComm(true)}
-                  className="bg-[#6fa3b8]/10 hover:bg-[#6fa3b8]/20 text-[#6fa3b8] border border-[#6fa3b8]/20 rounded-md px-3 py-1.5 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1 shrink-0 transition-colors"
-                >
-                  <Phone className="w-3 h-3" /> Log Outreach
-                </button>
               </div>
             </div>
 
@@ -513,7 +506,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
               {/* Text Input */}
               <textarea 
-                rows={3}
+                rows={8}
                 required
                 value={newNoteContent}
                 onChange={(e) => setNewNoteContent(e.target.value)}

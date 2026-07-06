@@ -923,9 +923,6 @@ export default function App() {
                   <div className="text-[10px] font-black text-[var(--color-text)] leading-tight">
                     {currentUser.displayName || `${currentUser.first} ${currentUser.last}`}
                   </div>
-                  <div className="text-[8px] text-[var(--color-text-muted)] leading-none font-bold uppercase tracking-wider">
-                    {currentUser.role}
-                  </div>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0" />
               </button>

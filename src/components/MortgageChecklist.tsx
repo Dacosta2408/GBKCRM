@@ -48,7 +48,10 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
   useEffect(() => {
     localStorage.setItem(`gbk_checklist_items_${client.id}`, JSON.stringify(items));
     // Also dispatch custom event to notify App.tsx or FileReadiness if they want to recalculate
-    window.dispatchEvent(new CustomEvent("checklist-updated", { detail: { clientId: client.id } }));
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("checklist-updated", { detail: { clientId: client.id } }));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [items, client.id]);
 
   // If client details change (e.g. status or type), we can let user know they can re-generate,
@@ -137,36 +140,35 @@ export const MortgageChecklist: React.FC<MortgageChecklistProps> = ({
         description: `Marked checklist condition "${matchedItem.name}" as [${newStatus}]`,
         details: `Category: ${matchedItem.category} | Linked stage: ${matchedItem.linkedStage || "General"}`
       });
+
+      // Also sync back to document vault if it's a linked doc item!
+      if (matchedItem.linkedDocId) {
+        const clientVault = docVault[client.id] || {};
+        const currentDoc = clientVault[matchedItem.linkedDocId] || {};
+        let docVaultStatus = currentDoc.status || "required";
+
+        if (newStatus === "Completed") docVaultStatus = "approved";
+        else if (newStatus === "Waived") docVaultStatus = "waived";
+        else if (newStatus === "Waiting on Client") docVaultStatus = "requested";
+        else if (newStatus === "Needs Review") docVaultStatus = "under_review";
+        else if (newStatus === "Not Started") docVaultStatus = "required";
+
+        const updatedDocs = {
+          ...clientVault,
+          [matchedItem.linkedDocId]: {
+            ...currentDoc,
+            status: docVaultStatus,
+            reviewedBy: `${currentUser.first} ${currentUser.last}`,
+            reviewedAt: new Date().toISOString()
+          }
+        };
+        setDocVault(prev => ({ ...prev, [client.id]: updatedDocs }));
+      }
     }
 
+    const isCompleted = newStatus === "Completed" || newStatus === "Waived";
     setItems(prev => prev.map(item => {
       if (item.id === itemId) {
-        const isCompleted = newStatus === "Completed" || newStatus === "Waived";
-        
-        // Also sync back to document vault if it's a linked doc item!
-        if (item.linkedDocId) {
-          const clientVault = docVault[client.id] || {};
-          const currentDoc = clientVault[item.linkedDocId] || {};
-          let docVaultStatus = currentDoc.status || "required";
-
-          if (newStatus === "Completed") docVaultStatus = "approved";
-          else if (newStatus === "Waived") docVaultStatus = "waived";
-          else if (newStatus === "Waiting on Client") docVaultStatus = "requested";
-          else if (newStatus === "Needs Review") docVaultStatus = "under_review";
-          else if (newStatus === "Not Started") docVaultStatus = "required";
-
-          const updatedDocs = {
-            ...clientVault,
-            [item.linkedDocId]: {
-              ...currentDoc,
-              status: docVaultStatus,
-              reviewedBy: `${currentUser.first} ${currentUser.last}`,
-              reviewedAt: new Date().toISOString()
-            }
-          };
-          setDocVault(prev => ({ ...prev, [client.id]: updatedDocs }));
-        }
-
         return {
           ...item,
           status: newStatus,

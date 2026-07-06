@@ -586,12 +586,12 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
         <div className="flex flex-col gap-4">
           
           {/* Subheader details */}
-          <div className="flex justify-between items-center bg-[#131317] p-4 border border-white/5 rounded-xl">
+          <div className="flex justify-between items-center bg-[var(--color-surface-2)] p-4 border border-[var(--color-border)] rounded-xl">
             <div>
-              <h4 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
                 📂 Mortgage Folder Checklist 
               </h4>
-              <p className="text-[10px] text-white/40 mt-1">Automatic matching against self-employed, joint borrower, or purchase/refinance triggers</p>
+              <p className="text-[10px] text-[var(--color-text-muted)] mt-1">Automatic matching against self-employed, joint borrower, or purchase/refinance triggers</p>
             </div>
             
             <div className="flex gap-2">
@@ -606,7 +606,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               )}
               <button 
                 onClick={() => setCustomReqOpen(true)}
-                className="text-[10px] font-bold uppercase bg-white/5 hover:bg-white/10 border border-white/5 text-white/80 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                className="text-[10px] font-bold uppercase bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
                 title="Inject specific lender conditions or bespoke clauses"
               >
                 <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Add Lender Clause
@@ -711,8 +711,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               <div className="flex flex-col gap-3 mt-2 border-t border-white/5 pt-4 space-y-1">
                 <span className="text-[10px] text-white/30 uppercase font-black tracking-widest">Workbench Filters</span>
                 
-                {/* Real-time search */}
-                <div className="relative">
+                 <div className="relative">
                   <input 
                     type="text" 
                     placeholder="Search client folder or file..."
@@ -720,16 +719,16 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-[11px] rounded-lg pl-8 pr-3 py-1.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   />
-                  <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-white/30" />
+                  <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--color-text-faint)]" />
                 </div>
 
                 {/* Status Selection */}
                 <div className="space-y-1">
-                  <label className="text-[8px] text-white/30 font-bold uppercase tracking-wider block">Compliance Status</label>
+                  <label className="text-[8px] text-[var(--color-text-muted)] font-black uppercase tracking-wider block">Compliance Status</label>
                   <select 
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 text-[10px] rounded-lg p-1.5 font-bold uppercase text-white/80 focus:outline-none cursor-pointer"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] rounded-lg p-1.5 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                   >
                     <option value="all">All Statuses</option>
                     {Object.keys(STATUS_STYLING).map(k => (
@@ -740,11 +739,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
 
                 {/* Category Selection */}
                 <div className="space-y-1">
-                  <label className="text-[8px] text-white/30 font-bold uppercase tracking-wider block">Requirement Category</label>
+                  <label className="text-[8px] text-[var(--color-text-muted)] font-black uppercase tracking-wider block">Requirement Category</label>
                   <select 
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 text-[10px] rounded-lg p-1.5 font-bold uppercase text-white/80 focus:outline-none cursor-pointer"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] rounded-lg p-1.5 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                   >
                     <option value="all">All Categories</option>
                     {DOCUMENT_CATEGORIES.map(c => (
@@ -756,11 +755,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                 {/* Team / Broker Filter */}
                 {isOwnerOrManager && (
                   <div className="space-y-1">
-                    <label className="text-[8px] text-white/30 font-bold uppercase tracking-wider block">Assigned Broker Agent</label>
+                    <label className="text-[8px] text-[var(--color-text-muted)] font-black uppercase tracking-wider block">Assigned Broker Agent</label>
                     <select 
                       value={brokerFilter}
                       onChange={(e) => setBrokerFilter(e.target.value)}
-                      className="w-full bg-[#111114] border border-white/5 text-[10px] rounded-lg p-1.5 font-bold uppercase text-white/80 focus:outline-none cursor-pointer"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] rounded-lg p-1.5 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                     >
                       <option value="all">Entire Brokerage team</option>
                       {agentNames.map(name => (
@@ -775,7 +774,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
           </div>
 
           {/* Right Hand Content panel */}
-          <div className="flex-grow bg-[#131317] border border-white/5 rounded-2xl flex flex-col h-full overflow-hidden shadow-sm">
+          <div className="flex-grow bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl flex flex-col h-full overflow-hidden shadow-sm">
             
             {/* SUBTAB 1: OPERATIONS MASTER GRID */}
             {activeSubTab === "dashboard" && (
