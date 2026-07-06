@@ -89,13 +89,48 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   const filteredClients = filterList();
 
   const STAGES = [
-    { id: "lead", label: "Leads", color: "#676F9D", style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/25" },
-    { id: "open", label: "New/Open", color: "#486D83", style: "bg-blue-500/10 text-blue-400 border-blue-500/25" },
-    { id: "working", label: "Working", color: "#8E6076", style: "bg-purple-500/10 text-purple-400 border-purple-500/25" },
-    { id: "lender", label: "Submissions", color: "#F4A384", style: "bg-orange-500/10 text-orange-400 border-orange-500/25" },
-    { id: "conditional", label: "Conditional", color: "#e05c6e", style: "bg-red-500/10 text-red-400 border-red-500/25" },
-    { id: "approved", label: "Approved", color: "#34D399", style: "bg-green-500/10 text-green-400 border-green-500/25" },
-    { id: "funded", label: "Funded", color: "var(--color-accent)", style: "bg-yellow-500/10 text-[var(--color-accent)] border-[var(--color-accent)]/25" }
+    { 
+      id: "lead", 
+      label: "Leads", 
+      color: "var(--color-primary)", 
+      style: "bg-[var(--color-primary-subtle)] text-[var(--color-primary)] border border-[var(--color-primary)]/20 shadow-sm" 
+    },
+    { 
+      id: "open", 
+      label: "New/Open", 
+      color: "var(--color-info)", 
+      style: "bg-[var(--color-info-subtle)] text-[var(--color-info)] border border-[var(--color-info)]/20 shadow-sm" 
+    },
+    { 
+      id: "working", 
+      label: "Working", 
+      color: "var(--color-warning)", 
+      style: "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border border-[var(--color-warning)]/20 shadow-sm" 
+    },
+    { 
+      id: "lender", 
+      label: "Submissions", 
+      color: "var(--color-primary-hover)", 
+      style: "bg-[var(--color-primary-subtle)] text-[var(--color-primary-hover)] border border-[var(--color-primary-hover)]/20 shadow-sm" 
+    },
+    { 
+      id: "conditional", 
+      label: "Conditional", 
+      color: "var(--color-error)", 
+      style: "bg-[var(--color-error-subtle)] text-[var(--color-error)] border border-[var(--color-error)]/20 shadow-sm" 
+    },
+    { 
+      id: "approved", 
+      label: "Approved", 
+      color: "var(--color-success)", 
+      style: "bg-[var(--color-success-subtle)] text-[var(--color-success)] border border-[var(--color-success)]/20 shadow-sm" 
+    },
+    { 
+      id: "funded", 
+      label: "Funded", 
+      color: "var(--color-accent)", 
+      style: "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 shadow-sm" 
+    }
   ];
 
   return (
@@ -103,16 +138,16 @@ export const ClientsList: React.FC<ClientsListProps> = ({
       
       {/* Header bar and sub tabs */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-        <div className="flex bg-black/10 dark:bg-black/25 border border-[var(--color-border)] rounded-full p-1 select-none self-start backdrop-blur-md">
+        <div className="flex bg-[var(--color-surface-3)]/35 border border-[var(--color-border)] rounded-full p-1 select-none self-start backdrop-blur-md">
           <button 
             onClick={() => setViewMode("database")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-md" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"}`}
           >
             📋 Directory Table
           </button>
           <button 
             onClick={() => setViewMode("pipeline")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-md" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"}`}
           >
             📊 Stages
           </button>
@@ -121,12 +156,12 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         {/* Global search */}
         <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto">
           <div 
-            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full"
+            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full border focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
             style={{
               background: "var(--glass-bg)",
               backdropFilter: "var(--glass-blur)",
               WebkitBackdropFilter: "var(--glass-blur)",
-              border: "1px solid var(--glass-border)"
+              borderColor: "var(--glass-border)"
             }}
           >
             <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
@@ -179,7 +214,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         <div className="flex-1 flex flex-col min-h-0 glass-card shadow-md overflow-hidden">
           
           {/* Quick Filters */}
-          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface)]/20 select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
+          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/30 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
             <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-widest pl-2">Filter Stage:</span>
             {[
               { id: "all", label: "All Files" },
@@ -195,7 +230,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               <button
                 key={f.id}
                 onClick={() => setDbFilter(f.id)}
-                className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${dbFilter === f.id ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/40 shadow-sm" : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"}`}
+                className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${
+                  dbFilter === f.id 
+                    ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border-[var(--color-accent)]/35 shadow-[var(--shadow-sm)]" 
+                    : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/60"
+                }`}
               >
                 {f.label}
               </button>
@@ -216,7 +255,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b bg-[var(--color-surface-2)]/35 text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
+                <tr className="border-b bg-[var(--color-surface-2)]/90 backdrop-blur-md text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
                   <th className="p-3.5 pl-6">Profile</th>
                   <th className="p-3.5">Goal Type</th>
                   <th className="p-3.5">Filing Stage</th>
@@ -234,16 +273,17 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     const avatar = (c.first[0] + c.last[0]).toUpperCase();
                     const ltv = pn(c.propval) > 0 ? (pn(c.mtgamt) / pn(c.propval) * 100) : 0;
                     const gds = calculateRatios(c);
+                    const matchingStage = STAGES.find(s => s.id === c.status);
 
                     return (
                       <tr 
                         key={c.id} 
                         onClick={() => onOpenClient(c.id)}
-                        className="hover:bg-[var(--color-surface-2)] transition-colors cursor-pointer group"
+                        className="hover:bg-[var(--color-surface-2)] transition-all duration-150 cursor-pointer group"
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-bg)] group-hover:scale-105 transition-transform"
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-black text-[10px] text-[var(--color-text-inverse)] group-hover:scale-105 transition-transform"
                             style={{ background: "var(--grad-soft)" }}
                           >
                             {avatar}
@@ -256,13 +296,9 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            c.status === "funded" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border border-[var(--color-accent)]/20" :
-                            c.status === "approved" ? "bg-[var(--color-success-subtle)] text-[var(--color-success)] border border-[var(--color-success)]/20" :
-                            c.status === "conditional" ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border border-[var(--color-error)]/20" :
-                            c.status === "lender" ? "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border border-[var(--color-warning)]/20" :
-                            "bg-[var(--color-info-subtle)] text-[var(--color-info)] border border-[var(--color-info)]/20"
+                            matchingStage ? matchingStage.style : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border border-[var(--color-border)] shadow-sm"
                            }`}>
-                            {c.status}
+                            {matchingStage ? matchingStage.label : c.status}
                           </span>
                         </td>
                         <td className="p-3.5 text-xs font-mono font-bold text-[var(--color-text)]">{c.mtgamt ? fd(pn(c.mtgamt)) : "—"}</td>
@@ -327,15 +363,15 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   {/* Column Header */}
                   <div className="p-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: "var(--color-divider)" }}>
                     <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 10px ${s.color}` }}></div>
+                      <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
                       <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-black/30 text-[var(--color-text-muted)]">{colClients.length}</span>
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[var(--color-surface-3)]/80 text-[var(--color-text-muted)] border border-[var(--color-border)]/50">{colClients.length}</span>
                     </div>
                     <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
                   </div>
 
                   {/* Column Body Cards Area */}
-                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/30">
+                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/30 rounded-b-2xl">
                     {colClients.length > 0 ? colClients.map(c => {
                       const initials = (c.first[0] + c.last[0]).toUpperCase();
                       const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
@@ -345,7 +381,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3.5 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-1 ${
+                          className={`p-3.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer shadow-sm hover:-translate-y-1 ${
                             isStale 
                               ? "border-[var(--color-error)]/25 hover:border-[var(--color-error)]/55 hover:shadow-[0_0_15px_var(--color-error-subtle)]" 
                               : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)]"
@@ -357,7 +393,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div 
-                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-bg)]"
+                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)]"
                                 style={{ background: "var(--grad-soft)" }}
                               >
                                 {initials}
