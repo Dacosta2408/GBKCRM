@@ -334,20 +334,20 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex justify-end backdrop-blur-sm select-none animate-fade-in">
-      <div className="bg-[#131317] border-l border-white/5 w-full max-w-2xl h-full flex flex-col shadow-2xl relative">
+    <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-50 flex justify-end backdrop-blur-sm select-none animate-fade-in">
+      <div className="bg-[var(--color-surface)] border-l border-[var(--color-border)] w-full max-w-2xl h-full flex flex-col shadow-2xl relative">
         
         {/* Header */}
-        <div className="p-5 border-b border-white/5 bg-[#171720]/50 flex items-center justify-between">
+        <div className="p-5 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/50 flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-black uppercase text-[#b5a642] tracking-widest flex items-center gap-1.5">
+            <h3 className="text-xs font-black uppercase text-[var(--color-accent)] tracking-widest flex items-center gap-1.5">
               <Lock className="h-4 w-4" /> SECURED UNDERWRITING VAULT
             </h3>
-            <p className="text-[10px] text-white/40 mt-0.5">Underwriting audit, version controls, OCR checks &amp; review notes</p>
+            <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Underwriting audit, version controls, OCR checks &amp; review notes</p>
           </div>
           <button 
             onClick={onClose}
-            className="text-white/40 hover:text-white p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-2 rounded-lg bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -357,12 +357,12 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
         <div className="flex-grow overflow-y-auto p-5 space-y-6 text-xs font-semibold">
           
           {/* Section 1: Client and Doc ID Banner */}
-          <div className="bg-[#181822] border border-white/5 p-4 rounded-xl flex items-center justify-between">
+          <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-4 rounded-xl flex items-center justify-between">
             <div>
-              <span className="text-[8px] text-white/30 uppercase font-black tracking-wider block">Requirement Profile</span>
-              <h4 className="text-sm font-black text-white mt-0.5">{docLabel}</h4>
-              <p className="text-[10px] text-white/40 mt-1">
-                Client Folder: <strong className="text-white/70">{client.first} {client.last}</strong> | Category: <strong className="text-[#b5a642]">{docCategory}</strong>
+              <span className="text-[8px] text-[var(--color-text-faint)] uppercase font-black tracking-wider block">Requirement Profile</span>
+              <h4 className="text-sm font-black text-[var(--color-text)] mt-0.5">{docLabel}</h4>
+              <p className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                Client Folder: <strong className="text-[var(--color-text)]">{client.first} {client.last}</strong> | Category: <strong className="text-[var(--color-accent)]">{docCategory}</strong>
               </p>
             </div>
             <span className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full border ${STATUS_STYLING[savedDoc.status || 'required']?.color} ${STATUS_STYLING[savedDoc.status || 'required']?.border} ${STATUS_STYLING[savedDoc.status || 'required']?.text}`}>
@@ -383,30 +383,30 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer relative overflow-hidden ${
                   dragActive 
-                    ? "border-[#b5a642] bg-[#b5a642]/5 scale-[0.99]" 
-                    : "border-white/5 bg-[#171720]/30 hover:bg-[#171720]/60 hover:border-white/15"
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/5 scale-[0.99]" 
+                    : "border-[var(--color-border)] bg-[var(--color-surface-2)]/30 hover:bg-[var(--color-surface-2)]/60 hover:border-[var(--color-border-hover)]"
                 }`}
               >
                 {uploadProgress >= 0 ? (
                   /* SIMULATED UPLOADING DIALOG */
                   <div className="w-full space-y-4 py-4 px-2">
-                    <RefreshCw className="h-8 w-8 text-[#b5a642] animate-spin mx-auto" />
+                    <RefreshCw className="h-8 w-8 text-[var(--color-accent)] animate-spin mx-auto" />
                     <div className="space-y-1.5">
-                      <div className="flex justify-between text-[10px] font-mono text-white/40">
+                      <div className="flex justify-between text-[10px] font-mono text-[var(--color-text-faint)]">
                         <span>{uploadStepMsg}</span>
                         <span>{uploadProgress}%</span>
                       </div>
-                      <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
-                        <div className="bg-[#b5a642] h-full rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                      <div className="w-full bg-[var(--color-surface-3)] h-2 rounded-full overflow-hidden border border-[var(--color-border)]">
+                        <div className="bg-[var(--color-accent)] h-full rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   </div>
                 ) : (
                   /* IDLE DROP ZONE */
                   <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
-                    <UploadCloud className="h-10 w-10 text-white/20 mb-3 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-black text-white/80 uppercase">Drag &amp; Drop PDF File Here</span>
-                    <span className="text-[10px] text-white/30 block mt-1">Or click to select from local storage</span>
+                    <UploadCloud className="h-10 w-10 text-[var(--color-text-faint)] mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-black text-[var(--color-text)] uppercase">Drag &amp; Drop PDF File Here</span>
+                    <span className="text-[10px] text-[var(--color-text-faint)] block mt-1">Or click to select from local storage</span>
                     <input 
                       type="file" 
                       id="hidden-file-input" 
@@ -419,20 +419,20 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
               </div>
 
               {/* MOCK NAME OVERRIDE */}
-              <div className="bg-[#171720]/40 border border-white/5 p-3 rounded-xl space-y-2">
-                <label className="text-[9px] uppercase text-white/40 font-black block">Custom File Name Override (Optional)</label>
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] p-3 rounded-xl space-y-2">
+                <label className="text-[9px] uppercase text-[var(--color-text-muted)] font-black block">Custom File Name Override (Optional)</label>
                 <div className="flex gap-2">
                   <input 
                     type="text" 
                     placeholder="e.g. Verified_Notice_of_Assessment.pdf"
                     value={fileNameOverride}
                     onChange={(e) => setFileNameOverride(e.target.value)}
-                    className="flex-grow bg-[#111114] border border-white/5 text-[11px] rounded-lg p-2 text-white focus:outline-none focus:border-[#b5a642] font-semibold"
+                    className="flex-grow bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[11px] rounded-lg p-2 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] font-semibold"
                   />
                   <button 
                     onClick={handleTriggerUploadSubmit}
                     disabled={uploadProgress >= 0}
-                    className="bg-[#b5a642]/10 border border-[#b5a642]/20 hover:bg-[#b5a642]/25 text-[#b5a642] uppercase text-[9px] font-black tracking-wider px-3 py-2 rounded-lg transition-colors"
+                    className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/25 text-[var(--color-accent)] uppercase text-[9px] font-black tracking-wider px-3 py-2 rounded-lg transition-colors"
                   >
                     Quick Upload
                   </button>
@@ -441,23 +441,23 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
 
               {/* OCR ANALYSIS INSIGHTS PANEL */}
               {ocrMockDataReady(mockOCRData, files) && (
-                <div className="bg-[#111115] border border-green-500/10 p-4 rounded-xl space-y-2.5 animate-fade-in">
-                  <div className="flex items-center gap-1.5 text-green-400">
+                <div className="bg-[var(--color-success-subtle)]/30 border border-[var(--color-success)]/10 p-4 rounded-xl space-y-2.5 animate-fade-in">
+                  <div className="flex items-center gap-1.5 text-[var(--color-success)]">
                     <ShieldCheck className="h-4.5 w-4.5" />
                     <span className="text-[10px] uppercase font-black tracking-wider">GBK Secure AI-OCR Check Result</span>
                   </div>
-                  <div className="space-y-1.5 border-t border-white/5 pt-2 text-[10px] font-mono text-white/60">
+                  <div className="space-y-1.5 border-t border-[var(--color-border)] pt-2 text-[10px] font-mono text-[var(--color-text-muted)]">
                     <div className="flex justify-between">
-                      <span className="text-white/30">Document Identifier:</span>
-                      <span className="font-bold text-white/80">{mockOCRData?.docHash || "SHA-256#849302"}</span>
+                      <span className="text-[var(--color-text-faint)]">Document Identifier:</span>
+                      <span className="font-bold text-[var(--color-text)]">{mockOCRData?.docHash || "SHA-256#849302"}</span>
                     </div>
                     {(mockOCRData?.detectedFields || [
                       { field: "Verification Status", value: "Valid Document Hashed & Encrypted" },
                       { field: "Client Matching", value: "98.4% Match Confirmed" }
                     ]).map((f: any, idx: number) => (
                       <div key={idx} className="flex justify-between">
-                        <span className="text-white/30">{f.field}:</span>
-                        <span className="font-bold text-green-400/90">{f.value}</span>
+                        <span className="text-[var(--color-text-faint)]">{f.field}:</span>
+                        <span className="font-bold text-[var(--color-success)]">{f.value}</span>
                       </div>
                     ))}
                   </div>
@@ -466,28 +466,28 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
 
               {/* FILE VERSIONS TRACKER */}
               <div className="space-y-3">
-                <span className="text-[10px] text-white/30 uppercase font-black tracking-widest block">SECURED FILE VERSIONS ({files.length})</span>
+                <span className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest block">SECURED FILE VERSIONS ({files.length})</span>
                 {files.length === 0 ? (
-                  <div className="bg-white/1 border border-dashed border-white/5 p-6 rounded-xl text-center text-white/30 italic">
+                  <div className="bg-[var(--color-surface-2)]/40 border border-dashed border-[var(--color-border)] p-6 rounded-xl text-center text-[var(--color-text-faint)] italic">
                     <FileText className="h-6 w-6 mx-auto mb-2 opacity-10" />
                     No files vaulted for this checklist item yet.
                   </div>
                 ) : (
                   <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                     {files.map((ver, idx) => (
-                      <div key={ver.id} className="bg-[#171720]/80 border border-white/5 p-3 rounded-xl flex items-start justify-between gap-3 hover:bg-[#171720] transition-colors relative">
-                        <span className="absolute right-3 bottom-3 px-1.5 py-0.5 bg-white/5 border border-white/5 rounded text-[8px] text-white/40 font-bold uppercase font-mono">
+                      <div key={ver.id} className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-3 rounded-xl flex items-start justify-between gap-3 hover:bg-[var(--color-surface-2)]/80 transition-colors relative">
+                        <span className="absolute right-3 bottom-3 px-1.5 py-0.5 bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded text-[8px] text-[var(--color-text-faint)] font-bold uppercase font-mono">
                           v{idx + 1} {idx === files.length - 1 ? 'Active' : 'Superseded'}
                         </span>
                         <div className="min-w-0 space-y-1">
-                          <h6 className="text-[11px] font-black text-white/90 truncate pr-16">{ver.fileName}</h6>
-                          <div className="flex gap-x-3 gap-y-0.5 text-[9px] text-white/40 font-mono">
+                          <h6 className="text-[11px] font-black text-[var(--color-text)] truncate pr-16">{ver.fileName}</h6>
+                          <div className="flex gap-x-3 gap-y-0.5 text-[9px] text-[var(--color-text-faint)] font-mono">
                             <span className="text-[#6fa3b8]">{ver.fileSize}</span>
                             <span>{new Date(ver.uploadedAt).toLocaleString("en-CA")}</span>
                           </div>
-                          <span className="block text-[8px] text-white/30 font-bold uppercase font-mono">Uploaded By: {ver.uploadedBy}</span>
+                          <span className="block text-[8px] text-[var(--color-text-faint)] font-bold uppercase font-mono">Uploaded By: {ver.uploadedBy}</span>
                           {ver.notes && (
-                            <p className="text-[9.5px] italic text-white/50 bg-black/20 p-2 rounded-md border border-white/5 mt-2">
+                            <p className="text-[9.5px] italic text-[var(--color-text-muted)] bg-[var(--color-surface-3)]/60 border border-[var(--color-border)] p-2 rounded-md mt-2">
                               "{ver.notes}"
                             </p>
                           )}
@@ -495,14 +495,14 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
                         <div className="flex gap-1.5 z-10">
                           <button 
                             onClick={() => showToast(`Downloading ${ver.fileName} from secure storage node...`, "info", "💾")}
-                            className="p-1.5 bg-white/5 hover:bg-white/10 text-white/60 rounded-md"
+                            className="p-1.5 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)] rounded-md"
                             title="Download Version File"
                           >
                             <FileDown className="h-3.5 w-3.5" />
                           </button>
                           <button 
                             onClick={() => handleDeleteVersion(ver.id, ver.fileName)}
-                            className="p-1.5 bg-red-500/5 hover:bg-red-500/15 text-red-400/80 rounded-md border border-red-500/10"
+                            className="p-1.5 bg-[var(--color-error-subtle)] hover:bg-[var(--color-error-subtle)] text-[var(--color-error)] rounded-md border border-[var(--color-error)]/10"
                             title="Delete Version File"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -520,30 +520,30 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
             <div className="lg:col-span-5 space-y-5">
               
               {/* STAGE 1: FAST DECISIONS PANEL */}
-              <div className="bg-[#171720]/60 border border-[#b5a642]/10 p-4 rounded-xl space-y-3 shadow-md">
-                <span className="text-[10px] text-[#b5a642] uppercase font-black tracking-widest block">Fast Underwriting Decisions</span>
+              <div className="bg-[var(--color-surface-2)]/60 border border-[var(--color-accent)]/10 p-4 rounded-xl space-y-3 shadow-md">
+                <span className="text-[10px] text-[var(--color-accent)] uppercase font-black tracking-widest block">Fast Underwriting Decisions</span>
                 <div className="grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => handleDirectStatusSet("approved")}
-                    className="py-2.5 px-3 bg-green-500/10 border border-green-500/20 hover:bg-green-500/20 text-green-400 font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 bg-[var(--color-success-subtle)] border border-[var(--color-success)]/20 hover:bg-[var(--color-success)]/15 text-[var(--color-success)] font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" /> Approve
                   </button>
                   <button 
                     onClick={() => handleDirectStatusSet("rejected")}
-                    className="py-2.5 px-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 bg-[var(--color-error-subtle)] border border-[var(--color-error)]/20 hover:bg-[var(--color-error)]/15 text-[var(--color-error)] font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <X className="h-3.5 w-3.5" /> Reject File
                   </button>
                   <button 
                     onClick={() => handleDirectStatusSet("under_review")}
-                    className="py-2.5 px-3 bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/20 text-orange-400 font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 bg-[var(--color-warning-subtle)] border border-[var(--color-warning)]/20 hover:bg-[var(--color-warning)]/15 text-[var(--color-warning)] font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <RefreshCw className="h-3.5 w-3.5" /> Under Review
                   </button>
                   <button 
                     onClick={() => handleDirectStatusSet("follow_up")}
-                    className="py-2.5 px-3 bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-400 font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 bg-[var(--color-primary-subtle)] border border-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/15 text-[var(--color-primary)] font-black uppercase text-[9px] tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Info className="h-3.5 w-3.5" /> Follow-Up
                   </button>
@@ -551,26 +551,26 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
               </div>
 
               {/* STAGE 2: ISSUE IDENTIFICATION CHECKBOXES */}
-              <div className="bg-[#171720]/40 border border-white/5 p-4 rounded-xl space-y-3">
-                <div className="flex items-center gap-1.5 text-orange-400">
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                <div className="flex items-center gap-1.5 text-[var(--color-warning)]">
                   <ShieldAlert className="h-4.5 w-4.5" />
                   <span className="text-[10px] uppercase font-black tracking-widest">Flag Compliance Defect</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2 border-t border-white/[0.03] pt-2">
+                <div className="grid grid-cols-1 gap-2 border-t border-[var(--color-divider)] pt-2">
                   {ISSUE_CHECKBOXES.map(issue => (
                     <label 
                       key={issue.id} 
                       className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-[10.5px] font-semibold cursor-pointer transition-colors ${
                         selectedIssues[issue.id] 
-                          ? "bg-red-500/10 border-red-500/20 text-red-400" 
-                          : "bg-white/1 border-white/5 text-white/50 hover:bg-white/5"
+                          ? "bg-[var(--color-error-subtle)] border-[var(--color-error)]/20 text-[var(--color-error)]" 
+                          : "bg-[var(--color-surface-2)]/60 border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]"
                       }`}
                     >
                       <input 
                         type="checkbox" 
                         checked={!!selectedIssues[issue.id]} 
                         onChange={() => handleIssueToggle(issue.id, issue.label)}
-                        className="rounded border-white/10 bg-black text-[#b5a642] focus:ring-0 cursor-pointer"
+                        className="rounded border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-accent)] focus:ring-0 cursor-pointer"
                       />
                       {issue.label}
                     </label>
@@ -579,27 +579,27 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
               </div>
 
               {/* STAGE 3: EXPIRY & NOTES */}
-              <div className="bg-[#171720]/40 border border-white/5 p-4 rounded-xl space-y-3">
-                <span className="text-[10px] text-white/40 uppercase font-black tracking-wider block">Decision Notes &amp; Metadata</span>
+              <div className="bg-[var(--color-surface-2)]/40 border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                <span className="text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block">Decision Notes &amp; Metadata</span>
                 
                 <div className="space-y-1">
-                  <label className="text-[8px] text-white/30 uppercase font-black block">Lender Expiry Date</label>
+                  <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">Lender Expiry Date</label>
                   <input 
                     type="date" 
                     value={expiryDate}
                     onChange={(e) => setExpiryDate(e.target.value)}
-                    className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2 text-white focus:outline-none"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded-lg p-2 text-[var(--color-text)] focus:outline-none"
                   />
-                  <span className="text-[8px] text-white/20 block font-mono">Triggers automatic alerts 30 days prior to expiry</span>
+                  <span className="text-[8px] text-[var(--color-text-faint)] block font-mono">Triggers automatic alerts 30 days prior to expiry</span>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[8px] text-white/30 uppercase font-black block">Reviewer Notes</label>
+                  <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">Reviewer Notes</label>
                   <textarea 
                     value={reviewNote}
                     onChange={(e) => setReviewNote(e.target.value)}
                     placeholder="Provide detailed explanations or items required from client."
-                    className="w-full bg-[#111114] border border-white/5 text-xs rounded-lg p-2.5 text-white placeholder-white/20 h-24 focus:outline-none focus:border-[#b5a642] font-semibold whitespace-pre-line leading-relaxed"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs rounded-lg p-2.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)] h-24 focus:outline-none focus:border-[var(--color-accent)] font-semibold whitespace-pre-line leading-relaxed"
                   />
                 </div>
 
@@ -636,7 +636,7 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
 
                     showToast("Underwriting notes updated", "info", "⚙️");
                   }}
-                  className="w-full bg-white/5 border border-white/5 hover:bg-white/10 text-white/70 uppercase text-[9px] font-black tracking-wider py-2 rounded-lg transition-colors"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] uppercase text-[9px] font-black tracking-wider py-2 rounded-lg transition-colors"
                 >
                   Save Audits Only
                 </button>
@@ -648,15 +648,15 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
 
           {/* HISTORICAL REVIEW AUDIT TIMELINE LOG */}
           {savedDoc.reviewHistory && savedDoc.reviewHistory.length > 0 && (
-            <div className="border-t border-white/5 pt-4 space-y-2.5">
-              <span className="text-[10px] text-white/30 uppercase font-black tracking-widest block">UNDERWRITING STATUS REVISION HISTORY</span>
+            <div className="border-t border-[var(--color-border)] pt-4 space-y-2.5">
+              <span className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest block">UNDERWRITING STATUS REVISION HISTORY</span>
               <div className="space-y-2 font-mono text-[9px] max-h-[150px] overflow-y-auto pr-1">
                 {savedDoc.reviewHistory.map((rev: any, rIdx: number) => (
-                  <div key={rIdx} className="bg-black/20 border border-white/5 rounded-lg p-2.5 flex items-start gap-2">
-                    <span className="text-[#b5a642] mt-0.5 font-bold">[{new Date(rev.date).toLocaleDateString()}]</span>
+                  <div key={rIdx} className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 flex items-start gap-2">
+                    <span className="text-[var(--color-accent)] mt-0.5 font-bold">[{new Date(rev.date).toLocaleDateString()}]</span>
                     <div className="min-w-0">
-                      <strong className="text-white/80">{rev.user}</strong>: 
-                      <span className="text-white/40 block font-sans text-[10px] font-semibold mt-0.5 leading-relaxed">{rev.notes}</span>
+                      <strong className="text-[var(--color-text)]">{rev.user}</strong>: 
+                      <span className="text-[var(--color-text-muted)] block font-sans text-[10px] font-semibold mt-0.5 leading-relaxed">{rev.notes}</span>
                     </div>
                   </div>
                 ))}

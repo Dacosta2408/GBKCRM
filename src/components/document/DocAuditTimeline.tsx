@@ -47,22 +47,22 @@ export const DocAuditTimeline: React.FC<DocAuditTimelineProps> = ({ activities }
     <div className="flex flex-col h-full overflow-hidden">
       
       {/* Filters bar */}
-      <div className="p-4 border-b border-white/5 bg-[#171720]/40 flex flex-col sm:flex-row gap-3">
+      <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-grow">
           <input 
             type="text" 
             placeholder="Search audit trail logs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#111114] border border-white/5 text-[11px] rounded-lg pl-8 pr-3 py-1.5 text-white placeholder-white/20 focus:outline-none focus:border-[#b5a642]"
+            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[11px] rounded-lg pl-8 pr-3 py-1.5 text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-accent)]"
           />
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-white/30" />
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-[var(--color-text-faint)]" />
         </div>
         
         <select 
           value={actionFilter}
           onChange={(e) => setActionFilter(e.target.value)}
-          className="bg-[#111114] border border-white/5 text-[10px] font-bold uppercase rounded-lg px-2.5 py-1.5 text-white/80 focus:outline-none"
+          className="bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] font-bold uppercase rounded-lg px-2.5 py-1.5 text-[var(--color-text-muted)] focus:outline-none"
         >
           <option value="all">All Operations</option>
           <option value="requested">Requests</option>
@@ -76,25 +76,25 @@ export const DocAuditTimeline: React.FC<DocAuditTimelineProps> = ({ activities }
       {/* Timeline entries scroll */}
       <div className="flex-grow overflow-y-auto p-5">
         {filteredLogs.length === 0 ? (
-          <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-xl">
-            <History className="h-8 w-8 text-white/10 mb-2" />
-            <span className="text-xs text-white/40 font-bold">No matching activity logs captured.</span>
+          <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--color-border)] rounded-xl">
+            <History className="h-8 w-8 text-[var(--color-text-faint)] mb-2" />
+            <span className="text-xs text-[var(--color-text-muted)] font-bold">No matching activity logs captured.</span>
           </div>
         ) : (
-          <div className="relative border-l border-white/5 pl-4 ml-2.5 space-y-4 py-2">
+          <div className="relative border-l border-[var(--color-border)] pl-4 ml-2.5 space-y-4 py-2">
             {filteredLogs.map(act => (
               <div key={act.id} className="relative group animate-fade-in">
                 {/* Visual Bullet Icon */}
-                <span className="absolute -left-6 top-1 w-4 h-4 bg-[#131317] border border-white/10 rounded-full flex items-center justify-center shadow group-hover:scale-110 transition-transform">
+                <span className="absolute -left-6 top-1 w-4 h-4 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-full flex items-center justify-center shadow group-hover:scale-110 transition-transform">
                   {getActionIcon(act.action)}
                 </span>
                 
-                <div className="bg-[#16161c] border border-white/5 hover:border-white/10 rounded-xl p-3.5 space-y-2 transition-all shadow-sm">
-                  <div className="flex justify-between items-start text-[10px] text-white/30">
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/20 rounded-xl p-3.5 space-y-2 transition-all shadow-sm">
+                  <div className="flex justify-between items-start text-[10px] text-[var(--color-text-faint)]">
                     <div>
-                      <strong className="text-white/85">{act.user}</strong>
+                      <strong className="text-[var(--color-text)]">{act.user}</strong>
                       <span> triggered </span>
-                      <span className="text-[#b5a642] uppercase font-bold text-[8.5px] border border-[#b5a642]/25 px-1.5 py-0.5 rounded-full ml-1">
+                      <span className="text-[var(--color-accent)] uppercase font-bold text-[8.5px] border border-[var(--color-accent)]/25 px-1.5 py-0.5 rounded-full ml-1">
                         {act.action}
                       </span>
                     </div>
@@ -103,13 +103,13 @@ export const DocAuditTimeline: React.FC<DocAuditTimelineProps> = ({ activities }
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-[#eeeef2] font-semibold bg-[#111115] border border-white/5 p-2.5 rounded-lg font-mono">
+                  <div className="text-[11px] text-[var(--color-text)] font-semibold bg-[var(--color-surface-2)] border border-[var(--color-border)] p-2.5 rounded-lg font-mono">
                     {act.details}
                   </div>
 
-                  <div className="text-[9px] text-white/40 flex items-center justify-between">
-                    <span>Client Folder: <strong className="text-white/70">{act.clientName}</strong></span>
-                    <span>Requirement: <strong className="text-white/70">{act.docName}</strong></span>
+                  <div className="text-[9px] text-[var(--color-text-faint)] flex items-center justify-between">
+                    <span>Client Folder: <strong className="text-[var(--color-text-muted)]">{act.clientName}</strong></span>
+                    <span>Requirement: <strong className="text-[var(--color-text-muted)]">{act.docName}</strong></span>
                   </div>
                 </div>
               </div>

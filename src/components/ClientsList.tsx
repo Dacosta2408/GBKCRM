@@ -381,14 +381,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer shadow-sm hover:-translate-y-1 ${
+                          className={`p-3.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer shadow-sm ${
                             isStale 
-                              ? "border-[var(--color-error)]/25 hover:border-[var(--color-error)]/55 hover:shadow-[0_0_15px_var(--color-error-subtle)]" 
-                              : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)]"
+                              ? "border-[var(--color-error)]/25 hover:border-[var(--color-error)]/55 hover:shadow-[0_0_15px_var(--color-error-subtle)] bg-[var(--color-error-subtle)]" 
+                              : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
                           }`}
-                          style={{
-                            background: isStale ? "var(--color-error-subtle)" : "var(--color-surface)"
-                          }}
                         >
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <div className="flex items-center gap-2.5 min-w-0">

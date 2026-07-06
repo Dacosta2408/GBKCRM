@@ -15,17 +15,17 @@ export const DOCUMENT_CATEGORIES = [
 ];
 
 export const STATUS_STYLING: Record<string, { label: string; color: string; border: string; text: string }> = {
-  required: { label: "Required", color: "bg-zinc-500/10", border: "border-zinc-500/25", text: "text-zinc-400" },
-  requested: { label: "Requested", color: "bg-[#6fa3b8]/10", border: "border-[#6fa3b8]/35", text: "text-[#6fa3b8]" },
-  received: { label: "Received", color: "bg-blue-500/10", border: "border-blue-500/35", text: "text-blue-400" },
-  under_review: { label: "Under Review", color: "bg-orange-500/10", border: "border-orange-500/35", text: "text-orange-400" },
-  approved: { label: "Approved", color: "bg-green-500/10", border: "border-green-500/35", text: "text-green-400" },
-  rejected: { label: "Rejected", color: "bg-red-500/10", border: "border-red-500/35", text: "text-red-400" },
-  missing_pages: { label: "Missing Pages", color: "bg-yellow-500/10", border: "border-yellow-500/35", text: "text-yellow-400" },
-  expired: { label: "Expired", color: "bg-neutral-500/10", border: "border-red-500/50", text: "text-red-300" },
-  follow_up: { label: "Needs Follow-Up", color: "bg-indigo-500/10", border: "border-indigo-500/35", text: "text-indigo-400" },
-  waived: { label: "Waived", color: "bg-emerald-500/5", border: "border-emerald-500/20", text: "text-emerald-400/70" },
-  na: { label: "N/A", color: "bg-white/2", border: "border-white/5", text: "text-white/30" }
+  required: { label: "Required", color: "bg-zinc-500/10", border: "border-zinc-500/20", text: "text-[var(--color-text-muted)]" },
+  requested: { label: "Requested", color: "bg-[var(--color-info-subtle)]", border: "border-[var(--color-info)]/30", text: "text-[var(--color-info)]" },
+  received: { label: "Received", color: "bg-blue-500/10", border: "border-blue-500/20", text: "text-blue-600 dark:text-blue-400" },
+  under_review: { label: "Under Review", color: "bg-amber-500/10", border: "border-amber-500/20", text: "text-amber-600 dark:text-amber-400" },
+  approved: { label: "Approved", color: "bg-green-500/10", border: "border-green-500/20", text: "text-green-600 dark:text-green-400" },
+  rejected: { label: "Rejected", color: "bg-red-500/10", border: "border-red-500/20", text: "text-red-600 dark:text-red-400" },
+  missing_pages: { label: "Missing Pages", color: "bg-yellow-500/10", border: "border-yellow-500/20", text: "text-yellow-600 dark:text-yellow-400" },
+  expired: { label: "Expired", color: "bg-red-500/10", border: "border-red-500/30", text: "text-red-600 dark:text-red-400" },
+  follow_up: { label: "Needs Follow-Up", color: "bg-indigo-500/10", border: "border-indigo-500/20", text: "text-indigo-600 dark:text-indigo-400" },
+  waived: { label: "Waived", color: "bg-emerald-500/5", border: "border-emerald-500/15", text: "text-emerald-600/80 dark:text-emerald-400/80" },
+  na: { label: "N/A", color: "bg-[var(--color-surface-2)]/50", border: "border-[var(--color-border)]/50", text: "text-[var(--color-text-faint)]" }
 };
 
 export const ISSUE_CHECKBOXES = [
