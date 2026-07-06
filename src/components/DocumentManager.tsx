@@ -1058,7 +1058,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
 
       {/* --- FORM MODAL: BESPOKE LENDER CONDITION CLAUSE --- */}
       {customReqOpen && (
-        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none animate-fade-in">
+        <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm select-none animate-fade-in">
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => setCustomReqOpen(false)}

@@ -36,7 +36,7 @@ export const AIIntake: React.FC<AIIntakeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 z-40 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-40 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
       <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl">
         
         {/* Head */}
@@ -66,7 +66,7 @@ export const AIIntake: React.FC<AIIntakeProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Paste Application Notes
               </h4>
               {!apiKeySet && (
-                <span className="text-[10px] text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2.5 py-0.5 rounded flex items-center gap-1.5 animate-pulse">
+                <span className="text-[10px] badge-warning border border-[var(--color-warning)]/10 px-2.5 py-0.5 rounded flex items-center gap-1.5 animate-pulse">
                   <AlertTriangle className="w-3" /> API Key Missing
                 </span>
               )}

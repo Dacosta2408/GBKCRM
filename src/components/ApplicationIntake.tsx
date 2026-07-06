@@ -483,7 +483,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-[#030d1a]/70 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
       <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         
         {/* Modal Header */}
@@ -570,7 +570,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                     <Sparkles className="w-4 h-4 text-[var(--color-accent)]" /> Paste Application Text / Email Content
                   </h4>
                   {!apiKeySet && (
-                    <span className="text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded font-bold animate-pulse flex items-center gap-1">
+                    <span className="text-[9px] badge-warning border border-[var(--color-warning)]/10 px-2 py-0.5 rounded font-bold animate-pulse flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" /> Simulated AI Mode
                     </span>
                   )}
