@@ -122,7 +122,11 @@ export const MissingDocuments: React.FC<MissingDocumentsProps> = ({
 
                 {/* Action trigger row */}
                 <div className="flex items-center justify-between mt-1 text-[9px]">
-                  <span className="text-[var(--color-text-faint)] font-mono">Pending: {missing.length} files</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[var(--color-text-faint)] font-mono">Pending: {missing.length} files</span>
+                    <span className="text-[var(--color-border)]">•</span>
+                    <span className="text-[var(--color-primary)] font-bold">Broker: {client.agent || "Unassigned"}</span>
+                  </div>
                   <button
                     onClick={() => {
                       onOpenClient(client.id);

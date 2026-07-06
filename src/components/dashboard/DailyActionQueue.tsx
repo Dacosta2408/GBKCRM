@@ -55,6 +55,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         badge: isOverdue ? "Overdue" : "High Priority",
         badgeColor: isOverdue ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20" : "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20",
         date: t.dueDate ? `Due: ${t.dueDate}` : "Immediate Action",
+        owner: t.assignedTo || "Unassigned",
         icon: CheckSquare,
         iconColor: "text-[var(--color-info)]",
         actionLabel: "Complete Task",
@@ -91,6 +92,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         badge: `${inactiveDays}d Inactive`,
         badgeColor: "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20",
         date: `Last Touch: ${new Date(c.updatedAt || c.createdAt).toLocaleDateString("en-CA")}`,
+        owner: c.agent || "Unassigned Agent",
         icon: UserMinus,
         iconColor: "text-[var(--color-error)]",
         actionLabel: "Open File",
@@ -118,6 +120,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
         badge: `${missingFields.length} Missing Fields`,
         badgeColor: "bg-[var(--color-warning-subtle)] text-[var(--color-warning)] border-[var(--color-warning)]/20",
         date: "Incomplete Profile",
+        owner: c.agent || "Unassigned Agent",
         icon: AlertTriangle,
         iconColor: "text-[var(--color-warning)]",
         actionLabel: "Complete Profile",
@@ -149,6 +152,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
           badge: "Birthday 🎂",
           badgeColor: "bg-[var(--color-success-subtle)] text-[var(--color-success)] border-[var(--color-success)]/20",
           date: `Birthday in ${diffDays}d`,
+          owner: c.agent || "Unassigned Agent",
           icon: Cake,
           iconColor: "text-[var(--color-accent)]",
           actionLabel: "Client Outreach",
@@ -175,6 +179,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
           badge: `Renewal in ${diffDays}d`,
           badgeColor: "bg-[var(--color-info-subtle)] text-[var(--color-info)] border-[var(--color-info)]/20",
           date: `Matures: ${c.maturityDate}`,
+          owner: c.agent || "Unassigned Agent",
           icon: CalendarClock,
           iconColor: "text-[var(--color-info)]",
           actionLabel: "Secure Renewal",
@@ -302,10 +307,12 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
                     <p className="text-[10px] text-[var(--color-text-muted)] mt-1.5 leading-relaxed max-w-xl">
                       {item.desc}
                     </p>
-                    <div className="text-[9px] text-[var(--color-text-faint)] font-mono mt-2 flex items-center gap-1.5 font-bold">
+                    <div className="text-[9px] text-[var(--color-text-faint)] font-mono mt-2 flex flex-wrap items-center gap-1.5 font-bold">
                       <span className="bg-[var(--color-surface-3)]/40 px-1.5 py-0.5 rounded border border-[var(--color-border)]/30">{item.category}</span>
                       <span className="text-[var(--color-border)]">•</span>
                       <span>{item.date}</span>
+                      <span className="text-[var(--color-border)]">•</span>
+                      <span className="text-[var(--color-primary)] font-extrabold uppercase tracking-wide">Broker: {item.owner}</span>
                     </div>
                   </div>
                 </div>

@@ -70,9 +70,14 @@ export const IntakeOverview: React.FC<IntakeOverviewProps> = ({
                     <span className="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">
                       {client.status}
                     </span>
+                    {(!client.agent || client.agent.toLowerCase() === "unassigned") && (
+                      <span className="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/15 animate-pulse">
+                        Unassigned
+                      </span>
+                    )}
                   </div>
                   <p className="text-[10px] text-[var(--color-text-muted)] truncate mt-1">
-                    {client.type || "Purchase"} • {client.agent || "Unassigned"}
+                    {client.type || "Purchase"} • {client.agent || "Unassigned Lead"}
                   </p>
                   <p className="text-[9px] text-[var(--color-text-faint)] font-mono mt-0.5">
                     Submitted: {new Date(client.createdAt).toLocaleDateString("en-CA")}
