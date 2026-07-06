@@ -762,7 +762,7 @@ export default function App() {
         
         {/* Top Header */}
         <header 
-          className="h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
+          className="relative z-40 h-14 border-b flex items-center justify-between px-6 shrink-0 select-none"
           style={{
             background: "var(--glass-bg)",
             backdropFilter: "var(--glass-blur)",
