@@ -483,13 +483,13 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 bg-[#030d1a]/70 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
       <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         
         {/* Modal Header */}
         <div className="p-5 border-b border-[var(--color-border)] flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-tr from-[#bdae45] to-[#5d9bb1] rounded-xl text-black">
+            <div className="p-2 bg-gradient-to-tr from-[var(--color-accent)] to-[var(--color-primary)] rounded-xl text-[var(--color-text-inverse)] shadow-sm">
               <Sparkles className="w-5 h-5 font-bold" />
             </div>
             <div>
@@ -525,11 +525,11 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
                   isDragActive 
-                    ? "border-[#5d9bb1] bg-[#5d9bb1]/10" 
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary-subtle)]" 
                     : "border-[var(--color-border)] bg-[var(--color-bg)]/30 hover:bg-[var(--color-surface-2)]/30"
                 }`}
               >
-                <div className="p-4 bg-[var(--color-surface-2)] rounded-full text-[#5d9bb1]">
+                <div className="p-4 bg-[var(--color-surface-2)] rounded-full text-[var(--color-primary)]">
                   <UploadCloud className="w-8 h-8" />
                 </div>
                 <div>
@@ -544,19 +544,19 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <span className="text-[10px] text-[var(--color-text-faint)]">or</span>
                   <button 
                     onClick={() => handleLoadSample('barrie')}
-                    className="px-4 py-1.5 bg-[#bdae45]/20 text-[#bdae45] hover:bg-[#bdae45]/30 border border-[#bdae45]/30 text-xs font-semibold rounded-lg transition-all"
+                    className="px-4 py-1.5 bg-[var(--color-accent-subtle)] text-[var(--color-accent)] hover:bg-[var(--color-accent-hover)]/20 border border-[var(--color-accent)]/20 text-xs font-semibold rounded-lg transition-all"
                   >
                     Load Sample A (Barrie)
                   </button>
                   <button 
                     onClick={() => handleLoadSample('newmarket')}
-                    className="px-4 py-1.5 bg-[#5d9bb1]/20 text-[#5d9bb1] hover:bg-[#5d9bb1]/30 border border-[#5d9bb1]/30 text-xs font-semibold rounded-lg transition-all"
+                    className="px-4 py-1.5 bg-[var(--color-primary-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]/20 border border-[var(--color-primary)]/20 text-xs font-semibold rounded-lg transition-all"
                   >
                     Load Sample B (Newmarket)
                   </button>
                 </div>
                 {fileName && (
-                  <div className="mt-3 px-3 py-1.5 bg-[#5d9bb1]/10 border border-[#5d9bb1]/20 text-[#5d9bb1] rounded-lg text-xs font-bold flex items-center gap-2">
+                  <div className="mt-3 px-3 py-1.5 bg-[var(--color-primary-subtle)] border border-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-lg text-xs font-bold flex items-center gap-2">
                      <FileCheck className="w-4 h-4" />
                      <span>Loaded: {fileName} ({fileSize})</span>
                   </div>
@@ -566,11 +566,11 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
               {/* Paste Text / Email Application Form Field */}
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-5 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-[#bdae45] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#bdae45]" /> Paste Application Text / Email Content
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[var(--color-accent)]" /> Paste Application Text / Email Content
                   </h4>
                   {!apiKeySet && (
-                    <span className="text-[9px] text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded font-bold animate-pulse flex items-center gap-1">
+                    <span className="text-[9px] text-amber-500 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded font-bold animate-pulse flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" /> Simulated AI Mode
                     </span>
                   )}
@@ -581,14 +581,14 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder="Paste the mortgage application content, credit details, or copy/pasted email form here. Example: Jane Smith, single, cell 705-555-1212. Works at RVH Hospital in Barrie, salary 98,500. Buying a house for 620,000..."
-                  className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-xs text-[var(--color-text)] focus:outline-none focus:border-[#5d9bb1]/40 font-mono leading-relaxed"
+                  className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono leading-relaxed"
                 />
 
                 <div className="flex justify-end gap-2 mt-1">
                   <button
                     onClick={handleExtractWithAI}
                     disabled={isLoading}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#bdae45] to-[#5d9bb1] disabled:opacity-40 text-black font-black text-xs uppercase tracking-wider rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] disabled:opacity-40 text-[var(--color-text-inverse)] font-black text-xs uppercase tracking-wider rounded-lg hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
                   >
                     {isLoading ? (
                       <>
@@ -627,14 +627,14 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-5 py-3 text-xs font-bold transition-all border-b-2 uppercase tracking-wider shrink-0 flex items-center gap-2 ${
+                      className={`px-5 py-3 text-xs font-bold transition-all border-b-2 uppercase tracking-wider shrink-0 flex items-center gap-2 cursor-pointer ${
                         isActive 
-                          ? "text-[#bdae45] border-[#bdae45] bg-[#bdae45]/5" 
+                          ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-[var(--color-accent-subtle)]" 
                           : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)]"
                       }`}
                     >
                       <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
-                        isActive ? "bg-[#bdae45] text-black border-[#bdae45]" : "border-[var(--color-border)]"
+                        isActive ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "border-[var(--color-border)]"
                       }`}>{idx + 1}</span>
                       <span>{labelMap[tab]}</span>
                     </button>
@@ -649,144 +649,144 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-personal-form">
                     {/* Applicant */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant</span>
+                      <span className="text-[10px] bg-[var(--color-primary-subtle)] text-[var(--color-primary)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-primary)]/20">Applicant</span>
                       
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">First Name *</label>
-                          <input type="text" value={fields.app_first || ""} onChange={(e) => handleFieldChange("app_first", e.target.value)} placeholder="Jane" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">First Name *</label>
+                          <input type="text" value={fields.app_first || ""} onChange={(e) => handleFieldChange("app_first", e.target.value)} placeholder="Jane" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Last Name *</label>
-                          <input type="text" value={fields.app_last || ""} onChange={(e) => handleFieldChange("app_last", e.target.value)} placeholder="Smith" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Last Name *</label>
+                          <input type="text" value={fields.app_last || ""} onChange={(e) => handleFieldChange("app_last", e.target.value)} placeholder="Smith" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Email Address *</label>
-                        <input type="email" value={fields.app_email || ""} onChange={(e) => handleFieldChange("app_email", e.target.value)} placeholder="jane@email.com" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Email Address *</label>
+                        <input type="email" value={fields.app_email || ""} onChange={(e) => handleFieldChange("app_email", e.target.value)} placeholder="jane@email.com" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Date of Birth</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Date of Birth</label>
                         <div className="grid grid-cols-3 gap-2">
-                          <input type="text" value={fields.app_dob_m || ""} onChange={(e) => handleFieldChange("app_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
-                          <input type="text" value={fields.app_dob_d || ""} onChange={(e) => handleFieldChange("app_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
-                          <input type="text" value={fields.app_dob_y || ""} onChange={(e) => handleFieldChange("app_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.app_dob_m || ""} onChange={(e) => handleFieldChange("app_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.app_dob_d || ""} onChange={(e) => handleFieldChange("app_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.app_dob_y || ""} onChange={(e) => handleFieldChange("app_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Marital Status</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Marital Status</label>
                         <div className="flex flex-wrap gap-1.5">
                           {["Married", "Single", "Divorced", "Separated", "Common-Law", "Widowed"].map(m => (
-                            <button key={m} type="button" onClick={() => handlePillSelect("app_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.app_marital === m ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5 hover:border-white/10"}`}>{m}</button>
+                            <button key={m} type="button" onClick={() => handlePillSelect("app_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all cursor-pointer ${fields.app_marital === m ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{m}</button>
                           ))}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">S.I.N.</label>
-                          <input type="text" value={fields.app_sin || ""} onChange={(e) => handleFieldChange("app_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">S.I.N.</label>
+                          <input type="text" value={fields.app_sin || ""} onChange={(e) => handleFieldChange("app_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Credit Beacon Score</label>
-                          <input type="number" value={fields.beacon || ""} onChange={(e) => handleFieldChange("beacon", e.target.value)} placeholder="720" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Cell Phone</label>
-                          <input type="text" value={fields.app_cell || ""} onChange={(e) => handleFieldChange("app_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
-                        </div>
-                        <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Home Phone</label>
-                          <input type="text" value={fields.app_home || ""} onChange={(e) => handleFieldChange("app_home", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Credit Beacon Score</label>
+                          <input type="number" value={fields.beacon || ""} onChange={(e) => handleFieldChange("beacon", e.target.value)} placeholder="720" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Work Phone</label>
-                          <input type="text" value={fields.app_work || ""} onChange={(e) => handleFieldChange("app_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Cell Phone</label>
+                          <input type="text" value={fields.app_cell || ""} onChange={(e) => handleFieldChange("app_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Preferred Contact</label>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Home Phone</label>
+                          <input type="text" value={fields.app_home || ""} onChange={(e) => handleFieldChange("app_home", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Work Phone</label>
+                          <input type="text" value={fields.app_work || ""} onChange={(e) => handleFieldChange("app_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Preferred Contact</label>
                           <div className="flex gap-2">
                             {["Email", "Phone"].map(c => (
-                              <button key={c} type="button" onClick={() => handlePillSelect("app_contact", c)} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_contact === c ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{c}</button>
+                              <button key={c} type="button" onClick={() => handlePillSelect("app_contact", c)} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.app_contact === c ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{c}</button>
                             ))}
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
-                        <input type="number" value={fields.app_dependents || ""} onChange={(e) => handleFieldChange("app_dependents", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
+                        <input type="number" value={fields.app_dependents || ""} onChange={(e) => handleFieldChange("app_dependents", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                       </div>
                     </div>
 
                     {/* Co-Applicant */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant (Optional)</span>
+                      <span className="text-[10px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-border)]">Co-Applicant (Optional)</span>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">First Name</label>
-                          <input type="text" value={fields.co_first || ""} onChange={(e) => handleFieldChange("co_first", e.target.value)} placeholder="John" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">First Name</label>
+                          <input type="text" value={fields.co_first || ""} onChange={(e) => handleFieldChange("co_first", e.target.value)} placeholder="John" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Last Name</label>
-                          <input type="text" value={fields.co_last || ""} onChange={(e) => handleFieldChange("co_last", e.target.value)} placeholder="Smith" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Last Name</label>
+                          <input type="text" value={fields.co_last || ""} onChange={(e) => handleFieldChange("co_last", e.target.value)} placeholder="Smith" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Email Address</label>
-                        <input type="email" value={fields.co_email || ""} onChange={(e) => handleFieldChange("co_email", e.target.value)} placeholder="john@email.com" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Email Address</label>
+                        <input type="email" value={fields.co_email || ""} onChange={(e) => handleFieldChange("co_email", e.target.value)} placeholder="john@email.com" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Date of Birth</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Date of Birth</label>
                         <div className="grid grid-cols-3 gap-2">
-                          <input type="text" value={fields.co_dob_m || ""} onChange={(e) => handleFieldChange("co_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
-                          <input type="text" value={fields.co_dob_d || ""} onChange={(e) => handleFieldChange("co_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
-                          <input type="text" value={fields.co_dob_y || ""} onChange={(e) => handleFieldChange("co_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <input type="text" value={fields.co_dob_m || ""} onChange={(e) => handleFieldChange("co_dob_m", e.target.value)} placeholder="MM" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.co_dob_d || ""} onChange={(e) => handleFieldChange("co_dob_d", e.target.value)} placeholder="DD" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.co_dob_y || ""} onChange={(e) => handleFieldChange("co_dob_y", e.target.value)} placeholder="YYYY" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Marital Status</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Marital Status</label>
                         <div className="flex flex-wrap gap-1.5">
                           {["Married", "Single", "Divorced", "Separated", "Common-Law", "Widowed"].map(m => (
-                            <button key={m} type="button" onClick={() => handlePillSelect("co_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.co_marital === m ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5 hover:border-white/10"}`}>{m}</button>
+                            <button key={m} type="button" onClick={() => handlePillSelect("co_marital", m)} className={`px-3 py-1 rounded text-[11px] border transition-all cursor-pointer ${fields.co_marital === m ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{m}</button>
                           ))}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">S.I.N.</label>
-                          <input type="text" value={fields.co_sin || ""} onChange={(e) => handleFieldChange("co_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">S.I.N.</label>
+                          <input type="text" value={fields.co_sin || ""} onChange={(e) => handleFieldChange("co_sin", e.target.value)} placeholder="000-000-000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Cell Phone</label>
-                          <input type="text" value={fields.co_cell || ""} onChange={(e) => handleFieldChange("co_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Cell Phone</label>
+                          <input type="text" value={fields.co_cell || ""} onChange={(e) => handleFieldChange("co_cell", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Work Phone</label>
-                          <input type="text" value={fields.co_work || ""} onChange={(e) => handleFieldChange("co_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5d9bb1]/50" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Work Phone</label>
+                          <input type="text" value={fields.co_work || ""} onChange={(e) => handleFieldChange("co_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Preferred Contact</label>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Preferred Contact</label>
                           <div className="flex gap-2">
                             {["Email", "Phone"].map(c => (
-                              <button key={c} type="button" onClick={() => handlePillSelect("co_contact", c)} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_contact === c ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{c}</button>
+                              <button key={c} type="button" onClick={() => handlePillSelect("co_contact", c)} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.co_contact === c ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{c}</button>
                             ))}
                           </div>
                         </div>
@@ -800,109 +800,109 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-address-form">
                     {/* Applicant Address */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Address</span>
+                      <span className="text-[10px] bg-[var(--color-primary-subtle)] text-[var(--color-primary)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-primary)]/20">Applicant Address</span>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Currently</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Currently</label>
                         <div className="flex flex-wrap gap-1.5">
                           {["Own", "Rent", "Live with Relatives", "Live With Others"].map(h => (
-                            <button key={h} type="button" onClick={() => handlePillSelect("app_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.app_housing === h ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{h}</button>
+                            <button key={h} type="button" onClick={() => handlePillSelect("app_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all cursor-pointer ${fields.app_housing === h ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{h}</button>
                           ))}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-4 gap-2">
                         <div className="col-span-3">
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Street Address *</label>
-                          <input type="text" value={fields.app_addr || ""} onChange={(e) => handleFieldChange("app_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Street Address *</label>
+                          <input type="text" value={fields.app_addr || ""} onChange={(e) => handleFieldChange("app_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Unit</label>
-                          <input type="text" value={fields.app_unit || ""} onChange={(e) => handleFieldChange("app_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Unit</label>
+                          <input type="text" value={fields.app_unit || ""} onChange={(e) => handleFieldChange("app_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">City</label>
-                          <input type="text" value={fields.app_city || ""} onChange={(e) => handleFieldChange("app_city", e.target.value)} placeholder="Barrie" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">City</label>
+                          <input type="text" value={fields.app_city || ""} onChange={(e) => handleFieldChange("app_city", e.target.value)} placeholder="Barrie" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Province</label>
-                          <input type="text" value={fields.app_prov || ""} onChange={(e) => handleFieldChange("app_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Province</label>
+                          <input type="text" value={fields.app_prov || ""} onChange={(e) => handleFieldChange("app_prov", e.target.value)} placeholder="ON" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Postal Code</label>
-                          <input type="text" value={fields.app_post || ""} onChange={(e) => handleFieldChange("app_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Postal Code</label>
+                          <input type="text" value={fields.app_post || ""} onChange={(e) => handleFieldChange("app_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Years at Residence</label>
-                          <input type="number" value={fields.app_res_yrs || ""} onChange={(e) => handleFieldChange("app_res_yrs", e.target.value)} placeholder="3" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Years at Residence</label>
+                          <input type="number" value={fields.app_res_yrs || ""} onChange={(e) => handleFieldChange("app_res_yrs", e.target.value)} placeholder="3" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Months</label>
-                          <input type="number" value={fields.app_res_mos || ""} onChange={(e) => handleFieldChange("app_res_mos", e.target.value)} placeholder="6" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Months</label>
+                          <input type="number" value={fields.app_res_mos || ""} onChange={(e) => handleFieldChange("app_res_mos", e.target.value)} placeholder="6" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       {/* Previous Address Block */}
-                      <div className="pt-4 border-t border-white/5">
-                        <span className="text-[10px] text-[#bdae45] uppercase font-bold tracking-wider mb-2 block">Previous Address (If less than 3 years)</span>
+                      <div className="pt-4 border-t border-[var(--color-border)]">
+                        <span className="text-[10px] text-[var(--color-accent)] uppercase font-bold tracking-wider mb-2 block">Previous Address (If less than 3 years)</span>
                         <div className="grid grid-cols-4 gap-2 mb-2">
                           <div className="col-span-3">
-                            <input type="text" value={fields.app_prev_addr || ""} onChange={(e) => handleFieldChange("app_prev_addr", e.target.value)} placeholder="Previous Street Address" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
+                            <input type="text" value={fields.app_prev_addr || ""} onChange={(e) => handleFieldChange("app_prev_addr", e.target.value)} placeholder="Previous Street Address" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                           <div>
-                            <input type="text" value={fields.app_prev_unit || ""} onChange={(e) => handleFieldChange("app_prev_unit", e.target.value)} placeholder="Unit" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
+                            <input type="text" value={fields.app_prev_unit || ""} onChange={(e) => handleFieldChange("app_prev_unit", e.target.value)} placeholder="Unit" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                          <input type="text" value={fields.app_prev_city || ""} onChange={(e) => handleFieldChange("app_prev_city", e.target.value)} placeholder="City" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white focus:outline-none" />
-                          <input type="text" value={fields.app_prev_prov || ""} onChange={(e) => handleFieldChange("app_prev_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white text-center focus:outline-none" />
-                          <input type="text" value={fields.app_prev_post || ""} onChange={(e) => handleFieldChange("app_prev_post", e.target.value)} placeholder="Postal" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2 text-xs text-white text-center focus:outline-none" />
+                          <input type="text" value={fields.app_prev_city || ""} onChange={(e) => handleFieldChange("app_prev_city", e.target.value)} placeholder="City" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.app_prev_prov || ""} onChange={(e) => handleFieldChange("app_prev_prov", e.target.value)} placeholder="ON" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                          <input type="text" value={fields.app_prev_post || ""} onChange={(e) => handleFieldChange("app_prev_post", e.target.value)} placeholder="Postal" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
                     </div>
 
                     {/* Co-Applicant Address */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Address</span>
+                      <span className="text-[10px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-border)]">Co-Applicant Address</span>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Currently</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Currently</label>
                         <div className="flex flex-wrap gap-1.5">
                           {["Own", "Rent", "Live with Relatives", "Live With Others"].map(h => (
-                            <button key={h} type="button" onClick={() => handlePillSelect("co_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.co_housing === h ? "bg-neutral-600 text-white border-neutral-600 font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{h}</button>
+                            <button key={h} type="button" onClick={() => handlePillSelect("co_housing", h)} className={`px-3 py-1 rounded text-[11px] border transition-all cursor-pointer ${fields.co_housing === h ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{h}</button>
                           ))}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-4 gap-2">
                         <div className="col-span-3">
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Street Address</label>
-                          <input type="text" value={fields.co_addr || ""} onChange={(e) => handleFieldChange("co_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Street Address</label>
+                          <input type="text" value={fields.co_addr || ""} onChange={(e) => handleFieldChange("co_addr", e.target.value)} placeholder="123 Main St" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Unit</label>
-                          <input type="text" value={fields.co_unit || ""} onChange={(e) => handleFieldChange("co_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Unit</label>
+                          <input type="text" value={fields.co_unit || ""} onChange={(e) => handleFieldChange("co_unit", e.target.value)} placeholder="Apt 4B" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">City</label>
-                          <input type="text" value={fields.co_city || ""} onChange={(e) => handleFieldChange("co_city", e.target.value)} placeholder="Barrie" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">City</label>
+                          <input type="text" value={fields.co_city || ""} onChange={(e) => handleFieldChange("co_city", e.target.value)} placeholder="Barrie" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Province</label>
-                          <input type="text" value={fields.co_prov || ""} onChange={(e) => handleFieldChange("co_prov", e.target.value)} placeholder="ON" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Province</label>
+                          <input type="text" value={fields.co_prov || ""} onChange={(e) => handleFieldChange("co_prov", e.target.value)} placeholder="ON" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Postal Code</label>
-                          <input type="text" value={fields.co_post || ""} onChange={(e) => handleFieldChange("co_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white text-center focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Postal Code</label>
+                          <input type="text" value={fields.co_post || ""} onChange={(e) => handleFieldChange("co_post", e.target.value)} placeholder="L4M 3B5" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] text-center focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
                     </div>
@@ -914,46 +914,46 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-employment-form">
                     {/* Applicant Employment */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Employment</span>
+                      <span className="text-[10px] bg-[var(--color-primary-subtle)] text-[var(--color-primary)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-primary)]/20">Applicant Employment</span>
                       
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Income Sources</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Income Sources</label>
                         <div className="flex gap-2">
-                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_inc_employed === "1" ? "bg-[#5d9bb1]/20 border-[#5d9bb1] text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Employed</button>
-                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_self")} className={`flex-1 py-1.5 rounded text-xs border ${fields.app_inc_self === "1" ? "bg-[#5d9bb1]/20 border-[#5d9bb1] text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Self-Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.app_inc_employed === "1" ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)] text-[var(--color-text)] font-semibold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("app_inc_self")} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.app_inc_self === "1" ? "bg-[var(--color-accent-subtle)] border-[var(--color-accent)] text-[var(--color-text)] font-semibold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>Self-Employed</button>
                         </div>
                       </div>
 
                       {/* Primary Employed Details block */}
                       {fields.app_inc_employed === "1" && (
-                        <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
-                          <span className="text-[10px] text-[#5d9bb1] uppercase font-extrabold tracking-wider block">Primary Employer Details</span>
+                        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[var(--color-primary)] uppercase font-extrabold tracking-wider block">Primary Employer Details</span>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Employer Name</label>
-                            <input type="text" value={fields.app_emp1_name || ""} onChange={(e) => handleFieldChange("app_emp1_name", e.target.value)} placeholder="Company Inc." className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Employer Name</label>
+                            <input type="text" value={fields.app_emp1_name || ""} onChange={(e) => handleFieldChange("app_emp1_name", e.target.value)} placeholder="Company Inc." className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Job Title</label>
-                              <input type="text" value={fields.app_emp1_title || ""} onChange={(e) => handleFieldChange("app_emp1_title", e.target.value)} placeholder="Manager" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Job Title</label>
+                              <input type="text" value={fields.app_emp1_title || ""} onChange={(e) => handleFieldChange("app_emp1_title", e.target.value)} placeholder="Manager" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Gross Annual Income</label>
-                              <input type="number" value={fields.app_emp1_income || ""} onChange={(e) => handleFieldChange("app_emp1_income", e.target.value)} placeholder="95000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Gross Annual Income</label>
+                              <input type="number" value={fields.app_emp1_income || ""} onChange={(e) => handleFieldChange("app_emp1_income", e.target.value)} placeholder="95000" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                           </div>
                           <div className="grid grid-cols-3 gap-2">
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Time (Yrs)</label>
-                              <input type="number" value={fields.app_emp1_yrs || ""} onChange={(e) => handleFieldChange("app_emp1_yrs", e.target.value)} placeholder="3" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Time (Yrs)</label>
+                              <input type="number" value={fields.app_emp1_yrs || ""} onChange={(e) => handleFieldChange("app_emp1_yrs", e.target.value)} placeholder="3" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Months</label>
-                              <input type="number" value={fields.app_emp1_mos || ""} onChange={(e) => handleFieldChange("app_emp1_mos", e.target.value)} placeholder="4" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Months</label>
+                              <input type="number" value={fields.app_emp1_mos || ""} onChange={(e) => handleFieldChange("app_emp1_mos", e.target.value)} placeholder="4" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Status</label>
-                              <select value={fields.app_emp1_status || ""} onChange={(e) => handleFieldChange("app_emp1_status", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Status</label>
+                              <select value={fields.app_emp1_status || ""} onChange={(e) => handleFieldChange("app_emp1_status", e.target.value)} className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30">
                                 <option value="">Select</option>
                                 <option value="Full Time">Full Time</option>
                                 <option value="Part Time">Part Time</option>
@@ -967,20 +967,20 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                       {/* Primary Self-Employed block */}
                       {fields.app_inc_self === "1" && (
-                        <div className="bg-[#16161c] border border-[#bdae45]/20 p-4 rounded-xl space-y-3">
-                          <span className="text-[10px] text-[#bdae45] uppercase font-extrabold tracking-wider block">Self-Employment / BFS</span>
+                        <div className="bg-[var(--color-surface-2)] border border-[var(--color-accent)]/20 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[var(--color-accent)] uppercase font-extrabold tracking-wider block">Self-Employment / BFS</span>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Business / Company Name</label>
-                            <input type="text" value={fields.app_self_name || ""} onChange={(e) => handleFieldChange("app_self_name", e.target.value)} placeholder="My Corporation" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Business / Company Name</label>
+                            <input type="text" value={fields.app_self_name || ""} onChange={(e) => handleFieldChange("app_self_name", e.target.value)} placeholder="My Corporation" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Years in Business</label>
-                              <input type="number" value={fields.app_self_yrs || ""} onChange={(e) => handleFieldChange("app_self_yrs", e.target.value)} placeholder="5" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Years in Business</label>
+                              <input type="number" value={fields.app_self_yrs || ""} onChange={(e) => handleFieldChange("app_self_yrs", e.target.value)} placeholder="5" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                             </div>
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">BFS Annual Net Income</label>
-                              <input type="number" value={fields.app_self_income || ""} onChange={(e) => handleFieldChange("app_self_income", e.target.value)} placeholder="110000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">BFS Annual Net Income</label>
+                              <input type="number" value={fields.app_self_income || ""} onChange={(e) => handleFieldChange("app_self_income", e.target.value)} placeholder="110000" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                             </div>
                           </div>
                         </div>
@@ -989,32 +989,32 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                     {/* Co-Applicant Employment */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Employment</span>
+                      <span className="text-[10px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-border)]">Co-Applicant Employment</span>
                       
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Income Sources</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Income Sources</label>
                         <div className="flex gap-2">
-                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_inc_employed === "1" ? "bg-neutral-600/30 border-neutral-500 text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Employed</button>
-                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_self")} className={`flex-1 py-1.5 rounded text-xs border ${fields.co_inc_self === "1" ? "bg-neutral-600/30 border-neutral-500 text-white" : "bg-white/5 text-white/40 border-transparent"}`}>Self-Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_employed")} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.co_inc_employed === "1" ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)] text-[var(--color-text)] font-semibold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>Employed</button>
+                          <button type="button" onClick={() => handleCheckboxToggle("co_inc_self")} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.co_inc_self === "1" ? "bg-[var(--color-accent-subtle)] border-[var(--color-accent)] text-[var(--color-text)] font-semibold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>Self-Employed</button>
                         </div>
                       </div>
 
                       {/* Co-Applicant Employed Details block */}
                       {fields.co_inc_employed === "1" && (
-                        <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
-                          <span className="text-[10px] text-[#5d9bb1] uppercase font-extrabold tracking-wider block">Co-Applicant Employer Details</span>
+                        <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[var(--color-primary)] uppercase font-extrabold tracking-wider block">Co-Applicant Employer Details</span>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Employer Name</label>
-                            <input type="text" value={fields.co_emp1_name || ""} onChange={(e) => handleFieldChange("co_emp1_name", e.target.value)} placeholder="School Board" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Employer Name</label>
+                            <input type="text" value={fields.co_emp1_name || ""} onChange={(e) => handleFieldChange("co_emp1_name", e.target.value)} placeholder="School Board" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Job Title</label>
-                              <input type="text" value={fields.co_emp1_title || ""} onChange={(e) => handleFieldChange("co_emp1_title", e.target.value)} placeholder="Teacher" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Job Title</label>
+                              <input type="text" value={fields.co_emp1_title || ""} onChange={(e) => handleFieldChange("co_emp1_title", e.target.value)} placeholder="Teacher" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                             <div>
-                              <label className="block text-[9px] text-white/40 mb-1">Gross Annual Income</label>
-                              <input type="number" value={fields.co_emp1_income || ""} onChange={(e) => handleFieldChange("co_emp1_income", e.target.value)} placeholder="85000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                              <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Gross Annual Income</label>
+                              <input type="number" value={fields.co_emp1_income || ""} onChange={(e) => handleFieldChange("co_emp1_income", e.target.value)} placeholder="85000" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                             </div>
                           </div>
                         </div>
@@ -1022,15 +1022,15 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                       {/* Co-Applicant Self-Employed block */}
                       {fields.co_inc_self === "1" && (
-                        <div className="bg-[#16161c] border border-[#bdae45]/20 p-4 rounded-xl space-y-3">
-                          <span className="text-[10px] text-[#bdae45] uppercase font-extrabold tracking-wider block">Co-Applicant Self-Employment</span>
+                        <div className="bg-[var(--color-surface-2)] border border-[var(--color-accent)]/20 p-4 rounded-xl space-y-3">
+                          <span className="text-[10px] text-[var(--color-accent)] uppercase font-extrabold tracking-wider block">Co-Applicant Self-Employment</span>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Business Name</label>
-                            <input type="text" value={fields.co_self_name || ""} onChange={(e) => handleFieldChange("co_self_name", e.target.value)} placeholder="Spouse Biz Inc." className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Business Name</label>
+                            <input type="text" value={fields.co_self_name || ""} onChange={(e) => handleFieldChange("co_self_name", e.target.value)} placeholder="Spouse Biz Inc." className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                           </div>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Annual Net Income</label>
-                            <input type="number" value={fields.co_self_income || ""} onChange={(e) => handleFieldChange("co_self_income", e.target.value)} placeholder="65000" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Annual Net Income</label>
+                            <input type="number" value={fields.co_self_income || ""} onChange={(e) => handleFieldChange("co_self_income", e.target.value)} placeholder="65000" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                           </div>
                         </div>
                       )}
@@ -1043,22 +1043,22 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-other-income-form">
                     {/* Applicant Other Income */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Applicant Other Income</span>
+                      <span className="text-[10px] bg-[var(--color-primary-subtle)] text-[var(--color-primary)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-primary)]/20">Applicant Other Income</span>
                       
-                      <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
-                        <span className="text-[10px] text-white/60 font-bold uppercase block">Source 1</span>
+                      <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                        <span className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase block">Source 1</span>
                         <div>
-                          <label className="block text-[9px] text-white/40 mb-1">Income Type / Description</label>
-                          <input type="text" value={fields.app_other0_specify || ""} onChange={(e) => handleFieldChange("app_other0_specify", e.target.value)} placeholder="e.g. Pension, Rental, Child Support" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Income Type / Description</label>
+                          <input type="text" value={fields.app_other0_specify || ""} onChange={(e) => handleFieldChange("app_other0_specify", e.target.value)} placeholder="e.g. Pension, Rental, Child Support" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Amount ($)</label>
-                            <input type="number" value={fields.app_other0_amount || ""} onChange={(e) => handleFieldChange("app_other0_amount", e.target.value)} placeholder="500" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Amount ($)</label>
+                            <input type="number" value={fields.app_other0_amount || ""} onChange={(e) => handleFieldChange("app_other0_amount", e.target.value)} placeholder="500" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Frequency</label>
-                            <select value={fields.app_other0_freq || ""} onChange={(e) => handleFieldChange("app_other0_freq", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Frequency</label>
+                            <select value={fields.app_other0_freq || ""} onChange={(e) => handleFieldChange("app_other0_freq", e.target.value)} className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30">
                               <option value="Monthly">Monthly</option>
                               <option value="Annually">Annually</option>
                             </select>
@@ -1069,22 +1069,22 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                     {/* Co-Applicant Other Income */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Co-Applicant Other Income</span>
+                      <span className="text-[10px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-border)]">Co-Applicant Other Income</span>
                       
-                      <div className="bg-[#16161c] border border-white/5 p-4 rounded-xl space-y-3">
-                        <span className="text-[10px] text-white/60 font-bold uppercase block">Source 1</span>
+                      <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                        <span className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase block">Source 1</span>
                         <div>
-                          <label className="block text-[9px] text-white/40 mb-1">Income Type / Description</label>
-                          <input type="text" value={fields.co_other0_specify || ""} onChange={(e) => handleFieldChange("co_other0_specify", e.target.value)} placeholder="e.g. Rental Income" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Income Type / Description</label>
+                          <input type="text" value={fields.co_other0_specify || ""} onChange={(e) => handleFieldChange("co_other0_specify", e.target.value)} placeholder="e.g. Rental Income" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Amount ($)</label>
-                            <input type="number" value={fields.co_other0_amount || ""} onChange={(e) => handleFieldChange("co_other0_amount", e.target.value)} placeholder="600" className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none" />
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Amount ($)</label>
+                            <input type="number" value={fields.co_other0_amount || ""} onChange={(e) => handleFieldChange("co_other0_amount", e.target.value)} placeholder="600" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                           </div>
                           <div>
-                            <label className="block text-[9px] text-white/40 mb-1">Frequency</label>
-                            <select value={fields.co_other0_freq || ""} onChange={(e) => handleFieldChange("co_other0_freq", e.target.value)} className="w-full bg-[#0d0d10] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                            <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Frequency</label>
+                            <select value={fields.co_other0_freq || ""} onChange={(e) => handleFieldChange("co_other0_freq", e.target.value)} className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30">
                               <option value="Monthly">Monthly</option>
                               <option value="Annually">Annually</option>
                             </select>
@@ -1100,52 +1100,52 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-property-form">
                     {/* Characteristics */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#bdae45] text-black px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Property Details</span>
+                      <span className="text-[10px] bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-accent)]/20">Property Details</span>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Property Type</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Property Type</label>
                         <div className="flex flex-wrap gap-1.5">
                           {["Detached", "Semi-Detached", "Townhouse", "Condo", "Other"].map(p => (
-                            <button key={p} type="button" onClick={() => handlePillSelect("prop_type", p)} className={`px-3 py-1 rounded text-[11px] border transition-all ${fields.prop_type === p ? "bg-[#bdae45] text-black border-[#bdae45] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{p}</button>
+                            <button key={p} type="button" onClick={() => handlePillSelect("prop_type", p)} className={`px-3 py-1 rounded text-[11px] border cursor-pointer transition-all ${fields.prop_type === p ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{p}</button>
                           ))}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Tenure Type</label>
-                          <select value={fields.prop_tenure || ""} onChange={(e) => handleFieldChange("prop_tenure", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Tenure Type</label>
+                          <select value={fields.prop_tenure || ""} onChange={(e) => handleFieldChange("prop_tenure", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Freehold">Freehold</option>
                             <option value="Leasehold">Leasehold</option>
                             <option value="Condominium">Condominium</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Property Age (Yrs)</label>
-                          <input type="number" value={fields.prop_age || ""} onChange={(e) => handleFieldChange("prop_age", e.target.value)} placeholder="10" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Property Age (Yrs)</label>
+                          <input type="number" value={fields.prop_age || ""} onChange={(e) => handleFieldChange("prop_age", e.target.value)} placeholder="10" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Lot Size</label>
-                          <input type="text" value={fields.prop_lot || ""} onChange={(e) => handleFieldChange("prop_lot", e.target.value)} placeholder="50 x 120" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Lot Size</label>
+                          <input type="text" value={fields.prop_lot || ""} onChange={(e) => handleFieldChange("prop_lot", e.target.value)} placeholder="50 x 120" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Building Area (SqFt)</label>
-                          <input type="number" value={fields.prop_area || ""} onChange={(e) => handleFieldChange("prop_area", e.target.value)} placeholder="2200" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Building Area (SqFt)</label>
+                          <input type="number" value={fields.prop_area || ""} onChange={(e) => handleFieldChange("prop_area", e.target.value)} placeholder="2200" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Garage</label>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Garage</label>
                         <div className="grid grid-cols-2 gap-2">
-                          <select value={fields.prop_garage_type || ""} onChange={(e) => handleFieldChange("prop_garage_type", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                          <select value={fields.prop_garage_type || ""} onChange={(e) => handleFieldChange("prop_garage_type", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Attached">Attached</option>
                             <option value="Detached">Detached</option>
                             <option value="None">None</option>
                           </select>
-                          <select value={fields.prop_garage_size || ""} onChange={(e) => handleFieldChange("prop_garage_size", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                          <select value={fields.prop_garage_size || ""} onChange={(e) => handleFieldChange("prop_garage_size", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Single">Single</option>
                             <option value="Double">Double</option>
                             <option value="Triple">Triple</option>
@@ -1156,59 +1156,59 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                     {/* Financials / Utilities */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#bdae45] text-black px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Property Financials</span>
+                      <span className="text-[10px] bg-[var(--color-accent-subtle)] text-[var(--color-accent)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-accent)]/20">Property Financials</span>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Estimated Value *</label>
-                          <input type="number" value={fields.prop_value || ""} onChange={(e) => handleFieldChange("prop_value", e.target.value)} placeholder="650000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Estimated Value *</label>
+                          <input type="number" value={fields.prop_value || ""} onChange={(e) => handleFieldChange("prop_value", e.target.value)} placeholder="650000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Original Price</label>
-                          <input type="number" value={fields.prop_orig_price || ""} onChange={(e) => handleFieldChange("prop_orig_price", e.target.value)} placeholder="450000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Original Price</label>
+                          <input type="number" value={fields.prop_orig_price || ""} onChange={(e) => handleFieldChange("prop_orig_price", e.target.value)} placeholder="450000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Purchase Date</label>
-                          <input type="text" value={fields.prop_purchase_date || ""} onChange={(e) => handleFieldChange("prop_purchase_date", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Purchase Date</label>
+                          <input type="text" value={fields.prop_purchase_date || ""} onChange={(e) => handleFieldChange("prop_purchase_date", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Yearly Property Tax</label>
-                          <input type="number" value={fields.prop_tax || ""} onChange={(e) => handleFieldChange("prop_tax", e.target.value)} placeholder="4100" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Yearly Property Tax</label>
+                          <input type="number" value={fields.prop_tax || ""} onChange={(e) => handleFieldChange("prop_tax", e.target.value)} placeholder="4100" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Condo Fees (Monthly)</label>
-                          <input type="number" value={fields.prop_condo_fees || ""} onChange={(e) => handleFieldChange("prop_condo_fees", e.target.value)} placeholder="350" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Condo Fees (Monthly)</label>
+                          <input type="number" value={fields.prop_condo_fees || ""} onChange={(e) => handleFieldChange("prop_condo_fees", e.target.value)} placeholder="350" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Heating (Monthly)</label>
-                          <input type="number" value={fields.prop_heat || ""} onChange={(e) => handleFieldChange("prop_heat", e.target.value)} placeholder="150" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Heating (Monthly)</label>
+                          <input type="number" value={fields.prop_heat || ""} onChange={(e) => handleFieldChange("prop_heat", e.target.value)} placeholder="150" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
                         <div>
-                          <label className="block text-[9px] text-white/40 mb-1">Water Source</label>
-                          <select value={fields.prop_water || ""} onChange={(e) => handleFieldChange("prop_water", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Water Source</label>
+                          <select value={fields.prop_water || ""} onChange={(e) => handleFieldChange("prop_water", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Municipal">Municipal</option>
                             <option value="Well">Well</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/40 mb-1">Sewage</label>
-                          <select value={fields.prop_sewage || ""} onChange={(e) => handleFieldChange("prop_sewage", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Sewage</label>
+                          <select value={fields.prop_sewage || ""} onChange={(e) => handleFieldChange("prop_sewage", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Municipal">Municipal</option>
                             <option value="Septic">Septic</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/40 mb-1">Heat Fuel</label>
-                          <select value={fields.prop_heat_source || ""} onChange={(e) => handleFieldChange("prop_heat_source", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded p-2 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-faint)] mb-1">Heat Fuel</label>
+                          <select value={fields.prop_heat_source || ""} onChange={(e) => handleFieldChange("prop_heat_source", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded p-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/30">
                             <option value="Forced Air Gas">FA Gas</option>
                             <option value="Electric Baseboard">Elec Base</option>
                             <option value="Forced Air Electric">FA Elec</option>
@@ -1225,29 +1225,29 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8" id="tab-mortgage-form">
                     {/* First Mortgage */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-[#5d9bb1] text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">First Mortgage</span>
+                      <span className="text-[10px] bg-[var(--color-primary-subtle)] text-[var(--color-primary)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-primary)]/20">First Mortgage</span>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Requested Amount / Bal *</label>
-                          <input type="number" value={fields.mtg1_balance || ""} onChange={(e) => handleFieldChange("mtg1_balance", e.target.value)} placeholder="450000" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Requested Amount / Bal *</label>
+                          <input type="number" value={fields.mtg1_balance || ""} onChange={(e) => handleFieldChange("mtg1_balance", e.target.value)} placeholder="450000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Monthly Payment</label>
-                          <input type="number" value={fields.mtg1_payment || ""} onChange={(e) => handleFieldChange("mtg1_payment", e.target.value)} placeholder="2800" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Monthly Payment</label>
+                          <input type="number" value={fields.mtg1_payment || ""} onChange={(e) => handleFieldChange("mtg1_payment", e.target.value)} placeholder="2800" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Interest Rate (%)</label>
-                          <input type="number" step="0.01" value={fields.mtg1_rate || ""} onChange={(e) => handleFieldChange("mtg1_rate", e.target.value)} placeholder="4.99" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Interest Rate (%)</label>
+                          <input type="number" step="0.01" value={fields.mtg1_rate || ""} onChange={(e) => handleFieldChange("mtg1_rate", e.target.value)} placeholder="4.99" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Rate Type</label>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Rate Type</label>
                           <div className="flex gap-2">
                             {["Fixed", "Variable"].map(r => (
-                              <button key={r} type="button" onClick={() => handlePillSelect("mtg1_rate_type", r)} className={`flex-1 py-1.5 rounded text-xs border ${fields.mtg1_rate_type === r ? "bg-[#5d9bb1] text-black border-[#5d9bb1] font-bold" : "bg-white/5 text-white/60 border-white/5"}`}>{r}</button>
+                              <button key={r} type="button" onClick={() => handlePillSelect("mtg1_rate_type", r)} className={`flex-1 py-1.5 rounded text-xs border cursor-pointer transition-all ${fields.mtg1_rate_type === r ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)] font-bold" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}>{r}</button>
                             ))}
                           </div>
                         </div>
@@ -1255,27 +1255,27 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Maturity Date</label>
-                          <input type="text" value={fields.mtg1_maturity || ""} onChange={(e) => handleFieldChange("mtg1_maturity", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Maturity Date</label>
+                          <input type="text" value={fields.mtg1_maturity || ""} onChange={(e) => handleFieldChange("mtg1_maturity", e.target.value)} placeholder="MM/DD/YYYY" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Lender / Holder</label>
-                          <input type="text" value={fields.mtg1_holder || ""} onChange={(e) => handleFieldChange("mtg1_holder", e.target.value)} placeholder="TD Bank" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Lender / Holder</label>
+                          <input type="text" value={fields.mtg1_holder || ""} onChange={(e) => handleFieldChange("mtg1_holder", e.target.value)} placeholder="TD Bank" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Payment Frequency</label>
-                          <select value={fields.mtg1_freq || ""} onChange={(e) => handleFieldChange("mtg1_freq", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Payment Frequency</label>
+                          <select value={fields.mtg1_freq || ""} onChange={(e) => handleFieldChange("mtg1_freq", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30">
                             <option value="Weekly">Weekly</option>
                             <option value="Bi-weekly">Bi-weekly</option>
                             <option value="Monthly">Monthly</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Term Type</label>
-                          <select value={fields.mtg1_term_type || ""} onChange={(e) => handleFieldChange("mtg1_term_type", e.target.value)} className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none">
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Term Type</label>
+                          <select value={fields.mtg1_term_type || ""} onChange={(e) => handleFieldChange("mtg1_term_type", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30">
                             <option value="Closed">Closed</option>
                             <option value="Open">Open</option>
                           </select>
@@ -1285,27 +1285,27 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                     {/* Second Mortgage */}
                     <div className="space-y-4">
-                      <span className="text-[10px] bg-neutral-600 text-white px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max">Second Mortgage</span>
+                      <span className="text-[10px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2.5 py-1 rounded font-black uppercase tracking-widest block w-max border border-[var(--color-border)]">Second Mortgage</span>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Balance Owing</label>
-                          <input type="number" value={fields.mtg2_balance || ""} onChange={(e) => handleFieldChange("mtg2_balance", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Balance Owing</label>
+                          <input type="number" value={fields.mtg2_balance || ""} onChange={(e) => handleFieldChange("mtg2_balance", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
-                          <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Monthly Payment</label>
-                          <input type="number" value={fields.mtg2_payment || ""} onChange={(e) => handleFieldChange("mtg2_payment", e.target.value)} placeholder="0" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Monthly Payment</label>
+                          <input type="number" value={fields.mtg2_payment || ""} onChange={(e) => handleFieldChange("mtg2_payment", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Second Mortgage Holder</label>
-                        <input type="text" value={fields.mtg2_holder || ""} onChange={(e) => handleFieldChange("mtg2_holder", e.target.value)} placeholder="e.g. Private Lender" className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Second Mortgage Holder</label>
+                        <input type="text" value={fields.mtg2_holder || ""} onChange={(e) => handleFieldChange("mtg2_holder", e.target.value)} placeholder="e.g. Private Lender" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                       </div>
 
                       <div>
-                        <label className="block text-[9px] text-white/50 uppercase font-black tracking-wider mb-1">Purpose of Second Mortgage</label>
-                        <textarea rows={3} value={fields.mtg2_purpose || ""} onChange={(e) => handleFieldChange("mtg2_purpose", e.target.value)} placeholder="Debt consolidation, renovation, etc." className="w-full bg-[#16161c] border border-white/5 rounded-lg p-2.5 text-xs text-[#eeeef2] focus:outline-none font-mono" />
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Purpose of Second Mortgage</label>
+                        <textarea rows={3} value={fields.mtg2_purpose || ""} onChange={(e) => handleFieldChange("mtg2_purpose", e.target.value)} placeholder="Debt consolidation, renovation, etc." className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-mono" />
                       </div>
                     </div>
                   </div>
@@ -1314,16 +1314,16 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                 {/* 7. REVIEW & SUBMIT */}
                 {activeTab === "submit" && (
                   <div className="space-y-6" id="tab-review-submit-box">
-                    <div className="bg-[#16161c] border border-white/5 p-6 rounded-2xl">
-                      <h3 className="text-sm font-extrabold text-white uppercase tracking-wider mb-3">CRM Intake &amp; Ownership Assignment</h3>
+                    <div className="bg-[var(--color-surface-1)] border border-[var(--color-border)] p-6 rounded-2xl">
+                      <h3 className="text-sm font-extrabold text-[var(--color-text)] uppercase tracking-wider mb-3">CRM Intake &amp; Ownership Assignment</h3>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] text-white/40 uppercase font-black tracking-wider mb-1.5">Assign Broker / Agent Owner</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1.5">Assign Broker / Agent Owner</label>
                           <select 
                             value={assignedAgent} 
                             onChange={(e) => setAssignedAgent(e.target.value)}
-                            className="w-full bg-[#0d0d10] border border-white/5 rounded-lg p-2.5 text-xs text-white focus:outline-none"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30"
                           >
                             {agentNames.map(name => (
                               <option key={name} value={name}>{name}</option>
@@ -1332,19 +1332,19 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[10px] text-white/40 uppercase font-black tracking-wider mb-1.5">Intake File Status</label>
+                          <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1.5">Intake File Status</label>
                           <div className="flex gap-2">
                             <button 
                               type="button" 
                               onClick={() => setIntakeStatus("working")}
-                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all ${intakeStatus === "working" ? "bg-[#5d9bb1] text-black border-[#5d9bb1]" : "bg-white/5 text-white/60 border-white/5"}`}
+                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${intakeStatus === "working" ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)]" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}
                             >
                               📁 Active Underwriting File
                             </button>
                             <button 
                               type="button" 
                               onClick={() => setIntakeStatus("lead")}
-                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all ${intakeStatus === "lead" ? "bg-[#bdae45] text-black border-[#bdae45]" : "bg-white/5 text-white/60 border-white/5"}`}
+                              className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${intakeStatus === "lead" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"}`}
                             >
                               ⭐ Lead Generation File
                             </button>
@@ -1353,14 +1353,14 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                       </div>
                     </div>
 
-                    <div className="bg-[#12191d] border border-[#6fa3b8]/20 p-5 rounded-2xl">
-                      <h4 className="text-xs font-extrabold text-[#6fa3b8] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <div className="bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/15 p-5 rounded-2xl">
+                      <h4 className="text-xs font-extrabold text-[var(--color-primary)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <Info className="w-4 h-4" /> Privacy &amp; Consent Statement
                       </h4>
-                      <p className="text-[11px] text-white/60 leading-relaxed">
+                      <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">
                         By submitting this application, you confirm that all information provided is accurate and complete. Your personal information will be handled securely and in accordance with applicable Canadian privacy legislation (PIPEDA). All credit checks are authorized under active client engagement disclosures.
                       </p>
-                      <div className="text-[9px] text-white/40 mt-3 font-mono">
+                      <div className="text-[9px] text-[var(--color-text-faint)] mt-3 font-mono">
                         GBK Financial • Licence #11921 • Barrie, Ontario
                       </div>
                     </div>
@@ -1369,7 +1369,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                     <div className="flex justify-end pt-2">
                       <button
                         onClick={handleCommissionFile}
-                        className="px-8 py-3 bg-gradient-to-r from-[#bdae45] to-[#5d9bb1] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl transition-all shadow-md"
+                        className="px-8 py-3 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-[var(--color-text-inverse)] font-extrabold text-xs uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-[0.98] hover:shadow-xl transition-all shadow-md cursor-pointer"
                         id="commission-new-crm-file-btn"
                       >
                         ✦ Commission CRM Mortgage File
@@ -1380,7 +1380,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
               </div>
 
               {/* Footer navigation */}
-              <div className="px-6 py-4 bg-[#16161c] border-t border-white/5 flex items-center justify-between shrink-0">
+              <div className="px-6 py-4 bg-[var(--color-surface-1)] border-t border-[var(--color-border)] flex items-center justify-between shrink-0">
                 <button
                   type="button"
                   onClick={() => {
@@ -1390,7 +1390,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                       onClose();
                     }
                   }}
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/5 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] border border-[var(--color-border)] text-xs font-bold rounded-lg transition-all cursor-pointer"
                 >
                   {mode === "ai" ? "← Back to AI Upload" : "Cancel"}
                 </button>
@@ -1403,7 +1403,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                         const currentIdx = tabs.indexOf(activeTab);
                         setActiveTab(tabs[currentIdx - 1]);
                       }}
-                      className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-lg transition-all"
+                      className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] border border-[var(--color-border)] text-xs font-bold rounded-lg transition-all cursor-pointer"
                     >
                       Previous Step
                     </button>
@@ -1416,7 +1416,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                         const currentIdx = tabs.indexOf(activeTab);
                         setActiveTab(tabs[currentIdx + 1]);
                       }}
-                      className="px-5 py-2 bg-[#5d9bb1] text-black text-xs font-black rounded-lg transition-all flex items-center gap-1"
+                      className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-[var(--color-text-inverse)] text-xs font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer"
                     >
                       <span>Continue</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -1424,7 +1424,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                   ) : (
                     <button
                       onClick={handleCommissionFile}
-                      className="px-6 py-2 bg-[#bdae45] text-black text-xs font-black rounded-lg transition-all"
+                      className="px-6 py-2 bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-text-inverse)] text-xs font-black rounded-lg transition-all cursor-pointer"
                     >
                       Commission File
                     </button>

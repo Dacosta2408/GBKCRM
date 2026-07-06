@@ -1,5 +1,5 @@
 import React from "react";
-import { Calculator, Copy, Award, ShieldAlert } from "lucide-react";
+import { Calculator, Copy, Award, ShieldAlert, TrendingUp, Clock, Coins, Percent } from "lucide-react";
 import { Client } from "../types";
 
 interface CalculatorsProps {
@@ -189,8 +189,8 @@ export const Calculators: React.FC<CalculatorsProps> = ({
     const gds = ((pmt + tax + heat + condo) / mi) * 100;
     const tds = ((pmt + tax + heat + condo + debts) / mi) * 100;
 
-    const gcColor = gds <= 32 ? "bg-green-500" : gds <= 39 ? "bg-yellow-500" : "bg-red-500";
-    const tcColor = tds <= 40 ? "bg-green-500" : tds <= 44 ? "bg-yellow-500" : "bg-red-500";
+    const gcColor = gds <= 32 ? "bg-[var(--color-success)]" : gds <= 39 ? "bg-[var(--color-warning)]" : "bg-[var(--color-error)]";
+    const tcColor = tds <= 40 ? "bg-[var(--color-success)]" : tds <= 44 ? "bg-[var(--color-warning)]" : "bg-[var(--color-error)]";
     
     return {
       gds,
@@ -221,15 +221,17 @@ export const Calculators: React.FC<CalculatorsProps> = ({
   return (
     <div className="flex flex-col gap-5 h-full overflow-y-auto pr-1">
       {/* Client Quick Link Bar */}
-      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-        <label className="text-xs font-semibold text-[var(--color-text-muted)]">Analyze existing client file:</label>
+      <div className="panel-card p-4 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0 transition-all duration-150">
+        <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1.5">
+          <span>📂</span> Analyze existing client file:
+        </label>
         <select 
           value={calcClientId}
           onChange={(e) => {
             setCalcClientId(e.target.value);
             if (e.target.value) onLoadClientToCalc(e.target.value);
           }}
-          className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
+          className="flex-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer"
         >
           <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">— Manual Calculator Mode —</option>
           {clients.map(c => (
@@ -238,7 +240,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
         </select>
         <button 
           onClick={onClearCalcClient}
-          className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-semibold rounded-lg transition-all border border-[var(--color-border)]"
+          className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold rounded-lg transition-all border border-[var(--color-border)] cursor-pointer"
         >
           Reset values
         </button>
@@ -247,97 +249,121 @@ export const Calculators: React.FC<CalculatorsProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
         {/* Stress Test */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-sm">
+        <div className="panel-card overflow-hidden transition-all duration-300">
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mr-1 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)]">🏦 OSFI stress qualifying test</h3>
-            <span className="text-[10px] text-[var(--color-text-muted)] font-semibold">Stress Rate: +2% contract or 5.25%</span>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>OSFI stress qualifying test</span>
+            </h3>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold bg-[var(--color-surface-3)] px-2 py-0.5 rounded border border-[var(--color-border)]">Stress Rate: +2% contract or 5.25%</span>
           </div>
 
           <div className="p-5 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Applicant Income/yr</label>
-                <input 
-                  type="text" 
-                  value={stIncome}
-                  onChange={(e) => setStIncome(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$100,000"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stIncome}
+                    onChange={(e) => setStIncome(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="100,000"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Co-Applicant Income/yr</label>
-                <input 
-                  type="text" 
-                  value={stCoIncome}
-                  onChange={(e) => setStCoIncome(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stCoIncome}
+                    onChange={(e) => setStCoIncome(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="0"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Monthly Debts</label>
-                <input 
-                  type="text" 
-                  value={stDebts}
-                  onChange={(e) => setStDebts(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-2.5 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stDebts}
+                    onChange={(e) => setStDebts(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="0"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-5.5 pr-2.5 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Condo Fees / mo</label>
-                <input 
-                  type="text" 
-                  value={stCondo}
-                  onChange={(e) => setStCondo(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-2.5 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stCondo}
+                    onChange={(e) => setStCondo(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="0"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-5.5 pr-2.5 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Prop Taxes/yr</label>
-                <input 
-                  type="text" 
-                  value={stTax}
-                  onChange={(e) => setStTax(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$4,800"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-2.5 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stTax}
+                    onChange={(e) => setStTax(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="4,800"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-5.5 pr-2.5 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Heat cost/mo</label>
-                <input 
-                  type="text" 
-                  value={stHeat}
-                  onChange={(e) => setStHeat(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$150"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-2.5 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={stHeat}
+                    onChange={(e) => setStHeat(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="150"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-5.5 pr-2.5 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Contract %</label>
-                <input 
-                  type="number" 
-                  step="0.01"
-                  value={stRate}
-                  onChange={(e) => setStRate(e.target.value)}
-                  placeholder="4.79"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute right-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">%</span>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={stRate}
+                    onChange={(e) => setStRate(e.target.value)}
+                    placeholder="4.79"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-3 pr-6 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Amortization</label>
                 <select 
                   value={stAmortization}
                   onChange={(e) => setStAmortization(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold"
+                  className="w-full bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-bold transition-all duration-150 cursor-pointer"
                 >
                   <option value="25" className="bg-[var(--color-bg)]">25 years</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 years</option>
@@ -347,17 +373,17 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 
             {/* Results card */}
             {stressRes ? (
-              <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] mt-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded ${stressRes.isQualifying ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>
+              <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] mt-2 shadow-sm transition-all duration-200">
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded border ${stressRes.isQualifying ? "badge-success border-[var(--color-success)]/10" : "badge-error border-[var(--color-error)]/10"}`}>
                   {stressRes.isQualifying ? "✓ Qualifies (Stress Test Clear)" : "✗ Over-leveraged Limits"}
                 </span>
-                <div className="text-3xl font-bold font-sans mt-2 text-[var(--color-accent)]">{fd(stressRes.maxQualifiedMortgage)}</div>
-                <div className="text-[10px] uppercase text-[var(--color-text-muted)] tracking-wide mt-0.5 font-semibold">Maximum estimated qualifying mortgage</div>
+                <div className="text-3xl font-extrabold font-sans mt-2.5 text-[var(--color-accent)] tracking-tight">{fd(stressRes.maxQualifiedMortgage)}</div>
+                <div className="text-[10px] uppercase text-[var(--color-text-muted)] tracking-wider mt-0.5 font-bold">Maximum estimated qualifying mortgage</div>
                 
-                <div className="border-t border-[var(--color-border)] pt-3 mt-3 flex flex-col gap-1.5 text-xs text-[var(--color-text-muted)] font-semibold">
+                <div className="border-t border-[var(--color-border)] pt-3 mt-3.5 flex flex-col gap-1.5 text-xs text-[var(--color-text-muted)] font-semibold">
                   <div className="flex justify-between"><span>Qualifying Stress Rate</span><span className="font-bold text-[var(--color-text)]">{stressRes.stressRate.toFixed(2)}%</span></div>
                   <div className="flex justify-between"><span>Combined Gross income</span><span className="font-bold text-[var(--color-text)]">{fd(stressRes.inc)}/yr</span></div>
-                  <div className="flex justify-between"><span>Est. Contract Payment</span><span className="font-bold text-green-500">{fd(stressRes.estPaymentAtContract)}/month</span></div>
+                  <div className="flex justify-between"><span>Est. Contract Payment</span><span className="font-extrabold text-[var(--color-success)]">{fd(stressRes.estPaymentAtContract)}/month</span></div>
                 </div>
               </div>
             ) : (
@@ -369,33 +395,42 @@ export const Calculators: React.FC<CalculatorsProps> = ({
         </div>
 
         {/* GDS / TDS Progress Bars */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-sm">
+        <div className="panel-card overflow-hidden transition-all duration-300">
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mr-1 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)]">📊 GDS / TDS Live Ratios</h3>
-            <span className="text-[10px] text-[var(--color-text-muted)] font-semibold">Standard threshold: GDS &lt; 39% | TDS &lt; 44%</span>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>GDS / TDS Live Ratios</span>
+            </h3>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold bg-[var(--color-surface-3)] px-2 py-0.5 rounded border border-[var(--color-border)]">GDS &lt; 39% | TDS &lt; 44%</span>
           </div>
 
           <div className="p-5 flex flex-col gap-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Gross Annual Income</label>
-                <input 
-                  type="text" 
-                  value={gcIncome}
-                  onChange={(e) => setGcIncome(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$120,000"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={gcIncome}
+                    onChange={(e) => setGcIncome(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="120,000"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Monthly housing Pmt</label>
-                <input 
-                  type="text" 
-                  value={gcPmt}
-                  onChange={(e) => setGcPmt(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="$2,000"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={gcPmt}
+                    onChange={(e) => setGcPmt(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="2,000"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
               </div>
             </div>
 
@@ -407,7 +442,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={gcTax}
                   onChange={(e) => setGcTax(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$400"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
                 />
               </div>
               <div>
@@ -417,7 +452,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={gcHeat}
                   onChange={(e) => setGcHeat(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$150"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
                 />
               </div>
               <div>
@@ -427,7 +462,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={gcCondo}
                   onChange={(e) => setGcCondo(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$0"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
                 />
               </div>
               <div>
@@ -437,7 +472,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   value={gcDebts}
                   onChange={(e) => setGcDebts(e.target.value.replace(/[^\d.]/g, ""))}
                   placeholder="$500"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-semibold"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
                 />
               </div>
             </div>
@@ -448,11 +483,11 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-[var(--color-text-muted)]">Gross Debt Service (GDS)</span>
-                    <span className={`font-mono font-bold ${ratioRes.gds > 39 ? "text-red-500" : "text-green-500"}`}>{ratioRes.gds.toFixed(1)}%</span>
+                    <span className={`font-mono font-bold ${ratioRes.gds > 39 ? "text-[var(--color-error)]" : "text-[var(--color-success)]"}`}>{ratioRes.gds.toFixed(1)}%</span>
                   </div>
                   <div className="h-2.5 w-full bg-[var(--color-surface-2)] rounded-full overflow-hidden relative border border-[var(--color-border)]">
-                    <div className={`h-full ${ratioRes.gcColor} rounded-full`} style={{ width: `${ratioRes.gdsPct}%` }}></div>
-                    <div className="absolute top-0 bottom-0 w-0.5 bg-[var(--color-text-muted)]/40" style={{ left: "78%" }} title="39% A-Lender Limit"></div>
+                    <div className={`h-full ${ratioRes.gcColor} rounded-full transition-all duration-300`} style={{ width: `${ratioRes.gdsPct}%` }}></div>
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-[var(--color-text-faint)]/50 z-10" style={{ left: "78%" }} title="39% A-Lender Limit"></div>
                   </div>
                 </div>
 
@@ -460,24 +495,26 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-[var(--color-text-muted)]">Total Debt Service (TDS)</span>
-                    <span className={`font-mono font-bold ${ratioRes.tds > 44 ? "text-red-500" : "text-green-500"}`}>{ratioRes.tds.toFixed(1)}%</span>
+                    <span className={`font-mono font-bold ${ratioRes.tds > 44 ? "text-[var(--color-error)]" : "text-[var(--color-success)]"}`}>{ratioRes.tds.toFixed(1)}%</span>
                   </div>
                   <div className="h-2.5 w-full bg-[var(--color-surface-2)] rounded-full overflow-hidden relative border border-[var(--color-border)]">
-                    <div className={`h-full ${ratioRes.tcColor} rounded-full`} style={{ width: `${ratioRes.tdsPct}%` }}></div>
-                    <div className="absolute top-0 bottom-0 w-0.5 bg-[var(--color-text-muted)]/40" style={{ left: "80%" }} title="44% A-Lender Limit"></div>
+                    <div className={`h-full ${ratioRes.tcColor} rounded-full transition-all duration-300`} style={{ width: `${ratioRes.tdsPct}%` }}></div>
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-[var(--color-text-faint)]/50 z-10" style={{ left: "80%" }} title="44% A-Lender Limit"></div>
                   </div>
                 </div>
 
                 {/* Status summary */}
-                <div className="p-3.5 bg-[var(--color-surface-2)] rounded-lg border border-[var(--color-border)] text-xs flex items-center justify-between text-[var(--color-text-muted)] font-semibold">
+                <div className="p-3.5 bg-[var(--color-surface-2)] rounded-lg border border-[var(--color-border)] text-xs flex items-center justify-between text-[var(--color-text-muted)] font-semibold shadow-sm">
                   <span>Qualifies for prime A-Lender files?</span>
-                  <span className={`font-bold ${ratioRes.passed ? "text-green-500" : "text-red-500"}`}>{ratioRes.passed ? "✓ YES" : "✗ NO (Alt-A Only)"}</span>
+                  <span className={`font-extrabold px-2.5 py-1 rounded text-[10px] uppercase tracking-wide border ${ratioRes.passed ? "badge-success border-[var(--color-success)]/10" : "badge-error border-[var(--color-error)]/10"}`}>
+                    {ratioRes.passed ? "✓ YES (Pass)" : "✗ NO (Alt-A Only)"}
+                  </span>
                 </div>
 
                 <div className="flex gap-2">
                   <button 
                     onClick={handleCopyRatios}
-                    className="flex-1 shrink-0 py-2 border border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all"
+                    className="flex-1 shrink-0 py-2 border border-[var(--color-border)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5" /> Copy calculated ratios
                   </button>
@@ -492,41 +529,51 @@ export const Calculators: React.FC<CalculatorsProps> = ({
         </div>
 
         {/* Mortgage Payments frequency breakdown */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-sm">
+        <div className="panel-card overflow-hidden transition-all duration-300">
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mr-1 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)]">💵 Amortized Payment breakdown</h3>
-            <span className="text-[10px] text-[var(--color-text-muted)] font-semibold">Standard payment schedule calculator</span>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Amortized Payment breakdown</span>
+            </h3>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold bg-[var(--color-surface-3)] px-2 py-0.5 rounded border border-[var(--color-border)]">Standard schedule</span>
           </div>
 
           <div className="p-5 flex flex-col gap-3">
-            <div className="fg"><label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Requested Loan amount</label>
-              <input 
-                type="text" 
-                value={pcAmount}
-                onChange={(e) => setPcAmount(e.target.value.replace(/[^\d.]/g, ""))}
-                placeholder="$500,000"
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40"
-              />
+            <div>
+              <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Requested Loan amount</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                <input 
+                  type="text" 
+                  value={pcAmount}
+                  onChange={(e) => setPcAmount(e.target.value.replace(/[^\d.]/g, ""))}
+                  placeholder="500,000"
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-[8px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Rate %</label>
-                <input 
-                  type="number" 
-                  step="0.01"
-                  value={pcRate}
-                  onChange={(e) => setPcRate(e.target.value)}
-                  placeholder="4.79"
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40"
-                />
+                <div className="relative">
+                  <span className="absolute right-2.5 top-2 text-[10px] text-[var(--color-text-faint)] font-bold">%</span>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={pcRate}
+                    onChange={(e) => setPcRate(e.target.value)}
+                    placeholder="4.79"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-2.5 pr-5 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-[8px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Amortization</label>
                 <select 
                   value={pcAm}
                   onChange={(e) => setPcAm(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)]/40"
+                  className="w-full bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer"
                 >
                   <option value="25" className="bg-[var(--color-bg)]">25 yr</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 yr</option>
@@ -538,7 +585,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <select 
                   value={pcFreq}
                   onChange={(e) => setPcFreq(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)]/40"
+                  className="w-full bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-2 py-2 text-xs text-[var(--color-text)] font-bold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer"
                 >
                   <option value="monthly" className="bg-[var(--color-bg)]">Monthly</option>
                   <option value="biweekly" className="bg-[var(--color-bg)]">Bi-Weekly</option>
@@ -548,14 +595,14 @@ export const Calculators: React.FC<CalculatorsProps> = ({
             </div>
 
             {payRes ? (
-              <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)]">
-                <div className="text-2xl font-bold text-[var(--color-accent)]">{fd(payRes[pcFreq as "monthly" | "biweekly" | "weekly" | "accelBiweekly"])}</div>
-                <div className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wide mt-0.5 font-semibold">Calculated {pcFreq} Mortgage Payment</div>
+              <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] shadow-sm">
+                <div className="text-2xl font-extrabold text-[var(--color-accent)] tracking-tight">{fd(payRes[pcFreq as "monthly" | "biweekly" | "weekly" | "accelBiweekly"])}</div>
+                <div className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wider mt-0.5 font-bold">Calculated {pcFreq} Mortgage Payment</div>
                 
                 <div className="border-t border-[var(--color-border)] pt-3 mt-3 flex flex-col gap-1.5 text-xs text-[var(--color-text-muted)] font-semibold">
                   <div className="flex justify-between"><span>Standard Monthly Payment</span><span className="font-bold text-[var(--color-text)]">{fd(payRes.monthly)}</span></div>
                   <div className="flex justify-between"><span>Rapid Accelerated Bi-Weekly</span><span className="font-bold text-[var(--color-text)]">{fd(payRes.accelBiweekly)}</span></div>
-                  <div className="flex justify-between"><span>Paid Interest Over Amortization</span><span className="font-bold text-orange-400">{fd(payRes.totalInterest)}</span></div>
+                  <div className="flex justify-between"><span>Paid Interest Over Amortization</span><span className="font-extrabold text-[var(--color-warning)]">{fd(payRes.totalInterest)}</span></div>
                 </div>
               </div>
             ) : null}
@@ -563,41 +610,87 @@ export const Calculators: React.FC<CalculatorsProps> = ({
         </div>
 
         {/* Self employed SE & Hourly income calculators */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden shadow-sm">
+        <div className="panel-card overflow-hidden transition-all duration-300">
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mr-1 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)]">💰 Secondary Income Annualizer</h3>
-            <span className="text-[10px] text-[var(--color-text-muted)] font-semibold">Wage and Business qualifying utilities</span>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
+              <Coins className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Secondary Income Annualizer</span>
+            </h3>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold bg-[var(--color-surface-3)] px-2 py-0.5 rounded border border-[var(--color-border)]">Wage & SE utilities</span>
           </div>
 
           <div className="p-5 flex flex-col gap-4">
-            <div className="border-b border-[var(--color-border)] pb-3">
-              <h4 className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider mb-2">Hourly To Annual</h4>
-              <div className="grid grid-cols-2 gap-3 mb-2.5">
+            <div className="border-b border-[var(--color-border)] pb-4">
+              <h4 className="text-[10px] font-extrabold text-[var(--color-accent)] uppercase tracking-wider mb-2 flex items-center gap-1">
+                <span>⏱</span> Hourly To Annual Salary
+              </h4>
+              <div className="grid grid-cols-2 gap-3 mb-3.5">
                 <div>
-                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Hourly rate $</label>
-                  <input type="number" value={hrRate} onChange={(e) => setHrRate(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
+                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-bold mb-1">Hourly rate $</label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1.5 text-[10px] text-[var(--color-text-faint)] font-bold">$</span>
+                    <input 
+                      type="number" 
+                      value={hrRate} 
+                      onChange={(e) => setHrRate(e.target.value)} 
+                      placeholder="35"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 pl-5.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150" 
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Hours / week</label>
-                  <input type="number" value={hrHrs} onChange={(e) => setHrHrs(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
+                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-bold mb-1">Hours / week</label>
+                  <input 
+                    type="number" 
+                    value={hrHrs} 
+                    onChange={(e) => setHrHrs(e.target.value)} 
+                    placeholder="40"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150" 
+                  />
                 </div>
               </div>
-              <div className="text-xs text-[var(--color-text-muted)] font-semibold">Extrapolated Salary: <strong className="text-green-500 font-mono font-bold">{fd(hrResult)}/yr</strong></div>
+              <div className="text-xs text-[var(--color-text-muted)] font-semibold bg-[var(--color-surface-2)] p-2.5 rounded-lg border border-[var(--color-border)] flex items-center justify-between shadow-sm">
+                <span>Extrapolated Salary:</span>
+                <strong className="text-[var(--color-success)] font-mono font-extrabold text-sm">{fd(hrResult)}/yr</strong>
+              </div>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-bold text-[var(--color-accent)] uppercase tracking-wider mb-2">Self Employed 2yr Net Average</h4>
-              <div className="grid grid-cols-2 gap-3 mb-2.5">
+              <h4 className="text-[10px] font-extrabold text-[var(--color-accent)] uppercase tracking-wider mb-2 flex items-center gap-1">
+                <span>💼</span> Self Employed 2yr Net Average
+              </h4>
+              <div className="grid grid-cols-2 gap-3 mb-3.5">
                 <div>
-                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Year 1 Net Income</label>
-                  <input type="number" value={seY1} onChange={(e) => setSeY1(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
+                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-bold mb-1">Year 1 Net Income</label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1.5 text-[10px] text-[var(--color-text-faint)] font-bold">$</span>
+                    <input 
+                      type="number" 
+                      value={seY1} 
+                      onChange={(e) => setSeY1(e.target.value)} 
+                      placeholder="80000"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 pl-5.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150" 
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-semibold mb-1">Year 2 Net Income</label>
-                  <input type="number" value={seY2} onChange={(e) => setSeY2(e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-3 py-1 text-xs text-[var(--color-text)] font-semibold focus:outline-none focus:border-[var(--color-primary)]/40" />
+                  <label className="block text-[8px] text-[var(--color-text-faint)] uppercase font-bold mb-1">Year 2 Net Income</label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1.5 text-[10px] text-[var(--color-text-faint)] font-bold">$</span>
+                    <input 
+                      type="number" 
+                      value={seY2} 
+                      onChange={(e) => setSeY2(e.target.value)} 
+                      placeholder="95000"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 pl-5.5 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 font-semibold focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150" 
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="text-xs text-[var(--color-text-muted)] font-semibold">Underwriting Qualifying Average: <strong className="text-[var(--color-accent)] font-mono font-bold">{fd(seAvg)}/yr</strong></div>
+              <div className="text-xs text-[var(--color-text-muted)] font-semibold bg-[var(--color-surface-2)] p-2.5 rounded-lg border border-[var(--color-border)] flex items-center justify-between shadow-sm">
+                <span>Underwriting Qualifying Average:</span>
+                <strong className="text-[var(--color-accent)] font-mono font-extrabold text-sm">{fd(seAvg)}/yr</strong>
+              </div>
             </div>
           </div>
         </div>
