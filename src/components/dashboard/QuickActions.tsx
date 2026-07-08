@@ -33,7 +33,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Chat with Gemini AI",
       icon: BrainCircuit,
       onClick: () => setActiveTab("ai"),
-      iconColor: "text-[var(--color-accent)]"
+      iconColor: "text-[var(--color-accent)]",
+      isAI: true
     },
     {
       label: "Full Loan Intake",
@@ -47,7 +48,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Extract from PDF / email",
       icon: Search,
       onClick: onOpenAIIntake,
-      iconColor: "text-[var(--color-accent)]"
+      iconColor: "text-[var(--color-accent)]",
+      isAI: true
     },
     {
       label: "Log Task / Action",
@@ -92,6 +94,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
               <div className="p-2.5 rounded-xl bg-[var(--color-surface-3)]/45 border border-[var(--color-border)]/50 shrink-0 group-hover:bg-[var(--color-surface-3)]/75 group-hover:border-[var(--color-accent)]/20 transition-all duration-200 shadow-sm">
                 <Icon className={`w-4 h-4 ${act.iconColor} group-hover:scale-105 transition-transform duration-200`} />
               </div>
+
+              {act.isAI && (
+                <span className="absolute top-1.5 right-1.5 text-[7px] font-black bg-[var(--color-accent)]/20 text-[var(--color-accent)] px-1 py-0.5 rounded border border-[var(--color-accent)]/30 leading-none uppercase tracking-wide">
+                  AI
+                </span>
+              )}
+
               <div className="min-w-0">
                 <div className="text-xs font-black text-[var(--color-text)] truncate leading-tight group-hover:text-[var(--color-accent)] transition-colors">
                   {act.label}

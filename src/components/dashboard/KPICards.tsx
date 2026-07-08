@@ -168,6 +168,10 @@ export const KPICards: React.FC<KPICardsProps> = ({
             {/* Inner top lighting reflection */}
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
+            {card.alert && (
+              <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--color-error)] animate-pulse shadow-[0_0_6px_var(--color-error)]" />
+            )}
+
             <div className="flex items-center justify-between gap-1.5">
               <span className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-widest truncate">
                 {card.title}
@@ -178,7 +182,10 @@ export const KPICards: React.FC<KPICardsProps> = ({
             </div>
 
             <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-2xl font-black tracking-tight font-sans" style={{ color: "var(--color-accent)" }}>
+              <span
+                className={`font-black tracking-tight font-sans ${String(card.value).length > 6 ? "text-base" : "text-2xl"}`}
+                style={{ color: "var(--color-accent)" }}
+              >
                 {card.value}
               </span>
               <span className="text-[10px] text-[var(--color-text-faint)]/40 group-hover:text-[var(--color-accent)]/80 transition-colors">

@@ -55,6 +55,10 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
     })
     .slice(0, 4);
 
+  const clearedLender = targetClients.filter(c => ["conditional", "approved", "funded"].includes(c.status)).length;
+  const totalActive = targetClients.filter(c => c.status !== "closed").length;
+  const progressionRate = totalActive > 0 ? Math.round((clearedLender / totalActive) * 100) : 0;
+
   return (
     <div className="glass-card shadow-md p-5 flex flex-col gap-5 select-none" id="pipeline-snapshot">
       
@@ -114,7 +118,10 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
               return (
                 <div 
                   key={s.id}
-                  onClick={() => setActiveTab("pipeline")}
+                  onClick={() => {
+                    localStorage.setItem("gbk_pipeline_filter_stage", s.id);
+                    setActiveTab("pipeline");
+                  }}
                   className="glass-card p-3 flex flex-col justify-between hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface-2)]/45 transition-all duration-200 cursor-pointer relative overflow-hidden group shadow-sm hover:shadow-md"
                 >
                   <div className="flex flex-col gap-1.5">
@@ -158,7 +165,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
               <span className="text-[var(--color-text)] font-bold">Active Loan Progression Index:</span>
-              <span className="text-[var(--color-text-muted)] font-medium">78.4% of intake files successfully cleared lender submission in Q2.</span>
+              <span className="text-[var(--color-text-muted)] font-medium">{progressionRate}% of active files have cleared lender submission stage.</span>
             </div>
             <button 
               onClick={() => setActiveTab("pipeline")}
