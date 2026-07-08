@@ -627,16 +627,16 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-5 py-3 text-xs font-bold transition-all border-b-2 uppercase tracking-wider shrink-0 flex items-center gap-2 cursor-pointer ${
+                      className={`flex-1 justify-center min-w-0 px-1 sm:px-3 py-3 text-[10px] sm:text-xs font-bold transition-all border-b-2 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
                         isActive 
                           ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-[var(--color-accent-subtle)]" 
                           : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)]"
                       }`}
                     >
-                      <span className={`s-bubble w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
+                      <span className={`s-bubble w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border shrink-0 ${
                         isActive ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "border-[var(--color-border)]"
                       }`}>{idx + 1}</span>
-                      <span className="s-label">{labelMap[tab]}</span>
+                      <span className="s-label truncate">{labelMap[tab]}</span>
                     </button>
                   );
                 })}
