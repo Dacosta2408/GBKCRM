@@ -30,7 +30,8 @@ export const KPICards: React.FC<KPICardsProps> = ({
   const newLeads = myClients.filter(c => c.status === "lead" || c.status === "open");
   const conditionalFiles = myClients.filter(c => c.status === "conditional");
   const approvedFiles = myClients.filter(c => c.status === "approved");
-  const fundedFiles = myClients.filter(c => c.status === "funded");
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const fundedFiles = myClients.filter(c => c.status === "funded" && c.fundedDate && c.fundedDate.startsWith(thisMonth));
 
   let pendingDocsCount = 0;
   const targetClients = isAgent ? myClients : clients;
@@ -43,11 +44,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
     });
   });
 
-  if (pendingDocsCount === 0) {
-    pendingDocsCount = targetClients.filter(c => ["working", "lender", "conditional"].includes(c.status)).length * 2;
-  }
-
-  const myTasks = isAgent ? tasks.filter(t => t.assignedTo === userFullName) : tasks;
+  const myTasks = isAgent ? tasks.filter(t => t.assignedTo?.trim().toLowerCase() === userFullName.trim().toLowerCase()) : tasks;
   const nowStr = new Date().toISOString().split("T")[0];
   const overdueTasks = myTasks.filter(t => t.status === "open" && t.dueDate && t.dueDate < nowStr);
 
@@ -67,7 +64,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
     return sum + num;
   }, 0);
 
-  const pipelineValue = activeFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
+  const pipelineValue = activeFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt || c.purchasePrice || c.mortgageAmount || 0).replace(/[$,\s]/g, "")) || 0), 0);
   const fundedValue = fundedFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
 
   const cards = [
@@ -93,7 +90,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
       id: "leads",
       title: "New Leads",
       value: newLeads.length,
-      sub: `${newLeads.filter(c => c.status === "lead").length} unassigned leads`,
+      sub: `${newLeads.filter(c => c.status === "lead" && !c.agent).length} unassigned leads`,
       icon: UserCheck,
       isPrimary: true,
       tab: "clients"
@@ -111,7 +108,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
       id: "docs",
       title: "Pending Docs",
       value: pendingDocsCount,
-      sub: "Awaiting upload",
+      sub: pendingDocsCount === 0 ? "No documents tracked yet" : "Awaiting upload",
       icon: FileText,
       isPrimary: false,
       tab: "clients"
@@ -139,7 +136,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
       id: "funded",
       title: "Funded Monthly",
       value: fundedFiles.length,
-      sub: `Vol: ${fdShort(fundedValue)}`,
+      sub: `This month: ${fdShort(fundedValue)}`,
       icon: DollarSign,
       isPrimary: false,
       tab: "pipeline"
@@ -173,7 +170,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
             )}
 
             <div className="flex items-center justify-between gap-1.5">
-              <span className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-widest truncate">
+              <span className="text-[10px] text-[var(--color-text)]/80 font-extrabold uppercase tracking-[0.14em] truncate">
                 {card.title}
               </span>
               <div className={`p-1.5 rounded-lg shrink-0 ${card.alert ? 'bg-[var(--color-error)]/10 text-[var(--color-error)]' : 'bg-[var(--color-surface-3)]/60 text-[var(--color-primary)] border border-[var(--color-border)]/40'} group-hover:scale-105 transition-transform duration-200`}>
@@ -183,17 +180,17 @@ export const KPICards: React.FC<KPICardsProps> = ({
 
             <div className="mt-3 flex items-baseline justify-between">
               <span
-                className={`font-black tracking-tight font-sans ${String(card.value).length > 6 ? "text-base" : "text-2xl"}`}
+                className={`font-black tracking-tight font-sans leading-none ${String(card.value).length > 6 ? "text-base" : "text-2xl"}`}
                 style={{ color: "var(--color-accent)" }}
               >
                 {card.value}
               </span>
-              <span className="text-[10px] text-[var(--color-text-faint)]/40 group-hover:text-[var(--color-accent)]/80 transition-colors">
+              <span className="text-[10px] text-[var(--color-text-muted)]/75 group-hover:text-[var(--color-primary)] transition-colors">
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>
 
-            <div className="text-[9px] text-[var(--color-text-faint)] truncate mt-1.5 font-bold bg-[var(--color-surface-3)]/25 px-1.5 py-0.5 rounded border border-[var(--color-border)]/20 self-start">
+            <div className="mt-2.5 w-full rounded-md border border-[var(--color-border)]/35 bg-[var(--color-surface-2)]/85 px-2 py-1 text-center text-[10px] font-semibold text-[var(--color-text-muted)] leading-tight">
               {card.sub}
             </div>
           </motion.div>
