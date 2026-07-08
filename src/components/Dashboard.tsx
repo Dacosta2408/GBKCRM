@@ -12,6 +12,7 @@ import { MissingDocuments } from "./dashboard/MissingDocuments";
 import { UpcomingDeadlines } from "./dashboard/UpcomingDeadlines";
 import { RecentActivityFeed } from "./dashboard/RecentActivityFeed";
 import { MortgageUpdates } from "./dashboard/MortgageUpdates";
+import { ClosingThisMonth } from "./dashboard/ClosingThisMonth";
 
 interface DashboardProps {
   clients: Client[];
@@ -29,6 +30,7 @@ interface DashboardProps {
   onAddEvent: () => void;
   setActiveTab: (tab: string) => void;
   onCompleteTask?: (taskId: string) => void;
+  onClearLogs?: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -46,7 +48,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onAddPartner = () => {},
   onAddEvent,
   setActiveTab,
-  onCompleteTask
+  onCompleteTask,
+  onClearLogs
 }) => {
   const [liveTime, setLiveTime] = useState<string>("");
 
@@ -94,6 +97,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <span>{getFormattedDate()}</span>
               <span className="text-[var(--color-border)]">•</span>
               <span className="font-mono text-[var(--color-accent)] font-bold tracking-wide bg-[var(--color-surface-3)]/40 px-2 py-0.5 rounded border border-[var(--color-border)]/50">{liveTime} EST</span>
+              {(() => {
+                const todayStr = new Date().toISOString().split("T")[0];
+                const todayEventCount = events.filter(e => e.date === todayStr).length;
+                return todayEventCount > 0 ? (
+                  <>
+                    <span className="text-[var(--color-border)]">•</span>
+                    <span className="flex items-center gap-1 text-[var(--color-text-muted)]">
+                      <Clock className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+                      {todayEventCount} event{todayEventCount !== 1 ? "s" : ""} today
+                    </span>
+                  </>
+                ) : null;
+              })()}
             </p>
           </div>
 
@@ -143,6 +159,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             auditLogs={auditLogs}
             setActiveTab={setActiveTab}
             currentUser={currentUser}
+            onClearActivity={onClearLogs}
           />
         </div>
       </div>
@@ -153,6 +170,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
         currentUser={currentUser}
         setActiveTab={setActiveTab}
         onOpenClient={onOpenClient}
+      />
+
+      {/* Row 4.5: Closing This Month */}
+      <ClosingThisMonth
+        clients={clients}
+        currentUser={currentUser}
+        onOpenClient={onOpenClient}
+        setActiveTab={setActiveTab}
       />
 
       {/* Row 5: 3-column Operational Grid (Intake Review, Missing Documents, Upcoming dates/Deadlines) */}

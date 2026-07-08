@@ -1069,6 +1069,7 @@ export default function App() {
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: "done", completedAt: new Date().toISOString() } : t));
                 showToast("Task completed successfully!", "success");
               }}
+              onClearLogs={() => setAuditLogs([])}
             />
           )}
 

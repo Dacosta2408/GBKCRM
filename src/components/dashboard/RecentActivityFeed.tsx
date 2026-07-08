@@ -5,12 +5,14 @@ interface RecentActivityFeedProps {
   auditLogs: any[];
   setActiveTab: (tab: string) => void;
   currentUser: any;
+  onClearActivity?: () => void;
 }
 
 export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
   auditLogs,
   setActiveTab,
-  currentUser
+  currentUser,
+  onClearActivity
 }) => {
   const isManager = ["Owner / Master Admin", "Super Admin", "IT / Developer"].includes(currentUser.role);
 
@@ -72,14 +74,24 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
             </p>
           </div>
         </div>
-        {isManager && (
-          <button
-            onClick={() => setActiveTab("admin")}
-            className="text-[10px] text-[var(--color-accent)] font-bold hover:underline tracking-tight uppercase"
-          >
-            Manage Audit &rarr;
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onClearActivity && (
+            <button
+              onClick={onClearActivity}
+              className="text-[9px] text-[var(--color-text-faint)] hover:text-[var(--color-error)] font-black uppercase tracking-wider transition-colors cursor-pointer px-2 py-0.5 rounded border border-[var(--color-border)]/50 hover:border-[var(--color-error)]/30"
+            >
+              Clear
+            </button>
+          )}
+          {isManager && (
+            <button
+              onClick={() => setActiveTab("admin")}
+              className="text-[10px] text-[var(--color-accent)] font-bold hover:underline tracking-tight uppercase"
+            >
+              Manage Audit &rarr;
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-y-auto max-h-[300px] flex flex-col gap-2.5 pr-1">

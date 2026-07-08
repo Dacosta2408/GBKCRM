@@ -484,7 +484,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
   return (
     <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 z-40 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         
         {/* Modal Header */}
         <div className="p-5 border-b border-[var(--color-border)] flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]">
@@ -621,13 +621,13 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                     otherIncome: "Other Income",
                     property: "Property",
                     mortgage: "Mortgage",
-                    submit: "Review & Submit"
+                    submit: "Review & Save"
                   };
                   return (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`flex-1 justify-center min-w-0 px-1 sm:px-3 py-3 text-[10px] sm:text-xs font-bold transition-all border-b-2 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
+                      className={`flex-1 md:flex-initial justify-center min-w-max flex-shrink-0 px-2 sm:px-4 py-3 text-[10px] sm:text-xs font-bold transition-all border-b-2 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
                         isActive 
                           ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-[var(--color-accent-subtle)]" 
                           : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)]"
@@ -636,7 +636,7 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                       <span className={`s-bubble w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border shrink-0 ${
                         isActive ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "border-[var(--color-border)]"
                       }`}>{idx + 1}</span>
-                      <span className="s-label truncate">{labelMap[tab]}</span>
+                      <span className="s-label whitespace-nowrap font-bold">{labelMap[tab]}</span>
                     </button>
                   );
                 })}
@@ -747,6 +747,24 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                           <input type="text" value={fields.app_work || ""} onChange={(e) => handleFieldChange("app_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Fax</label>
+                          <input type="text" value={fields.app_fax || ""} onChange={(e) => handleFieldChange("app_fax", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Daytime Phone</label>
+                          <input type="text" value={fields.app_day || ""} onChange={(e) => handleFieldChange("app_day", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Evening Phone</label>
+                          <input type="text" value={fields.app_evening || ""} onChange={(e) => handleFieldChange("app_evening", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
                           <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Preferred Contact</label>
                           <div className="flex gap-2">
                             {["Email", "Phone"].map(c => (
@@ -754,11 +772,10 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                             ))}
                           </div>
                         </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
-                        <input type="number" value={fields.app_dependents || ""} onChange={(e) => handleFieldChange("app_dependents", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
+                          <input type="number" value={fields.app_dependents || ""} onChange={(e) => handleFieldChange("app_dependents", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
                       </div>
                     </div>
 
@@ -813,8 +830,30 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Home Phone</label>
+                          <input type="text" value={fields.co_home || ""} onChange={(e) => handleFieldChange("co_home", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                        <div>
                           <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Work Phone</label>
                           <input type="text" value={fields.co_work || ""} onChange={(e) => handleFieldChange("co_work", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Fax</label>
+                          <input type="text" value={fields.co_fax || ""} onChange={(e) => handleFieldChange("co_fax", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Daytime Phone</label>
+                          <input type="text" value={fields.co_day || ""} onChange={(e) => handleFieldChange("co_day", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Evening Phone</label>
+                          <input type="text" value={fields.co_evening || ""} onChange={(e) => handleFieldChange("co_evening", e.target.value)} placeholder="(705) 555-1212" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                         </div>
                         <div>
                           <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Preferred Contact</label>
@@ -824,6 +863,11 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                             ))}
                           </div>
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Dependents Under 18</label>
+                        <input type="number" value={fields.co_dependents || ""} onChange={(e) => handleFieldChange("co_dependents", e.target.value)} placeholder="0" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30" />
                       </div>
                     </div>
                   </div>

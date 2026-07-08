@@ -4,6 +4,10 @@ export const BRIDGE_URL = (import.meta as any).env?.VITE_BRIDGE_URL || "http://l
 
 const BRIDGE_TOKEN = (import.meta as any).env?.VITE_BRIDGE_TOKEN || "gbk-local-secret-2024";
 
+function logError(message: string, err: any) {
+  console.warn(message, err);
+}
+
 /**
  * Helper to build headers with authentication token
  */
@@ -65,7 +69,7 @@ export async function getAllClients(): Promise<Client[]> {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.getAllClients error:", err);
+    logError("bridgeService.getAllClients error:", err);
     return [];
   }
 }
@@ -78,7 +82,7 @@ export async function getClient(id: string): Promise<Client | null> {
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
-    console.error(`bridgeService.getClient error for id ${id}:`, err);
+    logError(`bridgeService.getClient error for id ${id}:`, err);
     return null;
   }
 }
@@ -93,7 +97,7 @@ export async function createClient(client: Client): Promise<Client | null> {
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.createClient error:", err);
+    logError("bridgeService.createClient error:", err);
     return null;
   }
 }
@@ -108,7 +112,7 @@ export async function updateClient(id: string, client: Client): Promise<Client |
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
-    console.error(`bridgeService.updateClient error for id ${id}:`, err);
+    logError(`bridgeService.updateClient error for id ${id}:`, err);
     return null;
   }
 }
@@ -122,7 +126,7 @@ export async function deleteClient(id: string): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error(`bridgeService.deleteClient error for id ${id}:`, err);
+    logError(`bridgeService.deleteClient error for id ${id}:`, err);
     return false;
   }
 }
@@ -144,7 +148,7 @@ export async function getClientDocuments(id: string): Promise<ClientDocument[]> 
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error(`bridgeService.getClientDocuments error for id ${id}:`, err);
+    logError(`bridgeService.getClientDocuments error for id ${id}:`, err);
     return [];
   }
 }
@@ -163,7 +167,7 @@ export async function uploadDocument(clientId: string, file: File): Promise<bool
     });
     return res.ok;
   } catch (err) {
-    console.error(`bridgeService.uploadDocument error for client ${clientId}:`, err);
+    logError(`bridgeService.uploadDocument error for client ${clientId}:`, err);
     return false;
   }
 }
@@ -176,7 +180,7 @@ export async function deleteDocument(clientId: string, filename: string): Promis
     });
     return res.ok;
   } catch (err) {
-    console.error(`bridgeService.deleteDocument error for client ${clientId}, file ${filename}:`, err);
+    logError(`bridgeService.deleteDocument error for client ${clientId}, file ${filename}:`, err);
     return false;
   }
 }
@@ -192,7 +196,7 @@ export async function getRoster(): Promise<User[]> {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.getRoster error:", err);
+    logError("bridgeService.getRoster error:", err);
     return [];
   }
 }
@@ -206,7 +210,7 @@ export async function updateRoster(roster: User[]): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error("bridgeService.updateRoster error:", err);
+    logError("bridgeService.updateRoster error:", err);
     return false;
   }
 }
@@ -219,7 +223,7 @@ export async function getLenders(): Promise<Lender[]> {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.getLenders error:", err);
+    logError("bridgeService.getLenders error:", err);
     return [];
   }
 }
@@ -233,7 +237,7 @@ export async function updateLenders(lenders: Lender[]): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error("bridgeService.updateLenders error:", err);
+    logError("bridgeService.updateLenders error:", err);
     return false;
   }
 }
@@ -246,7 +250,7 @@ export async function getAuditLogs(): Promise<any[]> {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.getAuditLogs error:", err);
+    logError("bridgeService.getAuditLogs error:", err);
     return [];
   }
 }
@@ -260,7 +264,7 @@ export async function addAuditLog(logEntry: any): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error("bridgeService.addAuditLog error:", err);
+    logError("bridgeService.addAuditLog error:", err);
     return false;
   }
 }
@@ -273,7 +277,7 @@ export async function getBroadcasts(): Promise<any[]> {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error("bridgeService.getBroadcasts error:", err);
+    logError("bridgeService.getBroadcasts error:", err);
     return [];
   }
 }
@@ -287,7 +291,7 @@ export async function updateBroadcasts(broadcasts: any[]): Promise<boolean> {
     });
     return res.ok;
   } catch (err) {
-    console.error("bridgeService.updateBroadcasts error:", err);
+    logError("bridgeService.updateBroadcasts error:", err);
     return false;
   }
 }
@@ -314,7 +318,7 @@ export async function sendEmail(payload: {
     });
     return res.ok;
   } catch (err) {
-    console.error("bridgeService.sendEmail error:", err);
+    logError("bridgeService.sendEmail error:", err);
     return false;
   }
 }

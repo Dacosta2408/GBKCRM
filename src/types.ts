@@ -41,6 +41,8 @@ export interface Client {
   retentionNotes?: string;
   agent?: string;
   type?: string;
+  purchasePrice?: string | number;
+  mortgageAmount?: string | number;
 }
 
 export interface Note {

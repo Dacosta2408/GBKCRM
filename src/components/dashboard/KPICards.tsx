@@ -57,10 +57,29 @@ export const KPICards: React.FC<KPICardsProps> = ({
     return "$" + n;
   };
 
+  const fd = (n: any) => {
+    return "$" + Math.round(parseFloat(String(n).replace(/[$,\s]/g, "")) || 0).toLocaleString("en-CA");
+  };
+
+  const totalPipelineValue = clients.reduce((sum, c) => {
+    const val = c.purchasePrice !== undefined && c.purchasePrice !== null ? c.purchasePrice : c.mortgageAmount;
+    const num = parseFloat(String(val || 0).replace(/[$,\s]/g, "")) || 0;
+    return sum + num;
+  }, 0);
+
   const pipelineValue = activeFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
   const fundedValue = fundedFiles.reduce((sum, c) => sum + (parseFloat(String(c.mtgamt).replace(/[$,\s]/g, "")) || 0), 0);
 
   const cards = [
+    {
+      id: "total_pipeline_val",
+      title: "Total Pipeline Value",
+      value: fd(totalPipelineValue),
+      sub: "Cumulative folder volume",
+      icon: DollarSign,
+      isPrimary: true,
+      tab: "pipeline"
+    },
     {
       id: "active",
       title: isAgent ? "My Active Files" : "Active Pipeline",
@@ -128,7 +147,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 select-none" id="kpi-summary-row">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 select-none" id="kpi-summary-row">
       {cards.map((card) => {
         const Icon = card.icon;
         return (

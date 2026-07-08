@@ -97,8 +97,46 @@ export const MortgageUpdates: React.FC = () => {
         throw new Error("Invalid format returned by AI news processor.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "An unexpected error occurred while generating market intelligence.");
+      console.error("Primary API route failed, attempting direct Gemini fallback...", err);
+      try {
+        const apiKey = localStorage.getItem("gbk_apiKey") || "";
+        if (!apiKey) throw new Error("No API key configured.");
+        
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: "You are a Canadian mortgage industry analyst. Return ONLY a valid JSON array (no markdown, no explanation) of exactly 4 current mortgage industry news items relevant to Canadian brokers in Ontario. Each object must have these exact keys: headline (string), source (string), date (today's date as YYYY-MM-DD), summary (2-3 sentences), link (string, use the source's real website URL), category (one of: 'Rate Update', 'Lender Policy', 'Regulatory', 'Market Trend', 'CMHC'). Focus on Bank of Canada rates, OSFI rules, CMHC updates, and major lender policy changes."
+                }]
+              }]
+            })
+          }
+        );
+        
+        if (!geminiRes.ok) throw new Error("Gemini API returned an error.");
+        
+        const geminiData = await geminiRes.json();
+        const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) throw new Error("Could not parse Gemini response.");
+        
+        const parsed: NewsItem[] = JSON.parse(jsonMatch[0]);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const withBadge = parsed.map(item => ({ ...item, source: item.source + " ✦ AI" }));
+          setUpdates(withBadge);
+          localStorage.setItem("gbk_dashboard_ai_news", JSON.stringify(withBadge));
+          setError(null);
+        } else {
+          throw new Error("Invalid JSON structure from Gemini.");
+        }
+      } catch (fallbackErr: any) {
+        console.error("Gemini fallback also failed:", fallbackErr);
+        setError("Market intelligence temporarily unavailable. Displaying cached industry data.");
+      }
     } finally {
       setLoading(false);
     }

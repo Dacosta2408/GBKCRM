@@ -1,6 +1,6 @@
 import React from "react";
 import { 
-  UserPlus, FileCheck, CheckSquare, Handshake, Calendar, Search 
+  UserPlus, FileCheck, CheckSquare, Handshake, Calendar, Search, BrainCircuit 
 } from "lucide-react";
 
 interface QuickActionsProps {
@@ -26,6 +26,13 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       desc: "Create client folder",
       icon: UserPlus,
       onClick: onAddClient,
+      iconColor: "text-[var(--color-accent)]"
+    },
+    {
+      label: "AI Assistant",
+      desc: "Chat with Gemini AI",
+      icon: BrainCircuit,
+      onClick: () => setActiveTab("ai"),
       iconColor: "text-[var(--color-accent)]"
     },
     {
@@ -70,7 +77,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-extrabold">
         Quick Action Command Deck
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
         {actions.map((act, i) => {
           const Icon = act.icon;
           return (
