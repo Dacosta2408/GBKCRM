@@ -61,8 +61,8 @@ export const KPICards: React.FC<KPICardsProps> = ({
     return "$" + Math.round(parseFloat(String(n).replace(/[$,\s]/g, "")) || 0).toLocaleString("en-CA");
   };
 
-  const totalPipelineValue = clients.reduce((sum, c) => {
-    const val = c.mtgamt ?? c.purchasePrice ?? c.mortgageAmount;
+  const totalPipelineValue = myClients.reduce((sum, c) => {
+    const val = c.mtgamt || c.purchasePrice || c.mortgageAmount;
     const num = parseFloat(String(val || 0).replace(/[$,\s]/g, "")) || 0;
     return sum + num;
   }, 0);
