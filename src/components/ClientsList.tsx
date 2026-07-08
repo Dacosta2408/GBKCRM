@@ -138,16 +138,16 @@ export const ClientsList: React.FC<ClientsListProps> = ({
       
       {/* Header bar and sub tabs */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-        <div className="flex bg-[var(--color-surface-3)]/35 border border-[var(--color-border)] rounded-full p-1 select-none self-start backdrop-blur-md">
+        <div className="flex bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-full p-1 select-none self-start backdrop-blur-md">
           <button 
             onClick={() => setViewMode("database")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "database" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-blue-500/5"}`}
           >
             📋 Directory Table
           </button>
           <button 
             onClick={() => setViewMode("pipeline")}
-            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"}`}
+            className={`px-4 py-1.5 text-xs font-black uppercase tracking-tight rounded-full transition-all duration-200 cursor-pointer ${viewMode === "pipeline" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-[var(--shadow-sm)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-blue-500/5"}`}
           >
             📊 Stages
           </button>
@@ -170,7 +170,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onOpenNewClientIntake}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] shadow-sm hover:shadow-md"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:bg-blue-500/5 hover:text-blue-600 hover:border-blue-500/20 text-[var(--color-text)] shadow-sm hover:shadow-md"
           >
             ✦ Intake (PDF)
           </button>
@@ -200,7 +200,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         <div className="flex-1 flex flex-col min-h-0 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-sm overflow-hidden">
           
           {/* Quick Filters */}
-          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/40 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
+          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/95 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
             <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-widest pl-2">Filter Stage:</span>
             {[
               { id: "all", label: "All Files" },
@@ -241,7 +241,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b bg-[var(--color-surface-2)]/60 backdrop-blur-md text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
+                <tr className="border-b bg-[var(--color-surface-2)]/95 backdrop-blur-md text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
                   <th className="p-3.5 pl-6">Profile</th>
                   <th className="p-3.5">Goal Type</th>
                   <th className="p-3.5">Filing Stage</th>
@@ -270,11 +270,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       <tr 
                         key={c.id} 
                         onClick={() => onOpenClient(c.id)}
-                        className={`transition-all duration-150 cursor-pointer group ${
-                          isStale 
-                            ? "bg-[var(--color-warning-subtle)]/35 hover:bg-blue-50/80 dark:hover:bg-blue-950/30" 
-                            : "bg-transparent hover:bg-blue-50/80 dark:hover:bg-blue-950/30"
-                        }`}
+                        className="transition-all duration-150 cursor-pointer group bg-transparent hover:bg-blue-500/5 dark:hover:bg-blue-400/10 border-b border-[var(--color-divider)]"
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
@@ -298,7 +294,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            matchingStage ? matchingStage.style : "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/25 shadow-sm"
+                            matchingStage ? matchingStage.style : "bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-sm"
                            }`}>
                             {matchingStage ? matchingStage.label : c.status}
                           </span>
@@ -328,8 +324,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 ) : (
                   <tr>
                     <td colSpan={9} className="p-16 text-center">
-                      <div className="flex flex-col items-center justify-center max-w-md mx-auto p-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)]/40 backdrop-blur-md shadow-lg space-y-5">
-                        <div className="w-14 h-14 rounded-full bg-[var(--color-surface-3)]/60 flex items-center justify-center border border-[var(--color-border)]/80 text-[var(--color-accent)] shadow-inner">
+                      <div className="flex flex-col items-center justify-center max-w-md mx-auto p-8 rounded-2xl border border-[var(--color-border)]/60 bg-[var(--color-surface)] shadow-md space-y-5">
+                        <div className="w-14 h-14 rounded-full bg-blue-500/5 flex items-center justify-center border border-blue-500/20 text-[var(--color-accent)] shadow-inner">
                           <Search className="h-6 w-6 stroke-[2]" />
                         </div>
                         <div className="space-y-2">
@@ -345,7 +341,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                               setDbFilter("all");
                               setAgentFilter("");
                             }}
-                            className="px-4 py-1.5 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] border border-[var(--color-border)] text-[10px] font-extrabold uppercase tracking-wider rounded-full cursor-pointer transition-all active:scale-95 shadow-sm"
+                            className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-blue-500/5 text-[var(--color-text-muted)] hover:text-blue-600 border border-[var(--color-border)] hover:border-blue-500/25 text-[10px] font-extrabold uppercase tracking-wider rounded-full cursor-pointer transition-all active:scale-95 shadow-sm"
                           >
                             Reset filters
                           </button>
