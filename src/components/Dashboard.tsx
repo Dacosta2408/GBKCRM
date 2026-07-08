@@ -83,7 +83,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-6 text-sans" id="gbk-crm-dashboard">
       
       {/* Dynamic Executive Console Header Section */}
-      <div className="relative overflow-visible rounded-2xl border border-[var(--color-border)] bg-gradient-to-r from-[var(--color-surface-2)]/85 via-[var(--color-surface)]/70 to-[var(--color-surface-2)]/40 p-6 shadow-xl backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-gradient-to-r from-[var(--color-surface-2)]/85 via-[var(--color-surface)]/70 to-[var(--color-surface-2)]/40 p-6 shadow-xl backdrop-blur-md">
         {/* Subtle upper light reflection bar */}
         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-white/15 via-white/5 to-transparent" />
         
