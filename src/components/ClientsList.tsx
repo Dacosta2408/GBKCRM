@@ -156,13 +156,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         {/* Global search */}
         <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto">
           <div 
-            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full border focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
-            style={{
-              background: "var(--glass-bg)",
-              backdropFilter: "var(--glass-blur)",
-              WebkitBackdropFilter: "var(--glass-blur)",
-              borderColor: "var(--glass-border)"
-            }}
+            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:border-[var(--color-accent)]/30 focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
           >
             <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
             <input 
@@ -176,12 +170,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
           <button 
             onClick={onOpenNewClientIntake}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[var(--color-border)] hover:bg-[var(--color-surface-2)] text-[var(--color-text)] hover:shadow-md"
-            style={{
-              background: "var(--glass-bg)",
-              backdropFilter: "var(--glass-blur)",
-              WebkitBackdropFilter: "var(--glass-blur)"
-            }}
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] shadow-sm hover:shadow-md"
           >
             ✦ Intake (PDF)
           </button>
@@ -211,10 +200,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
 
       {/* Database Mode View */}
       {viewMode === "database" ? (
-        <div className="flex-1 flex flex-col min-h-0 glass-card shadow-md overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-sm overflow-hidden">
           
           {/* Quick Filters */}
-          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/30 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
+          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/80 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
             <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-widest pl-2">Filter Stage:</span>
             {[
               { id: "all", label: "All Files" },
@@ -232,8 +221,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 onClick={() => setDbFilter(f.id)}
                 className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${
                   dbFilter === f.id 
-                    ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border-[var(--color-accent)]/35 shadow-[var(--shadow-sm)]" 
-                    : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/60"
+                    ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border-[var(--color-accent)]/30 shadow-sm" 
+                    : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"
                 }`}
               >
                 {f.label}
@@ -389,16 +378,10 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               return (
                 <div 
                   key={s.id}
-                  className="w-80 h-full flex flex-col rounded-2xl max-h-full"
-                  style={{
-                    background: "var(--glass-bg)",
-                    border: "1px solid var(--glass-border)",
-                    backdropFilter: "var(--glass-blur)",
-                    WebkitBackdropFilter: "var(--glass-blur)"
-                  }}
+                  className="w-80 h-full flex flex-col rounded-2xl max-h-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm"
                 >
                   {/* Column Header */}
-                  <div className="p-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: "var(--color-divider)" }}>
+                  <div className="p-4 border-b flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]/50 rounded-t-2xl" style={{ borderColor: "var(--color-divider)" }}>
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
                       <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
@@ -408,7 +391,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   </div>
 
                   {/* Column Body Cards Area */}
-                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/30 rounded-b-2xl">
+                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/40 rounded-b-2xl">
                     {colClients.length > 0 ? colClients.map(c => {
                       const initials = (c.first[0] + c.last[0]).toUpperCase();
                       const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
