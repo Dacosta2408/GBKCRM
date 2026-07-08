@@ -203,7 +203,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         <div className="flex-1 flex flex-col min-h-0 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-sm overflow-hidden">
           
           {/* Quick Filters */}
-          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/80 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
+          <div className="p-3 border-b flex flex-wrap items-center gap-1.5 bg-[var(--color-surface-2)]/40 backdrop-blur-sm select-none" style={{ borderBottomColor: "var(--color-divider)" }}>
             <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-widest pl-2">Filter Stage:</span>
             {[
               { id: "all", label: "All Files" },
@@ -221,8 +221,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 onClick={() => setDbFilter(f.id)}
                 className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all cursor-pointer ${
                   dbFilter === f.id 
-                    ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border-[var(--color-accent)]/30 shadow-sm" 
-                    : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/40"
+                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25 shadow-sm font-extrabold" 
+                    : "bg-transparent text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)] hover:bg-blue-500/5 dark:hover:bg-blue-400/5"
                 }`}
               >
                 {f.label}
@@ -244,7 +244,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b bg-[var(--color-surface-2)]/90 backdrop-blur-md text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
+                <tr className="border-b bg-[var(--color-surface-2)]/60 backdrop-blur-md text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-wider sticky top-0 z-10" style={{ borderBottomColor: "var(--color-divider)" }}>
                   <th className="p-3.5 pl-6">Profile</th>
                   <th className="p-3.5">Goal Type</th>
                   <th className="p-3.5">Filing Stage</th>
@@ -275,8 +275,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         onClick={() => onOpenClient(c.id)}
                         className={`transition-all duration-150 cursor-pointer group ${
                           isStale 
-                            ? "bg-[var(--color-warning-subtle)] hover:bg-[var(--color-warning-subtle)]/80" 
-                            : "hover:bg-[var(--color-surface-2)]"
+                            ? "bg-[var(--color-warning-subtle)]/35 hover:bg-blue-50/80 dark:hover:bg-blue-950/30" 
+                            : "bg-transparent hover:bg-blue-50/80 dark:hover:bg-blue-950/30"
                         }`}
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
@@ -301,7 +301,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            matchingStage ? matchingStage.style : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border border-[var(--color-border)] shadow-sm"
+                            matchingStage ? matchingStage.style : "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/25 shadow-sm"
                            }`}>
                             {matchingStage ? matchingStage.label : c.status}
                           </span>
