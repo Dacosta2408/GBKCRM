@@ -17,6 +17,7 @@ interface ClientsListProps {
   agentNames: string[];
   searchQuery?: string;
   onSearchQueryChange?: (q: string) => void;
+  docVault?: Record<string, any>;
 }
 
 export const ClientsList: React.FC<ClientsListProps> = ({
@@ -30,7 +31,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   setViewMode,
   agentNames,
   searchQuery,
-  onSearchQueryChange
+  onSearchQueryChange,
+  docVault
 }) => {
   const [dbFilter, setDbFilter] = useState<string>("all");
   const [agentFilter, setAgentFilter] = useState<string>("");
@@ -280,24 +282,69 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                             {avatar}
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex flex-wrap items-center gap-1.5">
                               <span className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</span>
                               {isStale && (
                                 <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-[var(--color-warning)] text-[var(--color-text-inverse)] shadow-sm animate-pulse">
                                   Stale
                                 </span>
                               )}
+                              {(() => {
+                                if (c.nextFollowUpDate) {
+                                  const hasOverdueFollowUp = new Date(c.nextFollowUpDate) < new Date();
+                                  if (hasOverdueFollowUp) {
+                                    return (
+                                      <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-red-500 text-white shadow-sm animate-pulse" title={`Overdue follow-up was scheduled for ${c.nextFollowUpDate}`}>
+                                        ⚠️ Overdue
+                                      </span>
+                                    );
+                                  } else {
+                                    return (
+                                      <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm" title={`Scheduled follow-up date`}>
+                                        📅 {c.nextFollowUpDate}
+                                      </span>
+                                    );
+                                  }
+                                }
+                                return null;
+                              })()}
                             </div>
                             {c.cell && <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold">{c.cell}</div>}
                           </div>
                         </td>
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.type || "Purchase"}</td>
                         <td className="p-3.5 text-xs">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            matchingStage ? matchingStage.style : "bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-sm"
-                           }`}>
-                            {matchingStage ? matchingStage.label : c.status}
-                          </span>
+                          <div className="flex flex-col gap-1 items-start">
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              matchingStage ? matchingStage.style : "bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-sm"
+                             }`}>
+                              {matchingStage ? matchingStage.label : c.status}
+                            </span>
+                            {/* Document counts / completeness derived if docVault is available */}
+                            {docVault && (() => {
+                              const clientDocs = docVault[c.id] || {};
+                              const docs = Object.values(clientDocs) as any[];
+                              const approvedCount = docs.filter(d => d.status === "approved" || d.status === "verified").length;
+                              const reviewCount = docs.filter(d => d.status === "received").length;
+                              if (approvedCount > 0 || reviewCount > 0) {
+                                return (
+                                  <div className="text-[8px] font-black uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1 mt-0.5">
+                                    <span className="text-green-500 font-bold">{approvedCount} Clear</span>
+                                    {reviewCount > 0 && <span className="text-orange-400 font-bold">| {reviewCount} Review</span>}
+                                  </div>
+                                );
+                              }
+                              // Missing docs warning if client status is active (working, lender or conditional)
+                              if (["working", "lender", "conditional"].includes(c.status)) {
+                                return (
+                                  <span className="text-[8px] text-red-400 font-black uppercase tracking-wider mt-0.5">
+                                    ⚠️ Missing Files
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
                         </td>
                         <td className="p-3.5 text-xs font-mono font-bold text-[var(--color-text)]">{c.mtgamt ? fd(pn(c.mtgamt)) : "—"}</td>
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.lender || "—"}</td>
@@ -378,7 +425,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
                       <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[var(--color-surface-3)]/80 text-[var(--color-text-muted)] border border-[var(--color-border)]/50">{colClients.length}</span>
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]/50">{colClients.length}</span>
                     </div>
                     <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
                   </div>

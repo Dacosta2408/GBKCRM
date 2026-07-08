@@ -90,6 +90,17 @@ export function useClients({
     if (currentClient && currentClient.id === updatedClient.id) {
       setCurrentClient(updatedClient);
     }
+    
+    logActivity("Updated client details", `${updatedClient.first} ${updatedClient.last}`);
+    logActivityEvent({
+      clientId: updatedClient.id,
+      clientName: `${updatedClient.first} ${updatedClient.last}`,
+      eventType: "client_update",
+      user: `${currentUser.first} ${currentUser.last}`,
+      timestamp: new Date().toISOString(),
+      description: `Updated complete mortgage application file sections`
+    });
+
     const online = await checkBridgeHealth();
     if (online) {
       await updateClient(updatedClient.id, updatedClient);
@@ -98,6 +109,17 @@ export function useClients({
 
   async function handleCreateClient(newClient: Client) {
     setClients(prev => [newClient, ...prev]);
+    
+    logActivity("Created new client file", `${newClient.first} ${newClient.last}`);
+    logActivityEvent({
+      clientId: newClient.id,
+      clientName: `${newClient.first} ${newClient.last}`,
+      eventType: "client_created",
+      user: `${currentUser.first} ${currentUser.last}`,
+      timestamp: new Date().toISOString(),
+      description: `Created new client file folder: ${newClient.first} ${newClient.last}`
+    });
+
     const online = await checkBridgeHealth();
     if (online) {
       await createClient(newClient);
@@ -105,10 +127,23 @@ export function useClients({
   }
 
   async function handleDeleteClient(id: string) {
+    const target = clients.find(c => c.id === id);
+    const clientName = target ? `${target.first} ${target.last}` : "Unknown Client";
     setClients(prev => prev.filter(c => c.id !== id));
     if (currentClient && currentClient.id === id) {
       setCurrentClient(null);
     }
+
+    logActivity("Deleted client file", clientName);
+    logActivityEvent({
+      clientId: id,
+      clientName: clientName,
+      eventType: "client_deleted",
+      user: `${currentUser.first} ${currentUser.last}`,
+      timestamp: new Date().toISOString(),
+      description: `Permanently deleted client folder: ${clientName}`
+    });
+
     const online = await checkBridgeHealth();
     if (online) {
       await deleteClient(id);

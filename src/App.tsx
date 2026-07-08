@@ -1080,6 +1080,7 @@ export default function App() {
               agentNames={getAgentNames()}
               searchQuery={globalSearch}
               onSearchQueryChange={setGlobalSearch}
+              docVault={docVault}
             />
           )}
 
@@ -1096,6 +1097,7 @@ export default function App() {
               agentNames={getAgentNames()}
               searchQuery={globalSearch}
               onSearchQueryChange={setGlobalSearch}
+              docVault={docVault}
             />
           )}
 
