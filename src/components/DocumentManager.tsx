@@ -599,7 +599,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                 <button
                   onClick={handleSyncPending}
                   disabled={syncingAll}
-                  className="text-[10px] font-black uppercase bg-amber-500 hover:bg-amber-600 text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all animate-pulse"
+                  className="text-[10px] font-black uppercase bg-[var(--color-warning)] hover:bg-[var(--color-warning-subtle)] text-[var(--color-text-inverse)] px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all animate-pulse"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${syncingAll ? "animate-spin" : ""}`} /> Sync {pendingSyncCount} Pending
                 </button>
@@ -613,7 +613,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               </button>
               <button 
                 onClick={() => setRequestModalOpen(true)}
-                className="text-[10px] font-black uppercase bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1 transition-all"
+                className="text-[10px] font-black uppercase bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] px-3.5 py-1.5 rounded-lg flex items-center gap-1 transition-all"
               >
                 <Plus className="h-3.5 w-3.5" /> Issue Doc Request
               </button>
@@ -630,12 +630,12 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                 <div key={category} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl overflow-hidden shadow-sm">
                   <div className="bg-[var(--color-surface-2)]/40 px-4 py-2.5 border-b border-[var(--color-border)]/70 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase text-[var(--color-accent)] tracking-widest">{category} Requirements</span>
-                    <span className="text-[9px] bg-white/5 text-white/50 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[9px] bg-[var(--color-surface-3)] text-[var(--color-text-muted)] px-2 py-0.5 rounded-full font-bold">
                       {categoryDocs.length} items
                     </span>
                   </div>
 
-                  <div className="p-3 divide-y divide-white/[0.03] space-y-3">
+                  <div className="p-3 divide-y divide-[var(--color-divider)] space-y-3">
                     {categoryDocs.map((doc, idx) => {
                       const clientMatch = clients.find(c => c.id === embeddedClientId)!;
                       const vaultState = getFullChecklistForClient(clientMatch).find(d => d.id === doc.docId)!;
@@ -708,8 +708,8 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
 
             {/* DYNAMIC SIDEBAR FILTERS (only shown on Dashboard tab) */}
             {activeSubTab === "dashboard" && (
-              <div className="flex flex-col gap-3 mt-2 border-t border-white/5 pt-4 space-y-1">
-                <span className="text-[10px] text-white/30 uppercase font-black tracking-widest">Workbench Filters</span>
+              <div className="flex flex-col gap-3 mt-2 border-t border-[var(--color-border)] pt-4 space-y-1">
+                <span className="text-[10px] text-[var(--color-text-faint)] uppercase font-black tracking-widest">Workbench Filters</span>
                 
                  <div className="relative">
                   <input 
@@ -803,7 +803,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                         onClick={() => setManagerQueueTab(tab.id as any)}
                         className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${
                           managerQueueTab === tab.id 
-                            ? "bg-[var(--color-accent)] text-black shadow" 
+                            ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow" 
                             : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-3)]"
                         }`}
                       >
@@ -816,7 +816,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                     <button
                       onClick={handleSyncPending}
                       disabled={syncingAll}
-                      className="text-[10px] bg-amber-500 hover:bg-amber-600 text-black font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 xl:self-center animate-pulse"
+                      className="text-[10px] bg-[var(--color-warning)] hover:bg-[var(--color-warning)]/80 text-[var(--color-text-inverse)] font-black uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 xl:self-center animate-pulse"
                     >
                       <RefreshCw className={`h-3.5 w-3.5 ${syncingAll ? "animate-spin" : ""}`} /> Sync {pendingSyncCount} Documents
                     </button>
@@ -832,15 +832,15 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                 {/* Matrix Table */}
                 <div className="flex-grow overflow-auto p-4">
                   {allDocRows.length === 0 ? (
-                    <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
-                      <FileText className="h-8 w-8 text-white/10 mb-2" />
-                      <span className="text-xs text-white/40 font-bold">No underwriting folder documents match the current criteria.</span>
+                    <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--color-border)] rounded-2xl bg-[var(--color-surface-2)]/30">
+                      <FileText className="h-8 w-8 text-[var(--color-text-faint)]/40 mb-2" />
+                      <span className="text-xs text-[var(--color-text-muted)] font-bold">No underwriting folder documents match the current criteria.</span>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-xs font-semibold border-collapse">
                         <thead>
-                          <tr className="border-b border-white/5 text-[9.5px] text-white/30 uppercase tracking-widest pb-3">
+                          <tr className="border-b border-[var(--color-border)] text-[9.5px] text-[var(--color-text-faint)] uppercase tracking-widest pb-3">
                             <th className="pb-3 pr-3 font-black">Client file folder</th>
                             <th className="pb-3 pr-3 font-black">Required requirement</th>
                             <th className="pb-3 pr-3 font-black">Category</th>
@@ -850,11 +850,11 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                             <th className="pb-3 text-right font-black">Operations</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.02]">
+                        <tbody className="divide-y divide-[var(--color-divider)]">
                           {allDocRows.map((row, idx) => {
                             const style = STATUS_STYLING[row.status] || STATUS_STYLING.required;
                             return (
-                              <tr key={idx} className="hover:bg-white/[0.01] transition-colors">
+                              <tr key={idx} className="hover:bg-[var(--color-surface-2)]/60 transition-colors">
                                 <td className="py-3 pr-3">
                                   <button 
                                     onClick={() => onOpenClient(row.client.id)}
@@ -880,9 +880,9 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                                     )}
                                   </div>
                                 </td>
-                                <td className="py-3 pr-3 text-white/40">{row.category}</td>
-                                <td className="py-3 pr-3 text-white/50">{row.client.agent || "Unassigned"}</td>
-                                <td className="py-3 pr-3 text-white/30 font-mono text-[10px]">
+                                <td className="py-3 pr-3 text-[var(--color-text-muted)]">{row.category}</td>
+                                <td className="py-3 pr-3 text-[var(--color-text-muted)]">{row.client.agent || "Unassigned"}</td>
+                                <td className="py-3 pr-3 text-[var(--color-text-faint)] font-mono text-[10px]">
                                   {row.uploadedAt ? new Date(row.uploadedAt).toLocaleDateString("en-CA") : "—"}
                                 </td>
                                 <td className="py-3 pr-3">
@@ -894,7 +894,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                                   <div className="inline-flex gap-1.5">
                                     <button 
                                       onClick={() => handleOpenUploadDrawer(row.client, row.docId, row.label, row.category)}
-                                      className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase text-white/70 border border-white/5"
+                                      className="px-2.5 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] rounded-lg text-[9px] font-black uppercase text-[var(--color-text)] border border-[var(--color-border)]"
                                     >
                                       Audit &amp; Review
                                     </button>
@@ -940,9 +940,9 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
 
                 <div className="flex-grow overflow-auto p-4">
                   {docRequests.length === 0 ? (
-                    <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-2xl">
-                      <Clock className="h-8 w-8 text-white/10 mb-2" />
-                      <span className="text-xs text-white/40">No pending client requests registered.</span>
+                    <div className="h-60 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--color-border)] rounded-2xl bg-[var(--color-surface-2)]/30">
+                      <Clock className="h-8 w-8 text-[var(--color-text-faint)]/40 mb-2" />
+                      <span className="text-xs text-[var(--color-text-muted)]">No pending client requests registered.</span>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -977,13 +977,13 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                               </div>
 
                               {req.notes && (
-                                <p className="text-[10px] text-white/50 italic bg-white/[0.01] p-2 rounded-md border border-white/5 leading-relaxed">
+                                <p className="text-[10px] text-[var(--color-text-muted)] italic bg-[var(--color-surface-2)] p-2 rounded-md border border-[var(--color-border)] leading-relaxed">
                                   " {req.notes} "
                                 </p>
                               )}
                             </div>
 
-                            <div className="flex justify-between items-center border-t border-white/[0.03] pt-3 text-[9.5px] text-white/50 mt-2">
+                            <div className="flex justify-between items-center border-t border-[var(--color-border)]/70 pt-3 text-[9.5px] text-[var(--color-text-faint)] mt-2">
                               <span>Broker Broker: <strong>{req.assignedBroker}</strong></span>
                               {req.status === "pending" && (
                                 <button 
@@ -1108,7 +1108,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
 
               <button 
                 type="submit"
-                className="w-full bg-[var(--color-accent)] text-black font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
+                className="w-full bg-[var(--color-accent)] text-[var(--color-text-inverse)] font-black uppercase text-xs tracking-widest py-3 rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
               >
                 ✓ Embed Custom Condition
               </button>

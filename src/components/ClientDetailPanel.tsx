@@ -485,7 +485,7 @@ export function ClientDetailPanel({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-50 backdrop-blur-[8px]"
+        className="fixed inset-0 bg-slate-900/30 dark:bg-slate-950/50 z-50 backdrop-blur-[4px]"
         onClick={closeDetail}
       >
         <motion.div 
@@ -572,7 +572,7 @@ export function ClientDetailPanel({
                   onClick={() => setDetailTab(tab.toLowerCase())}
                   className={`px-3.5 py-1.5 font-bold tracking-tight text-[11px] rounded-full transition-all duration-200 shrink-0 cursor-pointer ${
                     isSelected 
-                      ? "bg-[var(--color-accent)] text-[#12131a] shadow-md font-black" 
+                      ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] shadow-md font-black" 
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/80"
                   }`}
                 >
@@ -875,7 +875,7 @@ export function ClientDetailPanel({
 
       {/* Absolute PIPEDA Delete Confirmation Modal */}
       {showDeleteConfirmModal && (
-        <div className="fixed inset-0 bg-[rgba(12,13,20,0.75)] z-[60] flex items-center justify-center p-4 backdrop-blur-[8px]">
+        <div className="fixed inset-0 bg-slate-900/30 dark:bg-slate-950/50 z-[60] flex items-center justify-center p-4 backdrop-blur-[4px]">
           <div className="panel-card border border-[var(--color-error)]/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button 
               onClick={() => {

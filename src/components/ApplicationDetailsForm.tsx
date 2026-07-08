@@ -640,7 +640,7 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
                     type="button" 
                     onClick={() => setFields(p => ({ ...p, app_inc_employed: "1", app_inc_self: "0" }))}
                     className={`px-3 py-1 text-[9px] uppercase font-black rounded border transition-all ${
-                      fields.app_inc_employed === "1" ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
+                      fields.app_inc_employed === "1" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
                     }`}
                   >
                     Salaried Employee
@@ -649,7 +649,7 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
                     type="button" 
                     onClick={() => setFields(p => ({ ...p, app_inc_employed: "0", app_inc_self: "1" }))}
                     className={`px-3 py-1 text-[9px] uppercase font-black rounded border transition-all ${
-                      fields.app_inc_self === "1" ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
+                      fields.app_inc_self === "1" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
                     }`}
                   >
                     BFS / Self-Employed
@@ -750,7 +750,7 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
                     type="button" 
                     onClick={() => setFields(p => ({ ...p, co_inc_employed: "1", co_inc_self: "0" }))}
                     className={`px-3 py-1 text-[9px] uppercase font-black rounded border transition-all ${
-                      fields.co_inc_employed === "1" ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
+                      fields.co_inc_employed === "1" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
                     }`}
                   >
                     Salaried Employee
@@ -759,7 +759,7 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
                     type="button" 
                     onClick={() => setFields(p => ({ ...p, co_inc_employed: "0", co_inc_self: "1" }))}
                     className={`px-3 py-1 text-[9px] uppercase font-black rounded border transition-all ${
-                      fields.co_inc_self === "1" ? "bg-[var(--color-accent)] text-black border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
+                      fields.co_inc_self === "1" ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border-[var(--color-border)]"
                     }`}
                   >
                     BFS / Self-Employed
