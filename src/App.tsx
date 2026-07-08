@@ -775,13 +775,7 @@ export default function App() {
             {/* Quick search input */}
             <div className="relative">
               <div 
-                className="px-3.5 py-1.5 flex items-center gap-2 w-48 focus-within:w-64 transition-all duration-300 rounded-full"
-                style={{
-                  background: "var(--glass-bg)",
-                  backdropFilter: "var(--glass-blur)",
-                  WebkitBackdropFilter: "var(--glass-blur)",
-                  border: "1px solid var(--glass-border)"
-                }}
+                className="px-3.5 py-1.5 flex items-center gap-2 w-48 focus-within:w-64 transition-all duration-300 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:border-[var(--color-accent)]/30 focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
               >
                 <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                 <input 
@@ -791,7 +785,7 @@ export default function App() {
                   onChange={(e) => {
                     setGlobalSearch(e.target.value);
                   }}
-                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none w-full font-medium"
+                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none w-full font-medium"
                 />
               </div>
 

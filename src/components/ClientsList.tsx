@@ -164,7 +164,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               placeholder="Search name, email, phone, address, or lender…" 
               value={activeSearchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="bg-transparent border-none text-xs text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none w-full font-medium"
+              className="bg-transparent border-none text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none w-full font-medium"
             />
           </div>
 

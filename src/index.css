@@ -87,6 +87,7 @@
   --grad-warm-canvas:         linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
   --grad-card:                linear-gradient(145deg, #16263F 0%, #112036 100%);
   --grad-soft:                linear-gradient(135deg, #142137 0%, #1C2E4C 100%);
+  --grad-deep:                linear-gradient(135deg, #0f1c2e 0%, #060e1a 100%);
 
   /* ── Glass & Blur (Layered & premium) ── */
   --glass-bg:                 rgba(13, 21, 37, 0.70); /* Stronger liquid glass blend */
@@ -176,6 +177,7 @@
   --grad-warm-canvas:         linear-gradient(135deg, #E2D5C2 0%, #FAEFE9 100%);
   --grad-card:                linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
   --grad-soft:                linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
+  --grad-deep:                linear-gradient(135deg, #2D3250 0%, #1F223B 100%);
 
   /* ── Glass & Blur (Warm, slightly translucent, matching #F2EEE8) ── */
   --glass-bg:                 rgba(255, 255, 255, 0.75);
