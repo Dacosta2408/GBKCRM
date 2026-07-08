@@ -615,13 +615,13 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                 {(["personal", "address", "employment", "otherIncome", "property", "mortgage", "submit"] as TabType[]).map((tab, idx) => {
                   const isActive = activeTab === tab;
                   const labelMap: Record<string, string> = {
-                    personal: "1. Personal",
-                    address: "2. Address",
-                    employment: "3. Employment",
-                    otherIncome: "4. Other Income",
-                    property: "5. Property",
-                    mortgage: "6. Mortgage",
-                    submit: "7. Review & Submit"
+                    personal: "Personal",
+                    address: "Address",
+                    employment: "Employment",
+                    otherIncome: "Other Income",
+                    property: "Property",
+                    mortgage: "Mortgage",
+                    submit: "Review & Submit"
                   };
                   return (
                     <button
@@ -633,10 +633,10 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                           : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text)]"
                       }`}
                     >
-                      <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
+                      <span className={`s-bubble w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center border ${
                         isActive ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" : "border-[var(--color-border)]"
                       }`}>{idx + 1}</span>
-                      <span>{labelMap[tab]}</span>
+                      <span className="s-label">{labelMap[tab]}</span>
                     </button>
                   );
                 })}
