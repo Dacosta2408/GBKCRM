@@ -62,7 +62,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
   };
 
   const totalPipelineValue = clients.reduce((sum, c) => {
-    const val = c.purchasePrice !== undefined && c.purchasePrice !== null ? c.purchasePrice : c.mortgageAmount;
+    const val = c.mtgamt ?? c.purchasePrice ?? c.mortgageAmount;
     const num = parseFloat(String(val || 0).replace(/[$,\s]/g, "")) || 0;
     return sum + num;
   }, 0);
