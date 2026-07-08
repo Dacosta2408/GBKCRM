@@ -167,7 +167,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
             <input 
               type="text" 
-              placeholder="Search name, site, or lender…" 
+              placeholder="Search name, email, phone, address, or lender…" 
               value={activeSearchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="bg-transparent border-none text-xs text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none w-full font-medium"
@@ -260,11 +260,12 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   <th className="p-3.5">Goal Type</th>
                   <th className="p-3.5">Filing Stage</th>
                   <th className="p-3.5">Requested</th>
+                  <th className="p-3.5">Lender</th>
                   <th className="p-3.5">Estimated LTV</th>
                   <th className="p-3.5">Beacon Credit</th>
                   <th className="p-3.5">Estimated GDS</th>
                   <th className="p-3.5">Lead Advisor</th>
-                  <th className="p-3.5 text-right pr-6">Added On</th>
+                  <th className="p-3.5 text-right pr-6">Last Updated</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-divider)]">
@@ -274,12 +275,20 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     const ltv = pn(c.propval) > 0 ? (pn(c.mtgamt) / pn(c.propval) * 100) : 0;
                     const gds = calculateRatios(c);
                     const matchingStage = STAGES.find(s => s.id === c.status);
+                    
+                    const updateTime = new Date(c.updatedAt || c.createdAt).getTime();
+                    const staleThreshold = Date.now() - 14 * 24 * 60 * 60 * 1000;
+                    const isStale = (c.status !== "funded" && c.status !== "closed") && (updateTime < staleThreshold);
 
                     return (
                       <tr 
                         key={c.id} 
                         onClick={() => onOpenClient(c.id)}
-                        className="hover:bg-[var(--color-surface-2)] transition-all duration-150 cursor-pointer group"
+                        className={`transition-all duration-150 cursor-pointer group ${
+                          isStale 
+                            ? "bg-[var(--color-warning-subtle)] hover:bg-[var(--color-warning-subtle)]/80" 
+                            : "hover:bg-[var(--color-surface-2)]"
+                        }`}
                       >
                         <td className="p-3.5 pl-6 flex items-center gap-3">
                           <div 
@@ -289,7 +298,14 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                             {avatar}
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</span>
+                              {isStale && (
+                                <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-[var(--color-warning)] text-[var(--color-text-inverse)] shadow-sm animate-pulse">
+                                  Stale
+                                </span>
+                              )}
+                            </div>
                             {c.cell && <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold">{c.cell}</div>}
                           </div>
                         </td>
@@ -302,6 +318,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           </span>
                         </td>
                         <td className="p-3.5 text-xs font-mono font-bold text-[var(--color-text)]">{c.mtgamt ? fd(pn(c.mtgamt)) : "—"}</td>
+                        <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-semibold">{c.lender || "—"}</td>
                         <td className="p-3.5 text-xs font-mono text-[var(--color-text-muted)] font-bold">
                           {ltv > 0 ? `${ltv.toFixed(0)}%` : "—"}
                         </td>
@@ -317,7 +334,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                         </td>
                         <td className="p-3.5 text-xs text-[var(--color-text-muted)] font-bold">{c.agent || "Unassigned"}</td>
                         <td className="p-3.5 text-right text-xs text-[var(--color-text-faint)] font-mono pr-6 font-bold">
-                          {new Date(c.createdAt).toLocaleDateString("en-CA")}
+                          {new Date(c.updatedAt || c.createdAt).toLocaleDateString("en-CA")}
                         </td>
                       </tr>
                     );

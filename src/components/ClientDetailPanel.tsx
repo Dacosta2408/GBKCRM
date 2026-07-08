@@ -7,6 +7,9 @@ import { DocumentManager } from "./DocumentManager";
 import { MortgageChecklist } from "./MortgageChecklist";
 import { MortgageActivityTracker } from "./MortgageActivityTracker";
 import { getClientDocuments } from "../lib/bridgeService";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { CHECKLIST_RULES } from "./document/constants";
 
 export interface ClientDetailPanelProps {
   currentClient: Client | null;
@@ -74,31 +77,405 @@ export function ClientDetailPanel({
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = React.useState(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isExportingPDF, setIsExportingPDF] = React.useState(false);
 
   const handleExportData = async () => {
+    if (isExportingPDF) return;
+    setIsExportingPDF(true);
     try {
-      showToast("Preparing complete dossier export...", "success", "📦");
-      const docsList = await getClientDocuments(currentClient.id);
+      showToast("Preparing client PDF export...", "success");
       
-      const dossier = {
-        exportedAt: new Date().toISOString(),
-        regulation: "PIPEDA Compliant Single-Client Export",
-        clientInfo: currentClient,
-        documentsInVault: docsList,
-        auditLogsPlaceholder: `Exported by ${currentUser.first} ${currentUser.last} (${currentUser.role})`
+      let docsList: any[] = [];
+      try {
+        docsList = await getClientDocuments(currentClient.id);
+      } catch (err) {
+        console.error("Failed to fetch documents via bridge, falling back to local vault:", err);
+      }
+
+      const doc = new jsPDF();
+      const marginX = 15;
+      let posY = 15;
+
+      const drawSectionHeader = (title: string) => {
+        if (posY > 240) {
+          doc.addPage();
+          posY = 15;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(30, 41, 59); // Primary Slate
+        doc.text(title.toUpperCase(), marginX, posY);
+        
+        // Underline bar
+        doc.setDrawColor(217, 119, 6); // Golden Amber
+        doc.setLineWidth(0.8);
+        doc.line(marginX, posY + 2, marginX + 35, posY + 2);
+        
+        doc.setDrawColor(226, 232, 240); // Soft grey across the page
+        doc.setLineWidth(0.2);
+        doc.line(marginX + 35, posY + 2, 210 - marginX, posY + 2);
+        
+        posY += 8;
       };
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dossier, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `gbkcrm_dossier_${currentClient.last}_${currentClient.first}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      // Header Accent Bar
+      doc.setFillColor(30, 41, 59); // Dark navy/slate
+      doc.rect(0, 0, 210, 26, "F");
 
-      showToast("Complete dossier downloaded!", "success", "✓");
+      // Header light accent
+      doc.setFillColor(217, 119, 6); // Amber
+      doc.rect(0, 26, 210, 2, "F");
+
+      // Title text on Dark Background
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.text("GBK CRM — CLIENT FILE DOSSIER", marginX, 17);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      const timestampStr = new Date().toLocaleString("en-CA");
+      doc.text(`EXPORTED AT: ${timestampStr}`, 210 - marginX, 12, { align: "right" });
+      doc.text(`BY ADVISOR: ${currentUser.first} ${currentUser.last} (${currentUser.role})`, 210 - marginX, 16, { align: "right" });
+      doc.text(`COMPLIANCE: PIPEDA COMPLIANT SINGLE-CLIENT EXPORT`, 210 - marginX, 20, { align: "right" });
+
+      posY = 38;
+
+      // Section 1: Client Summary
+      drawSectionHeader("Borrower Profile & File Metadata");
+
+      const summaryData = [
+        ["Full Name:", `${currentClient.first} ${currentClient.last}`, "Email Address:", currentClient.email || "—"],
+        ["File Type / Goal:", currentClient.type || "Purchase File", "Cell Phone:", currentClient.cell || "—"],
+        ["Current Stage:", (currentClient.status || "Lead").toUpperCase(), "Lender Partner:", currentClient.lender || "—"],
+        ["Lead Advisor:", currentClient.agent || "Unassigned", "Date of Birth:", currentClient.dob || "—"],
+        ["Filing Date:", new Date(currentClient.createdAt).toLocaleDateString("en-CA"), "Last Activity:", new Date(currentClient.updatedAt || currentClient.createdAt).toLocaleDateString("en-CA")]
+      ];
+
+      autoTable(doc, {
+        startY: posY,
+        head: [],
+        body: summaryData,
+        theme: "plain",
+        styles: {
+          fontSize: 8.5,
+          cellPadding: 2.5,
+          textColor: [51, 65, 85], // Slate 700
+          font: "helvetica"
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 35 },
+          1: { cellWidth: 55 },
+          2: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 35 },
+          3: { cellWidth: 55 }
+        },
+        margin: { left: marginX, right: marginX }
+      });
+
+      posY = (doc as any).lastAutoTable.finalY + 8;
+
+      // Section 2: Mortgage & Financial Details
+      drawSectionHeader("Financial Profile & Deal Parameters");
+
+      const mtg = pn(currentClient.mtgamt);
+      const prop = pn(currentClient.propval);
+      const purchase = pn(currentClient.purchasePrice || currentClient.propval); // fallback
+      const ltv = prop > 0 ? ((mtg / prop) * 100) : 0;
+
+      const financialData = [
+        ["Requested Mortgage:", fd(mtg), "Estimated LTV Ratio:", ltv > 0 ? `${ltv.toFixed(1)}%` : "0.0%"],
+        ["Estimated Property Value:", fd(prop), "Purchase Price:", purchase > 0 ? fd(purchase) : "—"],
+        ["Beacon Credit Score:", currentClient.beacon || "—", "Borrower Monthly Income:", currentClient.income ? fd(pn(currentClient.income)) : "—"],
+        ["Co-Borrower Monthly Income:", currentClient.coIncome ? fd(pn(currentClient.coIncome)) : "—", "Borrower Monthly Debts:", currentClient.debts ? fd(pn(currentClient.debts)) : "—"],
+        ["Annual Property Tax:", currentClient.tax ? fd(pn(currentClient.tax)) : "—", "Monthly Condo / Heat Fees:", `${currentClient.condo ? fd(pn(currentClient.condo)) : "—"} / ${currentClient.heat ? fd(pn(currentClient.heat)) : "—"}`]
+      ];
+
+      autoTable(doc, {
+        startY: posY,
+        head: [],
+        body: financialData,
+        theme: "plain",
+        styles: {
+          fontSize: 8.5,
+          cellPadding: 2.5,
+          textColor: [51, 65, 85],
+          font: "helvetica"
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 45 },
+          1: { cellWidth: 45 },
+          2: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 45 },
+          3: { cellWidth: 45 }
+        },
+        margin: { left: marginX, right: marginX }
+      });
+
+      posY = (doc as any).lastAutoTable.finalY + 8;
+
+      // Section 3: Debt Servicing & Qualification
+      drawSectionHeader("Qualification & Debt Service Ratios");
+
+      const inc = pn(currentClient.income) + pn(currentClient.coIncome);
+      const mtgVal = pn(currentClient.mtgamt);
+      const monthlyMtg = cPmt(mtgVal, 5.25, 25);
+      const tax = pn(currentClient.tax) / 12;
+      const condo = pn(currentClient.condo);
+      const heat = pn(currentClient.heat) || 150;
+      const gds = inc > 0 ? ((monthlyMtg + tax + condo + heat) / (inc / 12) * 100) : 0;
+      const debts = pn(currentClient.debts);
+      const tds = inc > 0 ? ((monthlyMtg + tax + condo + heat + debts) / (inc / 12) * 100) : 0;
+
+      const ratioData = [
+        ["Gross Debt Service (GDS):", `${gds > 0 ? gds.toFixed(2) : "0.00"}%`, "Benchmark Limit:", "< 39.00%", gds > 39 ? "FAIL (LIMIT EXCEEDED)" : "PASS (COMPLIANT)"],
+        ["Total Debt Service (TDS):", `${tds > 0 ? tds.toFixed(2) : "0.00"}%`, "Benchmark Limit:", "< 44.00%", tds > 44 ? "FAIL (LIMIT EXCEEDED)" : "PASS (COMPLIANT)"]
+      ];
+
+      autoTable(doc, {
+        startY: posY,
+        head: [],
+        body: ratioData,
+        theme: "striped",
+        styles: {
+          fontSize: 8.5,
+          cellPadding: 3,
+          textColor: [51, 65, 85],
+          font: "helvetica"
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 50 },
+          1: { fontStyle: "bold", cellWidth: 25 },
+          2: { textColor: [100, 116, 139], cellWidth: 35 },
+          3: { textColor: [100, 116, 139], cellWidth: 25 },
+          4: { fontStyle: "bold", cellWidth: 45 }
+        },
+        didParseCell: (data) => {
+          if (data.column.index === 4) {
+            if (data.cell.text[0].startsWith("FAIL")) {
+              data.cell.styles.textColor = [220, 38, 38] as any; // Red
+            } else if (data.cell.text[0].startsWith("PASS")) {
+              data.cell.styles.textColor = [22, 163, 74] as any; // Green
+            }
+          }
+        },
+        margin: { left: marginX, right: marginX }
+      });
+
+      posY = (doc as any).lastAutoTable.finalY + 8;
+
+      // Section 4: Application details section
+      drawSectionHeader("Comprehensive Application Details");
+
+      const detailFields: [string, string][] = [
+        ["First Name", String(currentClient.first || "")],
+        ["Last Name", String(currentClient.last || "")],
+        ["Email Address", String(currentClient.email || "")],
+        ["Cell Phone", String(currentClient.cell || "")],
+        ["Date of Birth", String(currentClient.dob || "")],
+        ["Marital Status", String(currentClient.marital || "")],
+        ["Social Insurance Number (SIN)", currentClient.sin ? "●●●-●●●-●●● (Protected)" : ""],
+        ["Dependents", String(currentClient.dep !== undefined && currentClient.dep !== null && currentClient.dep !== "" ? currentClient.dep : "")],
+        ["Co-Borrower Name", String(currentClient.co || "")],
+        ["Co-Borrower Email", String(currentClient.coEmail || "")],
+        ["Employment Type", String(currentClient.emptype || "")],
+        ["Beacon Credit Score", String(currentClient.beacon || "")],
+        ["Assigned Broker / Advisor", String(currentClient.agent || "")],
+        ["Lender Partner", String(currentClient.lender || "")],
+        ["Deal Lead Source", String(currentClient.source || "")],
+        ["Referred By", String(currentClient.referredBy || "")],
+        ["Funded Date", String(currentClient.fundedDate || "")],
+        ["Maturity Date", String(currentClient.maturityDate || "")],
+        ["Retention Owner", String(currentClient.retentionOwner || "")],
+        ["Last Contacted", String(currentClient.lastContactedDate || "")],
+        ["Next Follow-Up", String(currentClient.nextFollowUpDate || "")],
+        ["Retention Outcome", String(currentClient.retentionOutcome || "")],
+        ["Retention Notes", String(currentClient.retentionNotes || "")]
+      ];
+
+      // Skip empty values
+      const activeDetails = detailFields.filter(([_, val]) => {
+        const v = val ? val.trim() : "";
+        return v.length > 0 && v !== "—" && v !== "undefined";
+      });
+
+      // Render in 2 columns
+      const detailRows: any[] = [];
+      for (let i = 0; i < activeDetails.length; i += 2) {
+        const item1 = activeDetails[i];
+        const item2 = activeDetails[i + 1] || ["", ""];
+        detailRows.push([
+          item1[0], item1[1],
+          item2[0], item2[1]
+        ]);
+      }
+
+      autoTable(doc, {
+        startY: posY,
+        head: [],
+        body: detailRows,
+        theme: "plain",
+        styles: {
+          fontSize: 8,
+          cellPadding: 2.5,
+          textColor: [51, 65, 85],
+          font: "helvetica"
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 45 },
+          1: { cellWidth: 45 },
+          2: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 45 },
+          3: { cellWidth: 45 }
+        },
+        margin: { left: marginX, right: marginX }
+      });
+
+      posY = (doc as any).lastAutoTable.finalY + 8;
+
+      // Section 5: Documents section
+      drawSectionHeader("Document Verification & Checklist");
+
+      const clientVault = docVault[currentClient.id] || {};
+      const activeRules = CHECKLIST_RULES.filter(rule => rule.evaluate(currentClient));
+
+      const customRules: any[] = [];
+      Object.keys(clientVault).forEach(key => {
+        if (key.startsWith("custom_") && clientVault[key]?.isCustom) {
+          customRules.push({
+            id: key,
+            label: clientVault[key].label || "Custom Clause",
+            category: clientVault[key].category || "Other",
+            description: clientVault[key].description || "Bespoke condition.",
+            isCustom: true
+          });
+        }
+      });
+
+      const allRules = [...activeRules, ...customRules];
+      const docRows: any[] = [];
+
+      allRules.forEach(rule => {
+        const savedState = clientVault[rule.id] || {};
+        const status = savedState.status || "required";
+        const category = rule.category || "Other";
+        const label = rule.label || "Document Slot";
+        const notes = savedState.notes || "—";
+        
+        let filesCount = 0;
+        if (savedState.files) {
+          filesCount = savedState.files.length;
+        } else if (savedState.name) {
+          filesCount = 1;
+        }
+        
+        const expiry = savedState.expiryDate || "—";
+        
+        docRows.push({
+          label,
+          category,
+          status: status.toUpperCase(),
+          filesCount,
+          expiry,
+          notes
+        });
+      });
+
+      docsList.forEach(bridgeDoc => {
+        const alreadyTracked = docRows.some(row => row.label.toLowerCase() === bridgeDoc.name.toLowerCase());
+        if (!alreadyTracked) {
+          docRows.push({
+            label: bridgeDoc.name,
+            category: "Bridge File",
+            status: "RECEIVED",
+            filesCount: 1,
+            expiry: "—",
+            notes: `Bridge size: ${(bridgeDoc.size / (1024 * 1024)).toFixed(2)} MB. Modified: ${new Date(bridgeDoc.modified).toLocaleDateString("en-CA")}`
+          });
+        }
+      });
+
+      const docTableBody = docRows.map(row => [
+        row.label,
+        row.category,
+        row.status,
+        row.filesCount > 0 ? `${row.filesCount} files` : "0 files",
+        row.notes
+      ]);
+
+      autoTable(doc, {
+        startY: posY,
+        head: [["Document Name", "Category", "Status", "Files", "Notes / Remarks"]],
+        body: docTableBody,
+        theme: "striped",
+        headStyles: {
+          fillColor: [30, 41, 59], // Slate 800
+          textColor: [255, 255, 255],
+          fontSize: 8,
+          fontStyle: "bold"
+        },
+        styles: {
+          fontSize: 7.5,
+          cellPadding: 3,
+          font: "helvetica"
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", textColor: [15, 23, 42], cellWidth: 45 },
+          1: { cellWidth: 25 },
+          2: { fontStyle: "bold", cellWidth: 20 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 70 }
+        },
+        didParseCell: (data) => {
+          if (data.column.index === 2 && data.row.index >= 0) {
+            const txt = String(data.cell.text[0]);
+            if (txt === "APPROVED" || txt === "RECEIVED") {
+              data.cell.styles.textColor = [22, 163, 74] as any; // Green
+            } else if (txt === "REQUIRED") {
+              data.cell.styles.textColor = [100, 116, 139] as any; // Gray
+            } else if (txt === "REJECTED" || txt === "EXPIRED") {
+              data.cell.styles.textColor = [220, 38, 38] as any; // Red
+            } else {
+              data.cell.styles.textColor = [217, 119, 6] as any; // Orange
+            }
+          }
+        },
+        margin: { left: marginX, right: marginX }
+      });
+
+      posY = (doc as any).lastAutoTable.finalY + 10;
+
+      // Section 6: Compliance / Audit Footer
+      if (posY > 255) {
+        doc.addPage();
+        posY = 15;
+      }
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.line(marginX, posY, 210 - marginX, posY);
+
+      posY += 5;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(30, 41, 59);
+      doc.text("COMPLIANCE & AUDIT TRAIL FOOTER", marginX, posY);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      posY += 4;
+      doc.text(`This document serves as an official single-client dossier snapshot for file #${currentClient.id}.`, marginX, posY);
+      posY += 4;
+      doc.text(`Generated under strict regulatory compliance parameters. Export authorized and executed by broker ${currentUser.first} ${currentUser.last} (${currentUser.role}).`, marginX, posY);
+      posY += 4;
+      doc.text("CONFIDENTIALITY NOTICE: The information contained in this dossier is private, legally privileged, and protected under the Personal Information Protection and Electronic Documents Act (PIPEDA).", marginX, posY);
+
+      doc.save(`gbkcrm_file_${currentClient.last}_${currentClient.first}.pdf`);
+      showToast("Client PDF exported successfully!", "success", "✓");
     } catch (err: any) {
-      showToast("Failed to compile export dossier", "error");
+      console.error(err);
+      showToast("Failed to export client PDF", "error");
+    } finally {
+      setIsExportingPDF(false);
     }
   };
 
@@ -160,6 +537,15 @@ export function ClientDetailPanel({
                   ))}
                 </select>
               </div>
+
+              <button
+                onClick={handleExportData}
+                disabled={isExportingPDF}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm text-[10px] font-black uppercase tracking-wider text-[var(--color-text)] bg-[var(--glass-bg)] border-[var(--glass-border)] hover:bg-[var(--color-surface-2)]/80 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+                {isExportingPDF ? "Generating PDF..." : "Export PDF"}
+              </button>
               
               <button 
                 onClick={closeDetail} 
@@ -451,9 +837,10 @@ export function ClientDetailPanel({
                   <div className="border-t border-[var(--color-border)] pt-3.5 mt-1 flex justify-end">
                     <button
                       onClick={handleExportData}
-                      className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer"
+                      disabled={isExportingPDF}
+                      className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)] font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Download className="w-3.5 h-3.5" /> Export Client Dossier
+                      <Download className="w-3.5 h-3.5" /> {isExportingPDF ? "Generating PDF..." : "Export Client Dossier"}
                     </button>
                   </div>
                 </div>
