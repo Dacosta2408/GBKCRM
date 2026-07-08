@@ -439,6 +439,12 @@ input:focus, textarea:focus, select:focus {
   border-color: var(--color-border);
 }
 
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.95;
+}
+
 /* ─────────────────────────────────────────────────────────────
    UTILITY HELPER CLASSES
    ───────────────────────────────────────────────────────────── */

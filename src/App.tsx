@@ -785,7 +785,7 @@ export default function App() {
                   onChange={(e) => {
                     setGlobalSearch(e.target.value);
                   }}
-                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none w-full font-medium"
+                  className="bg-transparent border-none text-[11px] text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] placeholder:opacity-90 focus:outline-none w-full font-medium"
                 />
               </div>
 
