@@ -33,7 +33,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
   const [newLast, setNewLast] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPhone, setNewPhone] = useState("");
-  const [newRole, setNewRole] = useState<User["role"]>("Agent");
+  const [newRole, setNewRole] = useState<User["role"]>("Broker");
   const [newPin, setNewPin] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newFsra, setNewFsra] = useState("");
@@ -48,7 +48,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
   const [editLast, setEditLast] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
-  const [editRole, setEditRole] = useState<User["role"]>("Agent");
+  const [editRole, setEditRole] = useState<User["role"]>("Broker");
   const [editPin, setEditPin] = useState("");
   const [editTitle, setEditTitle] = useState("");
   const [editFsra, setEditFsra] = useState("");
@@ -242,11 +242,9 @@ export const UserManagement: React.FC<UserManagementProps> = ({
             className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 text-xs text-[var(--color-text)] px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-[var(--color-surface-3)] transition-all"
           >
             <option value="all">All Roles</option>
-            <option value="Owner / Master Admin">Owner / Master Admin</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="IT / Developer">IT / Developer</option>
-            <option value="Senior Broker">Senior Broker</option>
-            <option value="Agent">Agent</option>
+            <option value="Developer/Admin">Developer/Admin</option>
+            <option value="Admin">Admin</option>
+            <option value="Broker">Broker</option>
           </select>
 
           {/* Status Filter */}
@@ -326,7 +324,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   {/* Access Role */}
                   <td className="px-5 py-4">
                     <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border ${
-                      user.role.includes("Owner") || user.role.includes("Super Admin") || user.role.includes("IT")
+                      user.role === "Developer/Admin" || user.role === "Admin"
                         ? "bg-[var(--color-error-subtle)] text-[var(--color-error)] border-[var(--color-error)]/20"
                         : "bg-[var(--color-info)]/15 text-[var(--color-info)] border-[var(--color-info)]/20"
                     }`}>
@@ -494,11 +492,9 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                     onChange={(e) => setNewRole(e.target.value as User["role"])}
                     className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none cursor-pointer"
                   >
-                    <option value="Agent">Agent / Broker</option>
-                    <option value="Senior Broker">Senior Broker</option>
-                    <option value="IT / Developer">IT / Developer</option>
-                    <option value="Super Admin">Super Admin</option>
-                    <option value="Owner / Master Admin">Owner / Master Admin</option>
+                    <option value="Broker">Broker</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Developer/Admin">Developer/Admin</option>
                   </select>
                 </div>
                 <div>
@@ -674,11 +670,9 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                     onChange={(e) => setEditRole(e.target.value as User["role"])}
                     className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/50 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] outline-none cursor-pointer"
                   >
-                    <option value="Agent">Agent / Broker</option>
-                    <option value="Senior Broker">Senior Broker</option>
-                    <option value="IT / Developer">IT / Developer</option>
-                    <option value="Super Admin">Super Admin</option>
-                    <option value="Owner / Master Admin">Owner / Master Admin</option>
+                    <option value="Broker">Broker</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Developer/Admin">Developer/Admin</option>
                   </select>
                 </div>
                 <div>

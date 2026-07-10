@@ -1449,10 +1449,10 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   value={taskWizardAssignee}
                   onChange={(e) => setTaskWizardAssignee(e.target.value)}
                 >
-                  <option value="Jeff Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jeff Brown (Senior Agent)</option>
-                  <option value="Tim Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Tim Brown (Super Admin)</option>
-                  <option value="Wayne MacLeod" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Wayne MacLeod (Managing Broker)</option>
-                  <option value="Jamey Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jamey Brown (IT Staff)</option>
+                  <option value="Jeff Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jeff Brown (Broker)</option>
+                  <option value="Tim Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Tim Brown (Admin)</option>
+                  <option value="Wayne MacLeod" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Wayne MacLeod (Admin)</option>
+                  <option value="Jamey Brown" className="bg-[var(--color-surface-3)] text-[var(--color-text)]">Jamey Brown (Broker)</option>
                 </select>
               </div>
 

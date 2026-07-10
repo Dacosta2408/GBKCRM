@@ -39,6 +39,8 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
   apiKeySet,
   showToast
 }) => {
+  const isAdmin = currentUser.role === "Developer/Admin" || currentUser.role === "Admin" || currentUser.isOwner === true;
+
   // --- WORKFLOW PROCESS STEPPER ---
   type WorkflowStepType = "upload" | "review" | "finalize";
   const [workflowStep, setWorkflowStep] = useState<WorkflowStepType>(
@@ -1593,13 +1595,19 @@ export const ApplicationIntake: React.FC<ApplicationIntakeProps> = ({
                           <label className="block text-[10px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1.5">Assign Broker / Agent Owner</label>
                           <select 
                             value={assignedAgent} 
+                            disabled={!isAdmin}
                             onChange={(e) => setAssignedAgent(e.target.value)}
-                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 disabled:opacity-75 disabled:cursor-not-allowed font-semibold"
                           >
                             {agentNames.map(name => (
                               <option key={name} value={name}>{name}</option>
                             ))}
                           </select>
+                          {!isAdmin && (
+                            <span className="text-[9px] text-[var(--color-text-faint)] font-bold mt-1 block">
+                              ℹ️ Files are auto-assigned to you (Admins can reassign).
+                            </span>
+                          )}
                         </div>
 
                         <div>

@@ -38,6 +38,7 @@ interface MessagesProps {
   tasks?: Task[];
   setTasks?: React.Dispatch<React.SetStateAction<Task[]>>;
   showToast?: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
+  userRoster?: any[];
 }
 
 // Pre-defined list of operational channels with topics and specific seeds
@@ -81,7 +82,8 @@ export const Messages: React.FC<MessagesProps> = ({
   onOpenClient,
   tasks,
   setTasks,
-  showToast
+  showToast,
+  userRoster
 }) => {
   // Input composer & searching controls
   const [msgInputText, setMsgInputText] = useState("");
@@ -1099,11 +1101,19 @@ export const Messages: React.FC<MessagesProps> = ({
                 onChange={(e) => setWizardDraftTask({ ...wizardDraftTask, assignedTo: e.target.value })}
                 className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/20 font-bold"
               >
-                <option value="David Acosta">David Acosta (Me)</option>
-                <option value="Jeff Brown">Jeff Brown (Admin Assistant)</option>
-                <option value="Wayne MacLeod">Wayne MacLeod (Senior Broker)</option>
-                <option value="Sarah Chen">Sarah Chen (Compliance Auditor)</option>
-                <option value="Tim Brown">Tim Brown (Broker Principal)</option>
+                {userRoster && userRoster.length > 0 ? (
+                  userRoster.map(u => (
+                    <option key={u.id} value={`${u.first} ${u.last}`}>{u.first} {u.last} ({u.role})</option>
+                  ))
+                ) : (
+                  <>
+                    <option value="David Acosta">David Acosta (Me)</option>
+                    <option value="Jeff Brown">Jeff Brown (Admin Assistant)</option>
+                    <option value="Wayne MacLeod">Wayne MacLeod (Senior Broker)</option>
+                    <option value="Sarah Chen">Sarah Chen (Compliance Auditor)</option>
+                    <option value="Tim Brown">Tim Brown (Broker Principal)</option>
+                  </>
+                )}
               </select>
             </div>
 

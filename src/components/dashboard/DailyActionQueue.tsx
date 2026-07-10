@@ -22,7 +22,7 @@ export const DailyActionQueue: React.FC<DailyActionQueueProps> = ({
   setActiveTab,
   onCompleteTask
 }) => {
-  const isManager = ["Owner / Master Admin", "Super Admin", "IT / Developer"].includes(currentUser.role);
+  const isManager = ["Developer/Admin", "Admin"].includes(currentUser.role);
   const userFullName = `${currentUser.first} ${currentUser.last}`;
 
   const [queueMode, setQueueMode] = useState<"personal" | "team">(isManager ? "team" : "personal");

@@ -156,7 +156,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
     if (saved) return JSON.parse(saved);
     return [
       { id: "act-1", clientId: "c-1", clientName: "Marcus Vance", docId: "photo_id", docName: "Govt Photo ID", action: "uploaded", user: "Sarah Jenkins", timestamp: "2026-06-22T14:10:00Z", details: "Uploaded v1 passport copy." },
-      { id: "act-2", clientId: "c-1", clientName: "Marcus Vance", docId: "photo_id", docName: "Govt Photo ID", action: "reviewed", user: "Owner / Master Admin", timestamp: "2026-06-22T16:30:00Z", details: "Reviewed document. Flagged as Under Review." }
+      { id: "act-2", clientId: "c-1", clientName: "Marcus Vance", docId: "photo_id", docName: "Govt Photo ID", action: "reviewed", user: "Developer/Admin", timestamp: "2026-06-22T16:30:00Z", details: "Reviewed document. Flagged as Under Review." }
     ];
   });
 

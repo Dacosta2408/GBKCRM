@@ -48,27 +48,17 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
 
   // Role Default Templates Mappings
   const roleDefaultPermissions: Record<User["role"], Record<string, boolean>> = {
-    "Owner / Master Admin": {
+    "Developer/Admin": {
       dashboard: true, clients: true, pipeline: true, ai_intake: true, documents: true, 
       checklist: true, calendar: true, messages: true, email: true, reports: true, 
       settings: true, admin_control: true
     },
-    "Super Admin": {
+    "Admin": {
       dashboard: true, clients: true, pipeline: true, ai_intake: true, documents: true, 
       checklist: true, calendar: true, messages: true, email: true, reports: true, 
       settings: true, admin_control: true
     },
-    "IT / Developer": {
-      dashboard: true, clients: false, pipeline: false, ai_intake: true, documents: false, 
-      checklist: false, calendar: true, messages: true, email: false, reports: true, 
-      settings: true, admin_control: true
-    },
-    "Senior Broker": {
-      dashboard: true, clients: true, pipeline: true, ai_intake: true, documents: true, 
-      checklist: true, calendar: true, messages: true, email: true, reports: true, 
-      settings: true, admin_control: false
-    },
-    "Agent": {
+    "Broker": {
       dashboard: true, clients: true, pipeline: true, ai_intake: true, documents: true, 
       checklist: true, calendar: true, messages: true, email: true, reports: false, 
       settings: true, admin_control: false

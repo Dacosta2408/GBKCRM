@@ -72,7 +72,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Determine authorized role access
   const hasAccess = useMemo(() => {
     const role = currentUser.role;
-    return role === "Owner / Master Admin" || role === "Super Admin" || role === "IT / Developer" || currentUser.isOwner;
+    return role === "Developer/Admin" || role === "Admin" || currentUser.isOwner;
   }, [currentUser]);
 
   // Log activity helper
@@ -260,7 +260,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
 
                 {/* Deployment Readiness (Owner / Master Admin only) */}
-                {(currentUser.role === "Owner / Master Admin" || currentUser.isOwner) && (
+                {(currentUser.role === "Developer/Admin" || currentUser.isOwner) && (
                   <button
                     onClick={() => setActiveTab("deployment")}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-lg transition-all ${

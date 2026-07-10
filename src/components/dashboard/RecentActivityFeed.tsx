@@ -14,7 +14,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
   currentUser,
   onClearActivity
 }) => {
-  const isManager = ["Owner / Master Admin", "Super Admin", "IT / Developer"].includes(currentUser.role);
+  const isManager = ["Developer/Admin", "Admin"].includes(currentUser.role);
 
   const timeAgo = (isoStr: string) => {
     if (!isoStr) return "Some time ago";

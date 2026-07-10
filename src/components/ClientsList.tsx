@@ -3,7 +3,7 @@ import {
   Plus, Search, ArrowRight, UserCheck, Calendar, Filter, 
   MapPin, Landmark, BadgePercent, ShieldAlert, BadgeInfo 
 } from "lucide-react";
-import { Client, Lender } from "../types";
+import { Client, Lender, User } from "../types";
 
 interface ClientsListProps {
   clients: Client[];
@@ -19,6 +19,8 @@ interface ClientsListProps {
   onSearchQueryChange?: (q: string) => void;
   docVault?: Record<string, any>;
   onUpdateClientStatus?: (id: string, status: any) => void;
+  currentUser?: User;
+  onUpdateClient?: (updatedClient: Client) => void;
 }
 
 export const ClientsList: React.FC<ClientsListProps> = ({
@@ -34,8 +36,14 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   searchQuery,
   onSearchQueryChange,
   docVault,
-  onUpdateClientStatus
+  onUpdateClientStatus,
+  currentUser,
+  onUpdateClient
 }) => {
+  const isAdmin = currentUser 
+    ? (currentUser.role === "Developer/Admin" || currentUser.role === "Admin" || currentUser.isOwner === true) 
+    : true;
+
   const [dbFilter, setDbFilter] = useState<string>("all");
   const [agentFilter, setAgentFilter] = useState<string>("");
   const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
@@ -471,39 +479,84 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                 if (isActiveStage && !hasDocs) missingDocsCount++;
               });
 
+              const isCrowded = colClients.length >= 5;
+              const isEmpty = colClients.length === 0;
+
               return (
                 <div 
                   key={s.id}
-                  className="w-80 h-full flex flex-col rounded-2xl max-h-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm"
+                  className={`w-80 h-full flex flex-col rounded-2xl max-h-full border transition-all duration-300 ${
+                    isCrowded 
+                      ? "border-amber-500/30 bg-[var(--color-surface)] shadow-md ring-1 ring-amber-500/10" 
+                      : isEmpty 
+                        ? "border-[var(--color-border)]/50 bg-[var(--color-surface)]/40 opacity-75 hover:opacity-90 hover:border-[var(--color-border)]"
+                        : "border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm"
+                  }`}
                 >
                   {/* Column Header */}
-                  <div className="p-3 border-b flex flex-col gap-2 shrink-0 bg-[var(--color-surface-2)]/60 rounded-t-2xl" style={{ borderColor: "var(--color-divider)" }}>
+                  <div 
+                    className={`p-3.5 border-b flex flex-col gap-2 shrink-0 rounded-t-2xl transition-all duration-300 ${
+                      isCrowded 
+                        ? "bg-amber-500/[0.02]" 
+                        : isEmpty 
+                          ? "bg-[var(--color-surface-2)]/30" 
+                          : "bg-[var(--color-surface-2)]/60"
+                    }`}
+                    style={{ borderColor: isCrowded ? "rgba(245, 158, 11, 0.2)" : "var(--color-divider)" }}
+                  >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
-                        <h4 className="text-[11px] font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className={`w-2.5 h-2.5 rounded-full ${isCrowded ? "animate-pulse" : ""}`} 
+                          style={{ 
+                            backgroundColor: s.color, 
+                            boxShadow: `0 0 6px ${s.color}` 
+                          }}
+                        ></div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-1.5">
+                          {s.label}
+                          {isCrowded && (
+                            <span className="text-[9px] font-black tracking-normal normal-case bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                              Crowded
+                            </span>
+                          )}
+                        </h4>
                       </div>
                       <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
                     </div>
                     
                     {/* Stage Metrics Summary Row */}
-                    <div className="flex items-center gap-1.5 text-[9px] font-bold">
-                      <span className="text-[var(--color-text-muted)] bg-[var(--color-surface-3)] border border-[var(--color-border)]/50 px-1.5 py-0.5 rounded-md">
-                        {colClients.length} {colClients.length === 1 ? "file" : "files"}
-                      </span>
-                      {overdueFollowUpCount > 0 && (
-                        <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Overdue follow-ups">
-                          📅 {overdueFollowUpCount}
+                    <div className="flex items-center justify-between text-[10px] text-[var(--color-text-muted)]">
+                      <div className="flex items-center gap-1.5 font-semibold">
+                        <span className="bg-[var(--color-surface-3)] border border-[var(--color-border)]/40 px-2 py-0.5 rounded-md text-[10px]">
+                          {colClients.length} {colClients.length === 1 ? "file" : "files"}
                         </span>
-                      )}
-                      {stalledCount > 0 && (
-                        <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Stalled files">
-                          ⏳ {stalledCount}
-                        </span>
-                      )}
-                      {missingDocsCount > 0 && (
-                        <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Missing documents">
-                          ⚠️ {missingDocsCount}
+                        
+                        {/* Summary Badges if any alerts exist */}
+                        {(overdueFollowUpCount > 0 || stalledCount > 0 || missingDocsCount > 0) && (
+                          <div className="flex items-center gap-1">
+                            {overdueFollowUpCount > 0 && (
+                              <span className="bg-red-500/10 text-red-500 border border-red-500/15 px-1.5 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-0.5" title="Overdue follow-ups">
+                                📅 {overdueFollowUpCount}
+                              </span>
+                            )}
+                            {stalledCount > 0 && (
+                              <span className="bg-amber-500/10 text-amber-500 border border-amber-500/15 px-1.5 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-0.5" title="Stalled files">
+                                ⏳ {stalledCount}
+                              </span>
+                            )}
+                            {missingDocsCount > 0 && (
+                              <span className="bg-orange-500/10 text-orange-500 border border-orange-500/15 px-1.5 py-0.5 rounded-md text-[9px] font-bold flex items-center gap-0.5" title="Missing documents">
+                                ⚠️ {missingDocsCount}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {colClients.length > 0 && (
+                        <span className="text-[9px] text-[var(--color-text-faint)] font-medium">
+                          Avg: {fdShort(colValue / colClients.length)}
                         </span>
                       )}
                     </div>
@@ -512,9 +565,11 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   {/* Column Body Cards Area */}
                   <div 
                     onDragOver={(e) => {
+                      if (!isAdmin) return;
                       e.preventDefault();
                     }}
                     onDragEnter={(e) => {
+                      if (!isAdmin) return;
                       e.preventDefault();
                       setDragOverColumn(s.id);
                     }}
@@ -526,15 +581,18 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                     onDrop={(e) => {
                       e.preventDefault();
                       setDragOverColumn(null);
+                      if (!isAdmin) return;
                       const clientId = e.dataTransfer.getData("text/plain");
                       if (clientId && onUpdateClientStatus) {
                         onUpdateClientStatus(clientId, s.id);
                       }
                     }}
-                    className={`flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 rounded-b-2xl transition-all duration-200 ${
+                    className={`flex-1 overflow-y-auto p-3 flex flex-col gap-3 min-h-0 rounded-b-2xl transition-all duration-200 ${
                       dragOverColumn === s.id 
                         ? "bg-blue-500/10 ring-2 ring-blue-500/20 ring-inset" 
-                        : "bg-[var(--color-surface-2)]/40"
+                        : isEmpty 
+                          ? "bg-transparent" 
+                          : "bg-[var(--color-surface-2)]/30"
                     }`}
                   >
                     {colClients.length > 0 ? colClients.map(c => {
@@ -553,118 +611,149 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                       const hasDocs = approvedCount > 0 || reviewCount > 0;
                       const isActiveStage = ["working", "lender", "conditional"].includes(c.status);
                       const isMissingDocs = isActiveStage && !hasDocs;
-
+ 
                       return (
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          draggable
+                          draggable={isAdmin}
                           onDragStart={(e) => {
+                            if (!isAdmin) {
+                              e.preventDefault();
+                              return;
+                            }
                             e.dataTransfer.setData("text/plain", c.id);
                             e.dataTransfer.effectAllowed = "move";
                           }}
-                          className={`p-3.5 rounded-xl border-l-4 transition-all duration-300 ease-out cursor-pointer shadow-sm relative group/card ${
+                          className={`p-3 rounded-xl border border-[var(--color-border)]/60 border-l-4 transition-all duration-300 ease-out cursor-pointer shadow-sm relative group/card bg-[var(--color-surface)] hover:-translate-y-0.5 hover:shadow-md ${
                             hasOverdueFollowUp 
-                              ? "border-l-red-500 border-[var(--color-border)] hover:border-red-500/40 bg-red-500/5 hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" 
+                              ? "border-l-red-500 hover:border-red-500/40" 
                               : isStalledActive 
-                                ? "border-l-amber-500 border-[var(--color-border)] hover:border-amber-500/40 bg-amber-500/5 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+                                ? "border-l-amber-500 hover:border-amber-500/40"
                                 : isMissingDocs
-                                  ? "border-l-orange-500 border-[var(--color-border)] hover:border-orange-500/40 bg-orange-500/5 hover:shadow-[0_0_15px_rgba(249,115,22,0.15)]"
-                                  : "border-l-teal-500 border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
+                                  ? "border-l-orange-500 hover:border-orange-500/40"
+                                  : "border-l-[var(--color-primary)] hover:border-[var(--color-accent)]/30"
                           }`}
                         >
-                          <div className="flex justify-between items-start gap-2 mb-1.5">
-                            <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex justify-between items-start gap-2.5">
+                            <div className="flex items-start gap-2.5 min-w-0">
                               <div 
-                                className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)] shadow-sm"
+                                className="w-7 h-7 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)] shadow-sm shrink-0 mt-0.5"
                                 style={{ background: "var(--color-primary)" }}
                               >
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <h5 className="text-xs font-bold text-[var(--color-text)] truncate group-hover/card:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</h5>
-                                <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
+                                <h5 className="text-xs font-bold text-[var(--color-text)] truncate group-hover/card:text-[var(--color-accent)] transition-colors">
+                                  {c.first} {c.last}
+                                </h5>
+                                <div className="text-[10px] text-[var(--color-text-muted)] font-bold truncate mt-0.5 uppercase tracking-wide">
+                                  {c.type || "Purchase"}
+                                </div>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-[var(--color-accent)] whitespace-nowrap mt-0.5">
+                            <div className="text-xs font-mono font-bold text-[var(--color-accent)] whitespace-nowrap shrink-0 mt-0.5">
                               {c.mtgamt ? fdShort(pn(c.mtgamt)) : "—"}
                             </div>
                           </div>
-
+ 
                           {/* Broker Workflow Cues */}
-                          <div className="flex flex-wrap gap-1.5 mt-2">
-                            {/* Overdue follow up */}
-                            {c.nextFollowUpDate && (
-                              <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded flex items-center gap-1 ${
-                                hasOverdueFollowUp 
-                                  ? "bg-red-500/10 text-red-500 border border-red-500/20" 
-                                  : "bg-teal-500/10 text-teal-500 border border-teal-500/10"
-                              }`} title="Follow-up Date">
-                                📅 {hasOverdueFollowUp ? `Overdue: ${c.nextFollowUpDate}` : `Follow-up: ${c.nextFollowUpDate}`}
-                              </span>
-                            )}
-
-                            {/* Stalled active */}
-                            {isStalledActive && (
-                              <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1">
-                                ⏳ Idle {daysStale}d
-                              </span>
-                            )}
-
-                            {/* Missing/Document Vault status */}
-                            {(() => {
-                              if (hasDocs) {
-                                return (
-                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1">
-                                    📂 {approvedCount} Clear | {reviewCount} Rev
-                                  </span>
-                                );
-                              } else if (isMissingDocs) {
-                                return (
-                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center gap-1">
-                                    ⚠️ Missing Docs
-                                  </span>
-                                );
-                              }
-                              return null;
-                            })()}
-                          </div>
-
-                          <div className="flex justify-between items-center text-[10px] border-t border-[var(--color-divider)] pt-2 mt-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[100px] truncate">
-                                👤 {(c.agent || "Unassigned").split(" ")[0]}
-                              </span>
+                          {(c.nextFollowUpDate || isStalledActive || hasDocs || isMissingDocs) && (
+                            <div className="flex flex-wrap gap-1.5 mt-2.5">
+                              {/* Overdue follow up */}
+                              {c.nextFollowUpDate && (
+                                <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded flex items-center gap-1 ${
+                                  hasOverdueFollowUp 
+                                    ? "bg-red-500/10 text-red-500 border border-red-500/20" 
+                                    : "bg-teal-500/10 text-teal-500 border border-teal-500/10"
+                                }`} title="Follow-up Date">
+                                  📅 {hasOverdueFollowUp ? `Overdue` : `${c.nextFollowUpDate}`}
+                                </span>
+                              )}
+ 
+                              {/* Stalled active */}
+                              {isStalledActive && (
+                                <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1">
+                                  ⏳ Idle {daysStale}d
+                                </span>
+                              )}
+ 
+                              {/* Missing/Document Vault status */}
+                              {(() => {
+                                if (hasDocs) {
+                                  return (
+                                    <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1">
+                                      📂 {approvedCount} Clr | {reviewCount} Rev
+                                    </span>
+                                  );
+                                } else if (isMissingDocs) {
+                                  return (
+                                    <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center gap-1">
+                                      ⚠️ Docs Needed
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          )}
+ 
+                          <div className="flex justify-between items-center text-[10px] border-t border-[var(--color-divider)] pt-2 mt-2.5">
+                            <div className="flex items-center gap-1.5 min-w-0" onClick={(e) => e.stopPropagation()}>
+                              {isAdmin && onUpdateClient ? (
+                                <div className="flex items-center gap-1">
+                                  <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider shrink-0">Broker:</span>
+                                  <select
+                                    value={c.agent || ""}
+                                    onChange={(e) => {
+                                      onUpdateClient({ ...c, agent: e.target.value });
+                                    }}
+                                    className="text-[9px] font-black bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-1 py-0.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none cursor-pointer focus:border-[var(--color-accent)] transition-all font-sans max-w-[85px] truncate"
+                                    title={`Assigned Advisor: ${c.agent || 'Unassigned'}`}
+                                  >
+                                    <option value="">Unassigned</option>
+                                    {agentNames.map((name, i) => (
+                                      <option key={`${name}-${i}`} value={name}>{name.split(" ")[0]}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              ) : (
+                                <span className="px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] truncate max-w-[80px]" title={`Lead Advisor: ${c.agent || 'Unassigned'}`}>
+                                  👤 {(c.agent || "Unassigned").split(" ")[0]}
+                                </span>
+                              )}
                               
                               {/* Hover Indicator that Card opens Client File */}
-                              <span className="text-[9px] font-black text-[var(--color-accent)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-200">
-                                View File ↗
+                              <span className="text-[9px] font-bold text-[var(--color-accent)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 truncate shrink-0 ml-1">
+                                Open ↗
                               </span>
                             </div>
                             
-                            {/* Quick Move Selector */}
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">Move:</span>
-                              <select
-                                value={c.status}
-                                onChange={(e) => onUpdateClientStatus?.(c.id, e.target.value as any)}
-                                className="text-[9px] font-black bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-1.5 py-0.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none cursor-pointer focus:border-[var(--color-accent)] transition-all font-sans"
-                              >
-                                {STAGES.map(st => (
-                                  <option key={st.id} value={st.id}>{st.label}</option>
-                                ))}
-                              </select>
-                            </div>
+                            {/* Quick Move Selector (Admins Only) */}
+                            {isAdmin && (
+                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider shrink-0">Move:</span>
+                                <select
+                                  value={c.status}
+                                  onChange={(e) => onUpdateClientStatus?.(c.id, e.target.value as any)}
+                                  className="text-[9px] font-black bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-1.5 py-0.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none cursor-pointer focus:border-[var(--color-accent)] transition-all font-sans"
+                                >
+                                  {STAGES.map(st => (
+                                    <option key={st.id} value={st.id}>{st.label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
                     }) : (
-                      <div className="flex-1 flex flex-col items-center justify-center min-h-[140px] border border-dashed border-[var(--color-border)]/75 rounded-xl p-4 bg-[var(--color-surface)]/20 text-center m-1.5 shadow-inner">
-                        <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)]/50 flex items-center justify-center border border-[var(--color-border)]/40 text-[var(--color-text-faint)] mb-2">
-                          <Landmark className="w-4 h-4 opacity-70 text-[var(--color-accent)]" />
+                      <div className="flex-1 flex flex-col items-center justify-center min-h-[140px] border border-dashed border-[var(--color-border)]/40 rounded-xl p-4 bg-transparent text-center m-1.5 select-none">
+                        <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)]/30 flex items-center justify-center border border-[var(--color-border)]/10 text-[var(--color-text-faint)] mb-2">
+                          <Landmark className="w-4 h-4 opacity-40 text-[var(--color-text-muted)]" />
                         </div>
-                        <span className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider">Empty stage</span>
-                        <p className="text-[9px] text-[var(--color-text-faint)] leading-tight mt-1 max-w-[150px]">No active files are currently in this underwriting phase.</p>
+                        <span className="text-[10px] font-bold uppercase text-[var(--color-text-faint)] tracking-wider">Empty Stage</span>
+                        <p className="text-[9px] text-[var(--color-text-faint)] leading-tight mt-1 max-w-[150px] opacity-60">No active files are in this phase.</p>
                       </div>
                     )}
                   </div>

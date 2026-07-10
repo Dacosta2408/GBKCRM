@@ -174,7 +174,7 @@ export interface User {
   first: string;
   last: string;
   email: string;
-  role: 'Owner / Master Admin' | 'Super Admin' | 'IT / Developer' | 'Senior Broker' | 'Agent';
+  role: 'Developer/Admin' | 'Admin' | 'Broker';
   status: 'active' | 'inactive';
   phone?: string;
   photo?: string | null;

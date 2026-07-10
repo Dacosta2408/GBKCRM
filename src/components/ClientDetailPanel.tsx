@@ -74,6 +74,8 @@ export function ClientDetailPanel({
 }: ClientDetailPanelProps) {
   if (!currentClient) return null;
 
+  const isAdmin = ["Developer/Admin", "Admin"].includes(currentUser.role) || currentUser.isOwner === true;
+
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = React.useState(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -530,6 +532,38 @@ export function ClientDetailPanel({
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Assigned Broker / Lead Advisor Field */}
+              <div 
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm"
+                style={{
+                  background: "var(--glass-bg)",
+                  borderColor: "var(--glass-border)"
+                }}
+              >
+                <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-widest leading-none">Broker:</span>
+                {isAdmin ? (
+                  <select
+                    value={currentClient.agent || ""}
+                    onChange={(e) => {
+                      const updated = { ...currentClient, agent: e.target.value };
+                      handleUpdateClient(updated);
+                      showToast(`Assigned broker updated to ${e.target.value || "Unassigned"}`, "success", "✓");
+                    }}
+                    className="bg-transparent border-none text-[10px] font-black uppercase text-[var(--color-accent)] focus:outline-none cursor-pointer pr-1"
+                  >
+                    <option value="" className="bg-[var(--color-surface)] text-[var(--color-text)]">Unassigned</option>
+                    {getAgentNames().map(name => (
+                      <option key={name} value={name} className="bg-[var(--color-surface)] text-[var(--color-text)] font-bold uppercase">{name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-[10px] font-black uppercase text-[var(--color-text)] px-1">
+                    {currentClient.agent || "Unassigned"}
+                  </span>
+                )}
+              </div>
+
+              {/* Stage Select Field */}
               <div 
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm"
                 style={{
@@ -539,15 +573,21 @@ export function ClientDetailPanel({
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse shadow-[0_0_8px_var(--color-accent)]" />
                 <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-widest leading-none">Stage:</span>
-                <select
-                  value={currentClient.status}
-                  onChange={(e) => handleUpdateClientStatus(currentClient.id, e.target.value)}
-                  className="bg-transparent border-none text-[10px] font-black uppercase text-[var(--color-accent)] focus:outline-none cursor-pointer pr-1"
-                >
-                  {["lead", "open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
-                    <option key={st} value={st} className="bg-[var(--color-surface)] text-[var(--color-text)] font-bold uppercase">{st}</option>
-                  ))}
-                </select>
+                {isAdmin ? (
+                  <select
+                    value={currentClient.status}
+                    onChange={(e) => handleUpdateClientStatus(currentClient.id, e.target.value)}
+                    className="bg-transparent border-none text-[10px] font-black uppercase text-[var(--color-accent)] focus:outline-none cursor-pointer pr-1"
+                  >
+                    {["lead", "open", "working", "lender", "conditional", "approved", "funded", "closed"].map(st => (
+                      <option key={st} value={st} className="bg-[var(--color-surface)] text-[var(--color-text)] font-bold uppercase">{st}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-[10px] font-black uppercase text-[var(--color-accent)] px-1">
+                    {currentClient.status}
+                  </span>
+                )}
               </div>
 
               <button
@@ -822,7 +862,7 @@ export function ClientDetailPanel({
                   onOpenClient={openClient}
                   showToast={showToast}
                   agentNames={getAgentNames()}
-                  isOwnerOrManager={currentUser.role === 'Owner / Master Admin' || currentUser.role === 'Super Admin' || currentUser.role === 'IT / Developer'}
+                  isOwnerOrManager={currentUser.role === 'Developer/Admin' || currentUser.role === 'Admin'}
                   embeddedClientId={currentClient.id}
                   bridgeOnline={bridgeOnline}
                 />

@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           ) 
         },
-        ...((isOwner || currentUser.role === "Owner / Master Admin" || currentUser.role === "Super Admin" || currentUser.role === "IT / Developer") 
+        ...((isOwner || currentUser.role === "Developer/Admin" || currentUser.role === "Admin") 
           ? [{ id: "admin", label: "Admin Panel", icon: ShieldAlert, alert: true }] 
           : []),
         { id: "settings", label: "Settings", icon: Settings },

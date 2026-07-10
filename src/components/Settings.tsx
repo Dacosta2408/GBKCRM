@@ -219,7 +219,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const [newLast, setNewLast] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPhone, setNewPhone] = useState("");
-  const [newRole, setNewRole] = useState<User["role"]>("Agent");
+  const [newRole, setNewRole] = useState<User["role"]>("Broker");
   const [newPin, setNewPin] = useState("");
   const [newFsra, setNewFsra] = useState("");
   const [newEoCarrier, setNewEoCarrier] = useState("");
@@ -231,7 +231,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const [editLast, setEditLast] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
-  const [editRole, setEditRole] = useState<User["role"]>("Agent");
+  const [editRole, setEditRole] = useState<User["role"]>("Broker");
   const [editPin, setEditPin] = useState("");
   const [editStatus, setEditStatus] = useState<"active" | "inactive">("active");
   const [editFsra, setEditFsra] = useState("");
@@ -240,7 +240,7 @@ export const Settings: React.FC<SettingsProps> = ({
   const [editEoExpiry, setEditEoExpiry] = useState("");
 
   const isAdminOrManager = useMemo(() => {
-    return ["Owner / Master Admin", "Super Admin", "IT / Developer"].includes(currentUser.role);
+    return ["Developer/Admin", "Admin"].includes(currentUser.role);
   }, [currentUser]);
 
   const filteredRoster = useMemo(() => {
@@ -1241,11 +1241,9 @@ export const Settings: React.FC<SettingsProps> = ({
                             onChange={(e) => setNewRole(e.target.value as any)}
                             className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           >
-                            <option value="Agent">Agent (Standard)</option>
-                            <option value="Senior Broker">Senior Broker</option>
-                            <option value="Super Admin">Super Admin</option>
-                            <option value="IT / Developer">IT / Developer</option>
-                            <option value="Owner / Master Admin">Owner / Master Admin</option>
+                            <option value="Broker">Broker</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Developer/Admin">Developer/Admin</option>
                           </select>
                         </div>
                         <div>
@@ -1382,11 +1380,9 @@ export const Settings: React.FC<SettingsProps> = ({
                             onChange={(e) => setEditRole(e.target.value as any)}
                             className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none"
                           >
-                            <option value="Agent">Agent (Standard)</option>
-                            <option value="Senior Broker">Senior Broker</option>
-                            <option value="Super Admin">Super Admin</option>
-                            <option value="IT / Developer">IT / Developer</option>
-                            <option value="Owner / Master Admin">Owner / Master Admin</option>
+                            <option value="Broker">Broker</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Developer/Admin">Developer/Admin</option>
                           </select>
                         </div>
                         <div>

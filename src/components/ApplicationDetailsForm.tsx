@@ -22,6 +22,8 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
   lenders,
   showToast
 }) => {
+  const isAdmin = currentUser.role === "Developer/Admin" || currentUser.role === "Admin" || currentUser.isOwner === true;
+
   // --- SUB-TABS STATE ---
   type SubTabType = "personal" | "address" | "employment" | "property" | "mortgage";
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>("personal");
@@ -345,6 +347,7 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
 
       {/* 🛠️ TAB WORKSPACE */}
       <div className="flex-grow overflow-y-auto min-h-[350px] bg-[var(--color-surface)]/20 border border-[var(--color-border)] p-5 rounded-xl space-y-6">
+        <fieldset disabled={!isAdmin} className="contents">
         
         {/* 1. PERSONAL ROSTER */}
         {activeSubTab === "personal" && (
@@ -1141,15 +1144,22 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
           </div>
         )}
 
+        </fieldset>
       </div>
 
       {/* 💾 ACTION BUTTON */}
-      <button
-        type="submit"
-        className="w-full bg-[var(--color-accent)] text-[var(--color-bg)] font-black uppercase tracking-widest text-[10px] py-3.5 rounded-lg hover:bg-[var(--color-accent)]/85 hover:shadow-md transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow"
-      >
-        <Save className="w-3.5 h-3.5" /> Save Complete Mortgage Application File
-      </button>
+      {isAdmin ? (
+        <button
+          type="submit"
+          className="w-full bg-[var(--color-accent)] text-[var(--color-bg)] font-black uppercase tracking-widest text-[10px] py-3.5 rounded-lg hover:bg-[var(--color-accent)]/85 hover:shadow-md transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow"
+        >
+          <Save className="w-3.5 h-3.5" /> Save Complete Mortgage Application File
+        </button>
+      ) : (
+        <div className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] font-black uppercase tracking-widest text-[10px] py-3.5 rounded-lg text-center flex items-center justify-center gap-1.5 shrink-0 select-none">
+          🔒 READ-ONLY MODE (Admins / Operations Only)
+        </div>
+      )}
 
     </form>
   );

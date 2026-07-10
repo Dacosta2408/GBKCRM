@@ -43,7 +43,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
         {
           id: "broad_1",
           sender: "David Acosta",
-          senderRole: "Owner / Master Admin",
+          senderRole: "Developer/Admin",
           message: "⚠️ Attention Brokers: Please verify that all FSRA Ontario Licence registrations are fully uploaded to your profile vaults before tomorrow's audit cutoff.",
           type: "critical",
           timestamp: new Date(Date.now() - 3600000).toISOString(),
@@ -52,7 +52,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
         {
           id: "broad_2",
           sender: "Tim Brown",
-          senderRole: "Super Admin",
+          senderRole: "Admin",
           message: "Rate Sheet Update: TD Canada Trust has updated their 5-Year Fixed benchmark rates. Check Lender Sheets for compliance margins.",
           type: "info",
           timestamp: new Date(Date.now() - 7200000).toISOString(),

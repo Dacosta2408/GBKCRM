@@ -70,7 +70,7 @@ export function useAuth({ showToast, logActivity }: UseAuthDeps) {
   const [suFirst, setSuFirst] = useState("");
   const [suLast, setSuLast] = useState("");
   const [suEmail, setSuEmail] = useState("");
-  const [suRole, setSuRole] = useState<'Owner / Master Admin' | 'Super Admin' | 'IT / Developer' | 'Senior Broker' | 'Agent'>('Agent');
+  const [suRole, setSuRole] = useState<'Developer/Admin' | 'Admin' | 'Broker'>('Broker');
   const [suPhone, setSuPhone] = useState("");
   const [suPin, setSuPin] = useState("");
   const [suFsra, setSuFsra] = useState("");
@@ -130,7 +130,7 @@ export function useAuth({ showToast, logActivity }: UseAuthDeps) {
   }, []);
 
   // Helpers
-  const isOwner = () => currentUser.isOwner || currentUser.role === "Owner / Master Admin";
+  const isOwner = () => currentUser.isOwner || currentUser.role === "Developer/Admin";
 
   const getAgentNames = (): string[] => {
     const names = userRoster

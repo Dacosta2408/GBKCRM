@@ -24,7 +24,7 @@ export const PipelineSnapshot: React.FC<PipelineSnapshotProps> = ({
   setActiveTab,
   onOpenClient
 }) => {
-  const isManager = ["Owner / Master Admin", "Super Admin", "IT / Developer"].includes(currentUser.role);
+  const isManager = ["Developer/Admin", "Admin"].includes(currentUser.role);
   const userFullName = `${currentUser.first} ${currentUser.last}`;
 
   const [pipelineMode, setPipelineMode] = useState<"personal" | "team">(isManager ? "team" : "personal");

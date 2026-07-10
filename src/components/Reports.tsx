@@ -37,7 +37,7 @@ export const Reports: React.FC<ReportsProps> = ({
   // Owners, Master Admins, Super Admins, and Senior Brokers see overall performance.
   // Agents can only see their own reports (or they see a banner stating their scope is filtered to their ownership).
   const isPrivileged = useMemo(() => {
-    return ["Owner / Master Admin", "Super Admin", "Senior Broker", "IT / Developer"].includes(currentUser.role);
+    return ["Developer/Admin", "Admin"].includes(currentUser.role);
   }, [currentUser]);
 
   const activeAgentFilter = useMemo(() => {

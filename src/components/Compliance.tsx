@@ -66,7 +66,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
   // Check permissions: Owner/Admin see all, brokers see their own.
   const isPrivileged = useMemo(() => {
-    return ["Owner / Master Admin", "Super Admin", "Senior Broker", "IT / Developer"].includes(currentUser.role);
+    return ["Developer/Admin", "Admin"].includes(currentUser.role);
   }, [currentUser]);
 
   const activeAgentFilter = useMemo(() => {

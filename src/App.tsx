@@ -289,6 +289,25 @@ export default function App() {
     getAgentNames
   } = useAuth({ showToast, logActivity });
 
+  // --- USER SELF SERVICE STATE ---
+  const [profFirst, setProfFirst] = useState("");
+  const [profLast, setProfLast] = useState("");
+  const [profPhone, setProfPhone] = useState("");
+  const [profFsra, setProfFsra] = useState("");
+  const [profPhoto, setProfPhoto] = useState("");
+  const [profPin, setProfPin] = useState("");
+
+  useEffect(() => {
+    if (profileModalOpen && currentUser) {
+      setProfFirst(currentUser.first || "");
+      setProfLast(currentUser.last || "");
+      setProfPhone(currentUser.phone || "");
+      setProfFsra(currentUser.fsraNum || "");
+      setProfPhoto(currentUser.photo || "");
+      setProfPin(currentUser.pin || "");
+    }
+  }, [profileModalOpen, currentUser]);
+
   const {
     clients,
     setClients,
@@ -1082,6 +1101,7 @@ export default function App() {
               onSearchQueryChange={setGlobalSearch}
               docVault={docVault}
               onUpdateClientStatus={handleUpdateClientStatus}
+              currentUser={currentUser}
             />
           )}
 
@@ -1100,6 +1120,8 @@ export default function App() {
               onSearchQueryChange={setGlobalSearch}
               docVault={docVault}
               onUpdateClientStatus={handleUpdateClientStatus}
+              currentUser={currentUser}
+              onUpdateClient={handleUpdateClient}
             />
           )}
 
@@ -1200,6 +1222,7 @@ export default function App() {
               tasks={tasks}
               setTasks={setTasks}
               showToast={showToast}
+              userRoster={userRoster}
             />
           )}
 
@@ -1329,7 +1352,7 @@ export default function App() {
               onOpenClient={openClient}
               showToast={showToast}
               agentNames={getAgentNames()}
-              isOwnerOrManager={currentUser.role === 'Owner / Master Admin' || currentUser.role === 'Super Admin' || currentUser.role === 'IT / Developer'}
+              isOwnerOrManager={currentUser.role === 'Developer/Admin' || currentUser.role === 'Admin'}
               onUpdateClient={handleUpdateClient}
             />
           )}
@@ -1587,13 +1610,138 @@ export default function App() {
               {/* TAB CONTENT: PROFILE SYNC EDIT */}
               {profileTab === 'profile' && (
                 <div className="flex flex-col gap-4">
-                  <div className="bg-[var(--color-surface-2)] p-4 rounded-xl border border-[var(--color-border)]">
-                    <div className="text-xs font-black text-[var(--color-text)] mb-0.5">{currentUser.first} {currentUser.last}</div>
-                    <div className="text-[10px] text-[var(--color-accent)] font-extrabold uppercase tracking-wider mb-2">{currentUser.role}</div>
-                    <div className="text-[10px] text-[var(--color-text-muted)] flex flex-col gap-1 font-mono font-bold leading-relaxed">
-                      <span>Email: {currentUser.email}</span>
-                      {currentUser.phone && <span>Phone: {currentUser.phone}</span>}
-                      {currentUser.fsraNum && <span>Licence FSRA: {currentUser.fsraNum}</span>}
+                  <div className="bg-[var(--color-surface-2)] p-4 rounded-xl border border-[var(--color-border)] flex flex-col gap-3">
+                    <div className="flex items-center gap-3 border-b pb-2 mb-1" style={{ borderColor: "var(--color-divider)" }}>
+                      {profPhoto ? (
+                        <img 
+                          src={profPhoto} 
+                          alt={profFirst} 
+                          referrerPolicy="no-referrer"
+                          className="w-10 h-10 rounded-full object-cover border border-[var(--color-accent)]" 
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 flex items-center justify-center text-xs font-bold text-[var(--color-accent)] uppercase">
+                          {profFirst[0] || ""}{profLast[0] || ""}
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-xs font-black text-[var(--color-text)]">{currentUser.first} {currentUser.last}</div>
+                        <div className="text-[10px] text-[var(--color-accent)] font-extrabold uppercase tracking-wider">{currentUser.role}</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">First Name</label>
+                        <input 
+                          type="text" 
+                          value={profFirst}
+                          onChange={(e) => setProfFirst(e.target.value)}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">Last Name</label>
+                        <input 
+                          type="text" 
+                          value={profLast}
+                          onChange={(e) => setProfLast(e.target.value)}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">Phone</label>
+                        <input 
+                          type="text" 
+                          value={profPhone}
+                          onChange={(e) => setProfPhone(e.target.value)}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">FSRA Licence</label>
+                        <input 
+                          type="text" 
+                          value={profFsra}
+                          onChange={(e) => setProfFsra(e.target.value)}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">Security PIN (4-digit)</label>
+                        <input 
+                          type="password" 
+                          maxLength={4}
+                          value={profPin}
+                          onChange={(e) => setProfPin(e.target.value.replace(/\D/g, ""))}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-black tracking-widest mb-1">Avatar Photo URL</label>
+                        <input 
+                          type="text" 
+                          placeholder="https://..."
+                          value={profPhoto}
+                          onChange={(e) => setProfPhoto(e.target.value)}
+                          className="w-full bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-semibold"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end mt-1">
+                      <button
+                        onClick={async () => {
+                          if (!profFirst || !profLast || !profPin) {
+                            showToast("First name, Last name, and security PIN are required.", "error");
+                            return;
+                          }
+                          if (profPin.length !== 4) {
+                            showToast("Security PIN must be exactly 4 digits.", "error");
+                            return;
+                          }
+                          const plainPin = profPin;
+                          const encryptedPin = await encryptValue(plainPin, plainPin);
+                          const pinHash = await hashPin(plainPin, currentUser.id);
+
+                          const updatedUserForRoster = {
+                            ...currentUser,
+                            first: profFirst,
+                            last: profLast,
+                            phone: profPhone,
+                            fsraNum: profFsra,
+                            photo: profPhoto || null,
+                            pin: encryptedPin,
+                            pinHash
+                          };
+
+                          const updatedUserInMemory = {
+                            ...currentUser,
+                            first: profFirst,
+                            last: profLast,
+                            phone: profPhone,
+                            fsraNum: profFsra,
+                            photo: profPhoto || null,
+                            pin: profPin
+                          };
+
+                          setCurrentUser(updatedUserInMemory);
+                          const updatedRoster = userRoster.map(u => u.id === currentUser.id ? updatedUserForRoster : u);
+                          setUserRoster(updatedRoster);
+                          localStorage.setItem("gbk_roster", JSON.stringify(updatedRoster));
+                          logActivity(`Updated personal profile details`, currentUser.email);
+                          showToast("Profile details updated successfully!", "success", "👤");
+                        }}
+                        className="bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-text-inverse)] font-black uppercase text-[9px] px-3 py-1.5 rounded-lg tracking-wider cursor-pointer shadow-sm transition-all"
+                      >
+                        Save Profile Details
+                      </button>
                     </div>
                   </div>
 
@@ -1833,10 +1981,9 @@ export default function App() {
                       onChange={(e) => setSuRole(e.target.value as any)}
                       className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-all font-bold cursor-pointer"
                     >
-                      <option value="Agent">🏡 Licensed Mortgage Agent</option>
-                      <option value="Senior Broker">🥇 Senior Broker Consultant</option>
-                      <option value="Super Admin">💼 Operations Super Admin</option>
-                      <option value="Owner / Master Admin">👑 Owner / Master Director</option>
+                      <option value="Broker">🏡 Broker / Lead Advisor</option>
+                      <option value="Admin">💼 Operations Admin</option>
+                      <option value="Developer/Admin">👑 Developer / Master Admin</option>
                     </select>
                   </div>
 
