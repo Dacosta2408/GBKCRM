@@ -428,8 +428,8 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
                   className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 text-xs rounded-lg p-2 font-bold uppercase text-[var(--color-text)] focus:outline-none cursor-pointer"
                 >
                   <option value="all" className="bg-[var(--color-surface)]">All Brokers</option>
-                  {agentNames.map(name => (
-                    <option key={name} value={name} className="bg-[var(--color-surface)]">{name}</option>
+                  {agentNames.map((name, i) => (
+                    <option key={`${name}-${i}`} value={name} className="bg-[var(--color-surface)]">{name}</option>
                   ))}
                 </select>
               </div>
@@ -868,9 +868,9 @@ export const FileReadiness: React.FC<FileReadinessProps> = ({
             </h3>
 
             <div className="space-y-2">
-              {agentNames.map(name => (
+              {agentNames.map((name, i) => (
                 <button
-                  key={name}
+                  key={`${name}-${i}`}
                   onClick={() => handleAssignBroker(assigningClientId, name)}
                   className="w-full text-left bg-[var(--color-surface-2)]/50 hover:bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 p-2.5 rounded-lg text-[var(--color-text)] font-bold text-xs uppercase flex items-center justify-between transition-colors"
                 >

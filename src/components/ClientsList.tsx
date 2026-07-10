@@ -153,6 +153,12 @@ export const ClientsList: React.FC<ClientsListProps> = ({
       label: "Funded", 
       color: "var(--color-accent)", 
       style: "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 shadow-sm" 
+    },
+    {
+      id: "closed",
+      label: "Closed",
+      color: "#64748b",
+      style: "bg-slate-500/10 text-slate-500 border border-slate-500/20 shadow-sm"
     }
   ];
 
@@ -199,8 +205,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               className="bg-transparent border-none text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer font-bold"
             >
               <option value="" className="bg-[var(--color-surface-2)] text-[var(--color-text)]">All Advisors</option>
-              {agentNames.map(name => (
-                <option key={name} value={name} className="bg-[var(--color-surface-2)] text-[var(--color-text)]">{name}</option>
+              {agentNames.map((name, i) => (
+                <option key={`${name}-${i}`} value={name} className="bg-[var(--color-surface-2)] text-[var(--color-text)]">{name}</option>
               ))}
             </select>
           </div>
@@ -441,7 +447,29 @@ export const ClientsList: React.FC<ClientsListProps> = ({
             {STAGES.map((s) => {
               const pipelineClients = getPipelineClients();
               const colClients = pipelineClients.filter(c => c.status === s.id);
-              const colValue = colClients.reduce((sum, c) => sum + pn(c.mtgamt), 0);
+              const colValue = colClients.reduce((sum, c) => sum + pn(c.mtgamt || c.mortgageAmount), 0);
+
+              // Calculate stage-level counts for attention-needed indicators
+              let stalledCount = 0;
+              let missingDocsCount = 0;
+              let overdueFollowUpCount = 0;
+
+              colClients.forEach(c => {
+                const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
+                const isStalledActive = (c.status !== "funded" && c.status !== "closed") && (daysStale > 14);
+                if (isStalledActive) stalledCount++;
+
+                const hasOverdueFollowUp = c.nextFollowUpDate && (new Date(c.nextFollowUpDate) < new Date());
+                if (hasOverdueFollowUp) overdueFollowUpCount++;
+
+                const clientDocs = docVault ? docVault[c.id] || {} : {};
+                const docs = Object.values(clientDocs) as any[];
+                const approvedCount = docs.filter(d => d.status === "approved" || d.status === "verified").length;
+                const reviewCount = docs.filter(d => d.status === "received").length;
+                const hasDocs = approvedCount > 0 || reviewCount > 0;
+                const isActiveStage = ["working", "lender", "conditional"].includes(c.status);
+                if (isActiveStage && !hasDocs) missingDocsCount++;
+              });
 
               return (
                 <div 
@@ -449,13 +477,36 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   className="w-80 h-full flex flex-col rounded-2xl max-h-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm"
                 >
                   {/* Column Header */}
-                  <div className="p-4 border-b flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]/50 rounded-t-2xl" style={{ borderColor: "var(--color-divider)" }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
-                      <h4 className="text-xs font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]/50">{colClients.length}</span>
+                  <div className="p-3 border-b flex flex-col gap-2 shrink-0 bg-[var(--color-surface-2)]/60 rounded-t-2xl" style={{ borderColor: "var(--color-divider)" }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: s.color, boxShadow: `0 0 8px ${s.color}` }}></div>
+                        <h4 className="text-[11px] font-black uppercase tracking-wider text-[var(--color-text)]">{s.label}</h4>
+                      </div>
+                      <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
                     </div>
-                    <span className="text-xs font-bold font-mono text-[var(--color-accent)]">{fdShort(colValue)}</span>
+                    
+                    {/* Stage Metrics Summary Row */}
+                    <div className="flex items-center gap-1.5 text-[9px] font-bold">
+                      <span className="text-[var(--color-text-muted)] bg-[var(--color-surface-3)] border border-[var(--color-border)]/50 px-1.5 py-0.5 rounded-md">
+                        {colClients.length} {colClients.length === 1 ? "file" : "files"}
+                      </span>
+                      {overdueFollowUpCount > 0 && (
+                        <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Overdue follow-ups">
+                          📅 {overdueFollowUpCount}
+                        </span>
+                      )}
+                      {stalledCount > 0 && (
+                        <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Stalled files">
+                          ⏳ {stalledCount}
+                        </span>
+                      )}
+                      {missingDocsCount > 0 && (
+                        <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-0.5" title="Missing documents">
+                          ⚠️ {missingDocsCount}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Column Body Cards Area */}
@@ -519,7 +570,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                                 ? "border-l-amber-500 border-[var(--color-border)] hover:border-amber-500/40 bg-amber-500/5 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]"
                                 : isMissingDocs
                                   ? "border-l-orange-500 border-[var(--color-border)] hover:border-orange-500/40 bg-orange-500/5 hover:shadow-[0_0_15px_rgba(249,115,22,0.15)]"
-                                  : "border-l-teal-500 border-[var(--color-border)] hover:border-var(--color-accent)/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
+                                  : "border-l-teal-500 border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
                           }`}
                         >
                           <div className="flex justify-between items-start gap-2 mb-1.5">
@@ -580,9 +631,16 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                           </div>
 
                           <div className="flex justify-between items-center text-[10px] border-t border-[var(--color-divider)] pt-2 mt-2">
-                            <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[100px] truncate">
-                              👤 {(c.agent || "Unassigned").split(" ")[0]}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[100px] truncate">
+                                👤 {(c.agent || "Unassigned").split(" ")[0]}
+                              </span>
+                              
+                              {/* Hover Indicator that Card opens Client File */}
+                              <span className="text-[9px] font-black text-[var(--color-accent)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-200">
+                                View File ↗
+                              </span>
+                            </div>
                             
                             {/* Quick Move Selector */}
                             <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>

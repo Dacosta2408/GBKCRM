@@ -132,7 +132,13 @@ export function useAuth({ showToast, logActivity }: UseAuthDeps) {
   // Helpers
   const isOwner = () => currentUser.isOwner || currentUser.role === "Owner / Master Admin";
 
-  const getAgentNames = () => userRoster.filter(u => u.status === "active").map(u => u.first + " " + u.last);
+  const getAgentNames = (): string[] => {
+    const names = userRoster
+      .filter(u => u.status === "active")
+      .map(u => `${u.first || ""} ${u.last || ""}`.trim())
+      .filter(Boolean);
+    return Array.from(new Set(names)) as string[];
+  };
 
   // ─── LOGIN OVERLAY HANDLE ───
   async function handleUnlock() {

@@ -195,7 +195,7 @@ export const AIIntake: React.FC<AIIntakeProps> = ({
                   className="w-full bg-transparent text-xs text-[var(--color-text)] focus:outline-none border-none pr-3"
                 >
                   <option value="" className="bg-[var(--color-surface)]">Select advisor</option>
-                  {agentNames.map(name => <option key={name} value={name} className="bg-[var(--color-surface)]">{name}</option>)}
+                  {agentNames.map((name, i) => <option key={`${name}-${i}`} value={name} className="bg-[var(--color-surface)]">{name}</option>)}
                 </select>
               </div>
 
