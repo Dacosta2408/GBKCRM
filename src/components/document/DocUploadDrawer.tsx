@@ -198,12 +198,17 @@ export const DocUploadDrawer: React.FC<DocUploadDrawerProps> = ({
     let isSynced = false;
     if (bridgeOnline) {
       setUploadStepMsg("Syncing files to Z Drive Network Bridge...");
-      const fileToUpload = realFile || new File(["GBK Secured Document Backup Content"], finalName, { type: "application/pdf" });
-      const success = await uploadDocument(client.id, fileToUpload);
-      if (success) {
-        isSynced = true;
-      } else {
-        showToast("Bridge upload failed, queueing offline...", "info", "🔌");
+      try {
+        const fileToUpload = realFile || new File(["GBK Secured Document Backup Content"], finalName, { type: "application/pdf" });
+        const success = await uploadDocument(client.id, fileToUpload);
+        if (success) {
+          isSynced = true;
+        } else {
+          showToast("Bridge upload failed, queueing offline...", "info", "🔌");
+        }
+      } catch (err: any) {
+        console.error("Bridge upload threw exception:", err);
+        showToast("Bridge upload error, queueing offline...", "info", "🔌");
       }
     } else {
       showToast("Bridge server offline, queueing offline...", "info", "🔌");

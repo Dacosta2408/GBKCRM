@@ -87,7 +87,10 @@ export function ClientDetailPanel({
       
       let docsList: any[] = [];
       try {
-        docsList = await getClientDocuments(currentClient.id);
+        const fetched = await getClientDocuments(currentClient.id);
+        if (Array.isArray(fetched)) {
+          docsList = fetched;
+        }
       } catch (err) {
         console.error("Failed to fetch documents via bridge, falling back to local vault:", err);
       }
@@ -144,12 +147,21 @@ export function ClientDetailPanel({
       // Section 1: Client Summary
       drawSectionHeader("Borrower Profile & File Metadata");
 
+      const rawCreated = currentClient.createdAt;
+      const rawUpdated = currentClient.updatedAt || currentClient.createdAt;
+      
+      const createdDate = rawCreated ? new Date(rawCreated) : new Date();
+      const updatedDate = rawUpdated ? new Date(rawUpdated) : new Date();
+      
+      const filingDateStr = isNaN(createdDate.getTime()) ? new Date().toLocaleDateString("en-CA") : createdDate.toLocaleDateString("en-CA");
+      const lastActivityStr = isNaN(updatedDate.getTime()) ? filingDateStr : updatedDate.toLocaleDateString("en-CA");
+
       const summaryData = [
         ["Full Name:", `${currentClient.first} ${currentClient.last}`, "Email Address:", currentClient.email || "—"],
         ["File Type / Goal:", currentClient.type || "Purchase File", "Cell Phone:", currentClient.cell || "—"],
         ["Current Stage:", (currentClient.status || "Lead").toUpperCase(), "Lender Partner:", currentClient.lender || "—"],
         ["Lead Advisor:", currentClient.agent || "Unassigned", "Date of Birth:", currentClient.dob || "—"],
-        ["Filing Date:", new Date(currentClient.createdAt).toLocaleDateString("en-CA"), "Last Activity:", new Date(currentClient.updatedAt || currentClient.createdAt).toLocaleDateString("en-CA")]
+        ["Filing Date:", filingDateStr, "Last Activity:", lastActivityStr]
       ];
 
       autoTable(doc, {
@@ -333,7 +345,7 @@ export function ClientDetailPanel({
       // Section 5: Documents section
       drawSectionHeader("Document Verification & Checklist");
 
-      const clientVault = docVault[currentClient.id] || {};
+      const clientVault = (docVault && docVault[currentClient.id]) || {};
       const activeRules = CHECKLIST_RULES.filter(rule => rule.evaluate(currentClient));
 
       const customRules: any[] = [];
@@ -599,10 +611,23 @@ export function ClientDetailPanel({
                 const debts = pn(currentClient.debts);
                 const tds = inc > 0 ? ((monthlyMtg + tax + condo + heat + debts) / (inc / 12) * 100) : 0;
 
+                const clientVault = (docVault && docVault[currentClient.id]) || {};
+                const activeRules = CHECKLIST_RULES.filter(rule => rule.evaluate(currentClient));
+                const totalRequired = activeRules.length;
+                const approvedCount = activeRules.filter(rule => {
+                  const saved = clientVault[rule.id] || {};
+                  return saved.status === "approved" || saved.status === "verified";
+                }).length;
+                const completenessPercent = totalRequired > 0 ? Math.round((approvedCount / totalRequired) * 100) : 100;
+                const missingCount = activeRules.filter(rule => {
+                  const saved = clientVault[rule.id] || {};
+                  return !saved.status || saved.status === "required";
+                }).length;
+
                 return (
                   <div className="flex flex-col gap-5">
                     {/* Rich Client Summary Header Cards */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="glass-card p-4 flex flex-col justify-between">
                         <div>
                           <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">Mortgage Requested</div>
@@ -620,6 +645,27 @@ export function ClientDetailPanel({
                         </div>
                         <div className="text-[9px] text-[var(--color-text-faint)] font-bold mt-2.5 border-t border-[var(--color-border)] pt-2">
                           LTV Ratio: <span className="font-extrabold text-[var(--color-accent)]">{prop > 0 ? ((mtg / prop) * 100).toFixed(1) : "0.0"}%</span>
+                        </div>
+                      </div>
+
+                      <div className="glass-card p-4 flex flex-col justify-between">
+                        <div>
+                          <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">File Completeness</div>
+                          <div className="flex items-baseline gap-1.5 mt-1">
+                            <span className="text-xl font-black text-[var(--color-text)]">{completenessPercent}%</span>
+                            <span className="text-[10px] font-bold text-[var(--color-text-muted)]">({approvedCount}/{totalRequired} docs)</span>
+                          </div>
+                        </div>
+                        <div className="mt-2.5 border-t border-[var(--color-border)] pt-2 flex flex-col gap-1">
+                          <div className="w-full bg-[var(--color-surface-2)] h-1 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-emerald-500 h-full rounded-full transition-all duration-500" 
+                              style={{ width: `${completenessPercent}%` }}
+                            />
+                          </div>
+                          <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">
+                            {missingCount > 0 ? `${missingCount} required files missing` : "All compliance files submitted"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -668,6 +714,55 @@ export function ClientDetailPanel({
                       >
                         📝 Go to Application Details
                       </button>
+                    </div>
+
+                    {/* Action & Timeline panel */}
+                    <div className="glass-card p-4.5 bg-gradient-to-r from-[var(--color-surface-2)]/20 to-[var(--color-surface-2)]/40 rounded-xl border border-[var(--color-border)]">
+                      <div className="flex items-center justify-between mb-3 border-b border-[var(--color-border)] pb-2 flex-wrap gap-2">
+                        <h4 className="text-[9px] uppercase font-black tracking-widest text-[var(--color-accent)]">File Action Plan & Stamp</h4>
+                        {currentClient.updatedAt && (
+                          <span className="text-[8px] text-[var(--color-text-faint)] font-mono font-black uppercase">
+                            LAST UPDATED: {new Date(currentClient.updatedAt).toLocaleString("en-CA")}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col justify-between">
+                          <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">Next Follow-Up Action</div>
+                          {currentClient.nextFollowUpDate ? (() => {
+                            const isOverdue = new Date(currentClient.nextFollowUpDate) < new Date();
+                            return (
+                              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${isOverdue ? "bg-red-500 text-white animate-pulse" : "bg-amber-500/10 text-amber-500 border border-amber-500/20"}`}>
+                                  {isOverdue ? "⚠️ Overdue" : "📅 Scheduled"}
+                                </span>
+                                <span className="text-xs font-bold text-[var(--color-text)]">
+                                  {currentClient.nextFollowUpDate}
+                                </span>
+                              </div>
+                            );
+                          })() : (
+                            <span className="text-xs font-bold text-[var(--color-text-faint)] italic mt-2 block">No follow-up date scheduled</span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col justify-between border-t md:border-t-0 md:border-l border-[var(--color-border)] pt-3 md:pt-0 md:pl-4">
+                          <div className="text-[9px] text-[var(--color-text-muted)] uppercase font-extrabold tracking-wider">File Health Check</div>
+                          <div className="mt-2 flex items-center gap-2">
+                            {missingCount > 0 ? (
+                              <>
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                <span className="text-xs font-bold text-[var(--color-text)]">Attention Required ({missingCount} Missing Files)</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                <span className="text-xs font-bold text-[var(--color-text)]">Fully Compliant & Complete</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* General Borrower Details Grid */}

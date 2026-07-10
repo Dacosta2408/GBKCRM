@@ -618,6 +618,44 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
                       <option value="Other">Other</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Years at Residence</label>
+                    <input type="number" value={fields.co_res_yrs || ""} onChange={(e) => handleFieldChange("co_res_yrs", e.target.value)} placeholder="Years" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono text-center font-bold" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Months at Residence</label>
+                    <input type="number" value={fields.co_res_mos || ""} onChange={(e) => handleFieldChange("co_res_mos", e.target.value)} placeholder="Months" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono text-center" />
+                  </div>
+                </div>
+              )}
+
+              {fields.co_address_same !== "1" && fields.co_res_yrs && parseInt(fields.co_res_yrs, 10) < 3 && (
+                <div className="bg-[var(--color-surface-2)]/30 border border-amber-500/20 p-4 rounded-xl space-y-4 animate-fade-in mt-3">
+                  <h4 className="text-[10px] text-amber-400 uppercase font-black tracking-wider flex items-center gap-1.5 border-b border-[var(--color-border)] pb-2">
+                    <AlertCircle className="w-3.5 h-3.5" /> Co-Applicant Previous Address (Required - Under 3 yrs residency)
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Previous Street Address</label>
+                      <input type="text" value={fields.co_prev_addr || ""} onChange={(e) => handleFieldChange("co_prev_addr", e.target.value)} placeholder="Previous Street" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Unit</label>
+                      <input type="text" value={fields.co_prev_unit || ""} onChange={(e) => handleFieldChange("co_prev_unit", e.target.value)} placeholder="Apt #" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">City</label>
+                      <input type="text" value={fields.co_prev_city || ""} onChange={(e) => handleFieldChange("co_prev_city", e.target.value)} placeholder="City" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Province</label>
+                      <input type="text" value={fields.co_prev_prov || ""} onChange={(e) => handleFieldChange("co_prev_prov", e.target.value)} placeholder="ON" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none text-center" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Postal Code</label>
+                      <input type="text" value={fields.co_prev_post || ""} onChange={(e) => handleFieldChange("co_prev_post", e.target.value)} placeholder="Postal" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none text-center font-mono" />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -659,40 +697,105 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
 
               {/* Salaried Layout */}
               {fields.app_inc_employed === "1" && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Company / Employer Name</label>
-                    <input type="text" value={fields.app_emp1_name || ""} onChange={(e) => handleFieldChange("app_emp1_name", e.target.value)} placeholder="Employer Name" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Job Title</label>
-                    <input type="text" value={fields.app_emp1_title || ""} onChange={(e) => handleFieldChange("app_emp1_title", e.target.value)} placeholder="Title" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Industry Status</label>
-                    <select value={fields.app_emp1_status || "Full Time Salaried"} onChange={(e) => handleFieldChange("app_emp1_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
-                      <option value="Full Time Salaried">Full Time Salaried</option>
-                      <option value="Part-Time Employee">Part-Time Employee</option>
-                      <option value="Contract worker">Contract worker</option>
-                      <option value="Seasonal worker">Seasonal worker</option>
-                      <option value="Retired / Pensioner">Retired / Pensioner</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Annual Base Income ($)</label>
-                    <input type="number" value={fields.app_emp1_income || ""} onChange={(e) => handleFieldChange("app_emp1_income", e.target.value)} placeholder="Annual Income" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Time on Job (Years)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="number" value={fields.app_emp1_yrs || ""} onChange={(e) => handleFieldChange("app_emp1_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
-                      <input type="number" value={fields.app_emp1_mos || ""} onChange={(e) => handleFieldChange("app_emp1_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                <div className="space-y-4 animate-fade-in">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Company / Employer Name</label>
+                      <input type="text" value={fields.app_emp1_name || ""} onChange={(e) => handleFieldChange("app_emp1_name", e.target.value)} placeholder="Employer Name" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Job Title</label>
+                      <input type="text" value={fields.app_emp1_title || ""} onChange={(e) => handleFieldChange("app_emp1_title", e.target.value)} placeholder="Title" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Industry Status</label>
+                      <select value={fields.app_emp1_status || "Full Time Salaried"} onChange={(e) => handleFieldChange("app_emp1_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
+                        <option value="Full Time Salaried">Full Time Salaried</option>
+                        <option value="Part-Time Employee">Part-Time Employee</option>
+                        <option value="Contract worker">Contract worker</option>
+                        <option value="Seasonal worker">Seasonal worker</option>
+                        <option value="Retired / Pensioner">Retired / Pensioner</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Annual Base Income ($)</label>
+                      <input type="number" value={fields.app_emp1_income || ""} onChange={(e) => handleFieldChange("app_emp1_income", e.target.value)} placeholder="Annual Income" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Time on Job (Years)</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input type="number" value={fields.app_emp1_yrs || ""} onChange={(e) => handleFieldChange("app_emp1_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                        <input type="number" value={fields.app_emp1_mos || ""} onChange={(e) => handleFieldChange("app_emp1_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Employer Phone</label>
+                      <input type="text" value={fields.app_emp1_tel || ""} onChange={(e) => handleFieldChange("app_emp1_tel", e.target.value)} placeholder="Employer Tel" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono" />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Employer Phone</label>
-                    <input type="text" value={fields.app_emp1_tel || ""} onChange={(e) => handleFieldChange("app_emp1_tel", e.target.value)} placeholder="Employer Tel" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono" />
+
+                  {/* Secondary Job (Optional) */}
+                  <div className="bg-[var(--color-surface-3)]/40 border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                    <span className="text-[9px] text-teal-500 uppercase font-extrabold tracking-wider block">Secondary Employer Details (If applicable)</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Employer Name</label>
+                        <input type="text" value={fields.app_emp2_name || ""} onChange={(e) => handleFieldChange("app_emp2_name", e.target.value)} placeholder="Second Job Ltd." className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Job Title</label>
+                        <input type="text" value={fields.app_emp2_title || ""} onChange={(e) => handleFieldChange("app_emp2_title", e.target.value)} placeholder="Associate" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Gross Annual Income ($)</label>
+                        <input type="number" value={fields.app_emp2_income || ""} onChange={(e) => handleFieldChange("app_emp2_income", e.target.value)} placeholder="25000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Time on Job (Years / Months)</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="number" value={fields.app_emp2_yrs || ""} onChange={(e) => handleFieldChange("app_emp2_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                          <input type="number" value={fields.app_emp2_mos || ""} onChange={(e) => handleFieldChange("app_emp2_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Status</label>
+                        <select value={fields.app_emp2_status || ""} onChange={(e) => handleFieldChange("app_emp2_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
+                          <option value="">Select</option>
+                          <option value="Part Time">Part Time</option>
+                          <option value="Full Time">Full Time</option>
+                          <option value="Contract">Contract</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Previous Job (Required if under 3 years) */}
+                  {fields.app_emp1_yrs && parseInt(fields.app_emp1_yrs, 10) < 3 && (
+                    <div className="bg-[var(--color-surface-3)]/40 border border-amber-500/20 p-4 rounded-xl space-y-3">
+                      <span className="text-[9px] text-amber-500 uppercase font-extrabold tracking-wider block">Previous Employer Details (Required - Under 3 yrs on job)</span>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Employer Name</label>
+                          <input type="text" value={fields.app_prev_emp_name || ""} onChange={(e) => handleFieldChange("app_prev_emp_name", e.target.value)} placeholder="Old Company Corp" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Job Title</label>
+                          <input type="text" value={fields.app_prev_emp_title || ""} onChange={(e) => handleFieldChange("app_prev_emp_title", e.target.value)} placeholder="Specialist" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Gross Annual Income ($)</label>
+                          <input type="number" value={fields.app_prev_emp_income || ""} onChange={(e) => handleFieldChange("app_prev_emp_income", e.target.value)} placeholder="75000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Time on Job (Years / Months)</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="number" value={fields.app_prev_emp_yrs || ""} onChange={(e) => handleFieldChange("app_prev_emp_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                            <input type="number" value={fields.app_prev_emp_mos || ""} onChange={(e) => handleFieldChange("app_prev_emp_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -769,34 +872,100 @@ export const ApplicationDetailsForm: React.FC<ApplicationDetailsFormProps> = ({
 
               {/* Salaried Layout */}
               {fields.co_inc_employed === "1" && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Company Name</label>
-                    <input type="text" value={fields.co_emp1_name || ""} onChange={(e) => handleFieldChange("co_emp1_name", e.target.value)} placeholder="Co Employer" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Job Title</label>
-                    <input type="text" value={fields.co_emp1_title || ""} onChange={(e) => handleFieldChange("co_emp1_title", e.target.value)} placeholder="Co Job Title" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Employment Status</label>
-                    <select value={fields.co_emp1_status || "Full Time Salaried"} onChange={(e) => handleFieldChange("co_emp1_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
-                      <option value="Full Time Salaried">Full Time Salaried</option>
-                      <option value="Part-Time Employee">Part-Time Employee</option>
-                      <option value="Contract worker">Contract worker</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Annual Income ($)</label>
-                    <input type="number" value={fields.co_emp1_income || ""} onChange={(e) => handleFieldChange("co_emp1_income", e.target.value)} placeholder="Co Salary" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Time on Job (Years)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="number" value={fields.co_emp1_yrs || ""} onChange={(e) => handleFieldChange("co_emp1_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
-                      <input type="number" value={fields.co_emp1_mos || ""} onChange={(e) => handleFieldChange("co_emp1_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                <div className="space-y-4 animate-fade-in">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Company Name</label>
+                      <input type="text" value={fields.co_emp1_name || ""} onChange={(e) => handleFieldChange("co_emp1_name", e.target.value)} placeholder="Co Employer" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Job Title</label>
+                      <input type="text" value={fields.co_emp1_title || ""} onChange={(e) => handleFieldChange("co_emp1_title", e.target.value)} placeholder="Co Job Title" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Employment Status</label>
+                      <select value={fields.co_emp1_status || "Full Time Salaried"} onChange={(e) => handleFieldChange("co_emp1_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
+                        <option value="Full Time Salaried">Full Time Salaried</option>
+                        <option value="Part-Time Employee">Part-Time Employee</option>
+                        <option value="Contract worker">Contract worker</option>
+                        <option value="Seasonal worker">Seasonal worker</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Co Annual Income ($)</label>
+                      <input type="number" value={fields.co_emp1_income || ""} onChange={(e) => handleFieldChange("co_emp1_income", e.target.value)} placeholder="Co Salary" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black tracking-wider mb-1">Time on Job (Years)</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input type="number" value={fields.co_emp1_yrs || ""} onChange={(e) => handleFieldChange("co_emp1_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                        <input type="number" value={fields.co_emp1_mos || ""} onChange={(e) => handleFieldChange("co_emp1_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                      </div>
                     </div>
                   </div>
+
+                  {/* Secondary Job (Optional) */}
+                  <div className="bg-[var(--color-surface-3)]/40 border border-[var(--color-border)] p-4 rounded-xl space-y-3">
+                    <span className="text-[9px] text-teal-500 uppercase font-extrabold tracking-wider block">Secondary Employer Details (If applicable)</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Employer Name</label>
+                        <input type="text" value={fields.co_emp2_name || ""} onChange={(e) => handleFieldChange("co_emp2_name", e.target.value)} placeholder="Second Job Ltd." className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Job Title</label>
+                        <input type="text" value={fields.co_emp2_title || ""} onChange={(e) => handleFieldChange("co_emp2_title", e.target.value)} placeholder="Associate" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Gross Annual Income ($)</label>
+                        <input type="number" value={fields.co_emp2_income || ""} onChange={(e) => handleFieldChange("co_emp2_income", e.target.value)} placeholder="25000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Time on Job (Years / Months)</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="number" value={fields.co_emp2_yrs || ""} onChange={(e) => handleFieldChange("co_emp2_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                          <input type="number" value={fields.co_emp2_mos || ""} onChange={(e) => handleFieldChange("co_emp2_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Status</label>
+                        <select value={fields.co_emp2_status || ""} onChange={(e) => handleFieldChange("co_emp2_status", e.target.value)} className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-bold">
+                          <option value="">Select</option>
+                          <option value="Part Time">Part Time</option>
+                          <option value="Full Time">Full Time</option>
+                          <option value="Contract">Contract</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Previous Job (Required if under 3 years) */}
+                  {fields.co_emp1_yrs && parseInt(fields.co_emp1_yrs, 10) < 3 && (
+                    <div className="bg-[var(--color-surface-3)]/40 border border-amber-500/20 p-4 rounded-xl space-y-3">
+                      <span className="text-[9px] text-amber-500 uppercase font-extrabold tracking-wider block">Previous Employer Details (Required - Under 3 yrs on job)</span>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Employer Name</label>
+                          <input type="text" value={fields.co_prev_emp_name || ""} onChange={(e) => handleFieldChange("co_prev_emp_name", e.target.value)} placeholder="Old School Corp" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Job Title</label>
+                          <input type="text" value={fields.co_prev_emp_title || ""} onChange={(e) => handleFieldChange("co_prev_emp_title", e.target.value)} placeholder="Specialist" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Gross Annual Income ($)</label>
+                          <input type="number" value={fields.co_prev_emp_income || ""} onChange={(e) => handleFieldChange("co_prev_emp_income", e.target.value)} placeholder="75000" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2.5 text-xs text-[var(--color-text)] focus:outline-none font-mono font-bold" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-black mb-1">Time on Job (Years / Months)</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="number" value={fields.co_prev_emp_yrs || ""} onChange={(e) => handleFieldChange("co_prev_emp_yrs", e.target.value)} placeholder="Yrs" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                            <input type="number" value={fields.co_prev_emp_mos || ""} onChange={(e) => handleFieldChange("co_prev_emp_mos", e.target.value)} placeholder="Mos" className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-2 text-xs text-[var(--color-text)] text-center font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

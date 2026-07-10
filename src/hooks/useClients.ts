@@ -46,6 +46,16 @@ export function useClients({
     localStorage.setItem("gbk_clients", JSON.stringify(clients));
   }, [clients]);
 
+  // Keep currentClient in sync with the clients master list to prevent stale state
+  useEffect(() => {
+    if (currentClient) {
+      const latest = clients.find(c => c.id === currentClient.id);
+      if (latest && JSON.stringify(latest) !== JSON.stringify(currentClient)) {
+        setCurrentClient(latest);
+      }
+    }
+  }, [clients, currentClient]);
+
   // Double click or context opener
   function openClient(id: string, initialTab?: string) {
     const target = clients.find(cl => cl.id === id);
@@ -85,16 +95,20 @@ export function useClients({
   }
 
   async function handleUpdateClient(updatedClient: Client) {
-    const updated = clients.map(c => c.id === updatedClient.id ? updatedClient : c);
+    const updatedClientWithTime = {
+      ...updatedClient,
+      updatedAt: updatedClient.updatedAt || new Date().toISOString()
+    };
+    const updated = clients.map(c => c.id === updatedClientWithTime.id ? updatedClientWithTime : c);
     setClients(updated);
-    if (currentClient && currentClient.id === updatedClient.id) {
-      setCurrentClient(updatedClient);
+    if (currentClient && currentClient.id === updatedClientWithTime.id) {
+      setCurrentClient(updatedClientWithTime);
     }
     
-    logActivity("Updated client details", `${updatedClient.first} ${updatedClient.last}`);
+    logActivity("Updated client details", `${updatedClientWithTime.first} ${updatedClientWithTime.last}`);
     logActivityEvent({
-      clientId: updatedClient.id,
-      clientName: `${updatedClient.first} ${updatedClient.last}`,
+      clientId: updatedClientWithTime.id,
+      clientName: `${updatedClientWithTime.first} ${updatedClientWithTime.last}`,
       eventType: "client_update",
       user: `${currentUser.first} ${currentUser.last}`,
       timestamp: new Date().toISOString(),
@@ -103,7 +117,7 @@ export function useClients({
 
     const online = await checkBridgeHealth();
     if (online) {
-      await updateClient(updatedClient.id, updatedClient);
+      await updateClient(updatedClientWithTime.id, updatedClientWithTime);
     }
   }
 
