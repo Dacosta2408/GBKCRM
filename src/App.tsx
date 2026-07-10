@@ -1081,6 +1081,7 @@ export default function App() {
               searchQuery={globalSearch}
               onSearchQueryChange={setGlobalSearch}
               docVault={docVault}
+              onUpdateClientStatus={handleUpdateClientStatus}
             />
           )}
 
@@ -1098,6 +1099,7 @@ export default function App() {
               searchQuery={globalSearch}
               onSearchQueryChange={setGlobalSearch}
               docVault={docVault}
+              onUpdateClientStatus={handleUpdateClientStatus}
             />
           )}
 

@@ -18,6 +18,7 @@ interface ClientsListProps {
   searchQuery?: string;
   onSearchQueryChange?: (q: string) => void;
   docVault?: Record<string, any>;
+  onUpdateClientStatus?: (id: string, status: any) => void;
 }
 
 export const ClientsList: React.FC<ClientsListProps> = ({
@@ -32,11 +33,13 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   agentNames,
   searchQuery,
   onSearchQueryChange,
-  docVault
+  docVault,
+  onUpdateClientStatus
 }) => {
   const [dbFilter, setDbFilter] = useState<string>("all");
   const [agentFilter, setAgentFilter] = useState<string>("");
   const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
   const activeSearchQuery = searchQuery !== undefined ? searchQuery : localSearchQuery;
   const handleSearchChange = onSearchQueryChange || setLocalSearchQuery;
@@ -89,6 +92,24 @@ export const ClientsList: React.FC<ClientsListProps> = ({
   };
 
   const filteredClients = filterList();
+
+  const getPipelineClients = () => {
+    let list = [...clients];
+    if (agentFilter) {
+      list = list.filter(c => c.agent === agentFilter);
+    }
+    if (activeSearchQuery.trim()) {
+      const q = activeSearchQuery.toLowerCase();
+      list = list.filter(c => 
+        (c.first + " " + c.last).toLowerCase().includes(q) ||
+        (c.email || "").toLowerCase().includes(q) ||
+        (c.cell || "").includes(q) ||
+        (c.addr || "").toLowerCase().includes(q) ||
+        (c.lender || "").toLowerCase().includes(q)
+      );
+    }
+    return list;
+  };
 
   const STAGES = [
     { 
@@ -158,16 +179,30 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         {/* Global search */}
         <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto">
           <div 
-            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-64 transition-all duration-300 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:border-[var(--color-accent)]/30 focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
+            className="px-3.5 py-1.5 flex items-center gap-2 w-full sm:w-60 transition-all duration-300 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:border-[var(--color-accent)]/30 focus-within:border-[var(--color-accent)]/50 focus-within:shadow-[0_0_12px_var(--color-accent-subtle)]"
           >
             <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
             <input 
               type="text" 
-              placeholder="Search name, email, phone, address, or lender…" 
+              placeholder="Search clients, lender…" 
               value={activeSearchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="bg-transparent border-none text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] placeholder:opacity-90 focus:outline-none w-full font-medium"
             />
+          </div>
+
+          <div className="px-3.5 py-1.5 flex items-center gap-2 transition-all duration-300 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)]/80 hover:border-[var(--color-accent)]/30 focus-within:border-[var(--color-accent)]/50">
+            <Filter className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
+            <select 
+              value={agentFilter}
+              onChange={(e) => setAgentFilter(e.target.value)}
+              className="bg-transparent border-none text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer font-bold"
+            >
+              <option value="" className="bg-[var(--color-surface-2)] text-[var(--color-text)]">All Advisors</option>
+              {agentNames.map(name => (
+                <option key={name} value={name} className="bg-[var(--color-surface-2)] text-[var(--color-text)]">{name}</option>
+              ))}
+            </select>
           </div>
 
           <button 
@@ -228,15 +263,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
               </button>
             ))}
 
-            <select 
-              value={agentFilter}
-              onChange={(e) => setAgentFilter(e.target.value)}
-              className="ml-auto bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-full px-4 py-1 text-xs text-[var(--color-text-muted)] focus:outline-none cursor-pointer hover:border-[var(--color-accent)]/30 transition-all"
-            >
-              <option value="" className="bg-[var(--color-bg)]">All Advising Agents</option>
-              {agentNames.map(name => <option key={name} value={name} className="bg-[var(--color-bg)]">{name}</option>)}
-            </select>
-            <span className="text-xs text-[var(--color-text-faint)] font-bold border-l border-[var(--color-divider)] pl-3 ml-1">{filteredClients.length} clients</span>
+            <span className="text-xs text-[var(--color-text-faint)] font-bold border-l border-[var(--color-divider)] pl-3 ml-auto mr-1">{filteredClients.length} clients</span>
           </div>
 
           {/* Grid table */}
@@ -412,7 +439,8 @@ export const ClientsList: React.FC<ClientsListProps> = ({
         <div className="flex-1 overflow-x-auto overflow-y-hidden pb-2 select-none">
           <div className="flex gap-3 h-full min-w-[1240px]">
             {STAGES.map((s) => {
-              const colClients = clients.filter(c => c.status === s.id);
+              const pipelineClients = getPipelineClients();
+              const colClients = pipelineClients.filter(c => c.status === s.id);
               const colValue = colClients.reduce((sum, c) => sum + pn(c.mtgamt), 0);
 
               return (
@@ -431,23 +459,70 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                   </div>
 
                   {/* Column Body Cards Area */}
-                  <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 bg-[var(--color-surface-2)]/40 rounded-b-2xl">
+                  <div 
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
+                    onDragEnter={(e) => {
+                      e.preventDefault();
+                      setDragOverColumn(s.id);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverColumn === s.id) {
+                        setDragOverColumn(null);
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOverColumn(null);
+                      const clientId = e.dataTransfer.getData("text/plain");
+                      if (clientId && onUpdateClientStatus) {
+                        onUpdateClientStatus(clientId, s.id);
+                      }
+                    }}
+                    className={`flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5 min-h-0 rounded-b-2xl transition-all duration-200 ${
+                      dragOverColumn === s.id 
+                        ? "bg-blue-500/10 ring-2 ring-blue-500/20 ring-inset" 
+                        : "bg-[var(--color-surface-2)]/40"
+                    }`}
+                  >
                     {colClients.length > 0 ? colClients.map(c => {
                       const initials = (c.first[0] + c.last[0]).toUpperCase();
                       const daysStale = Math.floor((Date.now() - new Date(c.updatedAt || c.createdAt).getTime()) / (24 * 3600 * 1000));
-                      const isStale = daysStale > 30;
+                      
+                      // Stalled indicator for active stages
+                      const isStalledActive = (c.status !== "funded" && c.status !== "closed") && (daysStale > 14);
+                      const hasOverdueFollowUp = c.nextFollowUpDate && (new Date(c.nextFollowUpDate) < new Date());
+                      
+                      // Missing documents indicator
+                      const clientDocs = docVault ? docVault[c.id] || {} : {};
+                      const docs = Object.values(clientDocs) as any[];
+                      const approvedCount = docs.filter(d => d.status === "approved" || d.status === "verified").length;
+                      const reviewCount = docs.filter(d => d.status === "received").length;
+                      const hasDocs = approvedCount > 0 || reviewCount > 0;
+                      const isActiveStage = ["working", "lender", "conditional"].includes(c.status);
+                      const isMissingDocs = isActiveStage && !hasDocs;
 
                       return (
                         <div
                           key={c.id}
                           onClick={() => onOpenClient(c.id)}
-                          className={`p-3.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer shadow-sm ${
-                            isStale 
-                              ? "border-[var(--color-error)]/25 hover:border-[var(--color-error)]/55 hover:shadow-[0_0_15px_var(--color-error-subtle)] bg-[var(--color-error-subtle)]" 
-                              : "border-[var(--color-border)] hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", c.id);
+                            e.dataTransfer.effectAllowed = "move";
+                          }}
+                          className={`p-3.5 rounded-xl border-l-4 transition-all duration-300 ease-out cursor-pointer shadow-sm relative group/card ${
+                            hasOverdueFollowUp 
+                              ? "border-l-red-500 border-[var(--color-border)] hover:border-red-500/40 bg-red-500/5 hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" 
+                              : isStalledActive 
+                                ? "border-l-amber-500 border-[var(--color-border)] hover:border-amber-500/40 bg-amber-500/5 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+                                : isMissingDocs
+                                  ? "border-l-orange-500 border-[var(--color-border)] hover:border-orange-500/40 bg-orange-500/5 hover:shadow-[0_0_15px_rgba(249,115,22,0.15)]"
+                                  : "border-l-teal-500 border-[var(--color-border)] hover:border-var(--color-accent)/30 hover:shadow-[0_0_15px_var(--color-accent-subtle)] bg-[var(--color-surface)]"
                           }`}
                         >
-                          <div className="flex justify-between items-start gap-2 mb-2">
+                          <div className="flex justify-between items-start gap-2 mb-1.5">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div 
                                 className="w-7.5 h-7.5 rounded-lg text-[9px] font-black flex items-center justify-center text-[var(--color-text-inverse)] shadow-sm"
@@ -456,7 +531,7 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <h5 className="text-xs font-bold text-[var(--color-text)] truncate">{c.first} {c.last}</h5>
+                                <h5 className="text-xs font-bold text-[var(--color-text)] truncate group-hover/card:text-[var(--color-accent)] transition-colors">{c.first} {c.last}</h5>
                                 <div className="text-[10px] text-[var(--color-text-muted)] font-extrabold truncate mt-0.5 uppercase tracking-wider">{c.type || "Purchase"}</div>
                               </div>
                             </div>
@@ -465,13 +540,63 @@ export const ClientsList: React.FC<ClientsListProps> = ({
                             </div>
                           </div>
 
+                          {/* Broker Workflow Cues */}
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {/* Overdue follow up */}
+                            {c.nextFollowUpDate && (
+                              <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded flex items-center gap-1 ${
+                                hasOverdueFollowUp 
+                                  ? "bg-red-500/10 text-red-500 border border-red-500/20" 
+                                  : "bg-teal-500/10 text-teal-500 border border-teal-500/10"
+                              }`} title="Follow-up Date">
+                                📅 {hasOverdueFollowUp ? `Overdue: ${c.nextFollowUpDate}` : `Follow-up: ${c.nextFollowUpDate}`}
+                              </span>
+                            )}
+
+                            {/* Stalled active */}
+                            {isStalledActive && (
+                              <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1">
+                                ⏳ Idle {daysStale}d
+                              </span>
+                            )}
+
+                            {/* Missing/Document Vault status */}
+                            {(() => {
+                              if (hasDocs) {
+                                return (
+                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1">
+                                    📂 {approvedCount} Clear | {reviewCount} Rev
+                                  </span>
+                                );
+                              } else if (isMissingDocs) {
+                                return (
+                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 flex items-center gap-1">
+                                    ⚠️ Missing Docs
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
+
                           <div className="flex justify-between items-center text-[10px] border-t border-[var(--color-divider)] pt-2 mt-2">
-                            <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[120px] truncate">
+                            <span className="px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)] font-bold text-[9px] max-w-[100px] truncate">
                               👤 {(c.agent || "Unassigned").split(" ")[0]}
                             </span>
-                            <span className={`font-mono font-bold uppercase text-[8px] tracking-wider ${isStale ? "text-[var(--color-error)]" : "text-[var(--color-text-faint)]"}`}>
-                              {daysStale === 0 ? "today" : `${daysStale}d idle`}
-                            </span>
+                            
+                            {/* Quick Move Selector */}
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">Move:</span>
+                              <select
+                                value={c.status}
+                                onChange={(e) => onUpdateClientStatus?.(c.id, e.target.value as any)}
+                                className="text-[9px] font-black bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-1.5 py-0.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none cursor-pointer focus:border-[var(--color-accent)] transition-all font-sans"
+                              >
+                                {STAGES.map(st => (
+                                  <option key={st.id} value={st.id}>{st.label}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         </div>
                       );
