@@ -101,8 +101,10 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
 
   // Filter clients based on user search query
   const filteredClients = useMemo(() => {
-    if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase().trim();
+    if (!q) {
+      return allowedClients.slice(0, 35);
+    }
     return allowedClients.filter(c => {
       const first = (c.first || "").toLowerCase();
       const last = (c.last || "").toLowerCase();
@@ -581,39 +583,67 @@ Could you please let me know what my max qualifying amount is under the stress t
               <span className="text-[9px] bg-[var(--color-surface-2)] text-[var(--color-text-faint)] px-1.5 py-0.5 rounded font-mono">CRM-LINKED</span>
             </div>
             
-            {/* SEARCH COMPONENT */}
+            {/* UNIFIED SEARCH & SELECT COMPONENT */}
             <div className="relative space-y-1">
-              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">Search Client Database</span>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search by name, email, phone, address..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setDropdownOpen(true);
-                  }}
-                  onFocus={() => setDropdownOpen(true)}
-                  onBlur={() => setTimeout(() => setDropdownOpen(false), 250)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-8 pr-8 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-medium"
-                />
-                <span className="absolute left-2.5 top-2.5 text-[var(--color-text-muted)]">
-                  <Search className="w-3.5 h-3.5" />
-                </span>
-                {searchQuery && (
+              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">Search &amp; Select Client</span>
+              <div className="relative flex gap-2">
+                <div className="relative flex-grow">
+                  <input
+                    type="text"
+                    placeholder={currentClient ? `${currentClient.first} ${currentClient.last} (${currentClient.status.toUpperCase()})` : "Type name, email, phone, lender..."}
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setDropdownOpen(true);
+                    }}
+                    onFocus={() => setDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setDropdownOpen(false), 250)}
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-8 pr-8 py-2 text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
+                  />
+                  <span className="absolute left-2.5 top-2.5 text-[var(--color-text-muted)]">
+                    <Search className="w-3.5 h-3.5" />
+                  </span>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2.5 top-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                {currentClient && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs"
+                    onClick={() => {
+                      handleSelectClient("");
+                      setSearchQuery("");
+                    }}
+                    className="px-2.5 py-1 text-[10px] bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-semibold rounded-lg transition"
+                    title="Switch to General Knowledge Base (No Client)"
                   >
-                    ✕
+                    Clear
                   </button>
                 )}
               </div>
 
               {/* Autocomplete Dropdown */}
-              {dropdownOpen && searchQuery.trim() !== "" && (
+              {dropdownOpen && (
                 <div className="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl divide-y divide-[var(--color-border)]">
+                  {currentClient && (
+                    <button
+                      type="button"
+                      onMouseDown={() => {
+                        handleSelectClient("");
+                        setSearchQuery("");
+                        setDropdownOpen(false);
+                      }}
+                      className="w-full text-left p-2.5 text-xs text-rose-400 hover:bg-rose-500/10 transition font-bold"
+                    >
+                      ✖ Clear Selection (General Knowledge Base)
+                    </button>
+                  )}
                   {filteredClients.length === 0 ? (
                     <div className="p-3 text-xs text-[var(--color-text-muted)] text-center">
                       No results for "{searchQuery}"
@@ -623,42 +653,30 @@ Could you please let me know what my max qualifying amount is under the stress t
                       <button
                         key={c.id}
                         type="button"
-                        onClick={() => {
+                        onMouseDown={() => {
                           handleSelectClient(c.id);
                           setSearchQuery("");
                           setDropdownOpen(false);
                         }}
-                        className="w-full text-left p-2.5 hover:bg-[var(--color-surface-2)] transition flex flex-col gap-0.5"
+                        className={`w-full text-left p-2.5 hover:bg-[var(--color-surface-2)] transition flex flex-col gap-0.5 ${
+                          selectedClientId === c.id ? "bg-[var(--color-surface-2)] border-l-2 border-[var(--color-primary)]" : ""
+                        }`}
                       >
-                        <span className="text-xs font-bold text-[var(--color-text)]">
-                          {c.first} {c.last}
+                        <span className="text-xs font-bold text-[var(--color-text)] flex items-center justify-between">
+                          <span>{c.first} {c.last}</span>
+                          {selectedClientId === c.id && <span className="text-[9px] text-[var(--color-primary)] font-black">ACTIVE</span>}
                         </span>
                         <span className="text-[10px] text-[var(--color-text-muted)] flex flex-wrap gap-x-2">
                           {c.email && <span>{c.email}</span>}
                           {c.cell && <span>• {c.cell}</span>}
                           {c.lender && <span>• Lender: {c.lender}</span>}
-                          <span className="text-[9px] px-1 bg-[var(--color-surface-2)] rounded font-mono uppercase text-[var(--color-accent)]">{c.status}</span>
+                          <span className="text-[9px] px-1 bg-[var(--color-surface-3)] rounded font-mono uppercase text-[var(--color-accent)]">{c.status}</span>
                         </span>
                       </button>
                     ))
                   )}
                 </div>
               )}
-            </div>
-
-            {/* DIRECT SELECT DROPDOWN */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">Browse Allowed Clients</span>
-              <select
-                value={selectedClientId}
-                onChange={(e) => handleSelectClient(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
-              >
-                <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">-- General Knowledge Base (No Client) --</option>
-                {allowedClients.map(c => (
-                  <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} ({c.status.toUpperCase()})</option>
-                ))}
-              </select>
             </div>
 
             {currentClient ? (
