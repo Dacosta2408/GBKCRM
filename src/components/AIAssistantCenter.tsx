@@ -98,16 +98,17 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   const allowedClients = useMemo(() => {
     if (isOwnerOrManager) return clients;
     const currentFullName = `${currentUser.first} ${currentUser.last}`.trim().toLowerCase();
-    return clients.filter(c => {
+    const filtered = clients.filter(c => {
       return c.agent && c.agent.trim().toLowerCase() === currentFullName;
     });
+    return filtered.length > 0 ? filtered : clients;
   }, [clients, isOwnerOrManager, currentUser]);
 
   // Filter clients based on user search query
   const filteredClients = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) {
-      return allowedClients.slice(0, 35);
+      return allowedClients.slice(0, 50);
     }
     return allowedClients.filter(c => {
       const first = (c.first || "").toLowerCase();
@@ -617,7 +618,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                       setDropdownOpen(true);
                     }}
                     onFocus={() => setDropdownOpen(true)}
-                    onBlur={() => setTimeout(() => setDropdownOpen(false), 250)}
+                    onBlur={() => setTimeout(() => setDropdownOpen(false), 300)}
                     className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-8 pr-8 py-2 text-xs text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
                   />
                   <span className="absolute left-2.5 top-2.5 text-[var(--color-text-muted)]">
@@ -655,7 +656,8 @@ Could you please let me know what my max qualifying amount is under the stress t
                   {currentClient && (
                     <button
                       type="button"
-                      onMouseDown={() => {
+                      onMouseDown={(e) => {
+                        e.preventDefault();
                         setUserHasChosen(false);
                         handleSelectClient("");
                         setSearchQuery("");
@@ -671,37 +673,45 @@ Could you please let me know what my max qualifying amount is under the stress t
                       No results for "{searchQuery}"
                     </div>
                   ) : (
-                    filteredClients.map(c => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onMouseDown={() => {
-                          handleSelectClient(c.id);
-                          setSearchQuery("");
-                          setDropdownOpen(false);
-                        }}
-                        className={`w-full text-left p-2.5 hover:bg-[var(--color-surface-2)] transition flex flex-col gap-0.5 ${
-                          selectedClientId === c.id ? "bg-[var(--color-surface-2)] border-l-2 border-[var(--color-primary)]" : ""
-                        }`}
-                      >
-                        <span className="text-xs font-bold text-[var(--color-text)] flex items-center justify-between">
-                          <span>{c.first} {c.last}</span>
-                          {selectedClientId === c.id && <span className="text-[9px] text-[var(--color-primary)] font-black">ACTIVE</span>}
-                        </span>
-                        <span className="text-[10px] text-[var(--color-text-muted)] flex flex-wrap gap-x-2">
-                          {c.email && <span>{c.email}</span>}
-                          {c.cell && <span>• {c.cell}</span>}
-                          {c.lender && <span>• Lender: {c.lender}</span>}
-                          <span className="text-[9px] px-1 bg-[var(--color-surface-3)] rounded font-mono uppercase text-[var(--color-accent)]">{c.status}</span>
-                        </span>
-                      </button>
-                    ))
+                    <>
+                      {filteredClients.map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleSelectClient(c.id);
+                            setSearchQuery("");
+                            setDropdownOpen(false);
+                          }}
+                          className={`w-full text-left p-2.5 hover:bg-[var(--color-surface-2)] transition flex flex-col gap-0.5 ${
+                            selectedClientId === c.id ? "bg-[var(--color-surface-2)] border-l-2 border-[var(--color-primary)]" : ""
+                          }`}
+                        >
+                          <span className="text-xs font-bold text-[var(--color-text)] flex items-center justify-between">
+                            <span>{c.first} {c.last}</span>
+                            {selectedClientId === c.id && <span className="text-[9px] text-[var(--color-primary)] font-black">ACTIVE</span>}
+                          </span>
+                          <span className="text-[10px] text-[var(--color-text-muted)] flex flex-wrap gap-x-2">
+                            {c.email && <span>{c.email}</span>}
+                            {c.cell && <span>• {c.cell}</span>}
+                            {c.lender && <span>• Lender: {c.lender}</span>}
+                            <span className="text-[9px] px-1 bg-[var(--color-surface-3)] rounded font-mono uppercase text-[var(--color-accent)]">{c.status}</span>
+                          </span>
+                        </button>
+                      ))}
+                      {allowedClients.length > 50 && (
+                        <div className="p-2 text-[10px] text-[var(--color-text-muted)] text-center bg-[var(--color-surface-2)] border-t border-[var(--color-border)] font-semibold sticky bottom-0">
+                          Showing first 50 results — type to search
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
             </div>
 
-            {currentClient ? (
+            {selectedClientId && currentClient ? (
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 space-y-3">
                 <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
                   <span className="text-xs font-bold text-[var(--color-text)] block">{currentClient.first} {currentClient.last}</span>
