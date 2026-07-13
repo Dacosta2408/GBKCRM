@@ -9,6 +9,7 @@ import {
 import { Client, Task, User as CRMUser } from "../types";
 import { getNotesForClient, saveNotesForClient, logActivityEvent, FileNote } from "../lib/activityEngine";
 import { generateChecklistForClient, evaluateChecklistReadiness } from "../lib/checklistEngine";
+import { BRIDGE_URL } from "../lib/bridgeService";
 
 interface AIAssistantCenterProps {
   clients: Client[];
@@ -20,6 +21,7 @@ interface AIAssistantCenterProps {
   showToast: (msg: string, type?: "success" | "error" | "info", icon?: string) => void;
   currentClient?: Client | null;
   onSelectClient?: (client: Client | null) => void;
+  onOpenClientDetail?: (clientId: string) => void;
 }
 
 interface AIHistoryItem {
@@ -41,10 +43,12 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   onUpdateClient,
   showToast,
   currentClient: propCurrentClient,
-  onSelectClient
+  onSelectClient,
+  onOpenClientDetail
 }) => {
   // Main states
   const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [userHasChosen, setUserHasChosen] = useState<boolean>(false);
   const [aiInput, setAiInput] = useState<string>("");
   const [aiOutput, setAiOutput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -131,30 +135,37 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   // Unified client selection and prop synchronization
   useEffect(() => {
     if (propCurrentClient) {
-      if (selectedClientId !== propCurrentClient.id) {
-        setSelectedClientId(propCurrentClient.id);
-      }
-    } else if (allowedClients.length > 0) {
-      const isStillAllowed = allowedClients.some(c => c.id === selectedClientId);
-      if (!selectedClientId || !isStillAllowed) {
-        const fallback = allowedClients[0];
-        setSelectedClientId(fallback.id);
-        if (onSelectClient) {
-          onSelectClient(fallback);
+      // Check permission: Is this client allowed for the current user?
+      const isAllowed = allowedClients.some(c => c.id === propCurrentClient.id);
+      if (isAllowed) {
+        if (selectedClientId !== propCurrentClient.id) {
+          setSelectedClientId(propCurrentClient.id);
         }
-      }
-    } else {
-      if (selectedClientId !== "") {
+      } else {
+        // Restricted or deleted client: clear from context
         setSelectedClientId("");
         if (onSelectClient) {
           onSelectClient(null);
         }
       }
+    } else {
+      // Auto-fallback only if user has not chosen and current client is empty
+      if (!userHasChosen && selectedClientId === "" && allowedClients.length > 0) {
+        const fallback = allowedClients[0];
+        setSelectedClientId(fallback.id);
+        if (onSelectClient) {
+          onSelectClient(fallback);
+        }
+      } else if (selectedClientId !== "" && !userHasChosen) {
+        // If the parent client is null and no choice was made, clear it
+        setSelectedClientId("");
+      }
     }
-  }, [propCurrentClient, allowedClients, selectedClientId, onSelectClient]);
+  }, [propCurrentClient, allowedClients, selectedClientId, onSelectClient, userHasChosen]);
 
   // Selection change handler that syncs with parent database
   const handleSelectClient = (clientId: string) => {
+    setUserHasChosen(true);
     setSelectedClientId(clientId);
     setAiOutput("");
     setExtractedTasks([]);
@@ -166,8 +177,8 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
 
   // Selected client memo
   const currentClient = useMemo(() => {
-    return allowedClients.find(c => c.id === selectedClientId) || null;
-  }, [allowedClients, selectedClientId]);
+    return allowedClients.find(c => c.id === selectedClientId) || clients.find(c => c.id === selectedClientId) || null;
+  }, [allowedClients, clients, selectedClientId]);
 
   // Save history helper
   const saveHistory = (newHistory: AIHistoryItem[]) => {
@@ -241,7 +252,7 @@ ${notesSummary || "No notes logged yet."}
 
   // TRIGGER AI WORKFLOW
   const triggerAITool = async (toolKey: string, payloadOverride?: string) => {
-    if (!currentClient && toolKey !== "intake_raw") {
+    if (!currentClient && toolKey !== "intake_raw" && toolKey !== "custom") {
       showToast("Please select a client file first.", "error");
       return;
     }
@@ -294,7 +305,12 @@ Use Canadian terminology, mention OSFI guidelines or stress test validation, and
           prompt = `Draft a polite, expert mortgage advisory email to the client counseling them on borderline debt service (GDS/TDS) ratios.
 Explain what GDS/TDS is simply. Explain how paying off a small balance (e.g. credit cards, car loans) will significantly increase their qualifying loan limit or shift them into a lower interest rate A-Lender product.
 Provide a clear, strategic recommendation table.`;
-        } else {
+        } else if (subTemplate === "status_update") {
+          if (!currentClient) {
+            showToast("Please select a client file for the status update email", "error");
+            setLoading(false);
+            return;
+          }
           prompt = `Draft a beautiful client status update email. Let them know the underwriting team has reviewed their file status as [${currentClient?.status.toUpperCase()}] and outline the upcoming milestone, explaining what happens next in the Canadian mortgage process (e.g., appraisal, commitment signing, legal instructions).`;
         }
         break;
@@ -370,9 +386,13 @@ Keep it compact, highly professional, and written in standard underwriting short
     }
 
     try {
-      const response = await fetch("/api/ai/chat", {
+      const BRIDGE_TOKEN = (import.meta as any).env?.VITE_BRIDGE_TOKEN || "gbk-local-secret-2024";
+      const response = await fetch(`${BRIDGE_URL}/api/ai/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-gbk-token": BRIDGE_TOKEN
+        },
         body: JSON.stringify({
           message: prompt,
           history: [],
@@ -617,6 +637,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                   <button
                     type="button"
                     onClick={() => {
+                      setUserHasChosen(false);
                       handleSelectClient("");
                       setSearchQuery("");
                     }}
@@ -635,6 +656,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     <button
                       type="button"
                       onMouseDown={() => {
+                        setUserHasChosen(false);
                         handleSelectClient("");
                         setSearchQuery("");
                         setDropdownOpen(false);
@@ -683,15 +705,26 @@ Could you please let me know what my max qualifying amount is under the stress t
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 space-y-3">
                 <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
                   <span className="text-xs font-bold text-[var(--color-text)] block">{currentClient.first} {currentClient.last}</span>
-                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
-                    currentClient.status === "approved" || currentClient.status === "funded"
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      : currentClient.status === "conditional" || currentClient.status === "working"
-                      ? "bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] border border-[rgba(244,163,132,0.2)]"
-                      : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border border-[var(--color-border)]"
-                  }`}>
-                    {currentClient.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {onOpenClientDetail && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenClientDetail(currentClient.id)}
+                        className="text-[10px] text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] hover:underline flex items-center gap-0.5 font-bold transition-all"
+                      >
+                        → Open Full File
+                      </button>
+                    )}
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
+                      currentClient.status === "approved" || currentClient.status === "funded"
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        : currentClient.status === "conditional" || currentClient.status === "working"
+                        ? "bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] border border-[rgba(244,163,132,0.2)]"
+                        : "bg-[var(--color-surface-3)] text-[var(--color-text-muted)] border border-[var(--color-border)]"
+                    }`}>
+                      {currentClient.status}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold text-[var(--color-text-muted)]">

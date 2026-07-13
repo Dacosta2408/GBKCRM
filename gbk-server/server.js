@@ -60,12 +60,14 @@ const clientsRouter = require("./routes/clients");
 const documentsRouter = require("./routes/documents");
 const systemRouter = require("./routes/system");
 const emailRouter = require("./routes/email");
+const aiRouter = require("./routes/ai");
 
 app.use("/api/health", healthRouter);
 app.use("/api/clients", clientsRouter);
 app.use("/api/clients", documentsRouter); // Mounted on /api/clients so /api/clients/:id/documents works
 app.use("/api/system", systemRouter);
 app.use("/api/email", emailRouter);
+app.use("/api/ai", aiRouter);
 
 app.listen(PORT, "0.0.0.0", () => {
   const envLabel = process.env.NODE_ENV || "development";

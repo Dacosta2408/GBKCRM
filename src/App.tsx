@@ -1207,6 +1207,10 @@ export default function App() {
               showToast={showToast}
               currentClient={currentClient}
               onSelectClient={setCurrentClient}
+              onOpenClientDetail={(id) => {
+                openClient(id);
+                setActiveTab("clients");
+              }}
             />
           )}
 
@@ -1457,7 +1461,7 @@ export default function App() {
 
       {/* Detail panel slider */}
       <ClientDetailPanel
-        currentClient={currentClient}
+        currentClient={activeTab === "ai" ? null : currentClient}
         currentUser={currentUser}
         clients={clients}
         lenders={lenders}
