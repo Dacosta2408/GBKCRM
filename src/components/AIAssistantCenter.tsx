@@ -59,17 +59,35 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
 
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Auto-select the first client if none selected
+  // Role-based allowed clients logic
+  const isOwnerOrManager = useMemo(() => {
+    return currentUser.role === "Developer/Admin" || currentUser.role === "Admin";
+  }, [currentUser.role]);
+
+  const allowedClients = useMemo(() => {
+    if (isOwnerOrManager) return clients;
+    const currentFullName = `${currentUser.first} ${currentUser.last}`.trim().toLowerCase();
+    return clients.filter(c => {
+      return c.agent && c.agent.trim().toLowerCase() === currentFullName;
+    });
+  }, [clients, isOwnerOrManager, currentUser]);
+
+  // Auto-select the first client if none selected or if selected client is no longer allowed
   useEffect(() => {
-    if (!selectedClientId && clients.length > 0) {
-      setSelectedClientId(clients[0].id);
+    if (allowedClients.length > 0) {
+      const isStillAllowed = allowedClients.some(c => c.id === selectedClientId);
+      if (!selectedClientId || !isStillAllowed) {
+        setSelectedClientId(allowedClients[0].id);
+      }
+    } else {
+      setSelectedClientId("");
     }
-  }, [clients, selectedClientId]);
+  }, [allowedClients, selectedClientId]);
 
   // Selected client memo
   const currentClient = useMemo(() => {
-    return clients.find(c => c.id === selectedClientId) || null;
-  }, [clients, selectedClientId]);
+    return allowedClients.find(c => c.id === selectedClientId) || null;
+  }, [allowedClients, selectedClientId]);
 
   // Save history helper
   const saveHistory = (newHistory: AIHistoryItem[]) => {
@@ -243,9 +261,18 @@ ${textToDigest}`;
 
       case "recommender":
         prompt = `Perform a predictive audit of this file's current status [${currentClient?.status.toUpperCase()}] and potential roadblocks.
-Provide exactly 3 strategic "Next Best Action" recommendations tailored for the broker.
-For example, if the LTV is > 80%, recommend CMHC high-ratio guidelines. If Credit is under 600, recommend alternative monoline or private match. If the file is still a "Lead", suggest immediate initial follow-up templates.
-Make recommendations punchy with bold headers and action timelines.`;
+        Provide exactly 3 strategic "Next Best Action" recommendations tailored for the broker.
+        For example, if the LTV is > 80%, recommend CMHC high-ratio guidelines. If Credit is under 600, recommend alternative monoline or private match. If the file is still a "Lead", suggest immediate initial follow-up templates.
+        Make recommendations punchy with bold headers and action timelines.`;
+        break;
+
+      case "draft_notes":
+        prompt = `Based on the client's mortgage profile, draft a professional, concise internal underwriter file note.
+This note will be saved in the client's file history. It should contain:
+- FILE STATUS SUMMARY: A concise 2-sentence summary of the current loan-to-value (LTV), income, credit beacon, and property details.
+- VERIFICATION LOGS: A brief status log of outstanding/missing files and checklist readiness.
+- INTERNAL BROKER ACTION STEPS: Immediate task guidelines for the broker or underwriter.
+Keep it compact, highly professional, and written in standard underwriting shorthand.`;
         break;
 
       case "custom":
@@ -342,6 +369,7 @@ Make recommendations punchy with bold headers and action timelines.`;
       case "tasks": return "AI Task Builder";
       case "intake_raw": return "Raw Ingestion Summary";
       case "recommender": return "Next Step Strategy Recommender";
+      case "draft_notes": return "Underwriting Note Drafter";
       case "custom": return "Custom Copilot Prompt";
       default: return "AI Advisor Query";
     }
@@ -484,7 +512,7 @@ Could you please let me know what my max qualifying amount is under the stress t
               className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
             >
               <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">-- General Knowledge Base (No Client) --</option>
-              {clients.map(c => (
+              {allowedClients.map(c => (
                 <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} ({c.status.toUpperCase()})</option>
               ))}
             </select>
@@ -734,6 +762,20 @@ Could you please let me know what my max qualifying amount is under the stress t
                   <Landmark className="w-3.5 h-3.5 text-[var(--color-text-faint)]" /> Website Intake Summarizer
                 </span>
               </button>
+
+              {/* Underwriting Note Drafter */}
+              <button 
+                onClick={() => triggerAITool("draft_notes")}
+                className={`w-full text-left p-2 rounded-lg text-xs font-semibold border transition flex items-center justify-between ${
+                  activeTool === "draft_notes" 
+                    ? "bg-[rgba(244,163,132,0.15)] border-[rgba(244,163,132,0.4)] text-[var(--color-text)]" 
+                    : "bg-transparent border-transparent hover:bg-[var(--color-surface-2)]/40 text-[var(--color-text-muted)]"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5 text-[var(--color-text-faint)]" /> Underwriting Note Drafter
+                </span>
+              </button>
             </div>
           </div>
 
@@ -779,6 +821,13 @@ Could you please let me know what my max qualifying amount is under the stress t
               className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
               <CheckSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Tasks from Notes
+            </button>
+
+            <button 
+              onClick={() => triggerAITool("draft_notes")}
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Draft File Note
             </button>
 
             <button 
@@ -1098,8 +1147,8 @@ Could you please let me know what my max qualifying amount is under the stress t
                     onClick={() => {
                       setAiOutput(h.response);
                       setActiveTool("custom");
-                      // Try to restore client
-                      const client = clients.find(c => c.id === h.clientId);
+                      // Try to restore client safely
+                      const client = allowedClients.find(c => c.id === h.clientId);
                       if (client) setSelectedClientId(client.id);
                       showToast(`Restored: ${h.toolName}`, "info");
                     }}
