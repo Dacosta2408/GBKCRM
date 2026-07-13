@@ -3,7 +3,8 @@ import {
   Sparkles, Clipboard, Check, RefreshCw, Send, FileText, Mail, 
   FileCheck, CheckSquare, Plus, AlertCircle, User, CheckCircle2, 
   Trash2, Landmark, History, MessageSquare, ChevronRight, HelpCircle,
-  FileSpreadsheet, ShieldAlert, ArrowRight, CornerDownRight, ChevronDown
+  FileSpreadsheet, ShieldAlert, ArrowRight, CornerDownRight, ChevronDown,
+  Search
 } from "lucide-react";
 import { Client, Task, User as CRMUser } from "../types";
 import { getNotesForClient, saveNotesForClient, logActivityEvent, FileNote } from "../lib/activityEngine";
@@ -17,6 +18,8 @@ interface AIAssistantCenterProps {
   onAddTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt" | "createdBy">) => void;
   onUpdateClient: (updated: Client) => void;
   showToast: (msg: string, type?: "success" | "error" | "info", icon?: string) => void;
+  currentClient?: Client | null;
+  onSelectClient?: (client: Client | null) => void;
 }
 
 interface AIHistoryItem {
@@ -36,7 +39,9 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   tasks,
   onAddTask,
   onUpdateClient,
-  showToast
+  showToast,
+  currentClient: propCurrentClient,
+  onSelectClient
 }) => {
   // Main states
   const [selectedClientId, setSelectedClientId] = useState<string>("");
@@ -44,6 +49,10 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   const [aiOutput, setAiOutput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTool, setActiveTool] = useState<string>("summary");
+  
+  // Search query states
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   
   // Custom Raw Ingest text state for Intake Summary Tool
   const [rawIntakeText, setRawIntakeText] = useState<string>("");
@@ -90,17 +99,68 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
     });
   }, [clients, isOwnerOrManager, currentUser]);
 
-  // Auto-select the first client if none selected or if selected client is no longer allowed
+  // Filter clients based on user search query
+  const filteredClients = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    return allowedClients.filter(c => {
+      const first = (c.first || "").toLowerCase();
+      const last = (c.last || "").toLowerCase();
+      const name = `${first} ${last}`;
+      const email = (c.email || "").toLowerCase();
+      const cell = (c.cell || "").toLowerCase();
+      const addr = (c.addr || "").toLowerCase();
+      const lender = (c.lender || "").toLowerCase();
+      const status = (c.status || "").toLowerCase();
+      const co = (c.co || "").toLowerCase();
+      
+      return first.includes(q) ||
+             last.includes(q) ||
+             name.includes(q) ||
+             email.includes(q) ||
+             cell.includes(q) ||
+             addr.includes(q) ||
+             lender.includes(q) ||
+             status.includes(q) ||
+             co.includes(q);
+    });
+  }, [allowedClients, searchQuery]);
+
+  // Unified client selection and prop synchronization
   useEffect(() => {
-    if (allowedClients.length > 0) {
+    if (propCurrentClient) {
+      if (selectedClientId !== propCurrentClient.id) {
+        setSelectedClientId(propCurrentClient.id);
+      }
+    } else if (allowedClients.length > 0) {
       const isStillAllowed = allowedClients.some(c => c.id === selectedClientId);
       if (!selectedClientId || !isStillAllowed) {
-        setSelectedClientId(allowedClients[0].id);
+        const fallback = allowedClients[0];
+        setSelectedClientId(fallback.id);
+        if (onSelectClient) {
+          onSelectClient(fallback);
+        }
       }
     } else {
-      setSelectedClientId("");
+      if (selectedClientId !== "") {
+        setSelectedClientId("");
+        if (onSelectClient) {
+          onSelectClient(null);
+        }
+      }
     }
-  }, [allowedClients, selectedClientId]);
+  }, [propCurrentClient, allowedClients, selectedClientId, onSelectClient]);
+
+  // Selection change handler that syncs with parent database
+  const handleSelectClient = (clientId: string) => {
+    setSelectedClientId(clientId);
+    setAiOutput("");
+    setExtractedTasks([]);
+    if (onSelectClient) {
+      const client = clients.find(c => c.id === clientId) || null;
+      onSelectClient(client);
+    }
+  };
 
   // Selected client memo
   const currentClient = useMemo(() => {
@@ -521,20 +581,85 @@ Could you please let me know what my max qualifying amount is under the stress t
               <span className="text-[9px] bg-[var(--color-surface-2)] text-[var(--color-text-faint)] px-1.5 py-0.5 rounded font-mono">CRM-LINKED</span>
             </div>
             
-            <select
-              value={selectedClientId}
-              onChange={(e) => {
-                setSelectedClientId(e.target.value);
-                setAiOutput("");
-                setExtractedTasks([]);
-              }}
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
-            >
-              <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">-- General Knowledge Base (No Client) --</option>
-              {allowedClients.map(c => (
-                <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} ({c.status.toUpperCase()})</option>
-              ))}
-            </select>
+            {/* SEARCH COMPONENT */}
+            <div className="relative space-y-1">
+              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">Search Client Database</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by name, email, phone, address..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setDropdownOpen(true);
+                  }}
+                  onFocus={() => setDropdownOpen(true)}
+                  onBlur={() => setTimeout(() => setDropdownOpen(false), 250)}
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-8 pr-8 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-medium"
+                />
+                <span className="absolute left-2.5 top-2.5 text-[var(--color-text-muted)]">
+                  <Search className="w-3.5 h-3.5" />
+                </span>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Autocomplete Dropdown */}
+              {dropdownOpen && searchQuery.trim() !== "" && (
+                <div className="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl divide-y divide-[var(--color-border)]">
+                  {filteredClients.length === 0 ? (
+                    <div className="p-3 text-xs text-[var(--color-text-muted)] text-center">
+                      No results for "{searchQuery}"
+                    </div>
+                  ) : (
+                    filteredClients.map(c => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => {
+                          handleSelectClient(c.id);
+                          setSearchQuery("");
+                          setDropdownOpen(false);
+                        }}
+                        className="w-full text-left p-2.5 hover:bg-[var(--color-surface-2)] transition flex flex-col gap-0.5"
+                      >
+                        <span className="text-xs font-bold text-[var(--color-text)]">
+                          {c.first} {c.last}
+                        </span>
+                        <span className="text-[10px] text-[var(--color-text-muted)] flex flex-wrap gap-x-2">
+                          {c.email && <span>{c.email}</span>}
+                          {c.cell && <span>• {c.cell}</span>}
+                          {c.lender && <span>• Lender: {c.lender}</span>}
+                          <span className="text-[9px] px-1 bg-[var(--color-surface-2)] rounded font-mono uppercase text-[var(--color-accent)]">{c.status}</span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* DIRECT SELECT DROPDOWN */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">Browse Allowed Clients</span>
+              <select
+                value={selectedClientId}
+                onChange={(e) => handleSelectClient(e.target.value)}
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] font-semibold"
+              >
+                <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">-- General Knowledge Base (No Client) --</option>
+                {allowedClients.map(c => (
+                  <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} ({c.status.toUpperCase()})</option>
+                ))}
+              </select>
+            </div>
 
             {currentClient ? (
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 space-y-3">
@@ -974,7 +1099,7 @@ Could you please let me know what my max qualifying amount is under the stress t
               <div 
                 ref={outputScrollRef}
                 onScroll={handleScroll}
-                className="flex-grow p-5 overflow-y-auto max-h-[500px]"
+                className="flex-grow p-5 overflow-y-auto max-h-[580px] min-h-[385px] scrollbar-thin"
               >
                 
                 {loading ? (
@@ -1187,7 +1312,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                       setActiveTool("custom");
                       // Try to restore client safely
                       const client = allowedClients.find(c => c.id === h.clientId);
-                      if (client) setSelectedClientId(client.id);
+                      if (client) handleSelectClient(client.id);
                       showToast(`Restored: ${h.toolName}`, "info");
                     }}
                   >

@@ -1205,6 +1205,8 @@ export default function App() {
               }}
               onUpdateClient={handleUpdateClient}
               showToast={showToast}
+              currentClient={currentClient}
+              onSelectClient={setCurrentClient}
             />
           )}
 
