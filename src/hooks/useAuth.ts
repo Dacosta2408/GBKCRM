@@ -53,7 +53,29 @@ export function useAuth({ showToast, logActivity }: UseAuthDeps) {
   const [pinError, setPinError] = useState<string>("");
   const [userRoster, setUserRoster] = useState<User[]>(() => {
     const saved = localStorage.getItem("gbk_roster");
-    return saved ? JSON.parse(saved) : DEFAULT_USERS;
+    if (saved) {
+      try {
+        const roster = JSON.parse(saved) as User[];
+        const hasMatt = roster.some(u => u.id === 'u_matthewb');
+        if (!hasMatt) {
+          const matt = DEFAULT_USERS.find(u => u.id === 'u_matthewb');
+          if (matt) {
+            roster.push(matt);
+          }
+        } else {
+          const mattIdx = roster.findIndex(u => u.id === 'u_matthewb');
+          roster[mattIdx] = {
+            ...roster[mattIdx],
+            email: 'mattie@gbkfinancial.ca',
+            role: 'Broker'
+          };
+        }
+        return roster;
+      } catch (e) {
+        return DEFAULT_USERS;
+      }
+    }
+    return DEFAULT_USERS;
   });
   const [lockoutTries, setLockoutTries] = useState<number>(0);
   const [lockoutActive, setLockoutActive] = useState<boolean>(false);

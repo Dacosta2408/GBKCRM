@@ -28,7 +28,7 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({
   logActivity
 }) => {
   const [selectedUserId, setSelectedUserId] = useState<string>(userRoster[0]?.id || "");
-  const [activeRoleTab, setActiveRoleTab] = useState<User["role"]>("Agent");
+  const [activeRoleTab, setActiveRoleTab] = useState<User["role"]>("Broker");
 
   // Define CRM Modules
   const crmModules: ModulePermission[] = [

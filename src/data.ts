@@ -84,7 +84,7 @@ export const DEFAULT_USERS: User[] = [
     id: 'u_matthewb',
     first: 'Matt',
     last: 'Brown',
-    email: 'matthewb@gbkfinancial.ca',
+    email: 'mattie@gbkfinancial.ca',
     role: 'Broker',
     status: 'active',
     phone: '(705) 555-0177',

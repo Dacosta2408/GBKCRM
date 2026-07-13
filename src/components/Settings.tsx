@@ -301,7 +301,7 @@ export const Settings: React.FC<SettingsProps> = ({
     setNewLast("");
     setNewEmail("");
     setNewPhone("");
-    setNewRole("Agent");
+    setNewRole("Broker");
     setNewPin("");
     setNewFsra("");
     setNewEoCarrier("");
@@ -1567,7 +1567,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       <span className="text-[var(--color-text)]">Owner</span>
                       <span className="text-[var(--color-accent)]">SuperAdmin</span>
                       <span className="text-[var(--color-text-muted)]/90">SrBroker</span>
-                      <span className="text-[var(--color-text-muted)]">Agent</span>
+                      <span className="text-[var(--color-text-muted)]">Broker</span>
                     </div>
                     <div className="space-y-1 divide-y divide-[var(--color-border)]/70">
                       {([
