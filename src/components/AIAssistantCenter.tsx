@@ -3,7 +3,7 @@ import {
   Sparkles, Clipboard, Check, RefreshCw, Send, FileText, Mail, 
   FileCheck, CheckSquare, Plus, AlertCircle, User, CheckCircle2, 
   Trash2, Landmark, History, MessageSquare, ChevronRight, HelpCircle,
-  FileSpreadsheet, ShieldAlert, ArrowRight, CornerDownRight
+  FileSpreadsheet, ShieldAlert, ArrowRight, CornerDownRight, ChevronDown
 } from "lucide-react";
 import { Client, Task, User as CRMUser } from "../types";
 import { getNotesForClient, saveNotesForClient, logActivityEvent, FileNote } from "../lib/activityEngine";
@@ -58,6 +58,24 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   });
 
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Scroll tracking and auto-scroll states & refs
+  const outputScrollRef = React.useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+
+  const handleScroll = () => {
+    const container = outputScrollRef.current;
+    if (!container) return;
+    const isCloseToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+    setIsAtBottom(isCloseToBottom);
+  };
+
+  // Auto-scroll when output or loading state changes if at bottom
+  useEffect(() => {
+    if (isAtBottom && outputScrollRef.current) {
+      outputScrollRef.current.scrollTop = outputScrollRef.current.scrollHeight;
+    }
+  }, [aiOutput, loading, isAtBottom]);
 
   // Role-based allowed clients logic
   const isOwnerOrManager = useMemo(() => {
@@ -170,6 +188,7 @@ ${notesSummary || "No notes logged yet."}
     setAiOutput("");
     setExtractedTasks([]);
     setActiveTool(toolKey);
+    setIsAtBottom(true);
 
     const clientName = currentClient ? `${currentClient.first} ${currentClient.last}` : "General System Context";
     const clientContext = currentClient ? getClientContextString(currentClient) : "";
@@ -457,7 +476,7 @@ Could you please let me know what my max qualifying amount is under the stress t
   const isBroker = currentUser.role.toLowerCase().includes("broker") || currentUser.role.toLowerCase().includes("agent");
 
   return (
-    <div className="flex flex-col gap-6 h-full pb-10" id="ai-assistance-center">
+    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-10 text-sans" id="ai-assistance-center">
       
       {/* 1. CLEAR PAGE HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[var(--color-surface-2)] to-[var(--color-surface)] border border-[var(--color-border)] rounded-xl">
@@ -843,7 +862,7 @@ Could you please let me know what my max qualifying amount is under the stress t
           </div>
 
           {/* MAIN CANVAS WORKSPACE SCREEN */}
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-lg flex-1 flex flex-col overflow-hidden min-h-[480px]">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-lg flex-1 flex flex-col overflow-hidden min-h-[480px] relative">
             
             {/* CANVAS WORKSPACE BAR */}
             <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
@@ -952,7 +971,11 @@ Could you please let me know what my max qualifying amount is under the stress t
 
             {/* GENERAL OUTPUT CANVAS (MARKDOWN FORMATTER / RAW TEXT AREA) */}
             {(aiOutput || loading) && (
-              <div className="flex-grow p-5 overflow-y-auto max-h-[500px]">
+              <div 
+                ref={outputScrollRef}
+                onScroll={handleScroll}
+                className="flex-grow p-5 overflow-y-auto max-h-[500px]"
+              >
                 
                 {loading ? (
                   <div className="h-full flex flex-col items-center justify-center py-20 gap-4">
@@ -1041,6 +1064,21 @@ Could you please let me know what my max qualifying amount is under the stress t
                   </div>
                 )}
               </div>
+            )}
+
+            {/* FLOATING JUMP TO LATEST BUTTON */}
+            {!isAtBottom && (aiOutput || loading) && (
+              <button
+                onClick={() => {
+                  setIsAtBottom(true);
+                  if (outputScrollRef.current) {
+                    outputScrollRef.current.scrollTop = outputScrollRef.current.scrollHeight;
+                  }
+                }}
+                className="absolute bottom-16 right-4 px-3 py-1.5 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg transition-all duration-300 flex items-center gap-1 z-10 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <ChevronDown className="w-3.5 h-3.5" /> Jump to Latest
+              </button>
             )}
 
             {/* IF NO RESULT AND NOT LOADING, SHOW INTRO PANEL */}

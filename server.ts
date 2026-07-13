@@ -25,6 +25,37 @@ async function startServer() {
     return new GoogleGenAI({ apiKey: key });
   }
 
+  // Robust helper to perform generateContent calls with retries for transient/503/429 errors
+  async function generateContentWithRetry(ai: ReturnType<typeof getGeminiClient>, params: any, retries = 3, delayMs = 1500) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await ai.models.generateContent(params);
+      } catch (err: any) {
+        const isTransient = 
+          err.status === 503 || 
+          err.status === 429 ||
+          err.statusCode === 503 ||
+          err.statusCode === 429 ||
+          (err.message && (
+            err.message.includes("503") || 
+            err.message.includes("429") || 
+            err.message.includes("UNAVAILABLE") || 
+            err.message.includes("high demand") || 
+            err.message.includes("temporary")
+          ));
+        
+        if (isTransient && i < retries - 1) {
+          console.warn(`Transient Gemini API error (attempt ${i + 1}/${retries}). Retrying in ${delayMs}ms... Error:`, err.message || err);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          delayMs *= 2; // Exponential backoff
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error("Failed to generate content after retries.");
+  }
+
   // 1. General AI assistant chat proxy
   app.post("/api/ai/chat", async (req, res) => {
     try {
@@ -50,7 +81,7 @@ ${clientContext ? `Here is the current client's profile for context:\n${clientCo
       }));
       contents.push({ role: "user", parts: [{ text: message }] });
 
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: "gemini-3.5-flash",
         contents: contents,
         config: {
@@ -153,7 +184,7 @@ JSON Schema:
 Source Application Text:
 ${text}`;
 
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
@@ -207,7 +238,7 @@ Return a high-quality analysis broken down into these precise headers:
 
 Keep the tone expert, authoritative, and direct to brokers. Ensure you do not use any asterisks (*) or formatting tags. Write in clear paragraphs under each header.`;
 
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
@@ -242,7 +273,7 @@ Keep the tone expert, authoritative, and direct to brokers. Ensure you do not us
         "category": "string, must be exactly one of: 'Rate Update', 'Lender Policy', 'Regulatory', 'Market Trend', 'CMHC'"
       }`;
 
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
