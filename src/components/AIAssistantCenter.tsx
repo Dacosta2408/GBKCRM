@@ -211,15 +211,32 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
     const propVal = Number(currentClient.propval || 0);
     const ltv = propVal > 0 ? (mtgAmt / propVal) * 100 : 0;
 
+    const beacon = Number(currentClient.beacon || 0);
+    const status = (currentClient.status || "").toLowerCase();
+    
+    let fileHealth: "strong" | "review" | "atrisk" = "atrisk";
+    if (beacon >= 680 && ltv <= 80 && (status === "approved" || status === "working")) {
+      fileHealth = "strong";
+    } else if (beacon >= 600 && ltv <= 90) {
+      fileHealth = "review";
+    }
+
     return {
       combinedIncome,
       ltv: Math.round(ltv),
+      fileHealth,
     };
   }, [currentClient]);
 
   // Generate dynamic client notes and document status text for AI context
   const getClientContextString = (client: Client): string => {
-    const clientDocs = docVault[client.id] || {};
+    console.log('docVault keys:', Object.keys(docVault));
+    console.log('client id:', currentClient?.id);
+
+    const clientDocs = docVault[client.id] || 
+                       docVault[client.id.toLowerCase()] || 
+                       docVault[Object.keys(docVault).find(key => key.toLowerCase() === client.id.toLowerCase()) || ""] || 
+                       {};
     const docsSummary = Object.keys(clientDocs)
       .map(key => {
         const d = clientDocs[key];
@@ -714,7 +731,27 @@ Could you please let me know what my max qualifying amount is under the stress t
             {selectedClientId && currentClient ? (
               <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 space-y-3">
                 <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
-                  <span className="text-xs font-bold text-[var(--color-text)] block">{currentClient.first} {currentClient.last}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[var(--color-text)]">{currentClient.first} {currentClient.last}</span>
+                    {clientMetrics?.fileHealth === "strong" && (
+                      <span className="inline-flex items-center gap-1 text-[9px] font-black tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        STRONG FILE
+                      </span>
+                    )}
+                    {clientMetrics?.fileHealth === "review" && (
+                      <span className="inline-flex items-center gap-1 text-[9px] font-black tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        REVIEW
+                      </span>
+                    )}
+                    {clientMetrics?.fileHealth === "atrisk" && (
+                      <span className="inline-flex items-center gap-1 text-[9px] font-black tracking-wide bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                        AT RISK
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     {onOpenClientDetail && (
                       <button
@@ -1044,6 +1081,16 @@ Could you please let me know what my max qualifying amount is under the stress t
               className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
             >
               <CornerDownRight className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Summarize Ingest submission
+            </button>
+
+            <button 
+              onClick={() => {
+                setActiveTool("custom");
+                setAiOutput("");
+              }}
+              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[rgba(244,163,132,0.1)] border border-[var(--color-border)] hover:border-[rgba(244,163,132,0.3)] text-[var(--color-text)] text-[11px] font-bold rounded-lg transition flex items-center gap-1.5"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Custom Copilot
             </button>
           </div>
 
