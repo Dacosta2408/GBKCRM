@@ -405,7 +405,7 @@ Keep it compact, highly professional, and written in standard underwriting short
 
     try {
       const BRIDGE_TOKEN = (import.meta as any).env?.VITE_BRIDGE_TOKEN || "gbk-local-secret-2024";
-      const response = await fetch(`${BRIDGE_URL}/api/ai/chat`, {
+      const response = await fetch(`/api/ai/chat`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

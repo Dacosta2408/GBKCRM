@@ -4,6 +4,8 @@ import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import { spawn } from "child_process";
 
 dotenv.config();
 
@@ -13,6 +15,43 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Start the background Z Drive Bridge Server on port 3001
+  try {
+    console.log("Starting background Z Drive Bridge Server on port 3001...");
+    const bridgeProcess = spawn("node", ["gbk-server/server.js"], {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        GBK_PORT: "3001",
+        PORT: "3001",
+        GBK_ROOT_PATH: "./gbk-crm-data"
+      }
+    });
+
+    bridgeProcess.on("error", (err) => {
+      console.error("Failed to start Z Drive Bridge Server child process:", err);
+    });
+
+    process.on("exit", () => {
+      bridgeProcess.kill();
+    });
+  } catch (err) {
+    console.error("Error spawning background Z Drive Bridge Server:", err);
+  }
+
+  // Proxy requests starting with /api/bridge to localhost:3001
+  // This must be placed BEFORE any body parsing middleware like express.json()
+  app.use(
+    "/api/bridge",
+    createProxyMiddleware({
+      target: "http://localhost:3001",
+      changeOrigin: true,
+      pathRewrite: {
+        "^/api/bridge": ""
+      }
+    })
+  );
 
   app.use(express.json({ limit: "10mb" }));
 
