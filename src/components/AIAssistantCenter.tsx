@@ -11,6 +11,17 @@ import { getNotesForClient, saveNotesForClient, logActivityEvent, FileNote } fro
 import { generateChecklistForClient, evaluateChecklistReadiness } from "../lib/checklistEngine";
 import { BRIDGE_URL } from "../lib/bridgeService";
 
+const renderInlineMarkdown = (text: string) => {
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const processed = escaped
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>");
+  return { __html: processed };
+};
+
 interface AIAssistantCenterProps {
   clients: Client[];
   currentUser: CRMUser;
@@ -52,7 +63,26 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
   const [aiInput, setAiInput] = useState<string>("");
   const [aiOutput, setAiOutput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState<number>(0);
   const [activeTool, setActiveTool] = useState<string>("summary");
+
+  const loadingMessages = useMemo(() => [
+    "Analyzing file qualifiers...",
+    "Consulting Canadian Monoline Ratios...",
+    "Evaluating stress test thresholds...",
+    "Drafting output..."
+  ], []);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingMsgIdx(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setLoadingMsgIdx((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [loading, loadingMessages]);
   
   // Search query states
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -1191,11 +1221,11 @@ Could you please let me know what my max qualifying amount is under the stress t
                     </button>
 
                     <button 
-                      onClick={() => triggerAITool("intake_raw", rawIntakeText)}
-                      disabled={!rawIntakeText.trim()}
+                      onClick={() => triggerAITool("intake_raw")}
+                      disabled={rawIntakeText.trim().length === 0}
                       className="px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white text-xs font-black uppercase rounded-lg transition disabled:opacity-40 flex items-center gap-1.5"
                     >
-                      <Sparkles className="w-3.5 h-3.5 fill-current" /> Parse Application Digest
+                      <Sparkles className="w-3.5 h-3.5 fill-current" /> Run Intake Analysis
                     </button>
                   </div>
                 </div>
@@ -1218,7 +1248,7 @@ Could you please let me know what my max qualifying amount is under the stress t
                     </div>
                     <div className="space-y-1 text-center">
                       <span className="text-xs font-black uppercase tracking-wider text-[var(--color-text)] block">Invoking AI Underwriting Agent</span>
-                      <span className="text-[10px] text-[var(--color-text-muted)] block font-mono animate-pulse">Consulting Canadian Monoline Ratios &amp; GDS/TDS Stress Test Guidelines...</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] block font-mono animate-pulse">{loadingMessages[loadingMsgIdx]}</span>
                     </div>
                   </div>
                 ) : (
@@ -1239,21 +1269,21 @@ Could you please let me know what my max qualifying amount is under the stress t
                         if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
                           return (
                             <ul key={idx} className="list-disc list-inside ml-2 text-[var(--color-text-muted)] space-y-1">
-                              <li>{trimmed.substring(2)}</li>
+                              <li dangerouslySetInnerHTML={renderInlineMarkdown(trimmed.substring(2))} />
                             </ul>
                           );
                         }
                         if (/^\d+\.\s/.test(trimmed)) {
                           return (
                             <ol key={idx} className="list-decimal list-inside ml-2 text-[var(--color-text)] space-y-1">
-                              <li className="font-bold">{trimmed.replace(/^\d+\.\s/, "")}</li>
+                              <li className="font-bold" dangerouslySetInnerHTML={renderInlineMarkdown(trimmed.replace(/^\d+\.\s/, ""))} />
                             </ol>
                           );
                         }
                         if (trimmed === "") {
                           return <div key={idx} className="h-2" />;
                         }
-                        return <p key={idx} className="leading-relaxed text-[var(--color-text-muted)]">{line}</p>;
+                        return <p key={idx} className="leading-relaxed text-[var(--color-text-muted)]" dangerouslySetInnerHTML={renderInlineMarkdown(line)} />;
                       })}
                     </div>
 
@@ -1424,9 +1454,14 @@ Could you please let me know what my max qualifying amount is under the stress t
                       showToast(`Restored: ${h.toolName}`, "info");
                     }}
                   >
-                    <div className="space-y-0.5">
+                    <div className="space-y-0.5 flex-1 min-w-0">
                       <span className="font-bold text-[var(--color-text)] block">{h.toolName}</span>
-                      <span className="text-[var(--color-text-muted)]">Client: {h.clientName} | {new Date(h.timestamp).toLocaleTimeString()}</span>
+                      {h.response && (
+                        <span className="text-[9px] text-[var(--color-text-muted)] block truncate opacity-75 italic">
+                          {h.response.trim().substring(0, 80)}{h.response.trim().length > 80 ? "..." : ""}
+                        </span>
+                      )}
+                      <span className="text-[var(--color-text-muted)] block">Client: {h.clientName} | {new Date(h.timestamp).toLocaleTimeString()}</span>
                     </div>
                     <ArrowRight className="w-3 h-3 text-[var(--color-primary)] opacity-60" />
                   </div>

@@ -115,6 +115,30 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 }) => {
   const pn = (s: any) => parseFloat(String(s).replace(/[$,\s]/g, "")) || 0;
 
+  // Local state for CMHC Mortgage Insurance Premium Calculator
+  const [cmhcPrice, setCmhcPrice] = React.useState<string>("500000");
+  const [cmhcDown, setCmhcDown] = React.useState<string>("50000");
+
+  // Load client parameters into CMHC state
+  React.useEffect(() => {
+    if (calcClientId) {
+      const c = clients.find(x => x.id === calcClientId);
+      if (c) {
+        const val = pn(c.propval);
+        const mtg = pn(c.mtgamt);
+        if (val > 0) {
+          setCmhcPrice(String(val));
+          const calculatedDown = Math.max(0, val - mtg);
+          setCmhcDown(String(calculatedDown));
+        } else if (mtg > 0) {
+          // Fallback if propval is missing but mortgage amount is set
+          setCmhcPrice(String(Math.round(mtg * 1.15)));
+          setCmhcDown(String(Math.round(mtg * 0.15)));
+        }
+      }
+    }
+  }, [calcClientId, clients]);
+
   // Real-time Calculators evaluation
   // 1. Stress test
   const calculateStressTest = () => {
@@ -210,6 +234,68 @@ export const Calculators: React.FC<CalculatorsProps> = ({
   const hrResult = pn(hrRate) * pn(hrHrs) * 52;
   const seAvg = (pn(seY1) + pn(seY2)) / 2;
 
+  // 5. CMHC Mortgage Insurance Premium evaluation
+  const calculateCmhcPremium = () => {
+    const price = pn(cmhcPrice);
+    const down = pn(cmhcDown);
+    
+    if (price <= 0) {
+      return {
+        ltvRatio: 0,
+        downPct: 0,
+        premiumPct: 0,
+        baseMortgage: 0,
+        premiumAmount: 0,
+        totalMortgage: 0,
+        warning: null
+      };
+    }
+    
+    const baseMortgage = Math.max(0, price - down);
+    const downPct = price > 0 ? (down / price) * 100 : 0;
+    const ltvRatio = 100 - downPct;
+    
+    let premiumPct = 0;
+    let warning: string | null = null;
+    
+    if (downPct < 5) {
+      warning = "Warning: Standard CMHC guidelines require a minimum 5% down payment.";
+    }
+    
+    if (price >= 1000000) {
+      warning = "Note: CMHC mortgage insurance is generally not available for properties of $1,000,000 or more.";
+    }
+    
+    // Determine tier
+    if (ltvRatio <= 80) {
+      premiumPct = 0.00;
+    } else if (ltvRatio > 80 && ltvRatio <= 85) {
+      premiumPct = 2.80;
+    } else if (ltvRatio > 85 && ltvRatio <= 90) {
+      premiumPct = 3.10;
+    } else if (ltvRatio > 90 && ltvRatio <= 95) {
+      premiumPct = 4.00;
+    } else {
+      // LTV > 95%
+      premiumPct = 4.00;
+    }
+    
+    const premiumAmount = baseMortgage * (premiumPct / 100);
+    const totalMortgage = baseMortgage + premiumAmount;
+    
+    return {
+      ltvRatio,
+      downPct,
+      premiumPct,
+      baseMortgage,
+      premiumAmount,
+      totalMortgage,
+      warning
+    };
+  };
+
+  const cmhcRes = calculateCmhcPremium();
+
   const handleCopyRatios = () => {
     if (!ratioRes) return;
     const text = `GDS: ${ratioRes.gds.toFixed(1)}% | TDS: ${ratioRes.tds.toFixed(1)}% | Income: ${fd(pn(gcIncome))}/yr | Housing Pmt: ${fd(pn(gcPmt))}/mo`;
@@ -239,7 +325,11 @@ export const Calculators: React.FC<CalculatorsProps> = ({
           ))}
         </select>
         <button 
-          onClick={onClearCalcClient}
+          onClick={() => {
+            onClearCalcClient();
+            setCmhcPrice("500000");
+            setCmhcDown("50000");
+          }}
           className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold rounded-lg transition-all border border-[var(--color-border)] cursor-pointer"
         >
           Reset values
@@ -332,7 +422,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Heat cost/mo</label>
+                <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Heat cost/mo (default $150)</label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
                   <input 
@@ -367,6 +457,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 >
                   <option value="25" className="bg-[var(--color-bg)]">25 years</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 years</option>
+                  <option value="15" className="bg-[var(--color-bg)]">15 yr</option>
                 </select>
               </div>
             </div>
@@ -590,6 +681,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   <option value="25" className="bg-[var(--color-bg)]">25 yr</option>
                   <option value="30" className="bg-[var(--color-bg)]">30 yr</option>
                   <option value="20" className="bg-[var(--color-bg)]">20 yr</option>
+                  <option value="15" className="bg-[var(--color-bg)]">15 yr</option>
                 </select>
               </div>
               <div>
@@ -601,7 +693,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 >
                   <option value="monthly" className="bg-[var(--color-bg)]">Monthly</option>
                   <option value="biweekly" className="bg-[var(--color-bg)]">Bi-Weekly</option>
-                  <option value="accel" className="bg-[var(--color-bg)]">Accel Bi-Wk</option>
+                  <option value="accelBiweekly" className="bg-[var(--color-bg)]">Accel Bi-Wk</option>
                 </select>
               </div>
             </div>
@@ -714,6 +806,87 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                 <strong className="text-[var(--color-accent)] font-mono font-extrabold text-sm">{fd(seAvg)}/yr</strong>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* CMHC Mortgage Insurance Premium Calculator */}
+        <div className="panel-card overflow-hidden transition-all duration-300">
+          <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/30 mr-1 flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2">
+              <Percent className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>CMHC Insurance Premium</span>
+            </h3>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-mono font-bold bg-[var(--color-surface-3)] px-2 py-0.5 rounded border border-[var(--color-border)]">CMHC Tiers</span>
+          </div>
+
+          <div className="p-5 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Purchase Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={cmhcPrice}
+                    onChange={(e) => setCmhcPrice(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="500,000"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider font-semibold mb-1">Down Payment</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs text-[var(--color-text-faint)] font-bold">$</span>
+                  <input 
+                    type="text" 
+                    value={cmhcDown}
+                    onChange={(e) => setCmhcDown(e.target.value.replace(/[^\d.]/g, ""))}
+                    placeholder="50,000"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg pl-6 pr-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 font-semibold transition-all duration-150"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Results display */}
+            <div className="p-4 bg-[var(--color-surface-2)] rounded-xl border border-[var(--color-border)] shadow-sm space-y-3">
+              <div className="flex justify-between items-center border-b border-[var(--color-border)] pb-2">
+                <div>
+                  <div className="text-2xl font-extrabold text-[var(--color-accent)] tracking-tight">{fd(cmhcRes.premiumAmount)}</div>
+                  <div className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wider mt-0.5 font-bold">Insurance Premium Added</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-extrabold text-[var(--color-text)]">{cmhcRes.premiumPct.toFixed(2)}%</div>
+                  <div className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wider mt-0.5 font-bold">Premium Rate</div>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center text-xs text-[var(--color-text-muted)] font-semibold">
+                <span>LTV Ratio</span>
+                <span className="font-bold text-[var(--color-text)]">{cmhcRes.ltvRatio.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between items-center text-xs text-[var(--color-text-muted)] font-semibold">
+                <span>Down Payment %</span>
+                <span className="font-bold text-[var(--color-text)]">{cmhcRes.downPct.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between items-center text-xs text-[var(--color-text-muted)] font-semibold">
+                <span>Base Mortgage (Loan) Amount</span>
+                <span className="font-bold text-[var(--color-text)]">{fd(cmhcRes.baseMortgage)}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs text-[var(--color-text-muted)] font-semibold border-t border-[var(--color-border)] pt-2 mt-2">
+                <span className="text-[var(--color-text)] font-bold">Total Mortgage with CMHC</span>
+                <span className="font-extrabold text-[var(--color-success)] text-sm font-mono">{fd(cmhcRes.totalMortgage)}</span>
+              </div>
+            </div>
+
+            {cmhcRes.warning && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[10px] text-amber-300 font-medium flex gap-2 items-start leading-relaxed">
+                <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>{cmhcRes.warning}</span>
+              </div>
+            )}
           </div>
         </div>
 
