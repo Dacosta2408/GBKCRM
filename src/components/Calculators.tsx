@@ -55,9 +55,9 @@ interface CalculatorsProps {
   cPmt: (P: number, rPct: number, yrs: number) => number;
   pToAmt: (pmt: number, rPct: number, yrs: number) => number;
   fd: (n: number) => string;
-  showToast: (msg: string, type?: any) => void;
+  showToast: (msg: string, type?: "success" | "error" | "info" | "warning") => void;
   selectedClient: Client | null;
-  onSaveCalcToClient: (snapshot: any) => void;
+  onSaveCalcToClient: (snapshot: Partial<Exclude<Client["calcSnapshot"], undefined>>) => void;
   onNavigateToClient: (id: string) => void;
 }
 
@@ -119,7 +119,7 @@ export const Calculators: React.FC<CalculatorsProps> = ({
   onSaveCalcToClient,
   onNavigateToClient
 }) => {
-  const pn = (s: any) => parseFloat(String(s).replace(/[$,\s]/g, "")) || 0;
+  const pn = (s: string | number | undefined | null) => parseFloat(String(s || "").replace(/[$,\s]/g, "")) || 0;
 
   // Local state for CMHC Mortgage Insurance Premium Calculator
   const [cmhcPrice, setCmhcPrice] = React.useState<string>("500000");

@@ -479,8 +479,17 @@ export default function App() {
 
   const handleTabChange = (tab: string) => {
     resetIdleTimer();
+    setApplicationIntakeOpen(false);
+    setNewClientOpen(false);
     setActiveTab(tab);
   };
+
+  useEffect(() => {
+    if (activeTab === "calculators") {
+      setApplicationIntakeOpen(false);
+      setNewClientOpen(false);
+    }
+  }, [activeTab, setApplicationIntakeOpen]);
 
   useEffect(() => {
     const handleActivity = () => resetIdleTimer();

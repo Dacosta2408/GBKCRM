@@ -260,9 +260,6 @@ export const AIAssistantCenter: React.FC<AIAssistantCenterProps> = ({
 
   // Generate dynamic client notes and document status text for AI context
   const getClientContextString = (client: Client): string => {
-    console.log('docVault keys:', Object.keys(docVault));
-    console.log('client id:', currentClient?.id);
-
     const clientDocs = docVault[client.id] || 
                        docVault[client.id.toLowerCase()] || 
                        docVault[Object.keys(docVault).find(key => key.toLowerCase() === client.id.toLowerCase()) || ""] || 

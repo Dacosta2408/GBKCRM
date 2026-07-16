@@ -5,7 +5,7 @@ import { pn, cPmt } from "../lib/formatters";
 export interface UseCalculatorsProps {
   clients: Client[];
   onUpdateClient: (client: Client) => void;
-  showToast?: (msg: string, type?: any) => void;
+  showToast?: (msg: string, type?: "success" | "error" | "info" | "warning") => void;
 }
 
 export function useCalculators({ clients, onUpdateClient, showToast }: UseCalculatorsProps) {
@@ -109,7 +109,7 @@ export function useCalculators({ clients, onUpdateClient, showToast }: UseCalcul
     }
   }
 
-  function handleSaveCalcToClient(snapshot: any) {
+  function handleSaveCalcToClient(snapshot: Partial<Exclude<Client["calcSnapshot"], undefined>>) {
     if (!calcClientId) return;
     const client = clients.find(c => c.id === calcClientId);
     if (!client) return;
