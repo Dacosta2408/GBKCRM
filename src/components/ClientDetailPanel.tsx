@@ -31,6 +31,7 @@ export interface ClientDetailPanelProps {
   showToast: (msg: string, type?: "success" | "error", icon?: string) => void;
   bridgeOnline?: boolean;
   handleDeleteClient: (id: string) => Promise<void>;
+  onNavigateToCalculators?: (clientId: string) => void;
 }
 
 function fd(n: any) {
@@ -70,7 +71,8 @@ export function ClientDetailPanel({
   getAgentNames,
   showToast,
   bridgeOnline = false,
-  handleDeleteClient
+  handleDeleteClient,
+  onNavigateToCalculators
 }: ClientDetailPanelProps) {
   if (!currentClient) return null;
 
@@ -745,6 +747,104 @@ export function ClientDetailPanel({
                         </div>
                       </div>
                     </div>
+
+                    {/* Calculator Snapshot Section */}
+                    {currentClient.calcSnapshot && (
+                      <div className="glass-card p-4.5 border border-amber-500/10 bg-amber-500/[0.01]">
+                        <div className="flex items-center justify-between mb-3 border-b border-[var(--color-border)] pb-2">
+                          <h4 className="text-[9px] uppercase font-black tracking-widest text-amber-400 flex items-center gap-1.5">
+                            <span>📊</span> Calculator Snapshot
+                          </h4>
+                          <span className="text-[8px] text-[var(--color-text-muted)] font-bold italic">
+                            Saved on {new Date(currentClient.calcSnapshot.savedAt).toLocaleDateString()} {new Date(currentClient.calcSnapshot.savedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                          <div className="bg-[var(--color-surface-2)]/40 p-3 rounded-lg border border-[var(--color-border)]">
+                            <span className="text-[8px] uppercase font-bold text-[var(--color-text-muted)]">Max Qualified Mortgage</span>
+                            <div className="text-sm font-black text-[var(--color-text)] mt-1">
+                              {currentClient.calcSnapshot.stressTest ? fd(currentClient.calcSnapshot.stressTest.maxQualifiedMortgage) : "—"}
+                            </div>
+                            {currentClient.calcSnapshot.stressTest?.maxPurchasePrice ? (
+                              <span className="text-[8px] text-[var(--color-text-faint)] mt-1 block">
+                                Est. Max Purchase: {fd(currentClient.calcSnapshot.stressTest.maxPurchasePrice)}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          <div className="bg-[var(--color-surface-2)]/40 p-3 rounded-lg border border-[var(--color-border)]">
+                            <span className="text-[8px] uppercase font-bold text-[var(--color-text-muted)]">Debt Service (GDS / TDS)</span>
+                            <div className="flex items-baseline gap-2 mt-1">
+                              {currentClient.calcSnapshot.gdsTds ? (
+                                <>
+                                  <span className={`text-xs font-mono font-bold ${currentClient.calcSnapshot.gdsTds.passed ? "text-emerald-400" : "text-rose-400"}`}>
+                                    {currentClient.calcSnapshot.gdsTds.gds.toFixed(1)}% / {currentClient.calcSnapshot.gdsTds.tds.toFixed(1)}%
+                                  </span>
+                                  <span className={`text-[8px] px-1.5 py-0.5 font-bold uppercase rounded ${
+                                    currentClient.calcSnapshot.gdsTds.passed 
+                                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                                      : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                  }`}>
+                                    {currentClient.calcSnapshot.gdsTds.passed ? "Pass" : "Fail"}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-xs text-[var(--color-text-muted)]">—</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="bg-[var(--color-surface-2)]/40 p-3 rounded-lg border border-[var(--color-border)]">
+                            <span className="text-[8px] uppercase font-bold text-[var(--color-text-muted)]">Monthly Payment</span>
+                            <div className="text-sm font-black text-[var(--color-text)] mt-1">
+                              {currentClient.calcSnapshot.paymentCalc 
+                                ? fd(currentClient.calcSnapshot.paymentCalc.monthly) 
+                                : currentClient.calcSnapshot.stressTest?.estPaymentAtContract
+                                  ? fd(currentClient.calcSnapshot.stressTest.estPaymentAtContract)
+                                  : "—"
+                              }
+                            </div>
+                            {currentClient.calcSnapshot.paymentCalc?.frequency && (
+                              <span className="text-[8px] text-[var(--color-text-faint)] mt-1 block uppercase font-bold">
+                                Freq: {currentClient.calcSnapshot.paymentCalc.frequency} @ {currentClient.calcSnapshot.paymentCalc.rate}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {currentClient.calcSnapshot.cmhc && (
+                          <div className="mb-4 p-2.5 bg-amber-500/[0.02] border border-amber-500/10 rounded-lg text-[9px] text-[var(--color-text-muted)] flex flex-wrap gap-x-4 gap-y-1">
+                            <div>
+                              <span className="font-bold">Purchase:</span> {fd(currentClient.calcSnapshot.cmhc.purchasePrice)}
+                            </div>
+                            <div>
+                              <span className="font-bold">Down Payment:</span> {fd(currentClient.calcSnapshot.cmhc.downPayment)} ({currentClient.calcSnapshot.cmhc.downPct?.toFixed(1) || "0.0"}%)
+                            </div>
+                            <div>
+                              <span className="font-bold">CMHC Premium:</span> {fd(currentClient.calcSnapshot.cmhc.premiumAmount)} ({currentClient.calcSnapshot.cmhc.premiumPct?.toFixed(2) || "0.00"}%)
+                            </div>
+                            <div>
+                              <span className="font-bold">Total Mortgage:</span> {fd(currentClient.calcSnapshot.cmhc.totalMortgage)}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-center mt-3 pt-3 border-t border-[var(--color-border)]">
+                          <span className="text-[8px] text-[var(--color-text-faint)] font-bold uppercase tracking-wider">
+                            Snapshot contains stress, payments, GDS/TDS, and CMHC values
+                          </span>
+                          {onNavigateToCalculators && (
+                            <button
+                              onClick={() => onNavigateToCalculators(currentClient.id)}
+                              className="text-[9px] uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 font-black px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              Recalculate in Calculators ➔
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Quick Link Button to Application Details */}
                     <div className="flex justify-end">

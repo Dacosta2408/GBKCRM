@@ -43,6 +43,46 @@ export interface Client {
   type?: string;
   purchasePrice?: string | number;
   mortgageAmount?: string | number;
+  calcSnapshot?: {
+    savedAt: string;
+    stressTest?: {
+      stressRate: number;
+      maxQualifiedMortgage: number;
+      maxPurchasePrice: number;
+      estPaymentAtContract: number;
+      income: number;
+    };
+    paymentCalc?: {
+      loanAmount: number;
+      rate: number;
+      amortization: number;
+      frequency: string;
+      monthly: number;
+      biweekly: number;
+      accelBiweekly: number;
+      totalInterest: number;
+    };
+    gdsTds?: {
+      gds: number;
+      tds: number;
+      passed: boolean;
+      income: number;
+      payment: number;
+    };
+    cmhc?: {
+      purchasePrice: number;
+      downPayment: number;
+      downPct: number;
+      ltvRatio: number;
+      premiumPct: number;
+      premiumAmount: number;
+      totalMortgage: number;
+      warning?: string | null;
+    };
+    hourlyAnnual?: number;
+    seAverage?: number;
+    notes?: string;
+  };
 }
 
 export interface Note {

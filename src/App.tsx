@@ -450,8 +450,11 @@ export default function App() {
     seY2,
     setSeY2,
     handleLoadClientToCalc,
-    handleClearCalcClient
-  } = useCalculators({ clients });
+    handleClearCalcClient,
+    handleSaveCalcToClient
+  } = useCalculators({ clients, onUpdateClient: handleUpdateClient, showToast });
+
+  const calcSelectedClient = clients.find(c => c.id === calcClientId) ?? null;
 
   // Local storage writing side-effects
   useEffect(() => { localStorage.setItem("gbk_lenders", JSON.stringify(lenders)); }, [lenders]);
@@ -1180,6 +1183,12 @@ export default function App() {
               pToAmt={pToAmt}
               fd={fd}
               showToast={showToast}
+              selectedClient={calcSelectedClient}
+              onSaveCalcToClient={handleSaveCalcToClient}
+              onNavigateToClient={(id) => {
+                openClient(id);
+                setActiveTab("clients");
+              }}
             />
           )}
 
@@ -1480,6 +1489,12 @@ export default function App() {
         getAgentNames={getAgentNames}
         showToast={showToast}
         bridgeOnline={bridgeOnline}
+        onNavigateToCalculators={(clientId) => {
+          setCalcClientId(clientId);
+          handleLoadClientToCalc(clientId);
+          closeDetail();
+          setActiveTab("calculators");
+        }}
       />
 
       {/* Settings Modal config */}

@@ -56,6 +56,9 @@ interface CalculatorsProps {
   pToAmt: (pmt: number, rPct: number, yrs: number) => number;
   fd: (n: number) => string;
   showToast: (msg: string, type?: any) => void;
+  selectedClient: Client | null;
+  onSaveCalcToClient: (snapshot: any) => void;
+  onNavigateToClient: (id: string) => void;
 }
 
 export const Calculators: React.FC<CalculatorsProps> = ({
@@ -111,7 +114,10 @@ export const Calculators: React.FC<CalculatorsProps> = ({
   cPmt,
   pToAmt,
   fd,
-  showToast
+  showToast,
+  selectedClient,
+  onSaveCalcToClient,
+  onNavigateToClient
 }) => {
   const pn = (s: any) => parseFloat(String(s).replace(/[$,\s]/g, "")) || 0;
 
@@ -308,6 +314,49 @@ export const Calculators: React.FC<CalculatorsProps> = ({
 
   const cmhcRes = calculateCmhcPremium();
 
+  const handleSave = () => {
+    if (!calcClientId) return;
+    const snapshot = {
+      stressTest: stressRes ? {
+        stressRate: stressRes.stressRate,
+        maxQualifiedMortgage: stressRes.maxQualifiedMortgage,
+        maxPurchasePrice: stressRes.maxPurchasePrice || 0,
+        estPaymentAtContract: stressRes.estPaymentAtContract,
+        income: stressRes.inc
+      } : undefined,
+      paymentCalc: payRes ? {
+        loanAmount: pn(pcAmount),
+        rate: parseFloat(pcRate) || 0,
+        amortization: parseInt(pcAm) || 25,
+        frequency: pcFreq,
+        monthly: payRes.monthly,
+        biweekly: payRes.biweekly,
+        accelBiweekly: payRes.accelBiweekly,
+        totalInterest: payRes.totalInterest
+      } : undefined,
+      gdsTds: ratioRes ? {
+        gds: ratioRes.gds,
+        tds: ratioRes.tds,
+        passed: ratioRes.passed,
+        income: pn(gcIncome),
+        payment: pn(gcPmt)
+      } : undefined,
+      cmhc: cmhcRes ? {
+        purchasePrice: pn(cmhcPrice),
+        downPayment: pn(cmhcDown),
+        downPct: cmhcRes.downPct,
+        ltvRatio: cmhcRes.ltvRatio,
+        premiumPct: cmhcRes.premiumPct,
+        premiumAmount: cmhcRes.premiumAmount,
+        totalMortgage: cmhcRes.totalMortgage,
+        warning: cmhcRes.warning
+      } : undefined,
+      hourlyAnnual: hrResult,
+      seAverage: seAvg
+    };
+    onSaveCalcToClient(snapshot);
+  };
+
   const handleCopyRatios = () => {
     if (!ratioRes) return;
     const text = `GDS: ${ratioRes.gds.toFixed(1)}% | TDS: ${ratioRes.tds.toFixed(1)}% | Income: ${fd(pn(gcIncome))}/yr | Housing Pmt: ${fd(pn(gcPmt))}/mo`;
@@ -319,34 +368,93 @@ export const Calculators: React.FC<CalculatorsProps> = ({
   return (
     <div className="flex flex-col gap-5 h-full overflow-y-auto pr-1">
       {/* Client Quick Link Bar */}
-      <div className="panel-card p-4 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0 transition-all duration-150">
-        <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1.5">
-          <span>📂</span> Analyze existing client file:
-        </label>
-        <select 
-          value={calcClientId}
-          onChange={(e) => {
-            setCalcClientId(e.target.value);
-            if (e.target.value) onLoadClientToCalc(e.target.value);
-          }}
-          className="flex-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer"
-        >
-          <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">— Manual Calculator Mode —</option>
-          {clients.map(c => (
-            <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} {c.type ? `(${c.type})` : ""}</option>
-          ))}
-        </select>
-        <button 
-          onClick={() => {
-            onClearCalcClient();
-            setCmhcPrice("500000");
-            setCmhcDown("50000");
-          }}
-          className="px-4 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold rounded-lg transition-all border border-[var(--color-border)] cursor-pointer"
-        >
-          Reset values
-        </button>
-      </div>
+      {!calcClientId ? (
+        <div className="panel-card p-4 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0 transition-all duration-150">
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1.5">
+            <span>📂</span> Analyze existing client file:
+          </label>
+          <select 
+            value={calcClientId}
+            onChange={(e) => {
+              setCalcClientId(e.target.value);
+              if (e.target.value) onLoadClientToCalc(e.target.value);
+            }}
+            className="flex-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer"
+          >
+            <option value="" className="bg-[var(--color-bg)] text-[var(--color-text)]">— Manual Calculator Mode —</option>
+            {clients.map(c => (
+              <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last} {c.type ? `(${c.type})` : ""}</option>
+            ))}
+          </select>
+          <button 
+            disabled
+            className="px-4 py-1.5 bg-[var(--color-surface-2)]/50 text-[var(--color-text-faint)] text-xs font-bold rounded-lg border border-[var(--color-border)] opacity-50 cursor-not-allowed"
+          >
+            Save to Client File
+          </button>
+        </div>
+      ) : (
+        <div className="panel-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 transition-all duration-150">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2 py-0.5 bg-green-500/15 text-green-400 border border-green-500/30 rounded text-[10px] font-bold uppercase tracking-wider">
+              CLIENT MODE
+            </span>
+            <span className="text-xs font-extrabold text-[var(--color-text)]">
+              {selectedClient ? `${selectedClient.first} ${selectedClient.last}` : "Loading Client..."}
+            </span>
+            {selectedClient && (
+              <button
+                onClick={() => onNavigateToClient(selectedClient.id)}
+                title="Open client profile"
+                className="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-3)] rounded border border-[var(--color-border)] transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold"
+              >
+                <span>🔗 Profile</span>
+              </button>
+            )}
+            {selectedClient?.calcSnapshot?.savedAt && (
+              <span className="text-[10px] text-[var(--color-text-muted)] font-medium italic bg-[var(--color-surface-2)] px-2 py-0.5 rounded border border-[var(--color-border)]">
+                Last saved: {new Date(selectedClient.calcSnapshot.savedAt).toLocaleDateString()} {new Date(selectedClient.calcSnapshot.savedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 self-stretch md:self-auto justify-end">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold text-[var(--color-text-muted)]">Switch:</span>
+              <select 
+                value={calcClientId}
+                onChange={(e) => {
+                  setCalcClientId(e.target.value);
+                  if (e.target.value) onLoadClientToCalc(e.target.value);
+                }}
+                className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)]/30 border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-all duration-150 cursor-pointer min-w-[120px]"
+              >
+                {clients.map(c => (
+                  <option key={c.id} value={c.id} className="bg-[var(--color-bg)] text-[var(--color-text)]">{c.first} {c.last}</option>
+                ))}
+              </select>
+            </div>
+
+            <button 
+              onClick={handleSave}
+              className="px-3.5 py-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all cursor-pointer flex items-center gap-1"
+            >
+              <span>💾</span> Save to Client File
+            </button>
+
+            <button 
+              onClick={() => {
+                onClearCalcClient();
+                setCmhcPrice("500000");
+                setCmhcDown("50000");
+              }}
+              className="px-2.5 py-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold rounded-lg transition-all border border-[var(--color-border)] cursor-pointer"
+            >
+              Exit Client Mode
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
