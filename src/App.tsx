@@ -1502,7 +1502,11 @@ export default function App() {
           setCalcClientId(clientId);
           handleLoadClientToCalc(clientId);
           closeDetail();
-          setActiveTab("calculators");
+          setApplicationIntakeOpen(false);
+          setNewClientOpen(false);
+          setIntakePreloadedText("");
+          setIntakePreloadedFileName("");
+          handleTabChange("calculators");
         }}
       />
 
