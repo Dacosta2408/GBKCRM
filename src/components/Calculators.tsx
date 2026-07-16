@@ -163,12 +163,24 @@ export const Calculators: React.FC<CalculatorsProps> = ({
     const maxQualifiedMortgage = maxQualifiedPmt > 0 ? pToAmt(maxQualifiedPmt, stressRate, am) : 0;
     const isQualifying = maxQualifiedMortgage > 0;
 
+    let maxPurchasePrice = 0;
+    if (maxQualifiedMortgage > 0) {
+      if (maxQualifiedMortgage <= 500000) {
+        maxPurchasePrice = maxQualifiedMortgage / 0.95;
+      } else if (maxQualifiedMortgage < 1000000) {
+        maxPurchasePrice = (maxQualifiedMortgage - 25000) / 0.90;
+      } else {
+        maxPurchasePrice = maxQualifiedMortgage / 0.80;
+      }
+    }
+
     return {
       stressRate,
       maxQualifiedMortgage,
       isQualifying,
       estPaymentAtContract: cPmt(maxQualifiedMortgage, rate, am),
-      inc
+      inc,
+      maxPurchasePrice
     };
   };
 
@@ -475,6 +487,13 @@ export const Calculators: React.FC<CalculatorsProps> = ({
                   <div className="flex justify-between"><span>Qualifying Stress Rate</span><span className="font-bold text-[var(--color-text)]">{stressRes.stressRate.toFixed(2)}%</span></div>
                   <div className="flex justify-between"><span>Combined Gross income</span><span className="font-bold text-[var(--color-text)]">{fd(stressRes.inc)}/yr</span></div>
                   <div className="flex justify-between"><span>Est. Contract Payment</span><span className="font-extrabold text-[var(--color-success)]">{fd(stressRes.estPaymentAtContract)}/month</span></div>
+                  <div className="flex justify-between border-t border-[var(--color-border)]/60 pt-2 mt-1">
+                    <span className="text-[var(--color-accent)] font-bold">Est. Max Purchase Price</span>
+                    <span className="font-extrabold text-[var(--color-text)] text-sm">{fd(stressRes.maxPurchasePrice)}</span>
+                  </div>
+                  <div className="text-[10px] text-[var(--color-text-faint)] leading-snug font-medium mt-0.5">
+                    * Assumes minimum down payment (5% on first $500k, 10% on remainder up to $999k, 20% if $1M+).
+                  </div>
                 </div>
               </div>
             ) : (
