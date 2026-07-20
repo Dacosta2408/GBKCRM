@@ -4,7 +4,7 @@ import {
   Plus, Trash2, Save, AlertTriangle, CheckCircle2, AlertCircle, Sparkles, 
   Send, ListFilter, ChevronDown, RefreshCw, Edit2, Archive, Check, ArrowRight
 } from "lucide-react";
-import { Client, User as CRMUser } from "../types";
+import { Client, User as CRMUser, Task, Event } from "../types";
 import { 
   FileNote, 
   FileFollowUp, 
@@ -24,6 +24,10 @@ interface MortgageActivityTrackerProps {
   agentNames: string[];
   activeSubTab: "notes" | "activity";
   showToast: (msg: string, type?: "success" | "error" | "info", icon?: string) => void;
+  tasks?: Task[];
+  setTasks?: React.Dispatch<React.SetStateAction<Task[]>>;
+  events?: Event[];
+  setEvents?: React.Dispatch<React.SetStateAction<Event[]>>;
 }
 
 export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = ({
@@ -32,7 +36,11 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
   onUpdateClient,
   agentNames,
   activeSubTab,
-  showToast
+  showToast,
+  tasks,
+  setTasks,
+  events,
+  setEvents
 }) => {
   // --- STATE ---
   const [notes, setNotes] = useState<FileNote[]>([]);
@@ -63,6 +71,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
   const [followUpDueDate, setFollowUpDueDate] = useState("");
   const [followUpOwner, setFollowUpOwner] = useState(client.agent || "");
   const [followUpPriority, setFollowUpPriority] = useState<FileFollowUp["priority"]>("medium");
+  const [followUpActionType, setFollowUpActionType] = useState<"task" | "calendar" | "both">("both");
+  const [followUpNotes, setFollowUpNotes] = useState("");
 
   // Edit State for existing note
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -248,6 +258,17 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       setFollowUps(updatedFollowUps);
       saveFollowUpsForClient(client.id, updatedFollowUps);
 
+      // Sync next follow up date to client object immutably
+      const pendingFups = updatedFollowUps.filter(fup => fup.status === "pending");
+      pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+      const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
+
+      onUpdateClient({
+        ...client,
+        nextFollowUpDate: nextDate,
+        updatedAt: new Date().toISOString()
+      });
+
       logActivityEvent({
         clientId: client.id,
         clientName: `${client.first} ${client.last}`,
@@ -271,6 +292,45 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
     e.preventDefault();
     if (!followUpTitle.trim() || !followUpDueDate) return;
 
+    let taskId: string | undefined = undefined;
+    let eventId: string | undefined = undefined;
+
+    // Create central Task if selected Task or Both
+    if ((followUpActionType === "task" || followUpActionType === "both") && setTasks) {
+      taskId = `t_fup_${Date.now()}`;
+      const newTask: Task = {
+        id: taskId,
+        title: followUpTitle.trim(),
+        status: "open",
+        priority: followUpPriority === "critical" ? "high" : followUpPriority,
+        dueDate: followUpDueDate,
+        clientId: client.id,
+        clientName: `${client.first} ${client.last}`,
+        assignedTo: followUpOwner || `${currentUser.first} ${currentUser.last}`,
+        notes: followUpNotes.trim() || "CRM Follow-up task.",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        createdBy: `${currentUser.first} ${currentUser.last}`
+      };
+      setTasks(prevTasks => [...(prevTasks || []), newTask]);
+    }
+
+    // Create central Calendar Event if selected Calendar or Both
+    if ((followUpActionType === "calendar" || followUpActionType === "both") && setEvents) {
+      eventId = `ev_fup_${Date.now()}`;
+      const newEvent: Event = {
+        id: eventId,
+        title: followUpTitle.trim(),
+        date: followUpDueDate,
+        time: "09:00",
+        type: "client",
+        clientId: client.id,
+        notes: followUpNotes.trim() || "CRM Follow-up calendar event.",
+        createdBy: `${currentUser.first} ${currentUser.last}`
+      };
+      setEvents(prevEvents => [...(prevEvents || []), newEvent]);
+    }
+
     const newFollowUp: FileFollowUp = {
       id: `fup_${Date.now()}`,
       clientId: client.id,
@@ -280,12 +340,25 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       assignedOwner: followUpOwner || `${currentUser.first} ${currentUser.last}`,
       priority: followUpPriority,
       status: "pending",
-      createdTime: new Date().toISOString()
+      createdTime: new Date().toISOString(),
+      taskId,
+      eventId
     };
 
     const updatedFollowUps = [...followUps, newFollowUp];
     setFollowUps(updatedFollowUps);
     saveFollowUpsForClient(client.id, updatedFollowUps);
+
+    // Sync next follow up date to client object immutably
+    const pendingFups = updatedFollowUps.filter(fup => fup.status === "pending");
+    pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+    const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
+
+    onUpdateClient({
+      ...client,
+      nextFollowUpDate: nextDate,
+      updatedAt: new Date().toISOString()
+    });
 
     // Log Activity Event
     logActivityEvent({
@@ -294,23 +367,47 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       eventType: "followup_added",
       user: `${currentUser.first} ${currentUser.last}`,
       timestamp: new Date().toISOString(),
-      description: `Created file follow-up task: "${newFollowUp.title}" (Assigned to: ${newFollowUp.assignedOwner})`
+      description: `Created integrated ${followUpActionType} follow-up task: "${newFollowUp.title}" (Assigned to: ${newFollowUp.assignedOwner})`
     });
 
     setFollowUpTitle("");
     setFollowUpDueDate("");
+    setFollowUpNotes("");
+    setFollowUpActionType("both");
     setShowAddFollowUp(false);
     setRefreshTrigger(prev => prev + 1);
-    showToast(`Follow-up scheduled for ${newFollowUp.assignedOwner}`, "success", "⏰");
+    
+    let destMsg = "Task & Calendar Event";
+    if (followUpActionType === "task") destMsg = "Task only";
+    if (followUpActionType === "calendar") destMsg = "Calendar Event only";
+    showToast(`Follow-up scheduled in central CRM (${destMsg})`, "success", "⏰");
   };
 
   // Resolve / Complete Follow-Up
   const handleToggleFollowUp = (fupId: string) => {
+    const targetFup = followUps.find(f => f.id === fupId);
+    if (!targetFup) return;
+
+    const isCompleted = targetFup.status === "completed";
+    const newStatus = isCompleted ? "pending" : "completed";
+
+    // Synchronize toggle with the central Task state if linked
+    if (targetFup.taskId && setTasks) {
+      setTasks(prevTasks => prevTasks.map(t => {
+        if (t.id === targetFup.taskId) {
+          return {
+            ...t,
+            status: isCompleted ? "open" : "done",
+            completedAt: isCompleted ? null : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return t;
+      }));
+    }
+
     const updated = followUps.map(fup => {
       if (fup.id === fupId) {
-        const isCompleted = fup.status === "completed";
-        const newStatus = isCompleted ? "pending" : "completed";
-        
         // Log event
         logActivityEvent({
           clientId: client.id,
@@ -334,18 +431,54 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
     setFollowUps(updated);
     saveFollowUpsForClient(client.id, updated);
+
+    // Sync next follow up date to client object immutably
+    const pendingFups = updated.filter(fup => fup.status === "pending");
+    pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+    const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
+
+    onUpdateClient({
+      ...client,
+      nextFollowUpDate: nextDate,
+      updatedAt: new Date().toISOString()
+    });
+
     setRefreshTrigger(prev => prev + 1);
-    showToast("Follow-up status changed.", "success", "✓");
+    showToast("Follow-up status synchronized.", "success", "✓");
   };
 
   // Delete Follow-Up
   const handleDeleteFollowUp = (fupId: string) => {
     if (window.confirm("Are you sure you want to remove this follow-up?")) {
+      const targetFup = followUps.find(f => f.id === fupId);
+
+      // Clean up linked central Task
+      if (targetFup?.taskId && setTasks) {
+        setTasks(prevTasks => prevTasks.filter(t => t.id !== targetFup.taskId));
+      }
+
+      // Clean up linked central Event
+      if (targetFup?.eventId && setEvents) {
+        setEvents(prevEvents => prevEvents.filter(e => e.id !== targetFup.eventId));
+      }
+
       const updated = followUps.filter(fup => fup.id !== fupId);
       setFollowUps(updated);
       saveFollowUpsForClient(client.id, updated);
+
+      // Sync next follow up date to client object immutably
+      const pendingFups = updated.filter(fup => fup.status === "pending");
+      pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+      const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
+
+      onUpdateClient({
+        ...client,
+        nextFollowUpDate: nextDate,
+        updatedAt: new Date().toISOString()
+      });
+
       setRefreshTrigger(prev => prev + 1);
-      showToast("Follow-up task deleted.", "info", "🗑️");
+      showToast("Follow-up task deleted from CRM.", "info", "🗑️");
     }
   };
 
@@ -377,10 +510,26 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
     });
   }, [activities, activityFilter]);
 
+  // Dynamic resolution of follow-up state using real-time central task state
+  const resolvedFollowUps = useMemo(() => {
+    return followUps.map(fup => {
+      if (fup.taskId && tasks) {
+        const matchedTask = tasks.find(t => t.id === fup.taskId);
+        if (matchedTask) {
+          return {
+            ...fup,
+            status: matchedTask.status === "done" ? ("completed" as const) : ("pending" as const)
+          };
+        }
+      }
+      return fup;
+    });
+  }, [followUps, tasks]);
+
   // Underwriter Bottleneck Diagnostics (Manager checks)
   const auditDiagnostics = useMemo(() => {
-    const hasPendingFollowUp = followUps.some(fup => fup.status === "pending");
-    const activeFollowUps = followUps.filter(fup => fup.status === "pending");
+    const hasPendingFollowUp = resolvedFollowUps.some(fup => fup.status === "pending");
+    const activeFollowUps = resolvedFollowUps.filter(fup => fup.status === "pending");
     
     // Check stale (no communication/update events in last 7 days)
     const sevenDaysAgo = new Date();
@@ -415,7 +564,7 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       hasOverdue: overdueFollowUps.length > 0,
       isChasingHeavy
     };
-  }, [activities, followUps, client]);
+  }, [activities, resolvedFollowUps, client]);
 
   // Color mappings for note categories
   const noteTypeBadges: Record<FileNote["type"], { label: string; bg: string; text: string }> = {
@@ -851,6 +1000,30 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
               </div>
 
               <div className="space-y-1">
+                <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">CRM Action Destination</label>
+                <select 
+                  value={followUpActionType}
+                  onChange={(e) => setFollowUpActionType(e.target.value as any)}
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-1 text-[10px] font-extrabold text-[var(--color-text)] focus:outline-none"
+                >
+                  <option value="task">Task Only</option>
+                  <option value="calendar">Calendar Event Only</option>
+                  <option value="both">Both (Task & Calendar Event)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">Notes / Details (Optional)</label>
+                <textarea 
+                  placeholder="Details for task descriptions or calendar notes..."
+                  value={followUpNotes}
+                  onChange={(e) => setFollowUpNotes(e.target.value)}
+                  rows={2}
+                  className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-1.5 text-[10px] text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none font-semibold resize-none"
+                />
+              </div>
+
+              <div className="space-y-1">
                 <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">Owner</label>
                 <select 
                   value={followUpOwner}
@@ -883,16 +1056,27 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
           {/* List Follow-Ups */}
           <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-            {followUps.length === 0 ? (
+            {resolvedFollowUps.length === 0 ? (
               <p className="text-[10px] text-[var(--color-text-faint)] italic text-center py-4 font-semibold">No follow-ups recorded on this file.</p>
             ) : (
-              followUps.map(fup => {
+              resolvedFollowUps.map(fup => {
                 const isCompleted = fup.status === "completed";
                 const isOverdue = !isCompleted && fup.dueDate < new Date().toISOString().split("T")[0];
 
                 let priorityStyle = "text-zinc-400 bg-zinc-500/10";
                 if (fup.priority === "high") priorityStyle = "text-orange-400 bg-orange-500/10";
                 if (fup.priority === "critical") priorityStyle = "text-red-400 bg-red-500/10 animate-pulse";
+
+                let typeBadge = null;
+                if (fup.taskId && fup.eventId) {
+                  typeBadge = <span className="px-1 py-0.2 rounded font-black tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/10">Task & Cal</span>;
+                } else if (fup.taskId) {
+                  typeBadge = <span className="px-1 py-0.2 rounded font-black tracking-widest text-cyan-400 bg-cyan-500/10 border border-cyan-500/10">Task</span>;
+                } else if (fup.eventId) {
+                  typeBadge = <span className="px-1 py-0.2 rounded font-black tracking-widest text-pink-400 bg-pink-500/10 border border-pink-500/10">Cal</span>;
+                } else {
+                  typeBadge = <span className="px-1 py-0.2 rounded font-black tracking-widest text-zinc-500 bg-zinc-500/5 border border-zinc-500/5">Local</span>;
+                }
 
                 return (
                   <div 
@@ -923,7 +1107,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                         
                         <div className="flex items-center gap-2 mt-1 text-[8px] uppercase font-black text-[var(--color-text-faint)]">
                           <span className={`px-1 py-0.2 rounded font-black tracking-widest ${priorityStyle}`}>{fup.priority}</span>
-                          <span className={isOverdue ? "text-red-400" : ""}>Due: {fup.dueDate}</span>
+                          {typeBadge}
+                          <span className={isOverdue ? "text-red-400 font-extrabold" : ""}>Due: {fup.dueDate}</span>
                         </div>
                       </div>
                     </div>

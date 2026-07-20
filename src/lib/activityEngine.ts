@@ -42,6 +42,8 @@ export interface FileFollowUp {
   status: 'pending' | 'completed' | 'overdue';
   createdTime: string;
   completedTime?: string;
+  taskId?: string;
+  eventId?: string;
 }
 
 export interface ActivityEvent {

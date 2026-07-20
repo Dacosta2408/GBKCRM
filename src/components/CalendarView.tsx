@@ -216,19 +216,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   }, [currentUser]);
 
   const [selectedCalendarOwner, setSelectedCalendarOwner] = useState<string>(() => {
-    const role = (currentUser?.role || "").toLowerCase();
-    const canView = role.includes("admin") || role.includes("manager");
-    return canView ? "all" : (currentUser?.id || "all");
+    return canViewOtherCalendars ? "all" : (currentUser?.id || "all");
   });
 
   // Regular users are locked to their own calendar
   useEffect(() => {
-    const role = (currentUser?.role || "").toLowerCase();
-    const canView = role.includes("admin") || role.includes("manager");
-    if (!canView && currentUser?.id) {
+    if (!canViewOtherCalendars && currentUser?.id) {
       setSelectedCalendarOwner(currentUser.id);
     }
-  }, [currentUser]);
+  }, [currentUser, canViewOtherCalendars]);
 
   // Navigation & view mode controls
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());

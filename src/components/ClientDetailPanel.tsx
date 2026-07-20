@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, ShieldCheck, ShieldAlert, Download, Trash2, FileText, ChevronDown, Calendar } from "lucide-react";
-import { Client, User, Lender } from "../types";
+import { Client, User, Lender, Task, Event } from "../types";
 import { ApplicationDetailsForm } from "./ApplicationDetailsForm";
 import { DocumentManager } from "./DocumentManager";
 import { MortgageChecklist } from "./MortgageChecklist";
@@ -33,6 +33,10 @@ export interface ClientDetailPanelProps {
   handleDeleteClient: (id: string) => Promise<void>;
   onNavigateToCalculators?: (clientId: string) => void;
   onScheduleClientActivity?: (clientId: string) => void;
+  tasks?: Task[];
+  setTasks?: React.Dispatch<React.SetStateAction<Task[]>>;
+  events?: Event[];
+  setEvents?: React.Dispatch<React.SetStateAction<Event[]>>;
 }
 
 function fd(n: any) {
@@ -74,7 +78,11 @@ export function ClientDetailPanel({
   bridgeOnline = false,
   handleDeleteClient,
   onNavigateToCalculators,
-  onScheduleClientActivity
+  onScheduleClientActivity,
+  tasks,
+  setTasks,
+  events,
+  setEvents
 }: ClientDetailPanelProps) {
   if (!currentClient) return null;
 
@@ -1004,6 +1012,10 @@ export function ClientDetailPanel({
                 agentNames={getAgentNames()}
                 activeSubTab="notes"
                 showToast={showToast}
+                tasks={tasks}
+                setTasks={setTasks}
+                events={events}
+                setEvents={setEvents}
               />
             )}
 
@@ -1017,6 +1029,10 @@ export function ClientDetailPanel({
                 agentNames={getAgentNames()}
                 activeSubTab="activity"
                 showToast={showToast}
+                tasks={tasks}
+                setTasks={setTasks}
+                events={events}
+                setEvents={setEvents}
               />
             )}
 

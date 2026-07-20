@@ -1512,6 +1512,10 @@ export default function App() {
         getAgentNames={getAgentNames}
         showToast={showToast}
         bridgeOnline={bridgeOnline}
+        tasks={tasks}
+        setTasks={setTasks}
+        events={events}
+        setEvents={setEvents}
         onNavigateToCalculators={(clientId) => {
           setCalcClientId(clientId);
           handleLoadClientToCalc(clientId);
