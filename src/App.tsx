@@ -196,6 +196,13 @@ export default function App() {
   const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
   const [headerProfileOpen, setHeaderProfileOpen] = useState<boolean>(false);
 
+  const [calendarLaunchIntent, setCalendarLaunchIntent] = useState<{
+    clientId?: string;
+    dateStr?: string;
+    timeStr?: string;
+    openModal?: boolean;
+  } | null>(null);
+
   const [settings, setSettings] = useState({ 
     apiKey: localStorage.getItem("gbk_apiKey") || "" 
   });
@@ -1293,6 +1300,8 @@ export default function App() {
               setTasks={setTasks}
               clients={clients}
               showToast={showToast}
+              calendarLaunchIntent={calendarLaunchIntent}
+              clearCalendarLaunchIntent={() => setCalendarLaunchIntent(null)}
             />
           )}
 
@@ -1510,6 +1519,15 @@ export default function App() {
           setIntakePreloadedText("");
           setIntakePreloadedFileName("");
           handleTabChange("calculators");
+        }}
+        onScheduleClientActivity={(clientId) => {
+          setCalendarLaunchIntent({
+            clientId,
+            dateStr: new Date().toISOString().split("T")[0],
+            openModal: true
+          });
+          closeDetail();
+          handleTabChange("calendar");
         }}
       />
 

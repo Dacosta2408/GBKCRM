@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, ShieldCheck, ShieldAlert, Download, Trash2, FileText, ChevronDown } from "lucide-react";
+import { Sparkles, ShieldCheck, ShieldAlert, Download, Trash2, FileText, ChevronDown, Calendar } from "lucide-react";
 import { Client, User, Lender } from "../types";
 import { ApplicationDetailsForm } from "./ApplicationDetailsForm";
 import { DocumentManager } from "./DocumentManager";
@@ -32,6 +32,7 @@ export interface ClientDetailPanelProps {
   bridgeOnline?: boolean;
   handleDeleteClient: (id: string) => Promise<void>;
   onNavigateToCalculators?: (clientId: string) => void;
+  onScheduleClientActivity?: (clientId: string) => void;
 }
 
 function fd(n: any) {
@@ -72,7 +73,8 @@ export function ClientDetailPanel({
   showToast,
   bridgeOnline = false,
   handleDeleteClient,
-  onNavigateToCalculators
+  onNavigateToCalculators,
+  onScheduleClientActivity
 }: ClientDetailPanelProps) {
   if (!currentClient) return null;
 
@@ -591,6 +593,16 @@ export function ClientDetailPanel({
                   </span>
                 )}
               </div>
+
+              {onScheduleClientActivity && (
+                <button
+                  onClick={() => onScheduleClientActivity(currentClient.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20 transition-all cursor-pointer"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                  Schedule Activity
+                </button>
+              )}
 
               <button
                 onClick={handleExportData}

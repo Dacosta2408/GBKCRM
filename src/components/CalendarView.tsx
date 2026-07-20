@@ -39,7 +39,151 @@ interface CalendarViewProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   clients: Client[];
   showToast: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
+  calendarLaunchIntent?: { clientId?: string; dateStr?: string; timeStr?: string; openModal?: boolean } | null;
+  clearCalendarLaunchIntent?: () => void;
 }
+
+const QuickActionButton: React.FC<{
+  onClick: (e: React.MouseEvent) => void;
+  title: string;
+  variant: "done" | "cancel" | "copy" | "plus1" | "plus7" | "edit" | "delete";
+  showLabel?: boolean;
+}> = ({ onClick, title, variant, showLabel = false }) => {
+  let baseClasses = "flex items-center justify-center rounded-xl border font-extrabold text-[10px] uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:scale-102 active:scale-95 gap-1.5 ";
+  let icon: React.ReactNode = null;
+  let text = "";
+
+  switch (variant) {
+    case "done":
+      baseClasses += "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40";
+      icon = <Check className="w-3.5 h-3.5" />;
+      text = "Done";
+      break;
+    case "cancel":
+      baseClasses += "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40";
+      icon = <X className="w-3.5 h-3.5" />;
+      text = "Cancel";
+      break;
+    case "copy":
+      baseClasses += "bg-blue-500/10 border-blue-500/15 text-blue-500 dark:text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/40";
+      icon = <Copy className="w-3.5 h-3.5" />;
+      text = "Copy";
+      break;
+    case "plus1":
+      baseClasses += "bg-cyan-500/10 border-cyan-500/15 text-cyan-500 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40";
+      text = "+1d";
+      break;
+    case "plus7":
+      baseClasses += "bg-cyan-500/10 border-cyan-500/15 text-cyan-500 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40";
+      text = "+7d";
+      break;
+    case "edit":
+      baseClasses += "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)] hover:border-[var(--color-border)]/85";
+      icon = <Edit3 className="w-3.5 h-3.5" />;
+      text = "Edit";
+      break;
+    case "delete":
+      baseClasses += "bg-red-500/10 border-red-500/20 text-red-500 dark:text-red-400 hover:bg-red-500/20 hover:border-red-500/40";
+      icon = <Trash2 className="w-3.5 h-3.5" />;
+      text = "Delete";
+      break;
+  }
+
+  // Adjust padding based on whether we have label or only icon
+  const hasLabel = showLabel || !icon;
+  const paddingClasses = hasLabel ? "p-1.5 px-2.5" : "p-2";
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseClasses} ${paddingClasses}`}
+      title={title}
+    >
+      {icon}
+      {hasLabel && <span>{text}</span>}
+    </button>
+  );
+};
+
+interface CanadianHoliday {
+  date: string;
+  name: string;
+  regions: string[];
+}
+
+const CANADIAN_HOLIDAYS: CanadianHoliday[] = [
+  // 2024
+  { date: "2024-01-01", name: "New Year's Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2024-02-19", name: "Family Day", regions: ["ON", "BC", "AB"] },
+  { date: "2024-03-29", name: "Good Friday", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2024-05-20", name: "Victoria Day", regions: ["ON", "BC", "AB"] },
+  { date: "2024-05-20", name: "National Patriots' Day", regions: ["QC"] },
+  { date: "2024-06-24", name: "Fête Nationale", regions: ["QC"] },
+  { date: "2024-07-01", name: "Canada Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2024-08-05", name: "Civic Holiday", regions: ["ON"] },
+  { date: "2024-08-05", name: "British Columbia Day", regions: ["BC"] },
+  { date: "2024-08-05", name: "Heritage Day", regions: ["AB"] },
+  { date: "2024-09-02", name: "Labour Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2024-09-30", name: "National Day for Truth and Reconciliation", regions: ["BC", "ON"] },
+  { date: "2024-10-14", name: "Thanksgiving", regions: ["ON", "BC", "AB"] },
+  { date: "2024-11-11", name: "Remembrance Day", regions: ["BC", "AB"] },
+  { date: "2024-12-25", name: "Christmas Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2024-12-26", name: "Boxing Day", regions: ["ON"] },
+
+  // 2025
+  { date: "2025-01-01", name: "New Year's Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2025-02-17", name: "Family Day", regions: ["ON", "BC", "AB"] },
+  { date: "2025-04-18", name: "Good Friday", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2025-05-19", name: "Victoria Day", regions: ["ON", "BC", "AB"] },
+  { date: "2025-05-19", name: "National Patriots' Day", regions: ["QC"] },
+  { date: "2025-06-24", name: "Fête Nationale", regions: ["QC"] },
+  { date: "2025-07-01", name: "Canada Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2025-08-04", name: "Civic Holiday", regions: ["ON"] },
+  { date: "2025-08-04", name: "British Columbia Day", regions: ["BC"] },
+  { date: "2025-08-04", name: "Heritage Day", regions: ["AB"] },
+  { date: "2025-09-01", name: "Labour Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2025-09-30", name: "National Day for Truth and Reconciliation", regions: ["BC", "ON"] },
+  { date: "2025-10-13", name: "Thanksgiving", regions: ["ON", "BC", "AB"] },
+  { date: "2025-11-11", name: "Remembrance Day", regions: ["BC", "AB"] },
+  { date: "2025-12-25", name: "Christmas Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2025-12-26", name: "Boxing Day", regions: ["ON"] },
+
+  // 2026
+  { date: "2026-01-01", name: "New Year's Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2026-02-16", name: "Family Day", regions: ["ON", "BC", "AB"] },
+  { date: "2026-04-03", name: "Good Friday", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2026-05-18", name: "Victoria Day", regions: ["ON", "BC", "AB"] },
+  { date: "2026-05-18", name: "National Patriots' Day", regions: ["QC"] },
+  { date: "2026-06-24", name: "Fête Nationale", regions: ["QC"] },
+  { date: "2026-07-01", name: "Canada Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2026-08-03", name: "Civic Holiday", regions: ["ON"] },
+  { date: "2026-08-03", name: "British Columbia Day", regions: ["BC"] },
+  { date: "2026-08-03", name: "Heritage Day", regions: ["AB"] },
+  { date: "2026-09-07", name: "Labour Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2026-09-30", name: "National Day for Truth and Reconciliation", regions: ["BC", "ON"] },
+  { date: "2026-10-12", name: "Thanksgiving", regions: ["ON", "BC", "AB"] },
+  { date: "2026-11-11", name: "Remembrance Day", regions: ["BC", "AB"] },
+  { date: "2026-12-25", name: "Christmas Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2026-12-26", name: "Boxing Day", regions: ["ON"] },
+
+  // 2027
+  { date: "2027-01-01", name: "New Year's Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2027-02-15", name: "Family Day", regions: ["ON", "BC", "AB"] },
+  { date: "2027-03-26", name: "Good Friday", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2027-05-24", name: "Victoria Day", regions: ["ON", "BC", "AB"] },
+  { date: "2027-05-24", name: "National Patriots' Day", regions: ["QC"] },
+  { date: "2027-06-24", name: "Fête Nationale", regions: ["QC"] },
+  { date: "2027-07-01", name: "Canada Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2027-08-02", name: "Civic Holiday", regions: ["ON"] },
+  { date: "2027-08-02", name: "British Columbia Day", regions: ["BC"] },
+  { date: "2027-08-02", name: "Heritage Day", regions: ["AB"] },
+  { date: "2027-09-06", name: "Labour Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2027-09-30", name: "National Day for Truth and Reconciliation", regions: ["BC", "ON"] },
+  { date: "2027-10-11", name: "Thanksgiving", regions: ["ON", "BC", "AB"] },
+  { date: "2027-11-11", name: "Remembrance Day", regions: ["BC", "AB"] },
+  { date: "2027-12-25", name: "Christmas Day", regions: ["ON", "BC", "AB", "QC"] },
+  { date: "2027-12-26", name: "Boxing Day", regions: ["ON"] }
+];
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
   events,
@@ -47,7 +191,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   tasks,
   setTasks,
   clients,
-  showToast
+  showToast,
+  calendarLaunchIntent,
+  clearCalendarLaunchIntent
 }) => {
   // Calendar settings state
   const [defaultView, setDefaultView] = useState<"day" | "week" | "month" | "list">("week");
@@ -56,6 +202,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const [workdayEndHour, setWorkdayEndHour] = useState<number>(18);
   const [slotInterval, setSlotInterval] = useState<15 | 30>(15);
   const [defaultDuration, setDefaultDuration] = useState<number>(60);
+  const [holidayRegion, setHolidayRegion] = useState<string>("ON");
 
   // Navigation & view mode controls
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
@@ -92,9 +239,38 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     }
   }, [currentDate, selectedDateStr]);
 
+  // Handle launch intent from other CRM records
+  useEffect(() => {
+    if (calendarLaunchIntent) {
+      const { clientId, dateStr, timeStr, openModal } = calendarLaunchIntent;
+      
+      if (dateStr) {
+        setSelectedDateStr(dateStr);
+        try {
+          const d = new Date(dateStr + "T12:00:00");
+          if (!isNaN(d.getTime())) {
+            setCurrentDate(d);
+          }
+        } catch (err) {
+          console.error("Failed to parse date from calendarLaunchIntent:", err);
+        }
+      }
+
+      if (openModal) {
+        // Trigger opening of add modal with pre-populated values
+        handleOpenAddModal(dateStr, timeStr, clientId);
+      }
+
+      // Clear the intent immediately
+      clearCalendarLaunchIntent?.();
+    }
+  }, [calendarLaunchIntent, clearCalendarLaunchIntent]);
+
   // Task & Event editing wizardry
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [pendingDeleteEventId, setPendingDeleteEventId] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
 
   // Form states and enhancements
   const [eventTitle, setEventTitle] = useState("");
@@ -312,10 +488,26 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   // Memoized lists based on selections
+  const allEvents = useMemo(() => {
+    const holidayEvents: CalendarEvent[] = CANADIAN_HOLIDAYS
+      .filter(h => h.regions.includes(holidayRegion))
+      .map(h => ({
+        id: `system-holiday-${holidayRegion}-${h.date}-${h.name.replace(/\s+/g, '-').toLowerCase()}`,
+        title: `[Stat Holiday] ${h.name}`,
+        date: h.date,
+        type: 'holiday',
+        createdBy: 'System',
+        isPrivate: false,
+        status: 'scheduled'
+      }));
+
+    return [...events, ...holidayEvents];
+  }, [events, holidayRegion]);
+
   const selectedDayInfo = useMemo(() => {
     const d = new Date(selectedDateStr + "T00:00:00");
     const label = d.toLocaleDateString("en-CA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const dayEvs = events.filter(e => e.date === selectedDateStr);
+    const dayEvs = allEvents.filter(e => e.date === selectedDateStr);
     const dayTs = tasks.filter(t => t.dueDate === selectedDateStr);
     return {
       dateStr: selectedDateStr,
@@ -323,12 +515,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       events: dayEvs,
       tasks: dayTs
     };
-  }, [selectedDateStr, events, tasks]);
+  }, [selectedDateStr, allEvents, tasks]);
 
   // Dynamic filter lists
   const filteredEventsForMonth = useMemo(() => {
-    return events.filter(e => filterType === "all" || e.type === filterType);
-  }, [events, filterType]);
+    return allEvents.filter(e => filterType === "all" || e.type === filterType);
+  }, [allEvents, filterType]);
 
   // Overdue and open tasks count
   const openTasks = useMemo(() => {
@@ -411,6 +603,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   const handleOpenEditModal = (event: CalendarEvent) => {
+    if (event.id.startsWith("system-holiday-")) {
+      showToast(`${event.title} is a regional stat holiday and cannot be modified.`, "info", "ℹ");
+      return;
+    }
     setEditingEvent(event);
     setEventTitle(event.title);
     setEventDate(event.date);
@@ -523,11 +719,23 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   // Delete event
   const handleRemoveEvent = (eventId: string) => {
-    if (window.confirm("Delete this scheduled event from timeline?")) {
-      setEvents(prev => prev.filter(e => e.id !== eventId));
+    setPendingDeleteEventId(eventId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (pendingDeleteEventId) {
+      setEvents(prev => prev.filter(e => e.id !== pendingDeleteEventId));
       showToast("Event removed from timeline.", "info", "🗑️");
+      setDeleteConfirmOpen(false);
+      setPendingDeleteEventId(null);
       setIsEventModalOpen(false);
     }
+  };
+
+  const cancelDeleteEvent = () => {
+    setDeleteConfirmOpen(false);
+    setPendingDeleteEventId(null);
   };
 
   // Helper to quickly update event status
@@ -608,10 +816,54 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     return blocks;
   }, [workdayStartHour, workdayEndHour, slotInterval]);
 
+  // Generate valid start times for dropdown time picker
+  const timePickerOptions = useMemo(() => {
+    const options = [];
+    for (let h = workdayStartHour; h <= workdayEndHour; h++) {
+      const slotsCount = 60 / slotInterval;
+      for (let s = 0; s < slotsCount; s++) {
+        const mins = s * slotInterval;
+        const hourStr = String(h).padStart(2, "0");
+        const minStr = String(mins).padStart(2, "0");
+        const timeVal = `${hourStr}:${minStr}`;
+        
+        const ampm = h >= 12 ? "PM" : "AM";
+        const displayHour = h % 12 === 0 ? 12 : h % 12;
+        const label = `${displayHour}:${minStr} ${ampm}`;
+        
+        options.push({ value: timeVal, label });
+      }
+    }
+    
+    if (eventTime) {
+      const cleanedEventTime = eventTime.substring(0, 5);
+      const exists = options.some(opt => opt.value === cleanedEventTime);
+      if (!exists) {
+        let label = cleanedEventTime;
+        try {
+          const [hStr, mStr] = cleanedEventTime.split(":");
+          const hNum = parseInt(hStr, 10);
+          if (!isNaN(hNum)) {
+            const ampm = hNum >= 12 ? "PM" : "AM";
+            const displayHour = hNum % 12 === 0 ? 12 : hNum % 12;
+            label = `${displayHour}:${mStr} ${ampm}`;
+          }
+        } catch (err) {
+          console.error("Error formatting custom eventTime label:", err);
+        }
+        options.push({ value: cleanedEventTime, label });
+      }
+    }
+
+    // Sort options chronologically
+    options.sort((a, b) => a.value.localeCompare(b.value));
+    return options;
+  }, [workdayStartHour, workdayEndHour, slotInterval, eventTime]);
+
   // Check if an event falls inside a slot range
   // Let's compute if an event is starting at a given hour / minute slot
   const getEventsForTimeSlot = (dateStr: string, timeSlot: string) => {
-    return events.filter(ev => ev.date === dateStr && isEventInSlot(ev.time, timeSlot) && (filterType === "all" || ev.type === filterType));
+    return allEvents.filter(ev => ev.date === dateStr && isEventInSlot(ev.time, timeSlot) && (filterType === "all" || ev.type === filterType));
   };
 
   return (
@@ -650,7 +902,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* Month grid days */}
           <div className="grid grid-cols-7 gap-1">
             {monthDays.map((md, idx) => {
-              const worksOnThisDate = events.some(e => e.date === md.dateStr);
+              const worksOnThisDate = allEvents.some(e => e.date === md.dateStr);
               const isSelected = selectedDateStr === md.dateStr;
               
               return (
@@ -680,10 +932,27 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
         {/* Categories Color-Coded Filter List */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3.5">
-          <h4 className="text-[10.5px] font-extrabold text-[var(--color-text-muted)] uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-[var(--color-accent)]" /> 
-            Categories Legend
-          </h4>
+          <div className="flex items-center justify-between mb-3 border-b border-[var(--color-border)]/30 pb-2">
+            <h4 className="text-[10.5px] font-extrabold text-[var(--color-text-muted)] uppercase tracking-widest flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-[var(--color-accent)]" /> 
+              Categories Legend
+            </h4>
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] font-extrabold text-[var(--color-text-muted)] uppercase tracking-wider">
+                Region:
+              </span>
+              <select
+                value={holidayRegion}
+                onChange={(e) => setHolidayRegion(e.target.value)}
+                className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-md px-1 py-0.5 text-[10px] font-extrabold text-[var(--color-text)] focus:outline-none transition-all cursor-pointer"
+              >
+                <option value="ON">ON</option>
+                <option value="BC">BC</option>
+                <option value="AB">AB</option>
+                <option value="QC">QC</option>
+              </select>
+            </div>
+          </div>
           <div className="space-y-2">
             <button
               onClick={() => setFilterType("all")}
@@ -697,11 +966,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-text-muted)]" />
                 All Activities
               </span>
-              <span className="font-mono text-[10px] opacity-60">({events.length})</span>
+              <span className="font-mono text-[10px] opacity-60">({allEvents.length})</span>
             </button>
-
+ 
             {eventTypes.map(et => {
-              const count = events.filter(e => e.type === et.value).length;
+              let countStr = "";
+              if (et.value === "holiday") {
+                const userCount = allEvents.filter(e => e.type === "holiday" && !e.id.startsWith("system-holiday-")).length;
+                const systemCount = allEvents.filter(e => e.type === "holiday" && e.id.startsWith("system-holiday-")).length;
+                countStr = `${userCount + systemCount} (${userCount} user, ${systemCount} stat)`;
+              } else {
+                const count = allEvents.filter(e => e.type === et.value).length;
+                countStr = `${count}`;
+              }
               return (
                 <button
                   key={et.value}
@@ -716,7 +993,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <span className={`w-2.5 h-2.5 rounded-full ${et.color} ${et.glow}`} />
                     {et.label}
                   </span>
-                  <span className="font-mono text-[10px] opacity-50">({count})</span>
+                  <span className="font-mono text-[10px] opacity-60">({countStr})</span>
                 </button>
               );
             })}
@@ -1026,79 +1303,82 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                         </div>
 
                                         {/* Row actions */}
-                                        <div className="flex items-center flex-wrap gap-1 md:gap-1.5 sm:self-center shrink-0 justify-end opacity-0 group-hover/card:opacity-100 transition-opacity">
-                                          {ev.status !== "completed" && (
-                                            <button
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleUpdateEventStatus(ev.id, "completed");
-                                              }}
-                                              className="p-1 px-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 hover:bg-emerald-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                              title="Mark Completed"
-                                            >
-                                              <Check className="w-3 h-3" /> Done
-                                            </button>
+                                        <div className="flex items-center flex-wrap gap-2 sm:self-center shrink-0 justify-end opacity-0 group-hover/card:opacity-100 transition-opacity">
+                                          {ev.id.startsWith("system-holiday-") ? (
+                                            <span className="text-[9px] font-extrabold text-[var(--color-text-muted)] uppercase bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2.5 py-1.5 rounded-xl select-none">
+                                              Stat Holiday ({holidayRegion})
+                                            </span>
+                                          ) : (
+                                            <>
+                                              {ev.status !== "completed" && (
+                                                <QuickActionButton
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleUpdateEventStatus(ev.id, "completed");
+                                                  }}
+                                                  variant="done"
+                                                  title="Mark Completed"
+                                                  showLabel={true}
+                                                />
+                                              )}
+                                              {ev.status !== "canceled" && (
+                                                <QuickActionButton
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleUpdateEventStatus(ev.id, "canceled");
+                                                  }}
+                                                  variant="cancel"
+                                                  title="Cancel Event"
+                                                  showLabel={true}
+                                                />
+                                              )}
+                                              <QuickActionButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleDuplicateEvent(ev);
+                                                }}
+                                                variant="copy"
+                                                title="Duplicate Event"
+                                                showLabel={true}
+                                              />
+                                              <QuickActionButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleRescheduleEvent(ev, "next-day");
+                                                }}
+                                                variant="plus1"
+                                                title="Reschedule +1 Day"
+                                                showLabel={true}
+                                              />
+                                              <QuickActionButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleRescheduleEvent(ev, "next-week");
+                                                }}
+                                                variant="plus7"
+                                                title="Reschedule +1 Week"
+                                                showLabel={true}
+                                              />
+                                              <QuickActionButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleOpenEditModal(ev);
+                                                }}
+                                                variant="edit"
+                                                title="Edit Event"
+                                                showLabel={true}
+                                              />
+                                              <QuickActionButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleRemoveEvent(ev.id);
+                                                }}
+                                                variant="delete"
+                                                title="Delete Event"
+                                                showLabel={true}
+                                              />
+                                            </>
                                           )}
-                                          {ev.status !== "canceled" && (
-                                            <button
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleUpdateEventStatus(ev.id, "canceled");
-                                              }}
-                                              className="p-1 px-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-500 hover:bg-amber-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                              title="Cancel Event"
-                                            >
-                                              <X className="w-3 h-3" /> Cancel
-                                            </button>
-                                          )}
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleDuplicateEvent(ev);
-                                            }}
-                                            className="p-1 px-1.5 bg-blue-500/10 border border-blue-500/15 rounded-lg text-blue-400 hover:bg-blue-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                            title="Duplicate Event"
-                                          >
-                                            <Copy className="w-3 h-3" /> Copy
-                                          </button>
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleRescheduleEvent(ev, "next-day");
-                                            }}
-                                            className="p-1 px-1.5 bg-cyan-500/10 border border-cyan-500/15 rounded-lg text-cyan-400 hover:bg-cyan-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                            title="Reschedule +1 Day"
-                                          >
-                                            +1d
-                                          </button>
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleRescheduleEvent(ev, "next-week");
-                                            }}
-                                            className="p-1 px-1.5 bg-cyan-500/10 border border-cyan-500/15 rounded-lg text-cyan-400 hover:bg-cyan-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                            title="Reschedule +1 Week"
-                                          >
-                                            +7d
-                                          </button>
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleOpenEditModal(ev);
-                                            }}
-                                            className="p-1 px-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)] transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                          >
-                                            <Edit3 className="w-3 h-3" /> Edit
-                                          </button>
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleRemoveEvent(ev.id);
-                                            }}
-                                            className="p-1 px-1.5 bg-red-500/10 border border-red-500/15 rounded-lg text-red-400 hover:bg-red-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                          >
-                                            <Trash2 className="w-3 h-3" /> Delete
-                                          </button>
                                         </div>
                                       </div>
                                     );
@@ -1218,81 +1498,75 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                   )}
 
                                     {/* Quick hover-revealed activity actions */}
-                                    <div className="mt-2 pt-1.5 border-t border-[var(--color-border)]/25 flex flex-wrap items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                      {ev.status !== "completed" && (
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleUpdateEventStatus(ev.id, "completed");
-                                          }}
-                                          className="p-1 bg-emerald-500/10 border border-emerald-500/15 rounded text-emerald-500 hover:bg-emerald-500/20 transition-all cursor-pointer"
-                                          title="Complete"
-                                        >
-                                          <Check className="w-3 h-3" />
-                                        </button>
+                                    <div className="mt-2 pt-1.5 border-t border-[var(--color-border)]/25 flex flex-wrap items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                                      {ev.id.startsWith("system-holiday-") ? (
+                                        <span className="text-[8px] font-black uppercase text-[var(--color-text-muted)] bg-[var(--color-surface-2)] border border-[var(--color-border)] px-1.5 py-0.5 rounded select-none">
+                                          Stat Holiday ({holidayRegion})
+                                        </span>
+                                      ) : (
+                                        <>
+                                          {ev.status !== "completed" && (
+                                            <QuickActionButton
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleUpdateEventStatus(ev.id, "completed");
+                                              }}
+                                              variant="done"
+                                              title="Complete"
+                                            />
+                                          )}
+                                          {ev.status !== "canceled" && (
+                                            <QuickActionButton
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleUpdateEventStatus(ev.id, "canceled");
+                                              }}
+                                              variant="cancel"
+                                              title="Cancel"
+                                            />
+                                          )}
+                                          <QuickActionButton
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDuplicateEvent(ev);
+                                            }}
+                                            variant="copy"
+                                            title="Duplicate"
+                                          />
+                                          <QuickActionButton
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleRescheduleEvent(ev, "next-day");
+                                            }}
+                                            variant="plus1"
+                                            title="Reschedule +1 Day"
+                                          />
+                                          <QuickActionButton
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleRescheduleEvent(ev, "next-week");
+                                            }}
+                                            variant="plus7"
+                                            title="Reschedule +1 Week"
+                                          />
+                                          <QuickActionButton
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleOpenEditModal(ev);
+                                            }}
+                                            variant="edit"
+                                            title="Edit"
+                                          />
+                                          <QuickActionButton
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleRemoveEvent(ev.id);
+                                            }}
+                                            variant="delete"
+                                            title="Delete"
+                                          />
+                                        </>
                                       )}
-                                      {ev.status !== "canceled" && (
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleUpdateEventStatus(ev.id, "canceled");
-                                          }}
-                                          className="p-1 bg-amber-500/10 border border-amber-500/15 rounded text-amber-500 hover:bg-amber-500/20 transition-all cursor-pointer"
-                                          title="Cancel"
-                                        >
-                                          <X className="w-3 h-3" />
-                                        </button>
-                                      )}
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDuplicateEvent(ev);
-                                        }}
-                                        className="p-1 bg-blue-500/10 border border-blue-500/15 rounded text-blue-400 hover:bg-blue-500/20 transition-all cursor-pointer"
-                                        title="Duplicate"
-                                      >
-                                        <Copy className="w-3 h-3" />
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleRescheduleEvent(ev, "next-day");
-                                        }}
-                                        className="p-1 bg-cyan-500/10 border border-cyan-500/15 rounded text-cyan-400 hover:bg-cyan-500/20 text-[8px] font-bold transition-all cursor-pointer"
-                                        title="Reschedule +1 Day"
-                                      >
-                                        +1d
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleRescheduleEvent(ev, "next-week");
-                                        }}
-                                        className="p-1 bg-cyan-500/10 border border-cyan-500/15 rounded text-cyan-400 hover:bg-cyan-500/20 text-[8px] font-bold transition-all cursor-pointer"
-                                        title="Reschedule +1 Week"
-                                      >
-                                        +7d
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleOpenEditModal(ev);
-                                        }}
-                                        className="p-1 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)] transition-all cursor-pointer"
-                                        title="Edit"
-                                      >
-                                        <Edit3 className="w-3 h-3" />
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleRemoveEvent(ev.id);
-                                        }}
-                                        className="p-1 bg-red-500/10 border border-red-500/15 rounded text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
-                                        title="Delete"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </button>
                                     </div>
                                   </div>
                               );
@@ -1460,78 +1734,74 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           </div>
 
                           <div className="flex items-center flex-wrap gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {ev.status !== "completed" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateEventStatus(ev.id, "completed");
-                                }}
-                                className="p-1 px-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-500 hover:bg-emerald-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                title="Mark Completed"
-                              >
-                                <Check className="w-3 h-3" /> Done
-                              </button>
+                            {ev.id.startsWith("system-holiday-") ? (
+                              <span className="text-[8px] font-black uppercase text-[var(--color-text-muted)] bg-[var(--color-surface-2)] border border-[var(--color-border)] px-1.5 py-0.5 rounded select-none">
+                                Stat Holiday ({holidayRegion})
+                              </span>
+                            ) : (
+                              <>
+                                {ev.status !== "completed" && (
+                                  <QuickActionButton
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUpdateEventStatus(ev.id, "completed");
+                                    }}
+                                    variant="done"
+                                    title="Mark Completed"
+                                  />
+                                )}
+                                {ev.status !== "canceled" && (
+                                  <QuickActionButton
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUpdateEventStatus(ev.id, "canceled");
+                                    }}
+                                    variant="cancel"
+                                    title="Cancel Event"
+                                  />
+                                )}
+                                <QuickActionButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDuplicateEvent(ev);
+                                  }}
+                                  variant="copy"
+                                  title="Duplicate Event"
+                                />
+                                <QuickActionButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRescheduleEvent(ev, "next-day");
+                                  }}
+                                  variant="plus1"
+                                  title="Reschedule +1 Day"
+                                />
+                                <QuickActionButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRescheduleEvent(ev, "next-week");
+                                  }}
+                                  variant="plus7"
+                                  title="Reschedule +1 Week"
+                                />
+                                <QuickActionButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenEditModal(ev);
+                                  }}
+                                  variant="edit"
+                                  title="Edit Event"
+                                />
+                                <QuickActionButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveEvent(ev.id);
+                                  }}
+                                  variant="delete"
+                                  title="Delete Event"
+                                />
+                              </>
                             )}
-                            {ev.status !== "canceled" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateEventStatus(ev.id, "canceled");
-                                }}
-                                className="p-1 px-1.5 bg-amber-500/10 border border-amber-500/20 rounded text-amber-500 hover:bg-amber-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                                title="Cancel Event"
-                              >
-                                <X className="w-3 h-3" /> Cancel
-                              </button>
-                            )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDuplicateEvent(ev);
-                              }}
-                              className="p-1 px-1.5 bg-blue-500/10 border border-blue-500/15 rounded text-blue-400 hover:bg-blue-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                              title="Duplicate Event"
-                            >
-                              <Copy className="w-3 h-3" /> Copy
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRescheduleEvent(ev, "next-day");
-                              }}
-                              className="p-1 px-1.5 bg-cyan-500/10 border border-cyan-500/15 rounded text-cyan-400 hover:bg-cyan-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                              title="Reschedule +1 Day"
-                            >
-                              +1d
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRescheduleEvent(ev, "next-week");
-                              }}
-                              className="p-1 px-1.5 bg-cyan-500/10 border border-cyan-500/15 rounded text-cyan-400 hover:bg-cyan-500/20 transition-all text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                              title="Reschedule +1 Week"
-                            >
-                              +7d
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenEditModal(ev);
-                              }}
-                              className="p-1 px-1.5 border border-[var(--color-border)] rounded text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-2)] transition-colors text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                            >
-                              <Edit3 className="w-3 h-3" /> Edit
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveEvent(ev.id);
-                              }}
-                              className="p-1 px-1.5 border border-[var(--color-border)] rounded text-[var(--color-text-muted)]/60 hover:text-red-400 hover:bg-red-500/10 transition-colors text-[9px] font-bold flex items-center gap-0.5 cursor-pointer"
-                            >
-                              <Trash2 className="w-3 h-3" /> Delete
-                            </button>
                           </div>
                         </div>
                       );
@@ -1627,13 +1897,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   </div>
                   <div>
                     <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Start Time</label>
-                    <input
-                      type="time"
+                    <select
                       required
                       value={eventTime}
                       onChange={(e) => setEventTime(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono"
-                    />
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold cursor-pointer"
+                    >
+                      {timePickerOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value} className="bg-[var(--color-surface)] text-[var(--color-text)]">
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -1982,6 +2257,62 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   </div>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <AnimatePresence>
+        {deleteConfirmOpen && (
+          <div className="fixed inset-0 bg-[var(--color-sidebar)]/75 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden text-left"
+              style={{
+                background: "var(--color-surface)",
+                borderColor: "var(--color-border)",
+                color: "var(--color-text)"
+              }}
+            >
+              <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
+                <h3 className="text-xs uppercase font-extrabold text-red-500 tracking-wider flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  Delete Calendar Record?
+                </h3>
+                <button
+                  type="button"
+                  onClick={cancelDeleteEvent}
+                  className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-1 rounded-lg bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-3">
+                <p className="text-xs text-[var(--color-text-muted)] leading-relaxed font-semibold">
+                  Are you sure you want to permanently delete this calendar record? This action cannot be undone.
+                </p>
+              </div>
+
+              <div className="p-4 border-t border-[var(--color-border)] flex gap-2.5 justify-end bg-[var(--color-surface-2)]/20">
+                <button
+                  type="button"
+                  onClick={cancelDeleteEvent}
+                  className="px-4 py-2 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-extrabold text-xs rounded-xl transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDeleteEvent}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer shadow-md shadow-red-500/10"
+                >
+                  Delete Event
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
