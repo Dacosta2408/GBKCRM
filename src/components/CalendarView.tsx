@@ -73,11 +73,11 @@ const QuickActionButton: React.FC<{
       text = "Copy";
       break;
     case "plus1":
-      baseClasses += "bg-[rgba(249,177,122,0.08)] border-[rgba(249,177,122,0.15)] text-[#9E5D2A] dark:text-[#F9B17A] hover:bg-[rgba(249,177,122,0.16)] hover:border-[#F9B17A]/40";
+      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
       text = "+1d";
       break;
     case "plus7":
-      baseClasses += "bg-[rgba(249,177,122,0.08)] border-[rgba(249,177,122,0.15)] text-[#9E5D2A] dark:text-[#F9B17A] hover:bg-[rgba(249,177,122,0.16)] hover:border-[#F9B17A]/40";
+      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
       text = "+7d";
       break;
     case "edit":
@@ -1080,18 +1080,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onClick={() => selectDay(md.dateStr)}
                   className={`h-7 w-7 text-[10px] font-bold rounded-lg flex flex-col items-center justify-center relative transition-all ${
                     isSelected 
-                      ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-[0_0_12px_rgba(244,163,132,0.3)]"
+                      ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-md shadow-[var(--color-primary)]/20"
                       : md.isToday 
-                        ? "bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]"
+                        ? "bg-[var(--color-primary-subtle)] text-[var(--color-primary)] border border-[var(--color-primary)]/30 font-extrabold"
                         : md.isCurrentMonth
-                          ? "text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
-                          : "text-[var(--color-text-faint)] hover:text-[var(--color-text-muted)]"
+                          ? "text-[var(--color-text)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)]"
+                          : "text-[var(--color-text-faint)]/50 hover:text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span>{md.dayNum}</span>
                   {/* Event indicator dot */}
                   {worksOnThisDate && !isSelected && (
-                    <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
+                    <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
                   )}
                 </button>
               );
@@ -1127,7 +1127,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               onClick={() => setFilterType("all")}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-[11px] font-bold transition-all ${
                 filterType === "all" 
-                  ? "bg-[rgba(244,163,132,0.1)] border-[rgba(244,163,132,0.25)] text-[var(--color-primary)]" 
+                  ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/20 text-[var(--color-primary)] font-extrabold" 
                   : "bg-transparent border-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/60 hover:text-[var(--color-text)]"
               }`}
             >
@@ -1250,7 +1250,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* Top Row: Stable Title & Admin/Manager Switcher */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-[rgba(244,163,132,0.1)] border border-[rgba(244,163,132,0.2)] rounded-xl text-[var(--color-primary)]">
+              <div className="p-2.5 bg-[var(--color-primary-subtle)] border border-[var(--color-primary)]/20 rounded-xl text-[var(--color-primary)]">
                 <CalendarIcon className="w-5 h-5 text-[var(--color-accent)] animate-pulse" />
               </div>
               <div className="text-left">
@@ -1342,8 +1342,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
                   className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
                     advancedFiltersOpen || isFilterActive
-                      ? "border-[var(--color-primary)]/40 bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] font-extrabold"
-                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)]"
+                      ? "border-[var(--color-primary)]/40 bg-[var(--color-primary-subtle)] text-[var(--color-primary)] font-extrabold"
+                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 hover:bg-[var(--color-surface-3)]"
                   }`}
                   title="Toggle Advanced Filters"
                 >
@@ -1356,7 +1356,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 
                 <button 
                   onClick={() => setCalendarSettingsOpen(true)}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-all flex items-center gap-1 cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all flex items-center gap-1 cursor-pointer"
                   title="Configure working hours and time slots"
                 >
                   <Settings className="w-4 h-4" />
@@ -1367,7 +1367,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                 <button 
                   onClick={prevTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
                   title="Previous range"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -1380,7 +1380,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 </button>
                 <button 
                   onClick={nextTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
                   title="Next range"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -1442,7 +1442,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onClick={() => setFilterLinkedOnly(!filterLinkedOnly)}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
                         filterLinkedOnly
-                          ? "bg-[rgba(244,163,132,0.1)] border-[var(--color-primary)]/40 text-[var(--color-primary)]"
+                          ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/40 text-[var(--color-primary)] font-extrabold"
                           : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
                       }`}
                     >
@@ -1462,7 +1462,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onClick={() => setFilterPrivateOnly(!filterPrivateOnly)}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
                         filterPrivateOnly
-                          ? "bg-[rgba(244,163,132,0.1)] border-[var(--color-primary)]/40 text-[var(--color-primary)]"
+                          ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/40 text-[var(--color-primary)] font-extrabold"
                           : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
                       }`}
                     >
@@ -1495,7 +1495,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     disabled={!isFilterActive}
                     className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border flex items-center gap-1 transition-all ${
                       isFilterActive
-                        ? "bg-[rgba(244,163,132,0.15)] hover:bg-[rgba(244,163,132,0.25)] border-[var(--color-primary)]/30 text-[var(--color-primary)] cursor-pointer"
+                        ? "bg-[var(--color-primary-subtle)] hover:bg-[var(--color-primary)]/20 border-[var(--color-primary)]/30 text-[var(--color-primary)] cursor-pointer"
                         : "bg-transparent border-transparent text-[var(--color-text-faint)] cursor-not-allowed"
                     }`}
                   >
@@ -1535,7 +1535,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
               {/* All Day or Unscheduled events bar */}
               {selectedDayInfo.events.filter(e => !e.time).length > 0 && (
-                <div className="p-3 bg-[rgba(244,163,132,0.05)] border-b border-[var(--color-border)] flex flex-col gap-1.5 shrink-0 text-left">
+                <div className="p-3 bg-[var(--color-primary-subtle)]/40 border-b border-[var(--color-border)] flex flex-col gap-1.5 shrink-0 text-left">
                   <span className="text-[10px] text-[var(--color-primary)] font-extrabold uppercase tracking-wider block">
                     Unscheduled / All Day:
                   </span>
@@ -1632,7 +1632,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               }}
                               className={`min-h-[44px] flex items-stretch p-1.5 transition-all select-none relative group/slot text-left border-l-2 ${
                                 isSelected
-                                  ? "bg-[rgba(249,177,122,0.15)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
+                                  ? "bg-[var(--color-primary-subtle)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
                                   : "bg-[var(--color-surface-2)]/25 odd:bg-[var(--color-surface)]/20 hover:bg-[var(--color-surface-3)]/50 border-l-[var(--color-border)]/40 cursor-pointer"
                               }`}
                             >
@@ -2007,9 +2007,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       }}
                       className={`min-h-[90px] flex flex-col justify-between border rounded-xl p-2 relative transition-all cursor-pointer group ${
                         isSelected 
-                          ? "bg-[var(--color-primary)]/15 border-[var(--color-primary)] shadow-[0_0_15px_rgba(244,163,132,0.1)]" 
+                          ? "bg-[var(--color-primary)]/15 border-[var(--color-primary)] shadow-md shadow-[var(--color-primary)]/10" 
                           : md.isToday 
-                            ? "bg-[var(--color-surface-3)] border-[var(--color-border)]" 
+                            ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/30" 
                             : md.isCurrentMonth 
                               ? "bg-[var(--color-surface)] border-[var(--color-border)]/40 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]" 
                               : "bg-transparent border-transparent text-[var(--color-text-faint)]/40 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]"
