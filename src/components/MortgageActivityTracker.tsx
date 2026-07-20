@@ -69,6 +69,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
   const [showAddFollowUp, setShowAddFollowUp] = useState(false);
   const [followUpTitle, setFollowUpTitle] = useState("");
   const [followUpDueDate, setFollowUpDueDate] = useState("");
+  const [followUpTimeStart, setFollowUpTimeStart] = useState("09:00");
+  const [followUpTimeEnd, setFollowUpTimeEnd] = useState("10:00");
   const [followUpOwner, setFollowUpOwner] = useState(client.agent || "");
   const [followUpPriority, setFollowUpPriority] = useState<FileFollowUp["priority"]>("medium");
   const [followUpActionType, setFollowUpActionType] = useState<"task" | "calendar" | "both">("both");
@@ -295,19 +297,22 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
     let taskId: string | undefined = undefined;
     let eventId: string | undefined = undefined;
 
+    const timeRangeStr = `Scheduled Time: ${followUpTimeStart} - ${followUpTimeEnd}`;
+    const integratedNotes = [timeRangeStr, followUpNotes.trim()].filter(Boolean).join("\n\n");
+
     // Create central Task if selected Task or Both
     if ((followUpActionType === "task" || followUpActionType === "both") && setTasks) {
       taskId = `t_fup_${Date.now()}`;
       const newTask: Task = {
         id: taskId,
-        title: followUpTitle.trim(),
+        title: `${followUpTitle.trim()} (${followUpTimeStart} - ${followUpTimeEnd})`,
         status: "open",
         priority: followUpPriority === "critical" ? "high" : followUpPriority,
         dueDate: followUpDueDate,
         clientId: client.id,
         clientName: `${client.first} ${client.last}`,
         assignedTo: followUpOwner || `${currentUser.first} ${currentUser.last}`,
-        notes: followUpNotes.trim() || "CRM Follow-up task.",
+        notes: integratedNotes,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         createdBy: `${currentUser.first} ${currentUser.last}`
@@ -322,10 +327,10 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
         id: eventId,
         title: followUpTitle.trim(),
         date: followUpDueDate,
-        time: "09:00",
+        time: followUpTimeStart, // Keep purely formatted as HH:MM for slot indexing
         type: "client",
         clientId: client.id,
-        notes: followUpNotes.trim() || "CRM Follow-up calendar event.",
+        notes: integratedNotes,
         createdBy: `${currentUser.first} ${currentUser.last}`
       };
       setEvents(prevEvents => [...(prevEvents || []), newEvent]);
@@ -342,7 +347,9 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
       status: "pending",
       createdTime: new Date().toISOString(),
       taskId,
-      eventId
+      eventId,
+      timeStart: followUpTimeStart,
+      timeEnd: followUpTimeEnd
     };
 
     const updatedFollowUps = [...followUps, newFollowUp];
@@ -372,6 +379,8 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
     setFollowUpTitle("");
     setFollowUpDueDate("");
+    setFollowUpTimeStart("09:00");
+    setFollowUpTimeEnd("10:00");
     setFollowUpNotes("");
     setFollowUpActionType("both");
     setShowAddFollowUp(false);
@@ -449,37 +458,35 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
 
   // Delete Follow-Up
   const handleDeleteFollowUp = (fupId: string) => {
-    if (window.confirm("Are you sure you want to remove this follow-up?")) {
-      const targetFup = followUps.find(f => f.id === fupId);
+    const targetFup = followUps.find(f => f.id === fupId);
 
-      // Clean up linked central Task
-      if (targetFup?.taskId && setTasks) {
-        setTasks(prevTasks => prevTasks.filter(t => t.id !== targetFup.taskId));
-      }
-
-      // Clean up linked central Event
-      if (targetFup?.eventId && setEvents) {
-        setEvents(prevEvents => prevEvents.filter(e => e.id !== targetFup.eventId));
-      }
-
-      const updated = followUps.filter(fup => fup.id !== fupId);
-      setFollowUps(updated);
-      saveFollowUpsForClient(client.id, updated);
-
-      // Sync next follow up date to client object immutably
-      const pendingFups = updated.filter(fup => fup.status === "pending");
-      pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-      const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
-
-      onUpdateClient({
-        ...client,
-        nextFollowUpDate: nextDate,
-        updatedAt: new Date().toISOString()
-      });
-
-      setRefreshTrigger(prev => prev + 1);
-      showToast("Follow-up task deleted from CRM.", "info", "🗑️");
+    // Clean up linked central Task
+    if (targetFup?.taskId && setTasks) {
+      setTasks(prevTasks => prevTasks.filter(t => t.id !== targetFup.taskId));
     }
+
+    // Clean up linked central Event
+    if (targetFup?.eventId && setEvents) {
+      setEvents(prevEvents => prevEvents.filter(e => e.id !== targetFup.eventId));
+    }
+
+    const updated = followUps.filter(fup => fup.id !== fupId);
+    setFollowUps(updated);
+    saveFollowUpsForClient(client.id, updated);
+
+    // Sync next follow up date to client object immutably
+    const pendingFups = updated.filter(fup => fup.status === "pending");
+    pendingFups.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+    const nextDate = pendingFups.length > 0 ? pendingFups[0].dueDate : undefined;
+
+    onUpdateClient({
+      ...client,
+      nextFollowUpDate: nextDate,
+      updatedAt: new Date().toISOString()
+    });
+
+    setRefreshTrigger(prev => prev + 1);
+    showToast("Follow-up task deleted from CRM.", "info", "🗑️");
   };
 
   // --- FILTERS & COMPUTATIONS ---
@@ -999,6 +1006,37 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                 </div>
               </div>
 
+              {/* Time Frame inputs */}
+              <div className="grid grid-cols-2 gap-2 bg-[var(--color-surface)]/40 p-2 rounded border border-[var(--color-border)]/50">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1 text-[8px] uppercase font-black text-[var(--color-text-faint)]">
+                    <Clock className="w-2.5 h-2.5 text-[var(--color-accent)]" />
+                    <span>Start Time</span>
+                  </div>
+                  <input 
+                    type="time" 
+                    required
+                    value={followUpTimeStart}
+                    onChange={(e) => setFollowUpTimeStart(e.target.value)}
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-1 text-[10px] text-[var(--color-text)] focus:outline-none font-semibold"
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1 text-[8px] uppercase font-black text-[var(--color-text-faint)]">
+                    <Clock className="w-2.5 h-2.5 text-[var(--color-accent)]" />
+                    <span>End Time</span>
+                  </div>
+                  <input 
+                    type="time" 
+                    required
+                    value={followUpTimeEnd}
+                    onChange={(e) => setFollowUpTimeEnd(e.target.value)}
+                    className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-1 text-[10px] text-[var(--color-text)] focus:outline-none font-semibold"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1">
                 <label className="text-[8px] text-[var(--color-text-faint)] uppercase font-black block">CRM Action Destination</label>
                 <select 
@@ -1109,6 +1147,12 @@ export const MortgageActivityTracker: React.FC<MortgageActivityTrackerProps> = (
                           <span className={`px-1 py-0.2 rounded font-black tracking-widest ${priorityStyle}`}>{fup.priority}</span>
                           {typeBadge}
                           <span className={isOverdue ? "text-red-400 font-extrabold" : ""}>Due: {fup.dueDate}</span>
+                          {fup.timeStart && fup.timeEnd && (
+                            <span className="text-[var(--color-accent)] font-bold flex items-center gap-0.5 normal-case">
+                              <Clock className="w-2.5 h-2.5 shrink-0 text-[var(--color-accent)]" />
+                              <span>{fup.timeStart} - {fup.timeEnd}</span>
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

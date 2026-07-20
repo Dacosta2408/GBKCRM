@@ -44,6 +44,8 @@ export interface FileFollowUp {
   completedTime?: string;
   taskId?: string;
   eventId?: string;
+  timeStart?: string;
+  timeEnd?: string;
 }
 
 export interface ActivityEvent {

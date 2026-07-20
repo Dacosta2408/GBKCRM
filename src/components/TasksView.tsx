@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { 
   motion, AnimatePresence 
 } from "motion/react";
@@ -34,16 +34,16 @@ interface TasksViewProps {
 }
 
 export const TASK_CATEGORIES = [
-  { value: "Client Follow-up", color: "bg-[var(--color-warning)]", border: "border-[var(--color-warning)]/25", text: "text-[var(--color-warning)]", lightBg: "bg-[var(--color-warning-subtle)]", glow: "shadow-[0_0_12px_rgba(200,146,42,0.15)]" },
-  { value: "Document Collection", color: "bg-violet-500", border: "border-violet-500/25", text: "text-violet-400", lightBg: "bg-violet-500/10", glow: "shadow-[0_0_12px_rgba(139,92,246,0.15)]" },
-  { value: "Lender Follow-up", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
-  { value: "Underwriting Review", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
-  { value: "Compliance", color: "bg-emerald-500", border: "border-emerald-500/25", text: "text-emerald-400", lightBg: "bg-emerald-500/10", glow: "shadow-[0_0_12px_rgba(16,185,129,0.15)]" },
-  { value: "Appointment", color: "bg-pink-500", border: "border-pink-500/25", text: "text-pink-400", lightBg: "bg-pink-500/10", glow: "shadow-[0_0_12px_rgba(236,72,153,0.15)]" },
-  { value: "Internal Admin", color: "bg-[#8e95a3]", border: "border-[#8e95a3]/25", text: "text-slate-400", lightBg: "bg-[#8e95a3]/10", glow: "shadow-[0_0_12px_rgba(142,149,163,0.15)]" },
-  { value: "Renewal", color: "bg-blue-500", border: "border-blue-500/25", text: "text-blue-400", lightBg: "bg-blue-500/10", glow: "shadow-[0_0_12px_rgba(59,130,246,0.15)]" },
-  { value: "Retention", color: "bg-orange-500", border: "border-orange-500/25", text: "text-orange-400", lightBg: "bg-orange-500/10", glow: "shadow-[0_0_12px_rgba(249,115,22,0.15)]" },
-  { value: "Partner Follow-up", color: "bg-fuchsia-500", border: "border-fuchsia-500/25", text: "text-fuchsia-400", lightBg: "bg-fuchsia-500/10", glow: "shadow-[0_0_12px_rgba(217,70,239,0.15)]" }
+  { value: "Client Follow-up", color: "bg-[var(--color-warning)]", border: "border-[var(--color-warning)]/25", text: "text-amber-700 dark:text-[var(--color-warning)]", lightBg: "bg-[var(--color-warning-subtle)]", glow: "shadow-[0_0_12px_rgba(200,146,42,0.15)]" },
+  { value: "Document Collection", color: "bg-teal-500", border: "border-teal-500/25", text: "text-teal-700 dark:text-teal-400", lightBg: "bg-teal-500/10", glow: "shadow-[0_0_12px_rgba(20,184,166,0.15)]" },
+  { value: "Lender Follow-up", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-700 dark:text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
+  { value: "Underwriting Review", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-700 dark:text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
+  { value: "Compliance", color: "bg-emerald-500", border: "border-emerald-500/25", text: "text-emerald-700 dark:text-emerald-400", lightBg: "bg-emerald-500/10", glow: "shadow-[0_0_12px_rgba(16,185,129,0.15)]" },
+  { value: "Appointment", color: "bg-amber-600", border: "border-amber-600/25", text: "text-amber-800 dark:text-amber-400", lightBg: "bg-amber-600/10", glow: "shadow-[0_0_12px_rgba(217,119,6,0.15)]" },
+  { value: "Internal Admin", color: "bg-[#8e95a3]", border: "border-[#8e95a3]/25", text: "text-slate-700 dark:text-slate-400", lightBg: "bg-[#8e95a3]/10", glow: "shadow-[0_0_12px_rgba(142,149,163,0.15)]" },
+  { value: "Renewal", color: "bg-blue-500", border: "border-blue-500/25", text: "text-blue-700 dark:text-blue-400", lightBg: "bg-blue-500/10", glow: "shadow-[0_0_12px_rgba(59,130,246,0.15)]" },
+  { value: "Retention", color: "bg-orange-500", border: "border-orange-500/25", text: "text-orange-700 dark:text-orange-400", lightBg: "bg-orange-500/10", glow: "shadow-[0_0_12px_rgba(249,115,22,0.15)]" },
+  { value: "Partner Follow-up", color: "bg-sky-500", border: "border-sky-500/25", text: "text-sky-700 dark:text-sky-400", lightBg: "bg-sky-500/10", glow: "shadow-[0_0_12px_rgba(14,165,233,0.15)]" }
 ];
 
 export const PRIORITY_SCHEME = {
@@ -136,6 +136,41 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
   // Current date boundary helper
   const todayStr = "2026-06-22";
+
+  const initialSelectionDone = useRef(false);
+
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [isClientSelectorOpen, setIsClientSelectorOpen] = useState(false);
+  const clientSelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (clientSelectorRef.current && !clientSelectorRef.current.contains(event.target as Node)) {
+        setIsClientSelectorOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const timeOptions = useMemo(() => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let min = 0; min < 60; min += 15) {
+        const hh = hour.toString().padStart(2, "0");
+        const mm = min.toString().padStart(2, "0");
+        const val = `${hh}:${mm}`;
+        const period = hour >= 12 ? "PM" : "AM";
+        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+        const displayMin = mm;
+        const label = `${displayHour}:${displayMin} ${period}`;
+        options.push({ value: val, label });
+      }
+    }
+    return options;
+  }, []);
 
   // Gracefully parsing and state sanitizing tasks for operational safety
   const sanitizedTasks = useMemo<ExtendedTask[]>(() => {
@@ -243,10 +278,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
   // Sync details on start
   useEffect(() => {
-    if (sanitizedTasks.length > 0 && selectedTaskId === null) {
+    if (!initialSelectionDone.current && sanitizedTasks.length > 0 && selectedTaskId === null) {
       // Find first outstanding item
       const firstActive = sanitizedTasks.find(t => t.extendedStatus !== "done");
-      if (firstActive) setSelectedTaskId(firstActive.id);
+      if (firstActive) {
+        setSelectedTaskId(firstActive.id);
+        initialSelectionDone.current = true;
+      }
     }
   }, [sanitizedTasks, selectedTaskId]);
 
@@ -284,18 +322,28 @@ export const TasksView: React.FC<TasksViewProps> = ({
   };
 
   const handleRemoveTask = (taskId: string) => {
+    const taskToDelete = tasks.find(t => t.id === taskId) as ExtendedTask | undefined;
+    if (!taskToDelete) return;
+
     if (window.confirm("Are you sure you want to delete this Daily Task from the portfolio and any assigned schedules?")) {
+      // Clear selectedTaskId if the deleted task was currently selected
+      if (selectedTaskId === taskId) {
+        setSelectedTaskId(null);
+      }
+
       setTasks(prev => {
         const filtered = prev.filter(t => t.id !== taskId);
         localStorage.setItem("gbk_tasks", JSON.stringify(filtered));
         return filtered;
       });
-      // Clear event
-      if (setEvents) {
+
+      // If calendar sync is enabled for that task, ensure any linked synced event is also removed using the existing task/calendar sync pattern.
+      const isSyncEnabled = taskToDelete.calendarSync !== false;
+      if (isSyncEnabled && setEvents) {
         setEvents(prev => prev.filter(e => e.id !== `ev_task_${taskId}`));
       }
+
       showToast("Daily task cleanly removed from CRM logs.", "info", "🗑️");
-      setSelectedTaskId(null);
     }
   };
 
@@ -683,27 +731,142 @@ export const TasksView: React.FC<TasksViewProps> = ({
             </div>
           </div>
 
-          {/* Section C: Client File Quick Filter */}
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3 shrink-0">
+          {/* Section C: Client File Search Selector */}
+          <div ref={clientSelectorRef} className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-2xl p-3 shrink-0 relative" id="client-search-selector-container">
             <span className="text-[10px] font-black text-[var(--color-text-faint)] uppercase tracking-widest block mb-2 px-1.5">View By Client File</span>
-            <select
-              value={selectedClientFilter}
-              onChange={(e) => {
-                setSelectedClientFilter(e.target.value);
-                if (e.target.value !== "") setActiveFilter("all"); // release standard filters to show client ones
-              }}
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-xl px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/25 font-bold"
-            >
-              <option value="">-- All Active Client Files --</option>
-              {clients.map(c => {
-                const clientTaskCount = sanitizedTasks.filter(t => t.clientId === c.id && t.extendedStatus !== "done").length;
-                return (
-                  <option key={c.id} value={c.id}>
-                    {c.first} {c.last} ({clientTaskCount} remaining)
-                  </option>
-                );
-              })}
-            </select>
+            
+            {/* Selected Client Indicator / Dropdown Trigger */}
+            <div className="relative">
+              {selectedClientFilter ? (
+                <div className="flex items-center justify-between bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 rounded-xl px-3 py-2 text-xs text-[var(--color-primary)] font-bold">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <FileText className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">
+                      {(() => {
+                        const selClient = clients.find(c => c.id === selectedClientFilter);
+                        return selClient ? `${selClient.first} ${selClient.last}` : "Unknown Client";
+                      })()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedClientFilter("");
+                        setClientSearchQuery("");
+                      }}
+                      className="p-1 hover:bg-[var(--color-primary)]/20 rounded text-[var(--color-primary)] shrink-0 transition-colors"
+                      title="Clear selection"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsClientSelectorOpen(!isClientSelectorOpen)}
+                      className="p-1 hover:bg-[var(--color-primary)]/20 rounded text-[var(--color-primary)] shrink-0 transition-colors"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsClientSelectorOpen(!isClientSelectorOpen)}
+                  className="w-full flex items-center justify-between bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 hover:border-[var(--color-border)] rounded-xl px-3 py-2 text-xs text-[var(--color-text-muted)] font-bold transition-all text-left"
+                >
+                  <span className="flex items-center gap-1.5 truncate">
+                    <FileText className="w-3.5 h-3.5 shrink-0 text-[var(--color-text-faint)]" />
+                    <span>-- All Active Client Files --</span>
+                  </span>
+                  <Compass className="w-3.5 h-3.5 shrink-0 text-[var(--color-text-faint)]" />
+                </button>
+              )}
+
+              {/* Dropdown search container */}
+              {isClientSelectorOpen && (
+                <div className="absolute left-0 right-0 mt-1.5 bg-[var(--color-surface)] border border-[var(--color-border)]/95 rounded-xl shadow-2xl z-50 p-2 space-y-1.5 max-h-60 flex flex-col">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search client name..."
+                      value={clientSearchQuery}
+                      onChange={(e) => setClientSearchQuery(e.target.value)}
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg pl-8 pr-7 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold"
+                      autoFocus
+                    />
+                    <FileText className="absolute left-2.5 top-2 w-3.5 h-3.5 text-[var(--color-text-faint)]" />
+                    {clientSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setClientSearchQuery("")}
+                        className="absolute right-2.5 top-2.5 text-[var(--color-text-faint)] hover:text-[var(--color-text)]"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="overflow-y-auto flex-1 space-y-0.5 max-h-40 pr-1">
+                    {/* Reset Option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedClientFilter("");
+                        setClientSearchQuery("");
+                        setIsClientSelectorOpen(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] flex items-center justify-between"
+                    >
+                      <span>-- All Active Client Files --</span>
+                      {selectedClientFilter === "" && <Check className="w-3.5 h-3.5 text-[var(--color-primary)]" />}
+                    </button>
+
+                    {(() => {
+                      const filteredClients = clients.filter(c => {
+                        const fullName = `${c.first} ${c.last}`.toLowerCase();
+                        return fullName.includes(clientSearchQuery.toLowerCase());
+                      });
+
+                      if (filteredClients.length === 0) {
+                        return (
+                          <div className="text-[10px] text-[var(--color-text-faint)] text-center py-3">
+                            No matching clients found
+                          </div>
+                        );
+                      }
+
+                      return filteredClients.map(c => {
+                        const clientTaskCount = sanitizedTasks.filter(t => t.clientId === c.id && t.extendedStatus !== "done").length;
+                        const isSelected = selectedClientFilter === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedClientFilter(c.id);
+                              setActiveFilter("all"); // release standard filters to show client ones
+                              setIsClientSelectorOpen(false);
+                              setClientSearchQuery("");
+                            }}
+                            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center justify-between ${
+                              isSelected 
+                                ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]" 
+                                : "text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
+                            }`}
+                          >
+                            <span className="truncate">{c.first} {c.last}</span>
+                            <span className="text-[9px] text-[var(--color-text-faint)] font-mono shrink-0">
+                              ({clientTaskCount} remaining)
+                            </span>
+                          </button>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Section D: Category color codes matching legend */}
@@ -768,7 +931,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   viewLayout === "board" ? "bg-[var(--color-primary)] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
-                <Compass className="w-3.5 h-3.5" /> Kanban Board
+                <Compass className="w-3.5 h-3.5" /> Action Board
               </button>
               <button
                 onClick={() => setViewLayout("checklist")}
@@ -886,35 +1049,42 @@ export const TasksView: React.FC<TasksViewProps> = ({
                             </div>
 
                             {/* Group Details Badges */}
-                            <div className="flex flex-wrap items-center gap-2 mt-2 text-[9.5px] text-[var(--color-text-faint)]">
+                            <div className="flex flex-wrap items-center gap-2 mt-2.5 text-[10px]">
                               
                               {/* Color category badge matching legend */}
-                              <span className={`px-2 py-0.5 rounded-md border text-[9px] font-black ${badge.lightBg} ${badge.text} ${badge.border} flex items-center gap-1`}>
+                              <span className={`px-2 py-0.5 rounded-md border text-[9.5px] font-bold ${badge.lightBg} ${badge.text} ${badge.border} flex items-center gap-1.5 shrink-0 shadow-sm`}>
                                 <span className={`w-1.5 h-1.5 rounded-full ${badge.color} shrink-0`} />
                                 {tk.category}
                               </span>
 
                               {tk.clientName && (
-                                <span className="flex items-center gap-1 bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">
-                                  <FileText className="w-3 h-3 text-[var(--color-text-faint)]" /> Deal: <b className="text-[var(--color-text-muted)]">{tk.clientName}</b>
+                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-semibold shrink-0">
+                                  <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <span>Deal: <span className="text-amber-800 dark:text-amber-400 font-bold">{tk.clientName}</span></span>
                                 </span>
                               )}
 
                               {tk.dueDate && (
-                                <span className={`flex items-center gap-1 font-mono px-1.5 py-0.5 rounded ${isOverdue ? "text-red-400 font-bold" : "text-[var(--color-text-muted)]"}`}>
-                                  <Calendar className="w-3 h-3 text-[var(--color-text-faint)]" /> Due: {tk.dueDate} {tk.dueTime && `@ ${tk.dueTime}`}
+                                <span className={`flex items-center gap-1.5 font-mono px-2 py-0.5 rounded-md border shrink-0 ${
+                                  isOverdue 
+                                    ? "bg-red-500/10 border-red-500/25 text-red-700 dark:text-red-400 font-bold" 
+                                    : "bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 text-slate-700 dark:text-slate-300 font-semibold"
+                                }`}>
+                                  <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <span>Due: {tk.dueDate} {tk.dueTime && `@ ${tk.dueTime}`}</span>
                                 </span>
                               )}
 
                               {tk.assignedTo && (
-                                <span className="flex items-center gap-1 bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">
-                                  <User className="w-3 h-3 text-[var(--color-text-faint)]/40" /> Owner: {tk.assignedTo}
+                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-semibold shrink-0">
+                                  <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <span>Owner: <b className="text-[var(--color-text)] font-semibold">{tk.assignedTo}</b></span>
                                 </span>
                               )}
 
                               {/* Calendar synced badge status */}
                               {tk.calendarSync !== false && tk.dueDate && (
-                                <span className="text-[8.5px] bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/15 text-[var(--color-primary)] px-1.5 py-0.5 rounded font-bold uppercase">
+                                <span className="text-[8.5px] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] px-2 py-0.5 rounded-md font-black uppercase tracking-wider shrink-0">
                                   📆 Cal Linked
                                 </span>
                               )}
@@ -960,10 +1130,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
             {viewLayout === "board" && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-full select-none" id="kanban-scaffolding-box">
                 {[
-                  { key: "todo", label: "To Do Actions", border: "border-[var(--color-warning)]/20", colorText: "text-[var(--color-warning)]/80" },
-                  { key: "in_progress", label: "In active flow", border: "border-cyan-500/20", colorText: "text-cyan-400" },
-                  { key: "waiting", label: "Waiting On Info", border: "border-orange-500/20", colorText: "text-orange-400" },
-                  { key: "done", label: "Done / Completed", border: "border-emerald-500/20", colorText: "text-emerald-400" }
+                  { key: "todo", label: "To Do Actions", border: "border-[var(--color-warning)]/20", colorText: "text-amber-800 dark:text-[var(--color-warning)]" },
+                  { key: "in_progress", label: "In active flow", border: "border-cyan-500/20", colorText: "text-cyan-700 dark:text-cyan-400" },
+                  { key: "waiting", label: "Waiting On Info", border: "border-orange-500/20", colorText: "text-orange-700 dark:text-orange-400" },
+                  { key: "done", label: "Done / Completed", border: "border-emerald-500/20", colorText: "text-emerald-700 dark:text-emerald-400" }
                 ].map(col => {
                   const itemsInCol = sortedAndFilteredTasks.filter(t => t.extendedStatus === col.key);
                   return (
@@ -1266,12 +1436,18 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
                     <div>
                       <label className="text-[9.5px] text-[var(--color-text-muted)] uppercase font-black tracking-wider block mb-1">Start Time (Optional)</label>
-                      <input
-                        type="time"
+                      <select
                         value={selectedTask.dueTime || ""}
-                        onChange={(e) => handleUpdateTaskDetail({ dueTime: e.target.value })}
-                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1 text-xs text-[var(--color-text)] font-mono focus:outline-none"
-                      />
+                        onChange={(e) => handleUpdateTaskDetail({ dueTime: e.target.value || undefined })}
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
+                      >
+                        <option value="">-- No Start Time --</option>
+                        {timeOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
@@ -1618,13 +1794,19 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Start Time</label>
-                    <input
-                      type="time"
-                      value={newDueTime}
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Start Time (Optional)</label>
+                    <select
+                      value={newDueTime || ""}
                       onChange={(e) => setNewDueTime(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none font-mono"
-                    />
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none font-semibold"
+                    >
+                      <option value="">-- No Start Time --</option>
+                      {timeOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

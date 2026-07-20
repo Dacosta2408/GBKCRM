@@ -364,12 +364,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   // List of event types with professional visual parameters
   const eventTypes = [
-    { value: "meeting", label: "Meeting / Call", color: "bg-amber-500", border: "border-amber-500/25", text: "text-amber-400", lightBg: "bg-amber-500/10", glow: "shadow-[0_0_12px_rgba(245,158,11,0.15)]" },
-    { value: "client", label: "Client Deadline", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
-    { value: "lender", label: "Lender Review", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
-    { value: "personal", label: "Personal Task", color: "bg-violet-500", border: "border-violet-500/25", text: "text-violet-400", lightBg: "bg-violet-500/10", glow: "shadow-[0_0_12px_rgba(139,92,246,0.15)]" },
-    { value: "holiday", label: "Stat Holiday", color: "bg-emerald-500", border: "border-emerald-500/25", text: "text-emerald-400", lightBg: "bg-emerald-500/10", glow: "shadow-[0_0_12px_rgba(16,185,129,0.15)]" },
-    { value: "birthday", label: "Birthday Greeting", color: "bg-pink-500", border: "border-pink-500/25", text: "text-pink-400", lightBg: "bg-pink-500/10", glow: "shadow-[0_0_12px_rgba(236,72,153,0.15)]" }
+    { value: "meeting", label: "Meeting / Call", color: "bg-amber-500", border: "border-amber-500/25", text: "text-amber-700 dark:text-amber-400", lightBg: "bg-amber-500/10", glow: "shadow-[0_0_12px_rgba(245,158,11,0.15)]" },
+    { value: "client", label: "Client Deadline", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-700 dark:text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
+    { value: "lender", label: "Lender Review", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-700 dark:text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
+    { value: "personal", label: "Personal Task", color: "bg-teal-500", border: "border-teal-500/25", text: "text-teal-700 dark:text-teal-400", lightBg: "bg-teal-500/10", glow: "shadow-[0_0_12px_rgba(20,184,166,0.15)]" },
+    { value: "holiday", label: "Stat Holiday", color: "bg-emerald-500", border: "border-emerald-500/25", text: "text-emerald-700 dark:text-emerald-400", lightBg: "bg-emerald-500/10", glow: "shadow-[0_0_12px_rgba(16,185,129,0.15)]" },
+    { value: "birthday", label: "Birthday Greeting", color: "bg-sky-500", border: "border-sky-500/25", text: "text-sky-700 dark:text-sky-400", lightBg: "bg-sky-500/10", glow: "shadow-[0_0_12px_rgba(14,165,233,0.15)]" }
   ];
 
   const getTypeColor = (type: string) => {
