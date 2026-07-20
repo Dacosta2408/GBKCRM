@@ -68,16 +68,16 @@ const QuickActionButton: React.FC<{
       text = "Cancel";
       break;
     case "copy":
-      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
+      baseClasses += "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] hover:bg-[var(--color-calendar-selected-bg)]/20 hover:border-[var(--color-calendar-selected-bg)]/40";
       icon = <Copy className="w-3.5 h-3.5" />;
       text = "Copy";
       break;
     case "plus1":
-      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
+      baseClasses += "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] hover:bg-[var(--color-calendar-selected-bg)]/20 hover:border-[var(--color-calendar-selected-bg)]/40";
       text = "+1d";
       break;
     case "plus7":
-      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
+      baseClasses += "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] hover:bg-[var(--color-calendar-selected-bg)]/20 hover:border-[var(--color-calendar-selected-bg)]/40";
       text = "+7d";
       break;
     case "edit":
@@ -1044,7 +1044,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         {/* Compact Month Mini-Picker Widget */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3.5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[12px] font-extrabold text-[var(--color-primary)] tracking-wider uppercase font-sans">
+            <span className="text-[12px] font-extrabold text-[var(--color-calendar-strong-text)] tracking-wider uppercase font-sans">
               {monthNames[currentMonth]} {currentYear}
             </span>
             <div className="flex items-center gap-1">
@@ -1080,18 +1080,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onClick={() => selectDay(md.dateStr)}
                   className={`h-7 w-7 text-[10px] font-bold rounded-lg flex flex-col items-center justify-center relative transition-all ${
                     isSelected 
-                      ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-md shadow-[var(--color-primary)]/20"
+                      ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-md shadow-[var(--color-calendar-selected-bg)]/20"
                       : md.isToday 
-                        ? "bg-[var(--color-primary-subtle)] text-[var(--color-primary)] border border-[var(--color-primary)]/30 font-extrabold"
+                        ? "bg-[var(--color-calendar-selected-bg)]/10 text-[var(--color-calendar-strong-text)] border border-[var(--color-calendar-selected-bg)]/45 font-extrabold"
                         : md.isCurrentMonth
-                          ? "text-[var(--color-text)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)]"
+                          ? "text-[var(--color-text)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-strong-text)]"
                           : "text-[var(--color-text-faint)]/50 hover:text-[var(--color-text-muted)]"
                   }`}
                 >
                   <span>{md.dayNum}</span>
                   {/* Event indicator dot */}
                   {worksOnThisDate && !isSelected && (
-                    <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
+                    <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[var(--color-calendar-selected-bg)]" />
                   )}
                 </button>
               );
@@ -1127,7 +1127,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               onClick={() => setFilterType("all")}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-[11px] font-bold transition-all ${
                 filterType === "all" 
-                  ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/20 text-[var(--color-primary)] font-extrabold" 
+                  ? "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/25 text-[var(--color-calendar-strong-text)] font-extrabold" 
                   : "bg-transparent border-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)]/60 hover:text-[var(--color-text)]"
               }`}
             >
@@ -1220,7 +1220,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {t.title}
                     </span>
                     {t.clientName && (
-                      <span className="text-[9px] text-[var(--color-primary)] font-semibold block mt-1">
+                      <span className="text-[9px] text-[var(--color-calendar-strong-text)] font-semibold block mt-1">
                         File: {t.clientName}
                       </span>
                     )}
@@ -1250,7 +1250,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* Top Row: Stable Title & Admin/Manager Switcher */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-[var(--color-primary-subtle)] border border-[var(--color-primary)]/20 rounded-xl text-[var(--color-primary)]">
+              <div className="p-2.5 bg-[var(--color-calendar-selected-bg)]/10 border border-[var(--color-calendar-selected-bg)]/20 rounded-xl text-[var(--color-calendar-strong-text)]">
                 <CalendarIcon className="w-5 h-5 text-[var(--color-accent)] animate-pulse" />
               </div>
               <div className="text-left">
@@ -1278,7 +1278,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
             {/* Admin/Manager User Calendar Selector - High Visibility */}
             {canViewOtherCalendars && (
-              <div className="flex items-center gap-2.5 bg-[var(--color-surface-2)] border-2 border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40 px-3.5 py-1.5 rounded-xl shadow-md text-xs font-bold transition-all shrink-0">
+              <div className="flex items-center gap-2.5 bg-[var(--color-surface-2)] border-2 border-[var(--color-calendar-selected-bg)]/20 hover:border-[var(--color-calendar-selected-bg)]/40 px-3.5 py-1.5 rounded-xl shadow-md text-xs font-bold transition-all shrink-0">
                 <User className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
                 <div className="flex flex-col text-left">
                   <span className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wider font-extrabold block">Calendar Owner:</span>
@@ -1310,25 +1310,25 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-1 rounded-xl flex items-center shrink-0">
               <button 
                 onClick={() => setViewMode("day")}
-                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "day" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "day" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 Day Timeline
               </button>
               <button 
                 onClick={() => setViewMode("week")}
-                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "week" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "week" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 Week Timeline
               </button>
               <button 
                 onClick={() => setViewMode("month")}
-                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "month" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "month" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 Month Grid
               </button>
               <button 
                 onClick={() => setViewMode("list")}
-                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "list" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "list" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 List Index
               </button>
@@ -1342,8 +1342,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
                   className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
                     advancedFiltersOpen || isFilterActive
-                      ? "border-[var(--color-primary)]/40 bg-[var(--color-primary-subtle)] text-[var(--color-primary)] font-extrabold"
-                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 hover:bg-[var(--color-surface-3)]"
+                      ? "border-[var(--color-calendar-selected-bg)]/40 bg-[var(--color-calendar-selected-bg)]/10 text-[var(--color-calendar-strong-text)] font-extrabold"
+                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 hover:bg-[var(--color-surface-3)]"
                   }`}
                   title="Toggle Advanced Filters"
                 >
@@ -1356,7 +1356,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 
                 <button 
                   onClick={() => setCalendarSettingsOpen(true)}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all flex items-center gap-1 cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all flex items-center gap-1 cursor-pointer"
                   title="Configure working hours and time slots"
                 >
                   <Settings className="w-4 h-4" />
@@ -1367,20 +1367,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                 <button 
                   onClick={prevTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
                   title="Previous range"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={goToToday}
-                  className="px-3.5 py-2 border border-[var(--color-primary)]/20 text-[var(--color-primary)] bg-[var(--color-primary)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-primary)]/15 transition-all cursor-pointer"
+                  className="px-3.5 py-2 border border-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] bg-[var(--color-calendar-selected-bg)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-calendar-selected-bg)]/15 transition-all cursor-pointer"
                 >
                   Today
                 </button>
                 <button 
                   onClick={nextTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
                   title="Next range"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -1410,7 +1410,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <select
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all cursor-pointer"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-calendar-selected-bg)]/50 transition-all cursor-pointer"
                     >
                       <option value="all">All Activities</option>
                       {eventTypes.map(et => (
@@ -1427,7 +1427,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all cursor-pointer"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-calendar-selected-bg)]/50 transition-all cursor-pointer"
                     >
                       <option value="all">All Statuses</option>
                       <option value="scheduled">Scheduled</option>
@@ -1442,7 +1442,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onClick={() => setFilterLinkedOnly(!filterLinkedOnly)}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
                         filterLinkedOnly
-                          ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/40 text-[var(--color-primary)] font-extrabold"
+                          ? "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/35 text-[var(--color-calendar-strong-text)] font-extrabold"
                           : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
                       }`}
                     >
@@ -1450,7 +1450,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         <User className="w-3.5 h-3.5" />
                         Linked Only
                       </span>
-                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterLinkedOnly ? "bg-[var(--color-primary)]" : "bg-gray-600"}`}>
+                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterLinkedOnly ? "bg-[var(--color-calendar-selected-bg)]" : "bg-gray-600"}`}>
                         <div className={`w-3 h-3 rounded-full bg-white transition-transform ${filterLinkedOnly ? "translate-x-3" : "translate-x-0"}`} />
                       </div>
                     </button>
@@ -1462,7 +1462,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onClick={() => setFilterPrivateOnly(!filterPrivateOnly)}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
                         filterPrivateOnly
-                          ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/40 text-[var(--color-primary)] font-extrabold"
+                          ? "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)]/35 text-[var(--color-calendar-strong-text)] font-extrabold"
                           : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
                       }`}
                     >
@@ -1470,7 +1470,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         <Lock className="w-3.5 h-3.5" />
                         Private Only
                       </span>
-                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterPrivateOnly ? "bg-[var(--color-primary)]" : "bg-gray-600"}`}>
+                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterPrivateOnly ? "bg-[var(--color-calendar-selected-bg)]" : "bg-gray-600"}`}>
                         <div className={`w-3 h-3 rounded-full bg-white transition-transform ${filterPrivateOnly ? "translate-x-3" : "translate-x-0"}`} />
                       </div>
                     </button>
@@ -1495,7 +1495,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     disabled={!isFilterActive}
                     className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border flex items-center gap-1 transition-all ${
                       isFilterActive
-                        ? "bg-[var(--color-primary-subtle)] hover:bg-[var(--color-primary)]/20 border-[var(--color-primary)]/30 text-[var(--color-primary)] cursor-pointer"
+                        ? "bg-[var(--color-calendar-selected-bg)]/10 hover:bg-[var(--color-calendar-selected-bg)]/20 border-[var(--color-calendar-selected-bg)]/30 text-[var(--color-calendar-strong-text)] cursor-pointer"
                         : "bg-transparent border-transparent text-[var(--color-text-faint)] cursor-not-allowed"
                     }`}
                   >
@@ -1527,7 +1527,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 </div>
                 <button
                   onClick={() => handleOpenAddModal(selectedDateStr)}
-                  className="px-3 py-1.5 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/20 text-[var(--color-primary)] font-bold text-[11px] rounded-lg transition-all flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+                  className="px-3 py-1.5 bg-[var(--color-calendar-selected-bg)]/10 border border-[var(--color-calendar-selected-bg)]/25 hover:bg-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] font-bold text-[11px] rounded-lg transition-all flex items-center gap-1 self-start sm:self-auto cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Book Appointment
                 </button>
@@ -1535,8 +1535,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
               {/* All Day or Unscheduled events bar */}
               {selectedDayInfo.events.filter(e => !e.time).length > 0 && (
-                <div className="p-3 bg-[var(--color-primary-subtle)]/40 border-b border-[var(--color-border)] flex flex-col gap-1.5 shrink-0 text-left">
-                  <span className="text-[10px] text-[var(--color-primary)] font-extrabold uppercase tracking-wider block">
+                <div className="p-3 bg-[var(--color-calendar-selected-bg)]/10 border-b border-[var(--color-border)] flex flex-col gap-1.5 shrink-0 text-left">
+                  <span className="text-[10px] text-[var(--color-calendar-strong-text)] font-extrabold uppercase tracking-wider block">
                     Unscheduled / All Day:
                   </span>
                   <div className="flex flex-wrap gap-2">
@@ -1632,7 +1632,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               }}
                               className={`min-h-[44px] flex items-stretch p-1.5 transition-all select-none relative group/slot text-left border-l-2 ${
                                 isSelected
-                                  ? "bg-[var(--color-primary-subtle)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
+                                  ? "bg-[var(--color-calendar-selected-bg)]/10 border-l-[var(--color-calendar-selected-bg)] ring-1 ring-[var(--color-calendar-selected-bg)]/20"
                                   : "bg-[var(--color-surface-2)]/25 odd:bg-[var(--color-surface)]/20 hover:bg-[var(--color-surface-3)]/50 border-l-[var(--color-border)]/40 cursor-pointer"
                               }`}
                             >
@@ -1655,7 +1655,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                         }}
                                         onMouseDown={(e) => e.stopPropagation()}
                                         onMouseUp={(e) => e.stopPropagation()}
-                                        className="p-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/45 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group/card text-left shadow-sm hover:shadow-md cursor-pointer"
+                                        className="p-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-calendar-selected-bg)]/45 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group/card text-left shadow-sm hover:shadow-md cursor-pointer"
                                       >
                                         <div className="flex items-start gap-3 min-w-0">
                                           {/* Time indicator badge */}
@@ -1691,7 +1691,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                               </p>
                                             )}
                                             {matchedClient && (
-                                              <div className="mt-1 flex items-center gap-1 text-[9px] text-[var(--color-primary)] font-bold">
+                                              <div className="mt-1 flex items-center gap-1 text-[9px] text-[var(--color-calendar-strong-text)] font-bold">
                                                 <User className="w-3 h-3 text-[var(--color-accent)]" />
                                                 <span>Client: {matchedClient.first} {matchedClient.last}</span>
                                               </div>
@@ -1782,7 +1782,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                   })
                                 ) : (
                                   /* Empty slot guidance text shown on hover */
-                                  <div className="py-1 text-[10px] text-[var(--color-text-faint)]/20 font-bold select-none flex items-center gap-1 opacity-0 group-hover/slot:opacity-100 group-hover/slot:text-[var(--color-primary)]/40 transition-all">
+                                  <div className="py-1 text-[10px] text-[var(--color-text-faint)]/20 font-bold select-none flex items-center gap-1 opacity-0 group-hover/slot:opacity-100 group-hover/slot:text-[var(--color-calendar-selected-bg)]/40 transition-all">
                                     <Plus className="w-3 h-3" />
                                     <span>Click to schedule action at {slot.time}</span>
                                   </div>
@@ -1819,7 +1819,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       key={wd.dateStr}
                       className={`flex-1 min-w-[170px] xl:min-w-[180px] 2xl:min-w-[200px] bg-[var(--color-surface)] border rounded-2xl flex flex-col min-h-0 transition-all ${
                         isDaySelected 
-                          ? "border-[var(--color-primary)]/40 bg-[var(--color-surface-2)] ring-1 ring-[var(--color-primary)]/10" 
+                          ? "border-[var(--color-calendar-selected-bg)]/40 bg-[var(--color-surface-2)] ring-1 ring-[var(--color-calendar-selected-bg)]/10" 
                           : wd.isToday 
                             ? "border-[var(--color-border)] bg-[var(--color-surface-2)]" 
                             : "border-[var(--color-border)]/50"
@@ -1834,7 +1834,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           }}
                           className="cursor-pointer group flex flex-col text-left"
                         >
-                          <span className={`text-[9px] uppercase font-bold tracking-widest ${isDaySelected ? "text-[var(--color-primary)]" : "text-[var(--color-text-faint)] group-hover:text-[var(--color-accent)]"}`}>
+                          <span className={`text-[9px] uppercase font-bold tracking-widest ${isDaySelected ? "text-[var(--color-calendar-strong-text)]" : "text-[var(--color-text-faint)] group-hover:text-[var(--color-accent)]"}`}>
                             {wd.dayLabel}
                           </span>
                           <span className={`text-sm font-black mt-0.5 ${isDaySelected ? "text-[var(--color-accent)]" : "text-[var(--color-text)]"}`}>
@@ -1844,7 +1844,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                         <button
                           onClick={() => handleOpenAddModal(wd.dateStr)}
-                          className="p-1 bg-[var(--color-surface-3)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)] rounded-lg border border-[var(--color-border)] transition-all text-[var(--color-text)]"
+                          className="p-1 bg-[var(--color-surface-3)] hover:bg-[var(--color-calendar-selected-bg)] hover:text-[var(--color-calendar-selected-text)] rounded-lg border border-[var(--color-border)] transition-all text-[var(--color-text)] cursor-pointer"
                           title={`Book for ${wd.fullLabel}`}
                         >
                           <Plus className="w-3 h-3" />
@@ -2007,9 +2007,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       }}
                       className={`min-h-[90px] flex flex-col justify-between border rounded-xl p-2 relative transition-all cursor-pointer group ${
                         isSelected 
-                          ? "bg-[var(--color-primary)]/15 border-[var(--color-primary)] shadow-md shadow-[var(--color-primary)]/10" 
+                          ? "bg-[var(--color-calendar-selected-bg)]/15 border-[var(--color-calendar-selected-bg)] shadow-md shadow-[var(--color-calendar-selected-bg)]/10" 
                           : md.isToday 
-                            ? "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/30" 
+                            ? "bg-[var(--color-calendar-selected-bg)]/5 border-[var(--color-calendar-selected-bg)]/30" 
                             : md.isCurrentMonth 
                               ? "bg-[var(--color-surface)] border-[var(--color-border)]/40 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]" 
                               : "bg-transparent border-transparent text-[var(--color-text-faint)]/40 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]"
@@ -2018,7 +2018,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       <div className="flex items-start justify-between select-none gap-1">
                         <div className="flex items-center gap-1">
                           <span className={`text-[11px] font-bold font-mono px-1.5 py-0.5 rounded-md ${
-                            md.isToday ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow" : "text-[var(--color-text-muted)]"
+                            md.isToday ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow" : "text-[var(--color-text-muted)]"
                           }`}>
                             {md.dayNum}
                           </span>
@@ -2033,7 +2033,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             e.stopPropagation();
                             handleOpenAddModal(md.dateStr);
                           }}
-                          className="p-1 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)] text-[var(--color-text-muted)] hover:text-[var(--color-bg)] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                          className="p-1 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] hover:bg-[var(--color-calendar-selected-bg)] hover:text-[var(--color-calendar-selected-text)] text-[var(--color-text-muted)] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                           title={`Add event for ${md.dateStr}`}
                         >
                           <Plus className="w-2.5 h-2.5" />
@@ -2091,7 +2091,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   </p>
                   <button
                     onClick={() => handleOpenAddModal(new Date().toISOString().split("T")[0])}
-                    className="mt-4 px-4 py-1.5 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 font-black text-[10px] uppercase rounded-xl flex items-center gap-1.5 transition-all"
+                    className="mt-4 px-4 py-1.5 bg-[var(--color-calendar-selected-bg)]/10 border border-[var(--color-calendar-selected-bg)]/30 text-[var(--color-calendar-strong-text)] hover:bg-[var(--color-calendar-selected-bg)]/20 font-black text-[10px] uppercase rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" /> Schedule New Event
                   </button>
@@ -2124,7 +2124,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               </span>
                               <div className="flex items-center gap-2.5 text-[10px] text-[var(--color-text-muted)] mt-1 font-semibold">
                                 <span className="font-mono bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">{ev.date}</span>
-                                {ev.time && <span className="font-mono bg-[var(--color-primary)]/5 text-[var(--color-primary)] px-1.5 py-0.5 rounded border border-[var(--color-primary)]/10">{ev.time}</span>}
+                                {ev.time && <span className="font-mono bg-[var(--color-calendar-selected-bg)]/5 text-[var(--color-calendar-strong-text)] px-1.5 py-0.5 rounded border border-[var(--color-calendar-selected-bg)]/10">{ev.time}</span>}
                                 <span className="capitalize font-bold">{ev.type}</span>
                               </div>
                             </div>
@@ -2213,7 +2213,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         {/* Selected Day Agenda Side-drawer inside workflow */}
         <div className="mt-4 p-4 bg-[var(--color-surface-2)]/60 border border-[var(--color-border)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-xl text-[var(--color-primary)]">
+            <div className="p-2 bg-[var(--color-calendar-selected-bg)]/10 border border-[var(--color-calendar-selected-bg)]/20 rounded-xl text-[var(--color-calendar-strong-text)]">
               <Clock className="w-4 h-4" />
             </div>
             <div>
@@ -2226,7 +2226,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <span className="text-[10px] text-[var(--color-text-faint)] italic">Have a meeting or deadline to slate?</span>
             <button
               onClick={() => handleOpenAddModal(selectedDateStr)}
-              className="px-4 py-2 bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all"
+              className="px-4 py-2 bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] hover:opacity-90 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" /> Schedule on selected
             </button>
@@ -2252,8 +2252,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             >
               {/* Header */}
               <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between shrink-0">
-                <h3 className="text-xs uppercase font-extrabold text-[var(--color-primary)] tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 fill-[var(--color-primary)]/30 text-[var(--color-primary)]" />
+                <h3 className="text-xs uppercase font-extrabold text-[var(--color-calendar-strong-text)] tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-[var(--color-calendar-selected-bg)]/30 text-[var(--color-calendar-selected-bg)]" />
                   {editingEvent ? "Tweak Calendar Record" : "Book New Action Record"}
                 </h3>
                 <button
@@ -2278,7 +2278,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Section 1: Core Action Details */}
                       <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4">
                         <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
-                          <CalendarIcon className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <CalendarIcon className="w-4 h-4 text-[var(--color-calendar-selected-bg)] shrink-0" />
                           <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
                             Section 1: Core Action Details
                           </h4>
@@ -2295,7 +2295,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             placeholder="e.g., RBC Refinance Signing, Call Equifax underwriter"
                             value={eventTitle}
                             onChange={(e) => setEventTitle(e.target.value)}
-                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold transition-all"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-bold transition-all"
                           />
                         </div>
 
@@ -2308,7 +2308,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               required
                               value={eventDate}
                               onChange={(e) => setEventDate(e.target.value)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-mono transition-all"
                             />
                           </div>
                           <div>
@@ -2317,7 +2317,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               required
                               value={eventTime}
                               onChange={(e) => setEventTime(e.target.value)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold cursor-pointer transition-all"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-semibold cursor-pointer transition-all"
                             >
                               {timePickerOptions.map((opt) => (
                                 <option key={opt.value} value={opt.value} className="bg-[var(--color-surface)] text-[var(--color-text)]">
@@ -2334,7 +2334,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           <select
                             value={eventDuration}
                             onChange={(e) => setEventDuration(Number(e.target.value))}
-                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 transition-all"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 transition-all"
                           >
                             <option value={15} className="bg-[var(--color-surface)] text-[var(--color-text)]">15 Minutes Slot</option>
                             <option value={30} className="bg-[var(--color-surface)] text-[var(--color-text)]">30 Minutes</option>
@@ -2351,7 +2351,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Section 4: Notes */}
                       <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-3">
                         <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
-                          <Edit3 className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <Edit3 className="w-4 h-4 text-[var(--color-calendar-selected-bg)] shrink-0" />
                           <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
                             Section 4: Notes
                           </h4>
@@ -2363,7 +2363,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             placeholder="Provide specific guidelines, location details, phone coordinates, or items to finalize..."
                             value={eventNotes}
                             onChange={(e) => setEventNotes(e.target.value)}
-                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-primary)]/40 transition-all"
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 transition-all"
                           />
                         </div>
                       </div>
@@ -2376,7 +2376,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Section 2: Classification & Linkage */}
                       <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4 relative z-20">
                         <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
-                          <Layers className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <Layers className="w-4 h-4 text-[var(--color-calendar-selected-bg)] shrink-0" />
                           <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
                             Section 2: Classification & Linkage
                           </h4>
@@ -2438,7 +2438,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                 setClientSearchOpen(true);
                               }}
                               onFocus={() => setClientSearchOpen(true)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold placeholder-[var(--color-text-faint)]/40 transition-all"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold placeholder-[var(--color-text-faint)]/40 transition-all"
                             />
                             
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] pointer-events-none select-none">
@@ -2480,7 +2480,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                             setClientSearchOpen(false);
                                           }}
                                           className={`w-full text-left p-2.5 flex flex-col gap-0.5 transition-colors hover:bg-[var(--color-surface-2)] cursor-pointer ${
-                                            isSelected ? "bg-[var(--color-primary)]/10" : ""
+                                            isSelected ? "bg-[var(--color-calendar-selected-bg)]/10" : ""
                                           }`}
                                         >
                                           <div className="flex items-center justify-between">
@@ -2516,7 +2516,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Section 3: Activity Controls */}
                       <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4">
                         <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
-                          <Settings className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <Settings className="w-4 h-4 text-[var(--color-calendar-selected-bg)] shrink-0" />
                           <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
                             Section 3: Activity Controls
                           </h4>
@@ -2532,7 +2532,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               const isSelected = eventStatus === status;
                               let activeClass = "";
                               if (isSelected) {
-                                if (status === "scheduled") activeClass = "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-sm";
+                                if (status === "scheduled") activeClass = "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm";
                                 if (status === "completed") activeClass = "bg-[var(--color-success)] text-white font-extrabold shadow-sm";
                                 if (status === "canceled") activeClass = "bg-[var(--color-error)] text-white font-extrabold shadow-sm";
                               } else {
@@ -2561,7 +2561,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             <select
                               value={eventReminder}
                               onChange={(e) => setEventReminder(e.target.value as any)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold appearance-none cursor-pointer transition-all"
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold appearance-none cursor-pointer transition-all"
                             >
                               <option value="none" className="bg-[var(--color-surface)] text-[var(--color-text)]">No reminder</option>
                               <option value="15m" className="bg-[var(--color-surface)] text-[var(--color-text)]">15 minutes before</option>
@@ -2582,7 +2582,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             id="event-private-checkbox"
                             checked={eventIsPrivate}
                             onChange={(e) => setEventIsPrivate(e.target.checked)}
-                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
+                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-calendar-selected-bg)] focus:ring-1 focus:ring-[var(--color-calendar-selected-bg)] cursor-pointer accent-[var(--color-calendar-selected-bg)]"
                           />
                           <label htmlFor="event-private-checkbox" className="text-xs text-[var(--color-text-muted)] font-extrabold hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1.5 transition-all">
                             <Lock className="w-3.5 h-3.5 text-[var(--color-warning)]" />
@@ -2594,7 +2594,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Section 5: Follow-up Workflow */}
                       <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-3">
                         <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
-                          <Sparkles className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <Sparkles className="w-4 h-4 text-[var(--color-calendar-selected-bg)] shrink-0" />
                           <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
                             Section 5: Follow-up Workflow
                           </h4>
@@ -2621,9 +2621,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                 setFollowUpTitle(`Follow-up: ${eventTitle ? eventTitle.trim() : ""}`);
                               }
                             }}
-                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
+                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-calendar-selected-bg)] focus:ring-1 focus:ring-[var(--color-calendar-selected-bg)] cursor-pointer accent-[var(--color-calendar-selected-bg)]"
                           />
-                          <label htmlFor="event-followup-checkbox" className="text-xs font-black uppercase text-[var(--color-primary)] tracking-wider hover:text-[var(--color-primary)]/80 cursor-pointer flex items-center gap-1.5 transition-colors">
+                          <label htmlFor="event-followup-checkbox" className="text-xs font-black uppercase text-[var(--color-calendar-selected-bg)] tracking-wider hover:text-[var(--color-calendar-selected-bg)]/80 cursor-pointer flex items-center gap-1.5 transition-colors">
                             <Plus className="w-3.5 h-3.5" />
                             <span>Create follow-up action after saving</span>
                           </label>
@@ -2635,10 +2635,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="space-y-3 bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20 p-3.5 rounded-xl overflow-hidden text-left"
+                              className="space-y-3 bg-[var(--color-calendar-selected-bg)]/5 border border-[var(--color-calendar-selected-bg)]/20 p-3.5 rounded-xl overflow-hidden text-left"
                             >
-                              <div className="text-[10px] text-[var(--color-primary)] font-extrabold uppercase tracking-wide flex items-center gap-1.5 mb-1 bg-[var(--color-primary)]/10 px-2 py-1 rounded-md border border-[var(--color-primary)]/10">
-                                <Sparkles className="w-3 h-3 fill-[var(--color-primary)]/20 text-[var(--color-primary)]" />
+                              <div className="text-[10px] text-[var(--color-calendar-strong-text)] font-extrabold uppercase tracking-wide flex items-center gap-1.5 mb-1 bg-[var(--color-calendar-selected-bg)]/10 px-2 py-1 rounded-md border border-[var(--color-calendar-selected-bg)]/10">
+                                <Sparkles className="w-3 h-3 fill-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-selected-bg)]" />
                                 <span>Designated Follow-Up Step</span>
                               </div>
                               <div>
@@ -2651,7 +2651,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                   placeholder="e.g., Client check-in, Sign follow-up docs"
                                   value={followUpTitle}
                                   onChange={(e) => setFollowUpTitle(e.target.value)}
-                                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold transition-all"
+                                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-bold transition-all"
                                 />
                               </div>
 
@@ -2665,7 +2665,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                     required={createFollowUp}
                                     value={followUpDate}
                                     onChange={(e) => setFollowUpDate(e.target.value)}
-                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-mono transition-all"
                                   />
                                 </div>
 
@@ -2677,7 +2677,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                     type="time"
                                     value={followUpTime}
                                     onChange={(e) => setFollowUpTime(e.target.value)}
-                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-mono transition-all"
                                   />
                                 </div>
                               </div>
@@ -2714,7 +2714,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90 text-xs font-extrabold transition-all cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] hover:opacity-90 text-xs font-extrabold transition-all cursor-pointer"
                     >
                       Save appointment
                     </button>
@@ -2800,8 +2800,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             >
               {/* Header */}
               <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
-                <h3 className="text-xs uppercase font-extrabold text-[var(--color-primary)] tracking-wider flex items-center gap-1.5">
-                  <Settings className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                <h3 className="text-xs uppercase font-extrabold text-[var(--color-calendar-strong-text)] tracking-wider flex items-center gap-1.5">
+                  <Settings className="w-3.5 h-3.5 text-[var(--color-calendar-selected-bg)]" />
                   Calendar Configuration Settings
                 </h3>
                 <button
@@ -2830,7 +2830,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         }
                         setWorkdayStartHour(val);
                       }}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold"
                     >
                       {Array.from({ length: 11 }, (_, i) => i + 5).map(h => (
                         <option key={h} value={h} className="bg-[var(--color-surface)] text-[var(--color-text)]">
@@ -2854,7 +2854,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         }
                         setWorkdayEndHour(val);
                       }}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold"
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold"
                     >
                       {Array.from({ length: 11 }, (_, i) => i + 13).map(h => (
                         <option key={h} value={h} className="bg-[var(--color-surface)] text-[var(--color-text)]">
@@ -2878,7 +2878,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         onClick={() => setSlotInterval(val as 15 | 30)}
                         className={`py-2 text-xs font-bold rounded-lg border transition-all ${
                           slotInterval === val 
-                            ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] font-extrabold" 
+                            ? "bg-[var(--color-calendar-selected-bg)]/10 border-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-strong-text)] font-extrabold" 
                             : "border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)]"
                         }`}
                       >
@@ -2896,7 +2896,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   <select
                     value={defaultDuration}
                     onChange={(e) => setDefaultDuration(parseInt(e.target.value, 10))}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold"
                   >
                     {[15, 30, 45, 60, 90, 120].map(d => (
                       <option key={d} value={d} className="bg-[var(--color-surface)] text-[var(--color-text)]">
@@ -2918,7 +2918,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       setDefaultView(v);
                       setViewMode(v); // Respect view change directly
                     }}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/45 font-semibold"
                   >
                     <option value="day" className="bg-[var(--color-surface)] text-[var(--color-text)]">Day Timeline</option>
                     <option value="week" className="bg-[var(--color-surface)] text-[var(--color-text)]">Week Timeline</option>
@@ -2943,7 +2943,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     setCalendarSettingsOpen(false);
                     showToast("Calendar preferences saved!", "success", "✓");
                   }}
-                  className="px-4 py-2 bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90 font-extrabold text-xs rounded-xl transition-all"
+                  className="px-4 py-2 bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] hover:opacity-90 font-extrabold text-xs rounded-xl transition-all cursor-pointer"
                 >
                   Save Settings
                 </button>

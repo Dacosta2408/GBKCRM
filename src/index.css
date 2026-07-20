@@ -110,6 +110,13 @@
   --radius-btn:               8px;
   --transition-smooth:        all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast:          all 120ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Calendar UI Corrections ── */
+  --color-calendar-selected-bg:   #424769;
+  --color-calendar-selected-text: #FFFFFF;
+  --color-calendar-toolbar-icon:  #9FB4CC;
+  --color-calendar-strong-text:   #F0F4F8;
+  --color-calendar-muted-control: #5C7594;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -191,6 +198,13 @@
   --shadow-sm:                inset 0 1px 1px rgba(255, 255, 255, 0.95), 0 2px 6px rgba(15, 23, 42, 0.015);
   --shadow-lg:                inset 0 1px 2px rgba(255, 255, 255, 0.95), 0 24px 48px -12px rgba(15, 23, 42, 0.08), 0 10px 24px -6px rgba(15, 23, 42, 0.04);
   --shadow-sidebar:           inset -1px 0 0 rgba(255, 255, 255, 0.1), 12px 0 32px -8px rgba(15, 23, 42, 0.04);
+
+  /* ── Calendar UI Corrections ── */
+  --color-calendar-selected-bg:   #2D3250;
+  --color-calendar-selected-text: #FFFFFF;
+  --color-calendar-toolbar-icon:  #2D3250;
+  --color-calendar-strong-text:   #1C2230;
+  --color-calendar-muted-control: #4F5E7B;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -237,6 +251,13 @@
   --color-brand-slate-deep:  var(--color-brand-slate-deep);
   --color-brand-slate-darker:var(--color-brand-slate-darker);
   --color-brand-peach:       var(--color-brand-peach);
+
+  /* Calendar Correction Variables */
+  --color-calendar-selected-bg:   var(--color-calendar-selected-bg);
+  --color-calendar-selected-text: var(--color-calendar-selected-text);
+  --color-calendar-toolbar-icon:  var(--color-calendar-toolbar-icon);
+  --color-calendar-strong-text:   var(--color-calendar-strong-text);
+  --color-calendar-muted-control: var(--color-calendar-muted-control);
 }
 
 /* ─────────────────────────────────────────────────────────────
