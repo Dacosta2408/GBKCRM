@@ -1244,120 +1244,146 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       <div className="flex-grow flex flex-col min-w-0 min-h-0 p-5">
         
         {/* Timeline Navigation Custom Header */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4 border-b border-[var(--color-border)] pb-4 shrink-0">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-faint)] font-mono mb-1">
-              <span>Calendar System</span>
+        <div className="flex flex-col gap-4 mb-5 border-b border-[var(--color-border)] pb-4 shrink-0">
+          {/* Top Row: Stable Title & Admin/Manager Switcher */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-[rgba(244,163,132,0.1)] border border-[rgba(244,163,132,0.2)] rounded-xl text-[var(--color-primary)]">
+                <CalendarIcon className="w-5 h-5 text-[var(--color-accent)] animate-pulse" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-lg font-black text-[var(--color-text)] tracking-tight">
+                  Team Calendar Workspace
+                </h2>
+                {/* Stable Active Date/Range subheader meta line */}
+                <div className="text-[11px] font-bold text-[var(--color-text-muted)] mt-1 flex items-center gap-1.5 flex-wrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] shrink-0" />
+                  {viewMode === "day" && (
+                    <span>Day Frame: <strong className="text-[var(--color-text)] font-extrabold">{selectedDayInfo.label}</strong></span>
+                  )}
+                  {viewMode === "week" && (
+                    <span>Week Frame: <strong className="text-[var(--color-text)] font-extrabold">{weekDays[0]?.fullLabel} — {weekDays[6]?.fullLabel} ({currentYear})</strong></span>
+                  )}
+                  {viewMode === "month" && (
+                    <span>Month Frame: <strong className="text-[var(--color-text)] font-extrabold">{monthNames[currentMonth]} {currentYear} Scope</strong></span>
+                  )}
+                  {viewMode === "list" && (
+                    <span>Ledger Frame: <strong className="text-[var(--color-text)] font-extrabold">{monthNames[currentMonth]} {currentYear} Action Scope</strong></span>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            <h2 className="text-lg font-black text-[var(--color-text)] flex items-center gap-2">
-              {viewMode === "day" && selectedDayInfo.label}
-              {viewMode === "week" && `Week Agenda Framework: ${weekDays[0]?.fullLabel} - ${weekDays[6]?.fullLabel}, ${currentYear}`}
-              {viewMode === "month" && `Broker Month Grid: ${monthNames[currentMonth]} ${currentYear}`}
-              {viewMode === "list" && "Full Agenda Backlog Index"}
-            </h2>
-          </div>
 
-          <div className="flex items-center gap-2.5 self-stretch lg:self-auto justify-between lg:justify-end flex-wrap">
-            {/* Admin/Manager User Calendar Selector */}
+            {/* Admin/Manager User Calendar Selector - High Visibility */}
             {isAdminOrManager && (
-              <div className="flex items-center gap-2 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 rounded-xl shadow-sm text-xs font-bold">
-                <User className="w-3.5 h-3.5 text-[var(--color-accent)] shrink-0" />
-                <span className="text-[10px] uppercase text-[var(--color-text-muted)] tracking-wider hidden md:inline">Calendar:</span>
-                <select
-                  value={selectedCalendarOwner}
-                  onChange={(e) => setSelectedCalendarOwner(e.target.value)}
-                  className="bg-transparent text-[var(--color-text)] font-extrabold focus:outline-none cursor-pointer pr-1 text-xs"
-                >
-                  <option value="all" className="bg-[var(--color-surface)] text-[var(--color-text)]">All Users</option>
-                  {userRoster?.map(u => (
-                    <option key={u.id} value={u.id} className="bg-[var(--color-surface)] text-[var(--color-text)]">
-                      {u.first} {u.last} ({u.role})
+              <div className="flex items-center gap-2.5 bg-[var(--color-surface-2)] border-2 border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40 px-3.5 py-1.5 rounded-xl shadow-md text-xs font-bold transition-all shrink-0">
+                <User className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] uppercase text-[var(--color-text-muted)] tracking-wider font-extrabold block">Calendar Owner:</span>
+                  <select
+                    value={selectedCalendarOwner}
+                    onChange={(e) => setSelectedCalendarOwner(e.target.value)}
+                    className="bg-transparent text-[var(--color-text)] font-black focus:outline-none cursor-pointer pr-4 text-xs mt-0.5"
+                  >
+                    <option value="all" className="bg-[var(--color-surface)] text-[var(--color-text)] font-bold">
+                      🌍 All Users / Shared Views
                     </option>
-                  ))}
-                </select>
+                    {userRoster?.map(u => {
+                      const isMe = u.id === currentUser?.id;
+                      return (
+                        <option key={u.id} value={u.id} className="bg-[var(--color-surface)] text-[var(--color-text)] font-semibold">
+                          👤 {u.first} {u.last} ({isMe ? "You — " : ""}{u.role})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
             )}
+          </div>
 
-            {/* Active Date Badge */}
-            <div className="flex items-center gap-2 bg-[rgba(244,163,132,0.1)] border border-[rgba(244,163,132,0.25)] px-3 py-1.5 rounded-xl text-xs font-extrabold text-[var(--color-primary)] shadow-sm">
-              <CalendarIcon className="w-3.5 h-3.5 text-[var(--color-accent)] shrink-0" />
-              <span>Active: {selectedDayInfo.label}</span>
-            </div>
-
+          {/* Bottom Row: Controls Toolbar */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 bg-[var(--color-surface)]/40 border border-[var(--color-border)]/60 p-2 rounded-2xl select-none">
             {/* View Multi-Tabs Segmented control */}
-            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-1 rounded-xl flex items-center">
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-1 rounded-xl flex items-center shrink-0">
               <button 
                 onClick={() => setViewMode("day")}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "day" ? "bg-[var(--color-primary)] text-[var(--color-bg)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "day" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 Day Timeline
               </button>
               <button 
                 onClick={() => setViewMode("week")}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "week" ? "bg-[var(--color-primary)] text-[var(--color-bg)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "week" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
                 Week Timeline
               </button>
               <button 
                 onClick={() => setViewMode("month")}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "month" ? "bg-[var(--color-primary)] text-[var(--color-bg)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "month" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
-                Month
+                Month Grid
               </button>
               <button 
                 onClick={() => setViewMode("list")}
-                className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "list" ? "bg-[var(--color-primary)] text-[var(--color-bg)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                className={`flex-grow md:flex-none px-4 py-1.5 text-xs font-extrabold rounded-lg transition-all ${viewMode === "list" ? "bg-[var(--color-primary)] text-[var(--color-bg)] shadow" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
               >
-                List
+                List Index
               </button>
             </div>
 
-            {/* Quick action buttons */}
-            <div className="flex items-center gap-1.5">
-              <button 
-                onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
-                className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
-                  advancedFiltersOpen || isFilterActive
-                    ? "border-[var(--color-primary)]/40 bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] font-extrabold"
-                    : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)]"
-                }`}
-                title="Toggle Advanced Filters"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                <span className="hidden sm:inline text-[10px] font-extrabold tracking-wider uppercase px-0.5">Filters</span>
-                {isFilterActive && (
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--color-accent)] ring-2 ring-[var(--color-bg)] animate-pulse" />
-                )}
-              </button>
-              <button 
-                onClick={() => setCalendarSettingsOpen(true)}
-                className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-all flex items-center gap-1 cursor-pointer"
-                title="Configure working hours and time slots"
-              >
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline text-[10px] font-extrabold tracking-wider uppercase px-0.5">Settings</span>
-              </button>
-              <button 
-                onClick={prevTimeFrame}
-                className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)]"
-                title="Previous schedule page"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={goToToday}
-                className="px-3.5 py-2 border border-[var(--color-primary)]/20 text-[var(--color-primary)] bg-[var(--color-primary)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-primary)]/15 transition-all"
-              >
-                Get Today
-              </button>
-              <button 
-                onClick={nextTimeFrame}
-                className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)]"
-                title="Next schedule page"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+            {/* Navigation and other actions */}
+            <div className="flex items-center justify-between sm:justify-end gap-2.5 flex-wrap">
+              {/* Quick action buttons */}
+              <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                <button 
+                  onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
+                  className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
+                    advancedFiltersOpen || isFilterActive
+                      ? "border-[var(--color-primary)]/40 bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] font-extrabold"
+                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)]"
+                  }`}
+                  title="Toggle Advanced Filters"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  <span className="hidden sm:inline text-[10px] font-extrabold tracking-wider uppercase px-0.5">Filters</span>
+                  {isFilterActive && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--color-accent)] ring-2 ring-[var(--color-bg)] animate-pulse" />
+                  )}
+                </button>
+                
+                <button 
+                  onClick={() => setCalendarSettingsOpen(true)}
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-all flex items-center gap-1 cursor-pointer"
+                  title="Configure working hours and time slots"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline text-[10px] font-extrabold tracking-wider uppercase px-0.5">Settings</span>
+                </button>
+
+                <div className="h-4 w-px bg-[var(--color-border)] mx-1 hidden sm:block" />
+
+                <button 
+                  onClick={prevTimeFrame}
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  title="Previous range"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={goToToday}
+                  className="px-3.5 py-2 border border-[var(--color-primary)]/20 text-[var(--color-primary)] bg-[var(--color-primary)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-primary)]/15 transition-all cursor-pointer"
+                >
+                  Today
+                </button>
+                <button 
+                  onClick={nextTimeFrame}
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  title="Next range"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
