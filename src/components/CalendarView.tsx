@@ -58,26 +58,26 @@ const QuickActionButton: React.FC<{
 
   switch (variant) {
     case "done":
-      baseClasses += "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40";
+      baseClasses += "bg-[var(--color-success-subtle)] border-[var(--color-success)]/15 text-[var(--color-success)] hover:bg-[var(--color-success)]/15 hover:border-[var(--color-success)]/40";
       icon = <Check className="w-3.5 h-3.5" />;
       text = "Done";
       break;
     case "cancel":
-      baseClasses += "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40";
+      baseClasses += "bg-[var(--color-warning-subtle)] border-[var(--color-warning)]/15 text-[var(--color-warning)] hover:bg-[var(--color-warning)]/15 hover:border-[var(--color-warning)]/40";
       icon = <X className="w-3.5 h-3.5" />;
       text = "Cancel";
       break;
     case "copy":
-      baseClasses += "bg-blue-500/10 border-blue-500/15 text-blue-500 dark:text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/40";
+      baseClasses += "bg-[var(--color-primary-subtle)] border-[var(--color-primary)]/15 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40";
       icon = <Copy className="w-3.5 h-3.5" />;
       text = "Copy";
       break;
     case "plus1":
-      baseClasses += "bg-cyan-500/10 border-cyan-500/15 text-cyan-500 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40";
+      baseClasses += "bg-[rgba(249,177,122,0.08)] border-[rgba(249,177,122,0.15)] text-[#9E5D2A] dark:text-[#F9B17A] hover:bg-[rgba(249,177,122,0.16)] hover:border-[#F9B17A]/40";
       text = "+1d";
       break;
     case "plus7":
-      baseClasses += "bg-cyan-500/10 border-cyan-500/15 text-cyan-500 dark:text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/40";
+      baseClasses += "bg-[rgba(249,177,122,0.08)] border-[rgba(249,177,122,0.15)] text-[#9E5D2A] dark:text-[#F9B17A] hover:bg-[rgba(249,177,122,0.16)] hover:border-[#F9B17A]/40";
       text = "+7d";
       break;
     case "edit":
@@ -86,7 +86,7 @@ const QuickActionButton: React.FC<{
       text = "Edit";
       break;
     case "delete":
-      baseClasses += "bg-red-500/10 border-red-500/20 text-red-500 dark:text-red-400 hover:bg-red-500/20 hover:border-red-500/40";
+      baseClasses += "bg-[var(--color-error-subtle)] border-[var(--color-error)]/15 text-[var(--color-error)] hover:bg-[var(--color-error)]/15 hover:border-[var(--color-error)]/40";
       icon = <Trash2 className="w-3.5 h-3.5" />;
       text = "Delete";
       break;
@@ -364,12 +364,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   // List of event types with professional visual parameters
   const eventTypes = [
-    { value: "meeting", label: "Meeting / Call", color: "bg-amber-500", border: "border-amber-500/25", text: "text-amber-700 dark:text-amber-400", lightBg: "bg-amber-500/10", glow: "shadow-[0_0_12px_rgba(245,158,11,0.15)]" },
-    { value: "client", label: "Client Deadline", color: "bg-rose-500", border: "border-rose-500/25", text: "text-rose-700 dark:text-rose-400", lightBg: "bg-rose-500/10", glow: "shadow-[0_0_12px_rgba(244,63,94,0.15)]" },
-    { value: "lender", label: "Lender Review", color: "bg-cyan-500", border: "border-cyan-500/25", text: "text-cyan-700 dark:text-cyan-400", lightBg: "bg-cyan-500/10", glow: "shadow-[0_0_12px_rgba(6,182,212,0.15)]" },
-    { value: "personal", label: "Personal Task", color: "bg-teal-500", border: "border-teal-500/25", text: "text-teal-700 dark:text-teal-400", lightBg: "bg-teal-500/10", glow: "shadow-[0_0_12px_rgba(20,184,166,0.15)]" },
-    { value: "holiday", label: "Stat Holiday", color: "bg-emerald-500", border: "border-emerald-500/25", text: "text-emerald-700 dark:text-emerald-400", lightBg: "bg-emerald-500/10", glow: "shadow-[0_0_12px_rgba(16,185,129,0.15)]" },
-    { value: "birthday", label: "Birthday Greeting", color: "bg-sky-500", border: "border-sky-500/25", text: "text-sky-700 dark:text-sky-400", lightBg: "bg-sky-500/10", glow: "shadow-[0_0_12px_rgba(14,165,233,0.15)]" }
+    { value: "meeting", label: "Meeting / Call", color: "bg-[#DAA428]", border: "border-[#DAA428]/25", text: "text-[#B47D1C] dark:text-[#F9B17A]", lightBg: "bg-[#DAA428]/10", glow: "shadow-[0_0_12px_rgba(218,164,40,0.15)]" },
+    { value: "client", label: "Client Deadline", color: "bg-[#F9B17A]", border: "border-[#F9B17A]/25", text: "text-[#9E5D2A] dark:text-[#F9B17A]", lightBg: "bg-[#F9B17A]/10", glow: "shadow-[0_0_12px_rgba(249,177,122,0.15)]" },
+    { value: "lender", label: "Lender Review", color: "bg-[#676F9D]", border: "border-[#676F9D]/25", text: "text-[#424769] dark:text-[#9FB4CC]", lightBg: "bg-[#676F9D]/10", glow: "shadow-[0_0_12px_rgba(103,111,157,0.15)]" },
+    { value: "personal", label: "Personal Task", color: "bg-[#424769]", border: "border-[#424769]/25", text: "text-[#2D3250] dark:text-[#C8D8E8]", lightBg: "bg-[#424769]/10", glow: "shadow-[0_0_12px_rgba(66,71,105,0.15)]" },
+    { value: "holiday", label: "Stat Holiday", color: "bg-[#C2B19D]", border: "border-[#C2B19D]/25", text: "text-[#7A6451] dark:text-[#E2D5C2]", lightBg: "bg-[#C2B19D]/10", glow: "shadow-[0_0_12px_rgba(194,177,157,0.15)]" },
+    { value: "birthday", label: "Birthday Greeting", color: "bg-[#F4A384]", border: "border-[#F4A384]/25", text: "text-[#9E4A2A] dark:text-[#F4A384]", lightBg: "bg-[#F4A384]/10", glow: "shadow-[0_0_12px_rgba(244,163,132,0.15)]" }
   ];
 
   const getTypeColor = (type: string) => {
@@ -1191,22 +1191,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3.5 flex-1 flex flex-col min-h-0">
           <div className="flex items-center justify-between mb-3 shrink-0">
             <h4 className="text-[10.5px] font-extrabold text-[var(--color-text-muted)] uppercase tracking-widest flex items-center gap-1.5">
-              <CheckSquare className="w-3.5 h-3.5 text-emerald-400" /> 
+              <CheckSquare className="w-3.5 h-3.5 text-[var(--color-success)]" /> 
               Tasks to Schedule
             </h4>
-            <span className="text-[9px] bg-emerald-500/10 text-emerald-400 font-extrabold border border-emerald-500/15 rounded-md px-1.5 py-0.5 font-mono">
+            <span className="text-[9px] bg-[var(--color-success-subtle)] text-[var(--color-success)] font-extrabold border border-[var(--color-success)]/15 rounded-md px-1.5 py-0.5 font-mono">
               {openTasks.length} pending
             </span>
           </div>
 
           <p className="text-[10px] text-[var(--color-text-faint)] mb-3 leading-relaxed shrink-0">
-            Click on the green play arrow to instantly book any pending file target directly into the selected date timeline!
+            Click on the play arrow to instantly book any pending file target directly into the selected date timeline!
           </p>
 
           <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[160px]">
             {openTasks.length === 0 ? (
               <div className="h-full flex flex-col justify-center items-center py-6 text-center text-[var(--color-text-faint)] select-none">
-                <Check className="w-5 h-5 text-emerald-500 opacity-60 mb-2" />
+                <Check className="w-5 h-5 text-[var(--color-success)] opacity-60 mb-2" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">All Tasks Slated</span>
               </div>
             ) : (
@@ -1228,7 +1228,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                   <button
                     onClick={() => scheduleTaskOntoTimeline(t, "10:00")}
-                    className="p-1 px-1.5 bg-emerald-500/10 hover:bg-emerald-500 hover:text-black border border-emerald-500/20 text-emerald-400 rounded-lg text-[9px] font-black transition-all flex items-center gap-0.5 shrink-0"
+                    className="p-1 px-1.5 bg-[var(--color-success-subtle)] hover:bg-[var(--color-success)] hover:text-[var(--color-bg)] border border-[var(--color-success)]/15 text-[var(--color-success)] rounded-lg text-[9px] font-black transition-all flex items-center gap-0.5 shrink-0"
                     title="Schedule at 10:00 AM"
                   >
                     <Play className="w-2.5 h-2.5 fill-current" />
@@ -1549,11 +1549,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           key={ev.id}
                           onClick={() => handleOpenEditModal(ev)}
                           className={`p-2 rounded-lg border text-[11px] font-bold cursor-pointer hover:brightness-110 transition-all flex items-center gap-2 ${scheme.lightBg} ${scheme.border} ${scheme.text} ${scheme.glow} ${
-                            isCanceled ? "line-through opacity-50 decoration-red-400" : ""
+                            isCanceled ? "line-through opacity-50 decoration-[var(--color-error)]" : ""
                           }`}
                         >
-                          {ev.isPrivate && <Lock className="w-3 h-3 text-amber-500 shrink-0" />}
-                          {isCompleted && <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                          {ev.isPrivate && <Lock className="w-3 h-3 text-[var(--color-warning)] shrink-0" />}
+                          {isCompleted && <Check className="w-3.5 h-3.5 text-[var(--color-success)] shrink-0" />}
                           <span>{ev.title}</span>
                           <span className="text-[9px] uppercase tracking-wider px-1.5 bg-black/15 rounded-md text-[var(--color-text-muted)]">
                             {ev.type}
@@ -1632,7 +1632,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               }}
                               className={`min-h-[44px] flex items-stretch p-1.5 transition-all select-none relative group/slot text-left border-l-2 ${
                                 isSelected
-                                  ? "bg-[rgba(244,163,132,0.18)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
+                                  ? "bg-[rgba(249,177,122,0.15)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
                                   : "bg-[var(--color-surface-2)]/25 odd:bg-[var(--color-surface)]/20 hover:bg-[var(--color-surface-3)]/50 border-l-[var(--color-border)]/40 cursor-pointer"
                               }`}
                             >
@@ -1670,16 +1670,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                             <div className="flex flex-wrap items-center gap-1.5">
                                               <h4 className={`text-xs font-extrabold transition-colors truncate flex items-center gap-1.5 ${
                                                 ev.status === "canceled" 
-                                                  ? "line-through text-[var(--color-text-faint)]/70 decoration-red-400" 
+                                                  ? "line-through text-[var(--color-text-faint)]/70 decoration-[var(--color-error)]" 
                                                   : ev.status === "completed" 
-                                                    ? "text-emerald-500 dark:text-emerald-400 font-extrabold" 
+                                                    ? "text-[var(--color-success)] font-extrabold" 
                                                     : "text-[var(--color-text)] group-hover/card:text-[var(--color-accent)]"
                                               }`}>
-                                                {ev.isPrivate && <Lock className="w-3 h-3 text-amber-500 shrink-0" />}
-                                                {ev.status === "completed" && <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                                                {ev.isPrivate && <Lock className="w-3 h-3 text-[var(--color-warning)] shrink-0" />}
+                                                {ev.status === "completed" && <Check className="w-3.5 h-3.5 text-[var(--color-success)] shrink-0" />}
                                                 <span>{ev.title}</span>
-                                                {ev.status === "canceled" && <span className="text-[8px] uppercase tracking-wider px-1 bg-red-500/10 text-red-500 rounded font-normal shrink-0">Canceled</span>}
-                                                {ev.status === "completed" && <span className="text-[8px] uppercase tracking-wider px-1 bg-emerald-500/10 text-emerald-500 rounded font-normal shrink-0">Completed</span>}
+                                                {ev.status === "canceled" && <span className="text-[8px] uppercase tracking-wider px-1 bg-[var(--color-error-subtle)] text-[var(--color-error)] rounded font-normal shrink-0">Canceled</span>}
+                                                {ev.status === "completed" && <span className="text-[8px] uppercase tracking-wider px-1 bg-[var(--color-success-subtle)] text-[var(--color-success)] rounded font-normal shrink-0">Completed</span>}
                                               </h4>
                                               <span className={`text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded border ${scheme.lightBg} ${scheme.border} ${scheme.text} ${scheme.glow}`}>
                                                 {ev.type}
@@ -1870,7 +1870,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                     key={ev.id}
                                     onClick={() => handleOpenEditModal(ev)}
                                     className={`p-2.5 rounded-xl border text-[11px] font-bold cursor-pointer select-none relative group hover:brightness-110 active:scale-[0.98] transition-all flex flex-col gap-1 text-left ${scheme.lightBg} ${scheme.border} ${scheme.text} ${scheme.glow} ${
-                                      isCanceled ? "line-through opacity-50 decoration-red-400" : ""
+                                      isCanceled ? "line-through opacity-50 decoration-[var(--color-error)]" : ""
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1">
@@ -1879,13 +1879,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                     </div>
                                     <div className={`line-clamp-2 leading-tight mt-0.5 font-semibold group-hover:opacity-90 flex items-center flex-wrap gap-1 ${
                                       isCanceled 
-                                        ? "line-through text-[var(--color-text-faint)]/70 decoration-red-400" 
+                                        ? "line-through text-[var(--color-text-faint)]/70 decoration-[var(--color-error)]" 
                                         : isCompleted 
-                                          ? "text-emerald-600 dark:text-emerald-400 font-extrabold" 
+                                          ? "text-[var(--color-success)] font-extrabold" 
                                           : "text-[var(--color-text)]"
                                     }`}>
-                                      {ev.isPrivate && <Lock className="w-2.5 h-2.5 text-amber-500 inline-block shrink-0" />}
-                                      {isCompleted && <Check className="w-3 h-3 text-emerald-500 inline-block shrink-0" />}
+                                      {ev.isPrivate && <Lock className="w-2.5 h-2.5 text-[var(--color-warning)] inline-block shrink-0" />}
+                                      {isCompleted && <Check className="w-3.5 h-3.5 text-[var(--color-success)] inline-block shrink-0" />}
                                       <span>{ev.title}</span>
                                     </div>
                                   {ev.notes && (
@@ -2024,7 +2024,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           </span>
 
                           {dayTs.length > 0 && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-red-400" title={`${dayTs.length} pending obligations!`} />
+                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-error)]" title={`${dayTs.length} pending obligations!`} />
                           )}
                         </div>
 
@@ -2052,14 +2052,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               onClick={(e) => { e.stopPropagation(); handleOpenEditModal(ev); }}
                               className={`text-[8.5px] font-black rounded px-1.5 py-0.5 border truncate hover:brightness-110 flex items-center gap-1 ${scheme.lightBg} ${scheme.text} ${scheme.border} ${
                                 isCanceled 
-                                  ? "line-through opacity-50 decoration-red-400" 
+                                  ? "line-through opacity-50 decoration-[var(--color-error)]" 
                                   : isCompleted 
-                                    ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-extrabold" 
+                                    ? "border-[var(--color-success)]/40 text-[var(--color-success)] font-extrabold" 
                                     : ""
                               }`}
                               title={`${ev.time || ""} ${ev.title}`}
                             >
-                              {ev.isPrivate && <Lock className="w-2 h-2 text-amber-500 shrink-0 inline-block" />}
+                              {ev.isPrivate && <Lock className="w-2 h-2 text-[var(--color-warning)] shrink-0 inline-block" />}
                               {ev.time ? <span className="opacity-70 mr-0.5 font-mono text-[8px]">{ev.time}</span> : null}
                               <span>{ev.title}</span>
                             </div>
@@ -2111,16 +2111,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             <div>
                               <span className={`text-xs font-bold flex items-center gap-1.5 ${
                                 isCanceled 
-                                  ? "line-through text-[var(--color-text-faint)]/70 decoration-red-400" 
+                                  ? "line-through text-[var(--color-text-faint)]/70 decoration-[var(--color-error)]" 
                                   : isCompleted 
-                                    ? "text-emerald-500 dark:text-emerald-400 font-extrabold" 
+                                    ? "text-[var(--color-success)] font-extrabold" 
                                     : "text-[var(--color-text)]"
                               }`}>
-                                {ev.isPrivate && <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
-                                {isCompleted && <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                                {ev.isPrivate && <Lock className="w-3.5 h-3.5 text-[var(--color-warning)] shrink-0" />}
+                                {isCompleted && <Check className="w-3.5 h-3.5 text-[var(--color-success)] shrink-0" />}
                                 <span>{ev.title}</span>
-                                {isCanceled && <span className="text-[8px] uppercase tracking-wider px-1 bg-red-500/10 text-red-500 rounded font-normal shrink-0">Canceled</span>}
-                                {isCompleted && <span className="text-[8px] uppercase tracking-wider px-1 bg-emerald-500/10 text-emerald-500 rounded font-normal shrink-0">Completed</span>}
+                                {isCanceled && <span className="text-[8px] uppercase tracking-wider px-1 bg-[var(--color-error-subtle)] text-[var(--color-error)] rounded font-normal shrink-0">Canceled</span>}
+                                {isCompleted && <span className="text-[8px] uppercase tracking-wider px-1 bg-[var(--color-success-subtle)] text-[var(--color-success)] rounded font-normal shrink-0">Completed</span>}
                               </span>
                               <div className="flex items-center gap-2.5 text-[10px] text-[var(--color-text-muted)] mt-1 font-semibold">
                                 <span className="font-mono bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded text-[var(--color-text-muted)]">{ev.date}</span>
@@ -2287,7 +2287,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         {/* Title */}
                         <div>
                           <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
-                            Appointment / Milestone Title <span className="text-red-400">*</span>
+                            Appointment / Milestone Title <span className="text-[var(--color-error)]">*</span>
                           </label>
                           <input
                             type="text"
@@ -2421,7 +2421,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                   setClientSearchQuery("");
                                   setClientSearchOpen(false);
                                 }}
-                                className="text-[10px] text-red-400 hover:text-red-300 font-extrabold uppercase tracking-wide transition-colors cursor-pointer"
+                                className="text-[10px] text-[var(--color-error)] hover:opacity-80 font-extrabold uppercase tracking-wide transition-colors cursor-pointer"
                               >
                                 Clear Link
                               </button>
@@ -2443,7 +2443,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] pointer-events-none select-none">
                               {eventClientId ? (
-                                <span className="bg-emerald-500/10 text-emerald-400 font-extrabold border border-emerald-500/15 rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wide">
+                                <span className="bg-[var(--color-success-subtle)] text-[var(--color-success)] font-extrabold border border-[var(--color-success)]/15 rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wide">
                                   Linked
                                 </span>
                               ) : (
@@ -2533,8 +2533,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               let activeClass = "";
                               if (isSelected) {
                                 if (status === "scheduled") activeClass = "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-sm";
-                                if (status === "completed") activeClass = "bg-emerald-500 text-white font-extrabold shadow-sm";
-                                if (status === "canceled") activeClass = "bg-red-500 text-white font-extrabold shadow-sm";
+                                if (status === "completed") activeClass = "bg-[var(--color-success)] text-white font-extrabold shadow-sm";
+                                if (status === "canceled") activeClass = "bg-[var(--color-error)] text-white font-extrabold shadow-sm";
                               } else {
                                 activeClass = "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]";
                               }
@@ -2585,7 +2585,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
                           />
                           <label htmlFor="event-private-checkbox" className="text-xs text-[var(--color-text-muted)] font-extrabold hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1.5 transition-all">
-                            <Lock className="w-3.5 h-3.5 text-amber-500" />
+                            <Lock className="w-3.5 h-3.5 text-[var(--color-warning)]" />
                             <span>Private activity (internal calendar only)</span>
                           </label>
                         </div>
@@ -2643,7 +2643,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               </div>
                               <div>
                                 <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
-                                  Follow-up Title <span className="text-red-400">*</span>
+                                  Follow-up Title <span className="text-[var(--color-error)]">*</span>
                                 </label>
                                 <input
                                   type="text"
@@ -2658,7 +2658,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
                                   <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
-                                    Follow-up Date <span className="text-red-400">*</span>
+                                    Follow-up Date <span className="text-[var(--color-error)]">*</span>
                                   </label>
                                   <input
                                     type="date"
@@ -2698,7 +2698,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveEvent(editingEvent.id)}
-                      className="px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl text-xs font-bold transition-all border border-red-500/20 cursor-pointer"
+                      className="px-4 py-2 bg-[var(--color-error-subtle)] text-[var(--color-error)] hover:bg-[var(--color-error)]/20 rounded-xl text-xs font-bold transition-all border border-[var(--color-error)]/20 cursor-pointer"
                     >
                       Delete Event
                     </button>
@@ -2743,8 +2743,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               }}
             >
               <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
-                <h3 className="text-xs uppercase font-extrabold text-red-500 tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                <h3 className="text-xs uppercase font-extrabold text-[var(--color-error)] tracking-wider flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-[var(--color-error)]" />
                   Delete Calendar Record?
                 </h3>
                 <button
@@ -2773,7 +2773,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <button
                   type="button"
                   onClick={confirmDeleteEvent}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer shadow-md shadow-red-500/10"
+                  className="px-4 py-2 bg-[var(--color-error)] hover:opacity-95 text-white font-extrabold text-xs rounded-xl transition-all cursor-pointer shadow-md shadow-[var(--color-error)]/15"
                 >
                   Delete Event
                 </button>
