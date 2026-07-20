@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Client, Lender, User, Task, Partner } from "../types";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface ReportsProps {
   clients: Client[];
@@ -345,7 +345,7 @@ export const Reports: React.FC<ReportsProps> = ({
         ["File Conversion Rate", `${kpis.conversionRate}%`, "Average Deal Size", `$${kpis.avgDealSize.toLocaleString()} CAD`],
       ];
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         head: [["Metric Indicator", "Performance", "Operational Support", "Count"]],
         body: kpiData,
@@ -369,7 +369,7 @@ export const Reports: React.FC<ReportsProps> = ({
         `$${st.volume.toLocaleString()} CAD`
       ]);
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         head: [["Pipeline Stage Status", "File Allocations", "Current Volume Value"]],
         body: stageRows,
@@ -396,7 +396,7 @@ export const Reports: React.FC<ReportsProps> = ({
         `${item.conversionRate}%`
       ]);
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         head: [["Agent Name", "Designation", "Total", "Funded", "Closed Volume", "Conversion %"]],
         body: agentRows,
@@ -429,7 +429,7 @@ export const Reports: React.FC<ReportsProps> = ({
         ];
       });
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         head: [["Lender Institution", "Lending Class", "Allocated Deals", "Placed Volume", "Placement Share"]],
         body: lenderRows,

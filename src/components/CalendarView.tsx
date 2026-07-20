@@ -6,9 +6,10 @@ import {
   Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, 
   Plus, CheckSquare, Edit3, Trash2, X, AlertCircle, HelpCircle, 
   Check, Info, Sparkles, User, ListFilter, Layers, ArrowRight,
-  MapPin, Bell, Star, AlertTriangle, Play, Settings, Lock, Copy
+  MapPin, Bell, Star, AlertTriangle, Play, Settings, Lock, Copy,
+  SlidersHorizontal, Filter
 } from "lucide-react";
-import { Event, Task, Client } from "../types";
+import { Event, Task, Client, User as UserType } from "../types";
 
 // Extended Event typing for optional duration support (in minutes)
 interface CalendarEvent extends Event {
@@ -41,6 +42,8 @@ interface CalendarViewProps {
   showToast: (msg: string, type?: "success" | "error" | "info" | "warning", icon?: string) => void;
   calendarLaunchIntent?: { clientId?: string; dateStr?: string; timeStr?: string; openModal?: boolean } | null;
   clearCalendarLaunchIntent?: () => void;
+  currentUser?: UserType;
+  userRoster?: UserType[];
 }
 
 const QuickActionButton: React.FC<{
@@ -193,7 +196,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   clients,
   showToast,
   calendarLaunchIntent,
-  clearCalendarLaunchIntent
+  clearCalendarLaunchIntent,
+  currentUser,
+  userRoster
 }) => {
   // Calendar settings state
   const [defaultView, setDefaultView] = useState<"day" | "week" | "month" | "list">("week");
@@ -204,11 +209,36 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const [defaultDuration, setDefaultDuration] = useState<number>(60);
   const [holidayRegion, setHolidayRegion] = useState<string>("ON");
 
+  // User permission and selected calendar owner state
+  const isAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
+  const [selectedCalendarOwner, setSelectedCalendarOwner] = useState<string>(() => {
+    const isUserAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
+    return isUserAdminOrManager ? "all" : (currentUser?.id || "all");
+  });
+
+  // Regular users are locked to their own calendar
+  useEffect(() => {
+    const isUserAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
+    if (!isUserAdminOrManager && currentUser?.id) {
+      setSelectedCalendarOwner(currentUser.id);
+    }
+  }, [currentUser]);
+
   // Navigation & view mode controls
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [selectedDateStr, setSelectedDateStr] = useState<string>(() => new Date().toISOString().split("T")[0]);
   const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterLinkedOnly, setFilterLinkedOnly] = useState<boolean>(false);
+  const [filterPrivateOnly, setFilterPrivateOnly] = useState<boolean>(false);
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"day" | "week" | "month" | "list">(defaultView);
+
+  // Drag to create duration on Day timeline view
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragStartSlot, setDragStartSlot] = useState<string | null>(null); // e.g., "09:00"
+  const [dragEndSlot, setDragEndSlot] = useState<string | null>(null); // e.g., "10:30"
+  const [dragOccurred, setDragOccurred] = useState<boolean>(false);
 
   // Scroll handler for timelines
   const timelineScrollRef = useRef<HTMLDivElement>(null);
@@ -504,10 +534,72 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     return [...events, ...holidayEvents];
   }, [events, holidayRegion]);
 
+  // Dynamic filter lists applying all advanced filters in combination
+  const isEventForOwner = (e: Event, ownerId: string): boolean => {
+    if (ownerId === "all") return true;
+    
+    // System events, automated tasks, and holidays are team-wide/visible to all
+    if (e.createdBy === "System" || e.createdBy === "Automated Desk" || e.type === "holiday") {
+      return true;
+    }
+
+    if (!userRoster) {
+      // Fallback if roster is not provided
+      return e.createdBy === ownerId || e.createdBy === "User";
+    }
+
+    const targetUser = userRoster.find(u => u.id === ownerId);
+    if (!targetUser) {
+      return e.createdBy === ownerId;
+    }
+
+    const targetFullName = `${targetUser.first} ${targetUser.last}`.toLowerCase();
+    const creatorLower = e.createdBy.toLowerCase();
+
+    if (creatorLower === ownerId.toLowerCase()) return true;
+    if (creatorLower === targetFullName) return true;
+    
+    // If the owner matches the logged-in user, and the event was created with "User"
+    if (creatorLower === "user" && currentUser?.id === ownerId) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const filteredEvents = useMemo(() => {
+    return allEvents.filter(e => {
+      // 0. Selected calendar owner
+      if (!isEventForOwner(e, selectedCalendarOwner)) {
+        return false;
+      }
+      // 1. Activity type
+      if (filterType !== "all" && e.type !== filterType) {
+        return false;
+      }
+      // 2. Status
+      const currentStatus = e.status || "scheduled";
+      if (filterStatus !== "all" && currentStatus !== filterStatus) {
+        return false;
+      }
+      // 3. Linked only
+      if (filterLinkedOnly && !e.clientId) {
+        return false;
+      }
+      // 4. Private only
+      if (filterPrivateOnly && !e.isPrivate) {
+        return false;
+      }
+      return true;
+    });
+  }, [allEvents, filterType, filterStatus, filterLinkedOnly, filterPrivateOnly, selectedCalendarOwner, currentUser, userRoster]);
+
+  const filteredEventsForMonth = filteredEvents;
+
   const selectedDayInfo = useMemo(() => {
     const d = new Date(selectedDateStr + "T00:00:00");
     const label = d.toLocaleDateString("en-CA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const dayEvs = allEvents.filter(e => e.date === selectedDateStr);
+    const dayEvs = filteredEvents.filter(e => e.date === selectedDateStr);
     const dayTs = tasks.filter(t => t.dueDate === selectedDateStr);
     return {
       dateStr: selectedDateStr,
@@ -515,12 +607,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       events: dayEvs,
       tasks: dayTs
     };
-  }, [selectedDateStr, allEvents, tasks]);
-
-  // Dynamic filter lists
-  const filteredEventsForMonth = useMemo(() => {
-    return allEvents.filter(e => filterType === "all" || e.type === filterType);
-  }, [allEvents, filterType]);
+  }, [selectedDateStr, filteredEvents, tasks]);
 
   // Overdue and open tasks count
   const openTasks = useMemo(() => {
@@ -567,12 +654,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   // Open modal handlers
-  const handleOpenAddModal = (dateStr?: string, timeStr?: string, clientId?: string) => {
+  const handleOpenAddModal = (dateStr?: string, timeStr?: string, clientId?: string, customDuration?: number) => {
     setEditingEvent(null);
     setEventTitle("");
     setEventDate(dateStr || selectedDateStr);
     setEventTime(timeStr || "09:00");
-    setEventDuration(defaultDuration);
+    setEventDuration(customDuration !== undefined ? customDuration : defaultDuration);
     setEventType("meeting");
     setEventNotes("");
     
@@ -643,6 +730,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       return;
     }
 
+    // Determine the owner/creator based on current view/user
+    const getActiveOwnerName = (): string => {
+      if (selectedCalendarOwner !== "all" && userRoster) {
+        const owner = userRoster.find(u => u.id === selectedCalendarOwner);
+        if (owner) return `${owner.first} ${owner.last}`;
+      }
+      return currentUser ? `${currentUser.first} ${currentUser.last}` : "User";
+    };
+    const finalCreator = getActiveOwnerName();
+
     // Generate follow-up if checked
     let followUpEv: CalendarEvent | null = null;
     if (createFollowUp && followUpTitle.trim() && followUpDate) {
@@ -658,7 +755,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         reminder: "none",
         isPrivate: eventIsPrivate,
         duration: eventDuration,
-        createdBy: "User"
+        createdBy: finalCreator
       };
     }
 
@@ -699,7 +796,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         clientId: eventClientId || null,
         notes: eventNotes.trim(),
         duration: eventDuration,
-        createdBy: "User",
+        createdBy: finalCreator,
         status: eventStatus,
         reminder: eventReminder,
         isPrivate: eventIsPrivate
@@ -816,6 +913,74 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     return blocks;
   }, [workdayStartHour, workdayEndHour, slotInterval]);
 
+  // Derived helper list of flat slot times in chronological order
+  const flatSlots = useMemo(() => {
+    const list: string[] = [];
+    hoursOfDay.forEach(block => {
+      block.slots.forEach(slot => {
+        list.push(slot.time);
+      });
+    });
+    return list;
+  }, [hoursOfDay]);
+
+  // Determine if a slot time falls within the currently dragged range
+  const isSlotSelected = useMemo(() => {
+    if (!dragStartSlot || !dragEndSlot) return () => false;
+    const startIndex = flatSlots.indexOf(dragStartSlot);
+    const endIndex = flatSlots.indexOf(dragEndSlot);
+    if (startIndex === -1 || endIndex === -1) return () => false;
+    const minIdx = Math.min(startIndex, endIndex);
+    const maxIdx = Math.max(startIndex, endIndex);
+    
+    return (time: string) => {
+      const idx = flatSlots.indexOf(time);
+      return idx >= minIdx && idx <= maxIdx;
+    };
+  }, [dragStartSlot, dragEndSlot, flatSlots]);
+
+  // Handle global mouse up to release drag selection and trigger booking creation modal with duration prefilled
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseUp = () => {
+      setIsDragging(false);
+
+      if (dragOccurred && dragStartSlot && dragEndSlot) {
+        const startIndex = flatSlots.indexOf(dragStartSlot);
+        const endIndex = flatSlots.indexOf(dragEndSlot);
+
+        if (startIndex !== -1 && endIndex !== -1) {
+          const minIdx = Math.min(startIndex, endIndex);
+          const maxIdx = Math.max(startIndex, endIndex);
+
+          const startTime = flatSlots[minIdx];
+          const numSlots = maxIdx - minIdx + 1;
+          const duration = numSlots * slotInterval;
+
+          handleOpenAddModal(selectedDateStr, startTime, undefined, duration);
+        }
+      }
+
+      setTimeout(() => {
+        setDragOccurred(false);
+      }, 50);
+    };
+
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
+    };
+  }, [isDragging, dragOccurred, dragStartSlot, dragEndSlot, flatSlots, selectedDateStr, slotInterval]);
+
+  // Clear drag highlights automatically when the event creation modal closes
+  useEffect(() => {
+    if (!isEventModalOpen) {
+      setDragStartSlot(null);
+      setDragEndSlot(null);
+    }
+  }, [isEventModalOpen]);
+
   // Generate valid start times for dropdown time picker
   const timePickerOptions = useMemo(() => {
     const options = [];
@@ -863,8 +1028,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   // Check if an event falls inside a slot range
   // Let's compute if an event is starting at a given hour / minute slot
   const getEventsForTimeSlot = (dateStr: string, timeSlot: string) => {
-    return allEvents.filter(ev => ev.date === dateStr && isEventInSlot(ev.time, timeSlot) && (filterType === "all" || ev.type === filterType));
+    return filteredEvents.filter(ev => ev.date === dateStr && isEventInSlot(ev.time, timeSlot));
   };
+
+  const isFilterActive = filterType !== "all" || filterStatus !== "all" || filterLinkedOnly || filterPrivateOnly;
 
   return (
     <div className="flex-1 flex flex-col xl:flex-row h-full min-h-0 bg-[var(--color-bg)] select-none text-left" id="broker-calendar-panel">
@@ -966,18 +1133,36 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-text-muted)]" />
                 All Activities
               </span>
-              <span className="font-mono text-[10px] opacity-60">({allEvents.length})</span>
+              <span className="font-mono text-[10px] opacity-60">
+                ({allEvents.filter(e => {
+                  if (!isEventForOwner(e, selectedCalendarOwner)) return false;
+                  const currentStatus = e.status || "scheduled";
+                  if (filterStatus !== "all" && currentStatus !== filterStatus) return false;
+                  if (filterLinkedOnly && !e.clientId) return false;
+                  if (filterPrivateOnly && !e.isPrivate) return false;
+                  return true;
+                }).length})
+              </span>
             </button>
  
             {eventTypes.map(et => {
+              const matchingTypeEvents = allEvents.filter(e => {
+                if (!isEventForOwner(e, selectedCalendarOwner)) return false;
+                if (e.type !== et.value) return false;
+                const currentStatus = e.status || "scheduled";
+                if (filterStatus !== "all" && currentStatus !== filterStatus) return false;
+                if (filterLinkedOnly && !e.clientId) return false;
+                if (filterPrivateOnly && !e.isPrivate) return false;
+                return true;
+              });
+
               let countStr = "";
               if (et.value === "holiday") {
-                const userCount = allEvents.filter(e => e.type === "holiday" && !e.id.startsWith("system-holiday-")).length;
-                const systemCount = allEvents.filter(e => e.type === "holiday" && e.id.startsWith("system-holiday-")).length;
-                countStr = `${userCount + systemCount} (${userCount} user, ${systemCount} stat)`;
+                const userCount = matchingTypeEvents.filter(e => !e.id.startsWith("system-holiday-")).length;
+                const systemCount = matchingTypeEvents.filter(e => e.id.startsWith("system-holiday-")).length;
+                countStr = `${userCount + systemCount} (${userCount} u, ${systemCount} s)`;
               } else {
-                const count = allEvents.filter(e => e.type === et.value).length;
-                countStr = `${count}`;
+                countStr = `${matchingTypeEvents.length}`;
               }
               return (
                 <button
@@ -1074,6 +1259,26 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5 self-stretch lg:self-auto justify-between lg:justify-end flex-wrap">
+            {/* Admin/Manager User Calendar Selector */}
+            {isAdminOrManager && (
+              <div className="flex items-center gap-2 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-3 py-1.5 rounded-xl shadow-sm text-xs font-bold">
+                <User className="w-3.5 h-3.5 text-[var(--color-accent)] shrink-0" />
+                <span className="text-[10px] uppercase text-[var(--color-text-muted)] tracking-wider hidden md:inline">Calendar:</span>
+                <select
+                  value={selectedCalendarOwner}
+                  onChange={(e) => setSelectedCalendarOwner(e.target.value)}
+                  className="bg-transparent text-[var(--color-text)] font-extrabold focus:outline-none cursor-pointer pr-1 text-xs"
+                >
+                  <option value="all" className="bg-[var(--color-surface)] text-[var(--color-text)]">All Users</option>
+                  {userRoster?.map(u => (
+                    <option key={u.id} value={u.id} className="bg-[var(--color-surface)] text-[var(--color-text)]">
+                      {u.first} {u.last} ({u.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Active Date Badge */}
             <div className="flex items-center gap-2 bg-[rgba(244,163,132,0.1)] border border-[rgba(244,163,132,0.25)] px-3 py-1.5 rounded-xl text-xs font-extrabold text-[var(--color-primary)] shadow-sm">
               <CalendarIcon className="w-3.5 h-3.5 text-[var(--color-accent)] shrink-0" />
@@ -1111,6 +1316,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             {/* Quick action buttons */}
             <div className="flex items-center gap-1.5">
               <button 
+                onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
+                className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
+                  advancedFiltersOpen || isFilterActive
+                    ? "border-[var(--color-primary)]/40 bg-[rgba(244,163,132,0.1)] text-[var(--color-primary)] font-extrabold"
+                    : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-surface-3)]"
+                }`}
+                title="Toggle Advanced Filters"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span className="hidden sm:inline text-[10px] font-extrabold tracking-wider uppercase px-0.5">Filters</span>
+                {isFilterActive && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--color-accent)] ring-2 ring-[var(--color-bg)] animate-pulse" />
+                )}
+              </button>
+              <button 
                 onClick={() => setCalendarSettingsOpen(true)}
                 className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-all flex items-center gap-1 cursor-pointer"
                 title="Configure working hours and time slots"
@@ -1141,6 +1361,124 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Collapsible Advanced Filters Panel */}
+        <AnimatePresence>
+          {advancedFiltersOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden mb-4 shrink-0"
+            >
+              <div className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-md flex flex-col md:flex-row md:items-end justify-between gap-4 select-none">
+                <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* 1. Activity Type Selector */}
+                  <div className="flex flex-col space-y-1.5">
+                    <label className="text-[10px] font-extrabold uppercase text-[var(--color-text-muted)] tracking-wider">
+                      Activity Type
+                    </label>
+                    <select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value)}
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all cursor-pointer"
+                    >
+                      <option value="all">All Activities</option>
+                      {eventTypes.map(et => (
+                        <option key={et.value} value={et.value}>{et.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* 2. Status Selector */}
+                  <div className="flex flex-col space-y-1.5">
+                    <label className="text-[10px] font-extrabold uppercase text-[var(--color-text-muted)] tracking-wider">
+                      Event Status
+                    </label>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text)] rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all cursor-pointer"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="scheduled">Scheduled</option>
+                      <option value="completed">Completed</option>
+                      <option value="canceled">Canceled</option>
+                    </select>
+                  </div>
+
+                  {/* 3. Linked to Clients Toggle */}
+                  <div className="flex flex-col justify-end">
+                    <button
+                      onClick={() => setFilterLinkedOnly(!filterLinkedOnly)}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
+                        filterLinkedOnly
+                          ? "bg-[rgba(244,163,132,0.1)] border-[var(--color-primary)]/40 text-[var(--color-primary)]"
+                          : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <User className="w-3.5 h-3.5" />
+                        Linked Only
+                      </span>
+                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterLinkedOnly ? "bg-[var(--color-primary)]" : "bg-gray-600"}`}>
+                        <div className={`w-3 h-3 rounded-full bg-white transition-transform ${filterLinkedOnly ? "translate-x-3" : "translate-x-0"}`} />
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* 4. Private Only Toggle */}
+                  <div className="flex flex-col justify-end">
+                    <button
+                      onClick={() => setFilterPrivateOnly(!filterPrivateOnly)}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left border text-xs font-bold transition-all h-[38px] ${
+                        filterPrivateOnly
+                          ? "bg-[rgba(244,163,132,0.1)] border-[var(--color-primary)]/40 text-[var(--color-primary)]"
+                          : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5" />
+                        Private Only
+                      </span>
+                      <div className={`w-7 h-4 rounded-full p-0.5 transition-colors ${filterPrivateOnly ? "bg-[var(--color-primary)]" : "bg-gray-600"}`}>
+                        <div className={`w-3 h-3 rounded-full bg-white transition-transform ${filterPrivateOnly ? "translate-x-3" : "translate-x-0"}`} />
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reset Actions */}
+                <div className="flex md:flex-col items-center md:items-end justify-between md:justify-end gap-2 shrink-0 md:pl-2">
+                  {isFilterActive && (
+                    <div className="flex items-center gap-1 text-[9px] text-[var(--color-accent)] font-mono font-bold uppercase tracking-wider bg-[var(--color-accent)]/10 px-2 py-0.5 rounded-md animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
+                      Active Filter
+                    </div>
+                  )}
+                  <button
+                    onClick={() => {
+                      setFilterType("all");
+                      setFilterStatus("all");
+                      setFilterLinkedOnly(false);
+                      setFilterPrivateOnly(false);
+                    }}
+                    disabled={!isFilterActive}
+                    className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border flex items-center gap-1 transition-all ${
+                      isFilterActive
+                        ? "bg-[rgba(244,163,132,0.15)] hover:bg-[rgba(244,163,132,0.25)] border-[var(--color-primary)]/30 text-[var(--color-primary)] cursor-pointer"
+                        : "bg-transparent border-transparent text-[var(--color-text-faint)] cursor-not-allowed"
+                    }`}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* TIME STICKER BAR FOR TIMELINE DAY/WEEK RANGE */}
         <div className="flex-1 min-h-0 flex flex-col bg-[var(--color-surface-2)]/30 border border-[var(--color-border)] rounded-2xl overflow-hidden select-none">
@@ -1235,11 +1573,40 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             return evH === block.num && evM >= parseInt(slot.time.split(":")[1], 10) && evM < parseInt(slot.time.split(":")[1], 10) + slotInterval;
                           });
 
+                          const isSelected = isSlotSelected(slot.time);
+
                           return (
                             <div
                               key={slot.time}
-                              onClick={() => handleOpenAddModal(selectedDateStr, slot.time)}
-                              className="min-h-[44px] flex items-stretch p-1.5 bg-[var(--color-surface-2)]/25 odd:bg-[var(--color-surface)]/20 hover:bg-[var(--color-surface-3)]/50 border-l border-[var(--color-border)]/40 transition-all cursor-pointer relative group/slot text-left"
+                              onMouseDown={(e) => {
+                                if (e.button !== 0) return;
+                                const target = e.target as HTMLElement;
+                                if (target.closest('button') || target.closest('a') || target.closest('input')) return;
+                                e.preventDefault();
+                                setIsDragging(true);
+                                setDragStartSlot(slot.time);
+                                setDragEndSlot(slot.time);
+                                setDragOccurred(false);
+                              }}
+                              onMouseEnter={() => {
+                                if (isDragging) {
+                                  setDragEndSlot(slot.time);
+                                  if (slot.time !== dragStartSlot) {
+                                    setDragOccurred(true);
+                                  }
+                                }
+                              }}
+                              onClick={() => {
+                                if (dragOccurred) {
+                                  return;
+                                }
+                                handleOpenAddModal(selectedDateStr, slot.time);
+                              }}
+                              className={`min-h-[44px] flex items-stretch p-1.5 transition-all select-none relative group/slot text-left border-l-2 ${
+                                isSelected
+                                  ? "bg-[rgba(244,163,132,0.18)] border-l-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
+                                  : "bg-[var(--color-surface-2)]/25 odd:bg-[var(--color-surface)]/20 hover:bg-[var(--color-surface-3)]/50 border-l-[var(--color-border)]/40 cursor-pointer"
+                              }`}
                             >
                               {/* Small time label shown on slot hover */}
                               <div className="absolute left-2.5 top-1.5 text-[10px] text-[var(--color-text-muted)] font-mono font-bold select-none opacity-50 group-hover/slot:opacity-100 transition-opacity">
@@ -1258,6 +1625,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                           e.stopPropagation(); // Avoid triggering slot's openAddModal
                                           handleOpenEditModal(ev);
                                         }}
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onMouseUp={(e) => e.stopPropagation()}
                                         className="p-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/45 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group/card text-left shadow-sm hover:shadow-md cursor-pointer"
                                       >
                                         <div className="flex items-start gap-3 min-w-0">
@@ -1414,7 +1783,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               {/* Columns container */}
               <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 flex gap-4 min-w-0 h-full">
                 {weekDays.map(wd => {
-                  const dayEvents = events.filter(e => e.date === wd.dateStr && (filterType === "all" || e.type === filterType));
+                  const dayEvents = filteredEvents.filter(e => e.date === wd.dateStr);
                   const isDaySelected = selectedDateStr === wd.dateStr;
 
                   return (
@@ -1846,7 +2215,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden"
+              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
               style={{
                 background: "var(--color-surface)",
                 borderColor: "var(--color-border)",
@@ -1854,7 +2223,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               }}
             >
               {/* Header */}
-              <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between">
+              <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 flex items-center justify-between shrink-0">
                 <h3 className="text-xs uppercase font-extrabold text-[var(--color-primary)] tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 fill-[var(--color-primary)]/30 text-[var(--color-primary)]" />
                   {editingEvent ? "Tweak Calendar Record" : "Book New Action Record"}
@@ -1868,373 +2237,440 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               </div>
 
               {/* Form container */}
-              <form onSubmit={saveEvent} className="p-4 space-y-4 text-left">
+              <form onSubmit={saveEvent} className="flex flex-col overflow-hidden max-h-[85vh] md:max-h-[80vh]">
                 
-                {/* Title */}
-                <div>
-                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Appointment / Milestone Title <span className="text-red-400">*</span></label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g., RBC Refinance Signing, Call Equifax underwriter"
-                    value={eventTitle}
-                    onChange={(e) => setEventTitle(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold"
-                  />
-                </div>
-
-                {/* Date and Time selectors */}
-                <div className="grid grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Date</label>
-                    <input
-                      type="date"
-                      required
-                      value={eventDate}
-                      onChange={(e) => setEventDate(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Target Start Time</label>
-                    <select
-                      required
-                      value={eventTime}
-                      onChange={(e) => setEventTime(e.target.value)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold cursor-pointer"
-                    >
-                      {timePickerOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value} className="bg-[var(--color-surface)] text-[var(--color-text)]">
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Duration select */}
-                <div>
-                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Planned Duration</label>
-                  <select
-                    value={eventDuration}
-                    onChange={(e) => setEventDuration(Number(e.target.value))}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40"
-                  >
-                    <option value={15} className="bg-[var(--color-surface)] text-[var(--color-text)]">15 Minutes Slot</option>
-                    <option value={30} className="bg-[var(--color-surface)] text-[var(--color-text)]">30 Minutes</option>
-                    <option value={45} className="bg-[var(--color-surface)] text-[var(--color-text)]">45 Minutes Slot</option>
-                    <option value={60} className="bg-[var(--color-surface)] text-[var(--color-text)]">1 Hour Framework</option>
-                    <option value={90} className="bg-[var(--color-surface)] text-[var(--color-text)]">1.5 Hours</option>
-                    <option value={120} className="bg-[var(--color-surface)] text-[var(--color-text)]">2 Hours block</option>
-                    <option value={180} className="bg-[var(--color-surface)] text-[var(--color-text)]">3 Hours block</option>
-                    <option value={240} className="bg-[var(--color-surface)] text-[var(--color-text)]">4 Hours block</option>
-                  </select>
-                </div>
-
-                {/* Color-Coded classification selector matching layout legend */}
-                <div>
-                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-2">Classification Group</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {eventTypes.map(et => {
-                      const isSelected = eventType === et.value;
-                      return (
-                        <button
-                          key={et.value}
-                          type="button"
-                          onClick={() => setEventType(et.value as Event["type"])}
-                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-left border text-[11px] font-bold transition-all ${
-                            isSelected 
-                              ? `${et.lightBg} ${et.border} ${et.text} ${et.glow} border-white/20 ring-1 ring-white/10` 
-                              : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
-                          }`}
-                        >
-                          <span className={`w-2 h-2 rounded-full ${et.color} ${et.glow} shrink-0`} />
-                          <span>{et.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Linked Deal client file */}
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block">
-                      Linked Client File
-                    </label>
-                    {eventClientId && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEventClientId("");
-                          setClientSearchQuery("");
-                          setClientSearchOpen(false);
-                        }}
-                        className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase tracking-wide transition-colors cursor-pointer"
-                      >
-                        Clear Link
-                      </button>
-                    )}
-                  </div>
+                {/* Scrollable Body */}
+                <div className="p-5 overflow-y-auto space-y-5 text-left flex-1 custom-scrollbar">
                   
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search clients by name, email, phone, or address..."
-                      value={clientSearchQuery}
-                      onChange={(e) => {
-                        setClientSearchQuery(e.target.value);
-                        setClientSearchOpen(true);
-                      }}
-                      onFocus={() => setClientSearchOpen(true)}
-                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold placeholder-[var(--color-text-faint)]/40"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                     
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] pointer-events-none select-none">
-                      {eventClientId ? (
-                        <span className="bg-emerald-500/10 text-emerald-400 font-extrabold border border-emerald-500/15 rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wide">
-                          Linked
-                        </span>
-                      ) : (
-                        <span className="text-[var(--color-text-faint)]/40 text-[10px] font-mono">
-                          Search
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {clientSearchOpen && (
-                    <>
-                      <div 
-                        className="fixed inset-0 z-10" 
-                        onClick={() => setClientSearchOpen(false)}
-                      />
+                    {/* LEFT COLUMN */}
+                    <div className="space-y-5">
                       
-                      <div className="absolute left-0 right-0 mt-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-2xl overflow-hidden z-20 max-h-60 overflow-y-auto">
-                        {filteredClients.length === 0 ? (
-                          <div className="p-4 text-center text-xs text-[var(--color-text-faint)]">
-                            No matching clients found
+                      {/* Section 1: Core Action Details */}
+                      <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
+                          <CalendarIcon className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
+                            Section 1: Core Action Details
+                          </h4>
+                        </div>
+
+                        {/* Title */}
+                        <div>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
+                            Appointment / Milestone Title <span className="text-red-400">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g., RBC Refinance Signing, Call Equifax underwriter"
+                            value={eventTitle}
+                            onChange={(e) => setEventTitle(e.target.value)}
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold transition-all"
+                          />
+                        </div>
+
+                        {/* Date & Start Time */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">Target Date</label>
+                            <input
+                              type="date"
+                              required
+                              value={eventDate}
+                              onChange={(e) => setEventDate(e.target.value)}
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                            />
                           </div>
-                        ) : (
-                          <div className="divide-y divide-[var(--color-border)]/50">
-                            {filteredClients.map(cl => {
-                              const isSelected = eventClientId === cl.id;
+                          <div>
+                            <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">Target Start Time</label>
+                            <select
+                              required
+                              value={eventTime}
+                              onChange={(e) => setEventTime(e.target.value)}
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-semibold cursor-pointer transition-all"
+                            >
+                              {timePickerOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value} className="bg-[var(--color-surface)] text-[var(--color-text)]">
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Planned Duration */}
+                        <div>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">Planned Duration</label>
+                          <select
+                            value={eventDuration}
+                            onChange={(e) => setEventDuration(Number(e.target.value))}
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 transition-all"
+                          >
+                            <option value={15} className="bg-[var(--color-surface)] text-[var(--color-text)]">15 Minutes Slot</option>
+                            <option value={30} className="bg-[var(--color-surface)] text-[var(--color-text)]">30 Minutes</option>
+                            <option value={45} className="bg-[var(--color-surface)] text-[var(--color-text)]">45 Minutes Slot</option>
+                            <option value={60} className="bg-[var(--color-surface)] text-[var(--color-text)]">1 Hour Framework</option>
+                            <option value={90} className="bg-[var(--color-surface)] text-[var(--color-text)]">1.5 Hours</option>
+                            <option value={120} className="bg-[var(--color-surface)] text-[var(--color-text)]">2 Hours block</option>
+                            <option value={180} className="bg-[var(--color-surface)] text-[var(--color-text)]">3 Hours block</option>
+                            <option value={240} className="bg-[var(--color-surface)] text-[var(--color-text)]">4 Hours block</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Section 4: Notes */}
+                      <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
+                          <Edit3 className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
+                            Section 4: Notes
+                          </h4>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">Internal Instructions & Agenda Notes</label>
+                          <textarea
+                            rows={4}
+                            placeholder="Provide specific guidelines, location details, phone coordinates, or items to finalize..."
+                            value={eventNotes}
+                            onChange={(e) => setEventNotes(e.target.value)}
+                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none focus:border-[var(--color-primary)]/40 transition-all"
+                          />
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* RIGHT COLUMN */}
+                    <div className="space-y-5">
+
+                      {/* Section 2: Classification & Linkage */}
+                      <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4 relative z-20">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
+                          <Layers className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
+                            Section 2: Classification & Linkage
+                          </h4>
+                        </div>
+
+                        {/* Color-Coded classification selector */}
+                        <div>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-2">Classification Group</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {eventTypes.map(et => {
+                              const isSelected = eventType === et.value;
                               return (
                                 <button
-                                  key={cl.id}
+                                  key={et.value}
                                   type="button"
-                                  onClick={() => {
-                                    setEventClientId(cl.id);
-                                    setClientSearchQuery(`${cl.first} ${cl.last}`);
-                                    setClientSearchOpen(false);
-                                  }}
-                                  className={`w-full text-left p-2.5 flex flex-col gap-0.5 transition-colors hover:bg-[var(--color-surface-2)] cursor-pointer ${
-                                    isSelected ? "bg-[var(--color-primary)]/10" : ""
+                                  onClick={() => setEventType(et.value as Event["type"])}
+                                  className={`flex items-center gap-1.5 px-2 py-2 rounded-lg text-left border text-[10px] font-bold transition-all cursor-pointer ${
+                                    isSelected 
+                                      ? `${et.lightBg} ${et.border} ${et.text} ${et.glow} border-white/20 ring-1 ring-white/10` 
+                                      : "bg-[var(--color-surface-2)]/40 border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]"
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-[var(--color-text)]">
-                                      {cl.first} {cl.last}
-                                    </span>
-                                    {cl.status && (
-                                      <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text-muted)] scale-90">
-                                        {cl.status}
-                                      </span>
-                                    )}
-                                  </div>
-                                  
-                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-[var(--color-text-faint)] gap-1">
-                                    {cl.email && (
-                                      <span className="truncate max-w-[180px]">{cl.email}</span>
-                                    )}
-                                    {cl.cell && (
-                                      <span className="font-mono">{cl.cell}</span>
-                                    )}
-                                  </div>
+                                  <span className={`w-2 h-2 rounded-full ${et.color} ${et.glow} shrink-0`} />
+                                  <span className="truncate">{et.label}</span>
                                 </button>
                               );
                             })}
                           </div>
-                        )}
+                        </div>
+
+                        {/* Linked Deal client file */}
+                        <div className="relative">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block">
+                              Linked Client File
+                            </label>
+                            {eventClientId && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEventClientId("");
+                                  setClientSearchQuery("");
+                                  setClientSearchOpen(false);
+                                }}
+                                className="text-[10px] text-red-400 hover:text-red-300 font-extrabold uppercase tracking-wide transition-colors cursor-pointer"
+                              >
+                                Clear Link
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Search clients..."
+                              value={clientSearchQuery}
+                              onChange={(e) => {
+                                setClientSearchQuery(e.target.value);
+                                setClientSearchOpen(true);
+                              }}
+                              onFocus={() => setClientSearchOpen(true)}
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold placeholder-[var(--color-text-faint)]/40 transition-all"
+                            />
+                            
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] pointer-events-none select-none">
+                              {eventClientId ? (
+                                <span className="bg-emerald-500/10 text-emerald-400 font-extrabold border border-emerald-500/15 rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wide">
+                                  Linked
+                                </span>
+                              ) : (
+                                <span className="text-[var(--color-text-faint)]/40 text-[10px] font-mono">
+                                  Search
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {clientSearchOpen && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-10" 
+                                onClick={() => setClientSearchOpen(false)}
+                              />
+                              
+                              <div className="absolute left-0 right-0 mt-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-2xl overflow-hidden z-20 max-h-60 overflow-y-auto">
+                                {filteredClients.length === 0 ? (
+                                  <div className="p-4 text-center text-xs text-[var(--color-text-faint)]">
+                                    No matching clients found
+                                  </div>
+                                ) : (
+                                  <div className="divide-y divide-[var(--color-border)]/50">
+                                    {filteredClients.map(cl => {
+                                      const isSelected = eventClientId === cl.id;
+                                      return (
+                                        <button
+                                          key={cl.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setEventClientId(cl.id);
+                                            setClientSearchQuery(`${cl.first} ${cl.last}`);
+                                            setClientSearchOpen(false);
+                                          }}
+                                          className={`w-full text-left p-2.5 flex flex-col gap-0.5 transition-colors hover:bg-[var(--color-surface-2)] cursor-pointer ${
+                                            isSelected ? "bg-[var(--color-primary)]/10" : ""
+                                          }`}
+                                        >
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-xs font-bold text-[var(--color-text)]">
+                                              {cl.first} {cl.last}
+                                            </span>
+                                            {cl.status && (
+                                              <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text-muted)] scale-90">
+                                                {cl.status}
+                                              </span>
+                                            )}
+                                          </div>
+                                          
+                                          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-[var(--color-text-faint)] gap-1">
+                                            {cl.email && (
+                                              <span className="truncate max-w-[180px]">{cl.email}</span>
+                                            )}
+                                            {cl.cell && (
+                                              <span className="font-mono">{cl.cell}</span>
+                                            )}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </>
-                  )}
-                </div>
 
-                {/* CRM Activity Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {/* Activity Status */}
-                  <div>
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1.5">
-                      Activity Status
-                    </label>
-                    <div className="grid grid-cols-3 gap-1 bg-[var(--color-surface-2)]/50 p-1 rounded-xl border border-[var(--color-border)]/50">
-                      {(["scheduled", "completed", "canceled"] as const).map(status => {
-                        const isSelected = eventStatus === status;
-                        let activeClass = "";
-                        if (isSelected) {
-                          if (status === "scheduled") activeClass = "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-sm";
-                          if (status === "completed") activeClass = "bg-emerald-500 text-white font-extrabold shadow-sm";
-                          if (status === "canceled") activeClass = "bg-red-500 text-white font-extrabold shadow-sm";
-                        } else {
-                          activeClass = "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]";
-                        }
-                        return (
-                          <button
-                            key={status}
-                            type="button"
-                            onClick={() => setEventStatus(status)}
-                            className={`py-1.5 text-[11px] font-bold rounded-lg transition-all capitalize cursor-pointer text-center ${activeClass}`}
-                          >
-                            {status}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                      {/* Section 3: Activity Controls */}
+                      <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-4">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
+                          <Settings className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
+                            Section 3: Activity Controls
+                          </h4>
+                        </div>
 
-                  {/* Reminder alert */}
-                  <div>
-                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1.5">
-                      Reminder Alert
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={eventReminder}
-                        onChange={(e) => setEventReminder(e.target.value as any)}
-                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold appearance-none"
-                      >
-                        <option value="none" className="bg-[var(--color-surface)] text-[var(--color-text)]">No reminder</option>
-                        <option value="15m" className="bg-[var(--color-surface)] text-[var(--color-text)]">15 minutes before</option>
-                        <option value="30m" className="bg-[var(--color-surface)] text-[var(--color-text)]">30 minutes before</option>
-                        <option value="1h" className="bg-[var(--color-surface)] text-[var(--color-text)]">1 hour before</option>
-                        <option value="1d" className="bg-[var(--color-surface)] text-[var(--color-text)]">1 day before</option>
-                      </select>
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-text-faint)]">
-                        <Bell className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Privacy checkbox */}
-                <div className="flex items-center gap-2 py-1 select-none">
-                  <input
-                    type="checkbox"
-                    id="event-private-checkbox"
-                    checked={eventIsPrivate}
-                    onChange={(e) => setEventIsPrivate(e.target.checked)}
-                    className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
-                  />
-                  <label htmlFor="event-private-checkbox" className="text-xs text-[var(--color-text-muted)] font-bold hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Private activity (visible only as internal calendar item)</span>
-                  </label>
-                </div>
-
-                {/* Follow-up section */}
-                <div className="border-t border-[var(--color-border)]/45 pt-3.5 space-y-3">
-                  <div className="flex items-center gap-2 select-none">
-                    <input
-                      type="checkbox"
-                      id="event-followup-checkbox"
-                      checked={createFollowUp}
-                      onChange={(e) => {
-                        setCreateFollowUp(e.target.checked);
-                        if (e.target.checked) {
-                          let defaultFollowUpDate = eventDate;
-                          if (eventDate) {
-                            try {
-                              const d = new Date(eventDate + "T12:00:00");
-                              d.setDate(d.getDate() + 1);
-                              defaultFollowUpDate = d.toISOString().split("T")[0];
-                            } catch (err) {}
-                          }
-                          setFollowUpDate(defaultFollowUpDate);
-                          setFollowUpTime(eventTime || "09:00");
-                          setFollowUpTitle(`Follow-up: ${eventTitle ? eventTitle.trim() : ""}`);
-                        }
-                      }}
-                      className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
-                    />
-                    <label htmlFor="event-followup-checkbox" className="text-xs font-black uppercase text-[var(--color-primary)] tracking-wider hover:text-[var(--color-primary)]/80 cursor-pointer flex items-center gap-1.5">
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Create follow-up action after saving</span>
-                    </label>
-                  </div>
-
-                  <AnimatePresence>
-                    {createFollowUp && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="space-y-3 bg-[var(--color-surface-2)]/30 border border-[var(--color-border)]/30 p-3 rounded-xl overflow-hidden text-left"
-                      >
+                        {/* Activity Status */}
                         <div>
-                          <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">
-                            Follow-up Title <span className="text-red-400">*</span>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1.5">
+                            Activity Status
                           </label>
+                          <div className="grid grid-cols-3 gap-1 bg-[var(--color-surface-2)]/50 p-1 rounded-xl border border-[var(--color-border)]/50">
+                            {(["scheduled", "completed", "canceled"] as const).map(status => {
+                              const isSelected = eventStatus === status;
+                              let activeClass = "";
+                              if (isSelected) {
+                                if (status === "scheduled") activeClass = "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow-sm";
+                                if (status === "completed") activeClass = "bg-emerald-500 text-white font-extrabold shadow-sm";
+                                if (status === "canceled") activeClass = "bg-red-500 text-white font-extrabold shadow-sm";
+                              } else {
+                                activeClass = "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)]";
+                              }
+                              return (
+                                <button
+                                  key={status}
+                                  type="button"
+                                  onClick={() => setEventStatus(status)}
+                                  className={`py-1.5 text-[10px] font-bold rounded-lg transition-all capitalize cursor-pointer text-center ${activeClass}`}
+                                >
+                                  {status}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Reminder alert */}
+                        <div>
+                          <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1.5">
+                            Reminder Alert
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={eventReminder}
+                              onChange={(e) => setEventReminder(e.target.value as any)}
+                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold appearance-none cursor-pointer transition-all"
+                            >
+                              <option value="none" className="bg-[var(--color-surface)] text-[var(--color-text)]">No reminder</option>
+                              <option value="15m" className="bg-[var(--color-surface)] text-[var(--color-text)]">15 minutes before</option>
+                              <option value="30m" className="bg-[var(--color-surface)] text-[var(--color-text)]">30 minutes before</option>
+                              <option value="1h" className="bg-[var(--color-surface)] text-[var(--color-text)]">1 hour before</option>
+                              <option value="1d" className="bg-[var(--color-surface)] text-[var(--color-text)]">1 day before</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-text-faint)]">
+                              <Bell className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Privacy checkbox */}
+                        <div className="flex items-center gap-2 pt-1 select-none">
                           <input
-                            type="text"
-                            required={createFollowUp}
-                            placeholder="e.g., Client check-in, Sign follow-up docs"
-                            value={followUpTitle}
-                            onChange={(e) => setFollowUpTitle(e.target.value)}
-                            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold"
+                            type="checkbox"
+                            id="event-private-checkbox"
+                            checked={eventIsPrivate}
+                            onChange={(e) => setEventIsPrivate(e.target.checked)}
+                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
                           />
+                          <label htmlFor="event-private-checkbox" className="text-xs text-[var(--color-text-muted)] font-extrabold hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1.5 transition-all">
+                            <Lock className="w-3.5 h-3.5 text-amber-500" />
+                            <span>Private activity (internal calendar only)</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Section 5: Follow-up Workflow */}
+                      <div className="bg-[var(--color-surface-2)]/20 border border-[var(--color-border)]/40 rounded-xl p-4.5 space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[var(--color-border)]/30 mb-1">
+                          <Sparkles className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                          <h4 className="text-[10px] font-black text-[var(--color-text)] uppercase tracking-wider">
+                            Section 5: Follow-up Workflow
+                          </h4>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">
-                              Follow-up Date <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                              type="date"
-                              required={createFollowUp}
-                              value={followUpDate}
-                              onChange={(e) => setFollowUpDate(e.target.value)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">
-                              Follow-up Time
-                            </label>
-                            <input
-                              type="time"
-                              value={followUpTime}
-                              onChange={(e) => setFollowUpTime(e.target.value)}
-                              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono"
-                            />
-                          </div>
+                        <div className="flex items-center gap-2 select-none">
+                          <input
+                            type="checkbox"
+                            id="event-followup-checkbox"
+                            checked={createFollowUp}
+                            onChange={(e) => {
+                              setCreateFollowUp(e.target.checked);
+                              if (e.target.checked) {
+                                let defaultFollowUpDate = eventDate;
+                                if (eventDate) {
+                                  try {
+                                    const d = new Date(eventDate + "T12:00:00");
+                                    d.setDate(d.getDate() + 1);
+                                    defaultFollowUpDate = d.toISOString().split("T")[0];
+                                  } catch (err) {}
+                                }
+                                setFollowUpDate(defaultFollowUpDate);
+                                setFollowUpTime(eventTime || "09:00");
+                                setFollowUpTitle(`Follow-up: ${eventTitle ? eventTitle.trim() : ""}`);
+                              }
+                            }}
+                            className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
+                          />
+                          <label htmlFor="event-followup-checkbox" className="text-xs font-black uppercase text-[var(--color-primary)] tracking-wider hover:text-[var(--color-primary)]/80 cursor-pointer flex items-center gap-1.5 transition-colors">
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Create follow-up action after saving</span>
+                          </label>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+
+                        <AnimatePresence>
+                          {createFollowUp && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="space-y-3 bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20 p-3.5 rounded-xl overflow-hidden text-left"
+                            >
+                              <div className="text-[10px] text-[var(--color-primary)] font-extrabold uppercase tracking-wide flex items-center gap-1.5 mb-1 bg-[var(--color-primary)]/10 px-2 py-1 rounded-md border border-[var(--color-primary)]/10">
+                                <Sparkles className="w-3 h-3 fill-[var(--color-primary)]/20 text-[var(--color-primary)]" />
+                                <span>Designated Follow-Up Step</span>
+                              </div>
+                              <div>
+                                <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
+                                  Follow-up Title <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  required={createFollowUp}
+                                  placeholder="e.g., Client check-in, Sign follow-up docs"
+                                  value={followUpTitle}
+                                  onChange={(e) => setFollowUpTitle(e.target.value)}
+                                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-bold transition-all"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
+                                    Follow-up Date <span className="text-red-400">*</span>
+                                  </label>
+                                  <input
+                                    type="date"
+                                    required={createFollowUp}
+                                    value={followUpDate}
+                                    onChange={(e) => setFollowUpDate(e.target.value)}
+                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="text-[10px] text-[var(--color-text-muted)] font-extrabold uppercase tracking-wider block mb-1">
+                                    Follow-up Time
+                                  </label>
+                                  <input
+                                    type="time"
+                                    value={followUpTime}
+                                    onChange={(e) => setFollowUpTime(e.target.value)}
+                                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/40 font-mono transition-all"
+                                  />
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+
+                    </div>
+
+                  </div>
+
                 </div>
 
-                {/* Description and Agenda notes */}
-                <div>
-                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1">Internal Instructions & Agenda Notes</label>
-                  <textarea
-                    rows={3}
-                    placeholder="Provide specific guidelines, location details, phone coordinates, or items to finalize..."
-                    value={eventNotes}
-                    onChange={(e) => setEventNotes(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/40 focus:outline-none"
-                  />
-                </div>
-
-                {/* Operations buttons */}
-                <div className="pt-4 border-t border-[var(--color-border)] flex gap-2.5 justify-between">
+                {/* Operations buttons / Footer (Fixed and clearly separated) */}
+                <div className="p-4 bg-[var(--color-surface-2)]/50 border-t border-[var(--color-border)] flex gap-2.5 justify-between shrink-0">
                   {editingEvent ? (
                     <button
                       type="button"
                       onClick={() => handleRemoveEvent(editingEvent.id)}
-                      className="px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl text-xs font-bold transition-all border border-red-500/20"
+                      className="px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl text-xs font-bold transition-all border border-red-500/20 cursor-pointer"
                     >
                       Delete Event
                     </button>
@@ -2244,18 +2680,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsEventModalOpen(false)}
-                      className="px-4 py-2 rounded-xl bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-xs font-bold text-[var(--color-text-muted)] transition-colors"
+                      className="px-4 py-2 rounded-xl bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-xs font-bold text-[var(--color-text-muted)] transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90 text-xs font-extrabold transition-all"
+                      className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90 text-xs font-extrabold transition-all cursor-pointer"
                     >
                       Save appointment
                     </button>
                   </div>
                 </div>
+
               </form>
             </motion.div>
           </div>

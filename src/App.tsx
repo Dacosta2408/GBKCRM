@@ -1302,6 +1302,8 @@ export default function App() {
               showToast={showToast}
               calendarLaunchIntent={calendarLaunchIntent}
               clearCalendarLaunchIntent={() => setCalendarLaunchIntent(null)}
+              currentUser={currentUser}
+              userRoster={userRoster}
             />
           )}
 
