@@ -1052,13 +1052,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 onClick={prevMonth}
                 className="p-1 border border-[var(--color-border)] bg-[var(--color-surface-3)] rounded hover:bg-[var(--color-surface-2)] transition-all"
               >
-                <ChevronLeft className="w-3.5 h-3.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
+                <ChevronLeft className="w-3.5 h-3.5 text-[#2D3250] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
               </button>
               <button 
                 onClick={nextMonth}
                 className="p-1 border border-[var(--color-border)] bg-[var(--color-surface-3)] rounded hover:bg-[var(--color-surface-2)] transition-all"
               >
-                <ChevronRight className="w-3.5 h-3.5 text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#2D3250] dark:text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
               </button>
             </div>
           </div>
@@ -1342,8 +1342,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onClick={() => setAdvancedFiltersOpen(!advancedFiltersOpen)}
                   className={`p-2 border rounded-xl transition-all flex items-center gap-1.5 cursor-pointer relative ${
                     advancedFiltersOpen || isFilterActive
-                      ? "border-[var(--color-calendar-selected-bg)]/40 bg-[var(--color-calendar-selected-bg)]/10 text-[var(--color-calendar-strong-text)] font-extrabold"
-                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 hover:bg-[var(--color-surface-3)]"
+                      ? "border-[var(--color-calendar-selected-bg)]/40 bg-[var(--color-calendar-selected-bg)]/10 text-[#1C2230] dark:text-[var(--color-calendar-strong-text)] font-extrabold"
+                      : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[#2D3250] dark:text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 hover:bg-[var(--color-surface-3)]"
                   }`}
                   title="Toggle Advanced Filters"
                 >
@@ -1356,7 +1356,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 
                 <button 
                   onClick={() => setCalendarSettingsOpen(true)}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all flex items-center gap-1 cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] text-[#2D3250] dark:text-[var(--color-text-muted)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all flex items-center gap-1 cursor-pointer"
                   title="Configure working hours and time slots"
                 >
                   <Settings className="w-4 h-4" />
@@ -1367,20 +1367,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                 <button 
                   onClick={prevTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[#2D3250] dark:text-[var(--color-text-muted)] cursor-pointer"
                   title="Previous range"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={goToToday}
-                  className="px-3.5 py-2 border border-[var(--color-calendar-selected-bg)]/20 text-[var(--color-calendar-strong-text)] bg-[var(--color-calendar-selected-bg)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-calendar-selected-bg)]/15 transition-all cursor-pointer"
+                  className="px-3.5 py-2 border border-[var(--color-calendar-selected-bg)]/20 text-[#2D3250] dark:text-[var(--color-calendar-strong-text)] bg-[var(--color-calendar-selected-bg)]/5 font-extrabold rounded-xl text-xs hover:bg-[var(--color-calendar-selected-bg)]/15 transition-all cursor-pointer"
                 >
                   Today
                 </button>
                 <button 
                   onClick={nextTimeFrame}
-                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[var(--color-text-muted)] cursor-pointer"
+                  className="p-2 border border-[var(--color-border)] bg-[var(--color-surface-2)] rounded-xl hover:bg-[var(--color-surface-3)] hover:text-[var(--color-calendar-selected-bg)] hover:border-[var(--color-calendar-selected-bg)]/30 transition-all text-[#2D3250] dark:text-[var(--color-text-muted)] cursor-pointer"
                   title="Next range"
                 >
                   <ChevronRight className="w-4 h-4" />
