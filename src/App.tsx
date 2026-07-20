@@ -488,8 +488,11 @@ export default function App() {
     if (activeTab === "calculators") {
       setApplicationIntakeOpen(false);
       setNewClientOpen(false);
+      setIntakePreloadedText("");
+      setIntakePreloadedFileName("");
+      closeDetail();
     }
-  }, [activeTab, setApplicationIntakeOpen]);
+  }, [activeTab]);
 
   useEffect(() => {
     const handleActivity = () => resetIdleTimer();
@@ -1425,7 +1428,7 @@ export default function App() {
       </div>
 
       {/* ✦ New Client Intake / PDF Application Intake Overlay ✦ */}
-      {applicationIntakeOpen && (
+      {applicationIntakeOpen && activeTab !== "calculators" && (
         <ApplicationIntake
           mode="ai"
           preloadedText={intakePreloadedText}
@@ -1445,7 +1448,7 @@ export default function App() {
       )}
 
       {/* ✦ Manual Client Intake Form Modal Overlay ✦ */}
-      {newClientOpen && (
+      {newClientOpen && activeTab !== "calculators" && (
         <ApplicationIntake
           mode="manual"
           currentUser={currentUser}
@@ -1479,7 +1482,7 @@ export default function App() {
 
       {/* Detail panel slider */}
       <ClientDetailPanel
-        currentClient={activeTab === "ai" ? null : currentClient}
+        currentClient={(activeTab === "ai" || activeTab === "calculators") ? null : currentClient}
         currentUser={currentUser}
         clients={clients}
         lenders={lenders}

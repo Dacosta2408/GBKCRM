@@ -67,6 +67,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     }
   }, [viewMode, selectedDateStr]);
 
+  // Keep selectedDateStr visually synchronized with currentDate when currentDate changes
+  useEffect(() => {
+    if (currentDate) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      const formatted = `${year}-${month}-${day}`;
+      if (selectedDateStr !== formatted) {
+        setSelectedDateStr(formatted);
+      }
+    }
+  }, [currentDate, selectedDateStr]);
+
   // Task & Event editing wizardry
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -322,7 +335,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     setIsEventModalOpen(true);
   };
 
-  const handleOpenEditModal = (event: any) => {
+  const handleOpenEditModal = (event: CalendarEvent) => {
     setEditingEvent(event);
     setEventTitle(event.title);
     setEventDate(event.date);
@@ -354,13 +367,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             clientId: eventClientId || null,
             notes: eventNotes.trim(),
             duration: eventDuration // save extended property
-          } as any;
+          } as CalendarEvent;
         }
         return ev;
       }));
       showToast("Timeline entry updated!", "success", "✓");
     } else {
-      const newEv: any = {
+      const newEv: CalendarEvent = {
         id: `ev_${Date.now()}`,
         title: eventTitle.trim(),
         date: eventDate,
@@ -417,7 +430,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     <div className="flex-1 flex flex-col xl:flex-row h-full min-h-0 bg-[var(--color-bg)] select-none text-left" id="broker-calendar-panel">
       
       {/* LEFT COLUMN: Mini Monthly Picker, Categories and Quick Tasks Queue */}
-      <div className="w-full xl:w-80 shrink-0 border-b xl:border-b-0 xl:border-r border-[var(--color-border)] flex flex-col min-h-0 bg-[var(--color-surface-2)]/40 overflow-y-auto p-4 space-y-5">
+      <div className="w-full xl:w-[300px] 2xl:w-[320px] shrink-0 border-b xl:border-b-0 xl:border-r border-[var(--color-border)] flex flex-col min-h-0 bg-[var(--color-surface-2)]/40 overflow-y-auto p-4 space-y-5">
         
         {/* Compact Month Mini-Picker Widget */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3.5">
@@ -578,10 +591,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* RIGHT COLUMN: Chronological Timeline Canvas & Multi-Views */}
-      <div className="flex-grow flex flex-col min-h-0 p-5">
+      <div className="flex-grow flex flex-col min-w-0 min-h-0 p-5">
         
         {/* Timeline Navigation Custom Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 border-b border-[var(--color-border)] pb-4 shrink-0">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4 border-b border-[var(--color-border)] pb-4 shrink-0">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-faint)] font-mono mb-1">
               <span>ONTARIO LOAN PORTFOLIO SYSTEM</span>
@@ -597,7 +610,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 self-stretch md:self-auto justify-between md:justify-end">
+          <div className="flex items-center gap-2.5 self-stretch lg:self-auto justify-between lg:justify-end flex-wrap">
+            {/* Active Date Badge */}
+            <div className="flex items-center gap-2 bg-[rgba(244,163,132,0.1)] border border-[rgba(244,163,132,0.25)] px-3 py-1.5 rounded-xl text-xs font-extrabold text-[var(--color-primary)] shadow-sm">
+              <CalendarIcon className="w-3.5 h-3.5 text-[var(--color-accent)] shrink-0" />
+              <span>Active: {selectedDayInfo.label}</span>
+            </div>
+
             {/* View Multi-Tabs Segmented control */}
             <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] p-1 rounded-xl flex items-center">
               <button 
@@ -775,7 +794,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   return (
                     <div
                       key={wd.dateStr}
-                      className={`flex-1 min-w-[200px] bg-[var(--color-surface)] border rounded-2xl flex flex-col min-h-0 transition-all ${
+                      className={`flex-1 min-w-[170px] xl:min-w-[180px] 2xl:min-w-[200px] bg-[var(--color-surface)] border rounded-2xl flex flex-col min-h-0 transition-all ${
                         isDaySelected 
                           ? "border-[var(--color-primary)]/40 bg-[var(--color-surface-2)] ring-1 ring-[var(--color-primary)]/10" 
                           : wd.isToday 
@@ -786,7 +805,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {/* Day Header */}
                       <div className="p-3 border-b border-[var(--color-border)] flex items-center justify-between shrink-0 bg-[var(--color-surface-2)]/50 rounded-t-2xl">
                         <div 
-                          onClick={() => selectDay(wd.dateStr)}
+                          onClick={() => {
+                            selectDay(wd.dateStr);
+                            setViewMode("day");
+                          }}
                           className="cursor-pointer group flex flex-col text-left"
                         >
                           <span className={`text-[9px] uppercase font-bold tracking-widest ${isDaySelected ? "text-[var(--color-primary)]" : "text-[var(--color-text-faint)] group-hover:text-[var(--color-accent)]"}`}>
@@ -868,8 +890,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   return (
                     <div
                       key={idx}
-                      onClick={() => selectDay(md.dateStr)}
-                      className={`min-h-[90px] flex flex-col justify-between border rounded-xl p-2 relative transition-all cursor-pointer ${
+                      onClick={() => {
+                        selectDay(md.dateStr);
+                        if (dayEvs.length === 0) {
+                          handleOpenAddModal(md.dateStr);
+                        } else {
+                          setViewMode("day");
+                        }
+                      }}
+                      className={`min-h-[90px] flex flex-col justify-between border rounded-xl p-2 relative transition-all cursor-pointer group ${
                         isSelected 
                           ? "bg-[var(--color-primary)]/15 border-[var(--color-primary)] shadow-[0_0_15px_rgba(244,163,132,0.1)]" 
                           : md.isToday 
@@ -879,16 +908,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                               : "bg-transparent border-transparent text-[var(--color-text-faint)]/40 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]"
                       }`}
                     >
-                      <div className="flex items-start justify-between select-none">
-                        <span className={`text-[11px] font-bold font-mono px-1.5 py-0.5 rounded-md ${
-                          md.isToday ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow" : "text-[var(--color-text-muted)]"
-                        }`}>
-                          {md.dayNum}
-                        </span>
+                      <div className="flex items-start justify-between select-none gap-1">
+                        <div className="flex items-center gap-1">
+                          <span className={`text-[11px] font-bold font-mono px-1.5 py-0.5 rounded-md ${
+                            md.isToday ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-extrabold shadow" : "text-[var(--color-text-muted)]"
+                          }`}>
+                            {md.dayNum}
+                          </span>
 
-                        {dayTs.length > 0 && (
-                          <span className="h-2 w-2 rounded-full bg-red-400" title={`${dayTs.length} pending obligations!`} />
-                        )}
+                          {dayTs.length > 0 && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-red-400" title={`${dayTs.length} pending obligations!`} />
+                          )}
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenAddModal(md.dateStr);
+                          }}
+                          className="p-1 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)] text-[var(--color-text-muted)] hover:text-[var(--color-bg)] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                          title={`Add event for ${md.dateStr}`}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                        </button>
                       </div>
 
                       {/* Month Days Inner events list */}
@@ -1105,7 +1147,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         <button
                           key={et.value}
                           type="button"
-                          onClick={() => setEventType(et.value as any)}
+                          onClick={() => setEventType(et.value as Event["type"])}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-left border text-[11px] font-bold transition-all ${
                             isSelected 
                               ? `${et.lightBg} ${et.border} ${et.text} ${et.glow} border-white/20 ring-1 ring-white/10` 
