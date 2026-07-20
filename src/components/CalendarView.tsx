@@ -93,6 +93,37 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const [eventNotes, setEventNotes] = useState("");
   const [eventClientId, setEventClientId] = useState<string>("");
 
+  // Search states for client lookup inside the modal
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [clientSearchOpen, setClientSearchOpen] = useState(false);
+
+  // Derived selected client helper
+  const selectedLinkedClient = clients.find(c => c.id === eventClientId) || null;
+
+  // Filtered clients list for the search input dropdown, limited to 8
+  const filteredClients = useMemo(() => {
+    const q = clientSearchQuery.trim().toLowerCase();
+    if (!q) {
+      // Return first 8 clients if query is empty so they can be selected quickly upon focus
+      return clients.slice(0, 8);
+    }
+    return clients.filter(cl => {
+      const first = (cl.first || "").toLowerCase();
+      const last = (cl.last || "").toLowerCase();
+      const email = (cl.email || "").toLowerCase();
+      const cell = (cl.cell || "").toLowerCase();
+      const addr = (cl.addr || "").toLowerCase();
+      return (
+        first.includes(q) ||
+        last.includes(q) ||
+        email.includes(q) ||
+        cell.includes(q) ||
+        addr.includes(q) ||
+        `${first} ${last}`.includes(q)
+      );
+    }).slice(0, 8);
+  }, [clients, clientSearchQuery]);
+
   // Helpers to fetch month and year details
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
@@ -323,7 +354,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   // Open modal handlers
-  const handleOpenAddModal = (dateStr?: string, timeStr?: string) => {
+  const handleOpenAddModal = (dateStr?: string, timeStr?: string, clientId?: string) => {
     setEditingEvent(null);
     setEventTitle("");
     setEventDate(dateStr || selectedDateStr);
@@ -331,7 +362,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     setEventDuration(60);
     setEventType("meeting");
     setEventNotes("");
-    setEventClientId("");
+    
+    if (clientId) {
+      setEventClientId(clientId);
+      const matchedClient = clients.find(c => c.id === clientId);
+      if (matchedClient) {
+        setClientSearchQuery(`${matchedClient.first} ${matchedClient.last}`);
+      } else {
+        setClientSearchQuery("");
+      }
+    } else {
+      setEventClientId("");
+      setClientSearchQuery("");
+    }
+    
+    setClientSearchOpen(false);
     setIsEventModalOpen(true);
   };
 
@@ -344,6 +389,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     setEventType(event.type);
     setEventNotes(event.notes || "");
     setEventClientId(event.clientId || "");
+    
+    const matchedClient = clients.find(c => c.id === event.clientId);
+    if (matchedClient) {
+      setClientSearchQuery(`${matchedClient.first} ${matchedClient.last}`);
+    } else {
+      setClientSearchQuery("");
+    }
+    setClientSearchOpen(false);
     setIsEventModalOpen(true);
   };
 
@@ -1163,18 +1216,108 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 </div>
 
                 {/* Linked Deal client file */}
-                <div>
-                  <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block mb-1.5">Linked Client File</label>
-                  <select
-                    value={eventClientId}
-                    onChange={(e) => setEventClientId(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold"
-                  >
-                    <option value="" className="bg-[var(--color-surface)] text-[var(--color-text)]">-- No active link --</option>
-                    {clients.map(cl => (
-                      <option key={cl.id} value={cl.id} className="bg-[var(--color-surface)] text-[var(--color-text)]">{cl.first} {cl.last}</option>
-                    ))}
-                  </select>
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider block">
+                      Linked Client File
+                    </label>
+                    {eventClientId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEventClientId("");
+                          setClientSearchQuery("");
+                          setClientSearchOpen(false);
+                        }}
+                        className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase tracking-wide transition-colors cursor-pointer"
+                      >
+                        Clear Link
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search clients by name, email, phone, or address..."
+                      value={clientSearchQuery}
+                      onChange={(e) => {
+                        setClientSearchQuery(e.target.value);
+                        setClientSearchOpen(true);
+                      }}
+                      onFocus={() => setClientSearchOpen(true)}
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/45 font-semibold placeholder-[var(--color-text-faint)]/40"
+                    />
+                    
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] pointer-events-none select-none">
+                      {eventClientId ? (
+                        <span className="bg-emerald-500/10 text-emerald-400 font-extrabold border border-emerald-500/15 rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wide">
+                          Linked
+                        </span>
+                      ) : (
+                        <span className="text-[var(--color-text-faint)]/40 text-[10px] font-mono">
+                          Search
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {clientSearchOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-10" 
+                        onClick={() => setClientSearchOpen(false)}
+                      />
+                      
+                      <div className="absolute left-0 right-0 mt-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-2xl overflow-hidden z-20 max-h-60 overflow-y-auto">
+                        {filteredClients.length === 0 ? (
+                          <div className="p-4 text-center text-xs text-[var(--color-text-faint)]">
+                            No matching clients found
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-[var(--color-border)]/50">
+                            {filteredClients.map(cl => {
+                              const isSelected = eventClientId === cl.id;
+                              return (
+                                <button
+                                  key={cl.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setEventClientId(cl.id);
+                                    setClientSearchQuery(`${cl.first} ${cl.last}`);
+                                    setClientSearchOpen(false);
+                                  }}
+                                  className={`w-full text-left p-2.5 flex flex-col gap-0.5 transition-colors hover:bg-[var(--color-surface-2)] cursor-pointer ${
+                                    isSelected ? "bg-[var(--color-primary)]/10" : ""
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-[var(--color-text)]">
+                                      {cl.first} {cl.last}
+                                    </span>
+                                    {cl.status && (
+                                      <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-[var(--color-surface-3)] border border-[var(--color-border)] text-[var(--color-text-muted)] scale-90">
+                                        {cl.status}
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-[var(--color-text-faint)] gap-1">
+                                    {cl.email && (
+                                      <span className="truncate max-w-[180px]">{cl.email}</span>
+                                    )}
+                                    {cl.cell && (
+                                      <span className="font-mono">{cl.cell}</span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Description and Agenda notes */}
