@@ -210,16 +210,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const [holidayRegion, setHolidayRegion] = useState<string>("ON");
 
   // User permission and selected calendar owner state
-  const isAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
+  const canViewOtherCalendars = useMemo(() => {
+    const role = (currentUser?.role || "").toLowerCase();
+    return role.includes("admin") || role.includes("manager");
+  }, [currentUser]);
+
   const [selectedCalendarOwner, setSelectedCalendarOwner] = useState<string>(() => {
-    const isUserAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
-    return isUserAdminOrManager ? "all" : (currentUser?.id || "all");
+    const role = (currentUser?.role || "").toLowerCase();
+    const canView = role.includes("admin") || role.includes("manager");
+    return canView ? "all" : (currentUser?.id || "all");
   });
 
   // Regular users are locked to their own calendar
   useEffect(() => {
-    const isUserAdminOrManager = currentUser?.role === 'Developer/Admin' || currentUser?.role === 'Admin';
-    if (!isUserAdminOrManager && currentUser?.id) {
+    const role = (currentUser?.role || "").toLowerCase();
+    const canView = role.includes("admin") || role.includes("manager");
+    if (!canView && currentUser?.id) {
       setSelectedCalendarOwner(currentUser.id);
     }
   }, [currentUser]);
@@ -1275,7 +1281,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
 
             {/* Admin/Manager User Calendar Selector - High Visibility */}
-            {isAdminOrManager && (
+            {canViewOtherCalendars && (
               <div className="flex items-center gap-2.5 bg-[var(--color-surface-2)] border-2 border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/40 px-3.5 py-1.5 rounded-xl shadow-md text-xs font-bold transition-all shrink-0">
                 <User className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
                 <div className="flex flex-col text-left">
