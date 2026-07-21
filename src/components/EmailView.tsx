@@ -1,3 +1,6 @@
+// NOTE: SHARED_MAILBOX_PRESETS are demo-only and do NOT map to real Gmail inboxes.
+// Live Gmail integration will use actual messages retrieved via API/SMTP instead.
+
 import React, { useState, useEffect } from "react";
 import { 
   Mail, Star, Send, FileText, Trash2, ArrowLeft, RefreshCw, MailOpen, 
@@ -195,6 +198,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [mailboxScope, setMailboxScope] = useState<string>("personal"); // "personal" or shared address
+  const [selectedDemoMailbox, setSelectedDemoMailbox] = useState<string | null>(null);
   const [signatureText, setSignatureText] = useState<string>(() => {
     return inMemoryGmailSignature || 
       `Regards,\n\n${currentUser.first} ${currentUser.last}\nSenior Mortgage Advisor, GBK Financial\nPhone: ${currentUser.phone || "(416) 555-0105"}\nWeb: gbkfinancial.ca`;
@@ -254,6 +258,49 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [scheduleSendTime, setScheduleSendTime] = useState<string>("");
   const [isScheduled, setIsScheduled] = useState<boolean>(false);
 
+  // ── SMTP LOCAL STATES ──
+  const [emailHost, setEmailHost] = useState<string>(() => currentUser?.emailHost || "");
+  const [emailPort, setEmailPort] = useState<string>(() => currentUser?.emailPort || "");
+  const [emailUsername, setEmailUsername] = useState<string>(() => currentUser?.emailUsername || currentUser?.email || "");
+  const [emailPassword, setEmailPassword] = useState<string>(() => currentUser?.emailPassword || "");
+
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.emailHost !== undefined) setEmailHost(currentUser.emailHost || "");
+      if (currentUser.emailPort !== undefined) setEmailPort(currentUser.emailPort || "");
+      if (currentUser.emailUsername !== undefined) setEmailUsername(currentUser.emailUsername || currentUser.email || "");
+      if (currentUser.emailPassword !== undefined) setEmailPassword(currentUser.emailPassword || "");
+    }
+  }, [currentUser]);
+
+  const updateSmtpHost = (val: string) => {
+    setEmailHost(val);
+    if (currentUser) {
+      currentUser.emailHost = val;
+    }
+  };
+
+  const updateSmtpPort = (val: string) => {
+    setEmailPort(val);
+    if (currentUser) {
+      currentUser.emailPort = val;
+    }
+  };
+
+  const updateSmtpUsername = (val: string) => {
+    setEmailUsername(val);
+    if (currentUser) {
+      currentUser.emailUsername = val;
+    }
+  };
+
+  const updateSmtpPassword = (val: string) => {
+    setEmailPassword(val);
+    if (currentUser) {
+      currentUser.emailPassword = val;
+    }
+  };
+
   // ── GOOGLE AUTH CONNECT WORKFLOW ──
   const handleGoogleLogin = () => {
     const metaEnv = (import.meta as any).env || {};
@@ -306,7 +353,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
   // ── CONSTRUCT ACTIVE DIRECTORY ──
   // Merge emailsState from App props + shared inbox overrides based on active selection scope
   const getMailboxEmails = () => {
-    if (mailboxScope === "personal") {
+    if (!selectedDemoMailbox) {
       if (activeFolder === "inbox") return emailsState.inbox;
       if (activeFolder === "sent") return emailsState.sent;
       if (activeFolder === "scheduled") return emailsState.scheduled;
@@ -316,19 +363,19 @@ export const EmailView: React.FC<EmailViewProps> = ({
       return [];
     } else {
       // Shared mailbox from presets
-      const list = SHARED_MAILBOX_PRESETS[mailboxScope] || [];
+      const list = SHARED_MAILBOX_PRESETS[selectedDemoMailbox] || [];
       if (activeFolder === "inbox") {
         return list;
       } else if (activeFolder === "drafts") {
-        return draftsList.filter(e => e.fromEmail === mailboxScope);
+        return draftsList.filter(e => e.fromEmail === selectedDemoMailbox);
       } else if (activeFolder === "archived") {
-        return archivedList.filter(e => e.fromEmail === mailboxScope);
+        return archivedList.filter(e => e.fromEmail === selectedDemoMailbox);
       } else if (activeFolder === "sent") {
-        return emailsState.sent.filter(e => e.fromEmail === mailboxScope);
+        return emailsState.sent.filter(e => e.fromEmail === selectedDemoMailbox);
       } else if (activeFolder === "scheduled") {
-        return emailsState.scheduled.filter(e => e.fromEmail === mailboxScope);
+        return emailsState.scheduled.filter(e => e.fromEmail === selectedDemoMailbox);
       } else if (activeFolder === "queued") {
-        return (emailsState.queued || []).filter(e => e.fromEmail === mailboxScope);
+        return (emailsState.queued || []).filter(e => e.fromEmail === selectedDemoMailbox);
       }
       return [];
     }
@@ -678,7 +725,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
     const newMailRecord: Email = {
       id: newEmailId,
       from: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
-      fromEmail: mailboxScope === "personal" ? loginEmail : mailboxScope,
+      fromEmail: loginEmail,
       to: composeTo || composeToEmail,
       toEmail: composeToEmail,
       subject: composeSubject,
@@ -708,10 +755,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
       setIsComposeOpen(false);
     } else {
       if (bridgeOnline) {
-        const host = currentUser?.emailHost || "smtp.gmail.com";
-        const port = currentUser?.emailPort || "587";
-        const username = currentUser?.emailUsername || currentUser?.email || "";
-        const password = currentUser?.emailPassword || "";
+        const host = emailHost || currentUser?.emailHost;
+        const port = emailPort || currentUser?.emailPort;
+        const username = emailUsername || currentUser?.emailUsername || currentUser?.email;
+        const password = emailPassword || currentUser?.emailPassword;
+
+        if (!host || !port || !username || !password) {
+          showToast("SMTP not configured. Please set host, port, username, and app password.", "error");
+          return;
+        }
 
         showToast("Sending email via secure SMTP...", "info");
         const success = await sendEmail({
@@ -719,7 +771,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
           subject: composeSubject,
           body: composeBody,
           fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
-          fromEmail: mailboxScope === "personal" ? loginEmail : mailboxScope,
+          fromEmail: loginEmail,
           host,
           port,
           username,
@@ -737,7 +789,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
             setClients(prev => prev.map(c => {
               if (c.id === selectedClientLink) {
                 const currentSummary = c.aiSummary || "";
-                const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser.first} ${currentUser.last} via ${mailboxScope === "personal" ? loginEmail : mailboxScope}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
+                const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser.first} ${currentUser.last} via ${loginEmail}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
                 return {
                   ...c,
                   aiSummary: `${currentSummary}${formattedLog}`,
@@ -843,8 +895,8 @@ export const EmailView: React.FC<EmailViewProps> = ({
             </h2>
             <p className="text-[10px] text-[var(--color-text-muted)]">
               {isLoggedIn 
-                ? `Connected: ${loginEmail} (SMTP ready via smtp.gmail.com:587)`
-                : "Sandbox preview mode. Configure Gmail SMTP or OAuth to send real mail."}
+                ? `Connected: ${loginEmail} (Using configured SMTP / Gmail settings)`
+                : "Sandbox preview mode. Configure Gmail SMTP or OAuth to send real emails."}
             </p>
           </div>
         </div>
@@ -886,6 +938,33 @@ export const EmailView: React.FC<EmailViewProps> = ({
               <p className="text-[9px] text-[var(--color-text-faint)] mt-1">
                 Requires Google OAuth or SMTP app password setup.
               </p>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] w-full max-w-[280px]">
+                <input
+                  placeholder="SMTP host (e.g. smtp.gmail.com)"
+                  value={emailHost}
+                  onChange={e => updateSmtpHost(e.target.value)}
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2 py-1 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                />
+                <input
+                  placeholder="Port (587)"
+                  value={emailPort}
+                  onChange={e => updateSmtpPort(e.target.value)}
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2 py-1 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                />
+                <input
+                  placeholder="SMTP username (your Gmail address)"
+                  value={emailUsername}
+                  onChange={e => updateSmtpUsername(e.target.value)}
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2 py-1 col-span-2 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                />
+                <input
+                  type="password"
+                  placeholder="App password / OAuth token"
+                  value={emailPassword}
+                  onChange={e => updateSmtpPassword(e.target.value)}
+                  className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2 py-1 col-span-2 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                />
+              </div>
               <p className="text-[9.5px] text-[var(--color-text-muted)] text-center md:text-right max-w-[280px] font-medium leading-normal animate-fade-in">
                 You will be redirected to Google to authorize GBK Financial access to your Gmail inbox.
               </p>
@@ -936,7 +1015,35 @@ export const EmailView: React.FC<EmailViewProps> = ({
             );
           })}
 
-
+          {/* Active Mailbox Context Selection */}
+          <div className="mt-4 pt-3 border-t border-[var(--color-border)] flex flex-col gap-1">
+            <span className="block text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-1 px-1">
+              Active Context
+            </span>
+            <button
+              onClick={() => { setSelectedDemoMailbox(null); setSelectedEmail(null); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border ${!selectedDemoMailbox ? "bg-red-600/10 text-red-400 border-red-500/10 font-bold" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] border-transparent"}`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Personal Inbox</span>
+            </button>
+            
+            <div className="mt-2 flex flex-col gap-1">
+              <span className="block text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-1 px-1 leading-normal">
+                Sample workspace emails (for demo)
+              </span>
+              {Object.keys(SHARED_MAILBOX_PRESETS).map(email => (
+                <button
+                  key={email}
+                  onClick={() => { setSelectedDemoMailbox(email); setSelectedEmail(null); }}
+                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer border truncate ${selectedDemoMailbox === email ? "bg-red-600/10 text-red-300 border-red-500/10 font-bold" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] border-transparent"}`}
+                  title={email}
+                >
+                  {email}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Pre-Automated Mortgage Email Templates Accelerator */}
           <div className="mt-4 border-t border-[var(--color-border)] pt-3">
