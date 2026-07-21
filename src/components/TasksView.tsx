@@ -619,11 +619,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-text-muted)] font-mono mb-1">
             <span>ONTARIO MORTGAGE WORKFLOW ENGINE</span>
-            <span className="h-1.5 w-1.5 bg-[var(--color-primary)] rounded-full animate-pulse" />
-            <span className="text-[var(--color-primary)] text-[9.5px] uppercase tracking-wider font-extrabold">Active Portfolio Control Panel</span>
+            <span className="h-1.5 w-1.5 bg-[var(--color-calendar-selected-bg)] rounded-full animate-pulse" />
+            <span className="text-[var(--color-calendar-selected-bg)] text-[9.5px] uppercase tracking-wider font-extrabold">Active Portfolio Control Panel</span>
           </div>
           <h1 className="text-xl font-black text-[var(--color-text)] flex items-center gap-2">
-            <CheckSquare2 className="w-5 h-5 text-[var(--color-primary)]" />
+            <CheckSquare2 className="w-5 h-5 text-[var(--color-calendar-selected-bg)]" />
             Brokerage Task Command Center
           </h1>
         </div>
@@ -633,16 +633,16 @@ export const TasksView: React.FC<TasksViewProps> = ({
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-1 rounded-xl flex items-center shrink-0">
             <button
               onClick={() => setCurrentGroup("me")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                currentGroup === "me" ? "bg-[var(--color-primary)] text-black font-extrabold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentGroup === "me" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
               }`}
             >
               <User className="w-3.5 h-3.5" /> My Tasks
             </button>
             <button
               onClick={() => setCurrentGroup("team")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                currentGroup === "team" ? "bg-[var(--color-primary)] text-black font-extrabold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentGroup === "team" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" /> Team Board
@@ -651,9 +651,9 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
           <button
             onClick={() => setIsAddingTask(true)}
-            className="px-4 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg"
+            className="px-4 py-2 bg-[var(--color-calendar-selected-bg)] hover:opacity-90 text-[var(--color-calendar-selected-text)] font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-black" /> Log Daily Item
+            <Plus className="w-4 h-4 text-[var(--color-calendar-selected-text)]" /> Log Daily Item
           </button>
         </div>
       </div>
@@ -919,24 +919,24 @@ export const TasksView: React.FC<TasksViewProps> = ({
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)]/70 p-1 rounded-xl flex items-center shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setViewLayout("list")}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "list" ? "bg-[var(--color-primary)] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  viewLayout === "list" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <ListFilter className="w-3.5 h-3.5" /> Pipeline Feed
               </button>
               <button
                 onClick={() => setViewLayout("board")}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "board" ? "bg-[var(--color-primary)] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  viewLayout === "board" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" /> Action Board
               </button>
               <button
                 onClick={() => setViewLayout("checklist")}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                  viewLayout === "checklist" ? "bg-[var(--color-primary)] text-black font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  viewLayout === "checklist" ? "bg-[var(--color-calendar-selected-bg)] text-[var(--color-calendar-selected-text)] font-extrabold shadow-sm" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 }`}
               >
                 <CheckSquare2 className="w-3.5 h-3.5" /> Checklist Focus
@@ -1014,7 +1014,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                         onClick={() => setSelectedTaskId(tk.id)}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 text-left ${
                           isSelected 
-                            ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-primary)]/25 shadow-xl" 
+                            ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-calendar-selected-bg)]/45 shadow-xl" 
                             : isCompleted 
                               ? "bg-[var(--color-surface-2)]/30 border-[var(--color-border)]/70 opacity-55 hover:opacity-80" 
                               : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50"
@@ -1027,15 +1027,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               type="checkbox"
                               checked={isCompleted}
                               onChange={() => handleToggleTaskCheckbox(tk.id)}
-                              className="h-4 w-4 rounded border-[var(--color-border)] bg-[var(--color-surface-2)] accent-[var(--color-primary)] cursor-pointer"
+                              className="h-4 w-4 rounded border-[var(--color-border)] bg-[var(--color-surface-2)] accent-[var(--color-calendar-selected-bg)] cursor-pointer"
                             />
                           </div>
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               {/* Title description */}
-                              <span className={`text-[12px] font-semibold leading-relaxed ${
-                                isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : "text-[var(--color-text)]/90"
+                              <span className={`text-[13px] font-black leading-relaxed ${
+                                isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : "text-[var(--color-text)]"
                               }`}>
                                 {tk.title}
                               </span>
@@ -1058,33 +1058,33 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               </span>
 
                               {tk.clientName && (
-                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-semibold shrink-0">
-                                  <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                                  <span>Deal: <span className="text-amber-800 dark:text-amber-400 font-bold">{tk.clientName}</span></span>
+                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-0.5 rounded-md text-[var(--color-text)] font-extrabold shrink-0">
+                                  <FileText className="w-3.5 h-3.5 text-[var(--color-calendar-selected-bg)] dark:text-amber-400" />
+                                  <span>Deal: <span className="text-[var(--color-calendar-selected-bg)] dark:text-amber-400 font-black">{tk.clientName}</span></span>
                                 </span>
                               )}
 
                               {tk.dueDate && (
                                 <span className={`flex items-center gap-1.5 font-mono px-2 py-0.5 rounded-md border shrink-0 ${
                                   isOverdue 
-                                    ? "bg-red-500/10 border-red-500/25 text-red-700 dark:text-red-400 font-bold" 
-                                    : "bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 text-slate-700 dark:text-slate-300 font-semibold"
+                                    ? "bg-red-500/15 border-red-500/30 text-red-600 dark:text-red-400 font-black" 
+                                    : "bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] font-extrabold"
                                 }`}>
-                                  <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                                  <Calendar className="w-3.5 h-3.5 text-[var(--color-calendar-selected-bg)] dark:text-cyan-400" />
                                   <span>Due: {tk.dueDate} {tk.dueTime && `@ ${tk.dueTime}`}</span>
                                 </span>
                               )}
 
                               {tk.assignedTo && (
-                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)]/80 border border-[var(--color-border)]/70 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-semibold shrink-0">
-                                  <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                                  <span>Owner: <b className="text-[var(--color-text)] font-semibold">{tk.assignedTo}</b></span>
+                                <span className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] px-2 py-0.5 rounded-md text-[var(--color-text)] font-extrabold shrink-0">
+                                  <User className="w-3.5 h-3.5 text-[var(--color-calendar-selected-bg)] dark:text-sky-400" />
+                                  <span>Owner: <b className="text-[var(--color-text)] font-black">{tk.assignedTo}</b></span>
                                 </span>
                               )}
 
                               {/* Calendar synced badge status */}
                               {tk.calendarSync !== false && tk.dueDate && (
-                                <span className="text-[8.5px] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] px-2 py-0.5 rounded-md font-black uppercase tracking-wider shrink-0">
+                                <span className="text-[8.5px] bg-[var(--color-calendar-selected-bg)]/10 dark:bg-emerald-500/10 border border-[var(--color-calendar-selected-bg)]/30 dark:border-emerald-500/20 text-[var(--color-calendar-selected-bg)] dark:text-emerald-400 px-2 py-0.5 rounded-md font-black uppercase tracking-wider shrink-0">
                                   📆 Cal Linked
                                 </span>
                               )}
@@ -1130,10 +1130,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
             {viewLayout === "board" && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-full select-none" id="kanban-scaffolding-box">
                 {[
-                  { key: "todo", label: "To Do Actions", border: "border-[var(--color-warning)]/20", colorText: "text-amber-800 dark:text-[var(--color-warning)]" },
-                  { key: "in_progress", label: "In active flow", border: "border-cyan-500/20", colorText: "text-cyan-700 dark:text-cyan-400" },
-                  { key: "waiting", label: "Waiting On Info", border: "border-orange-500/20", colorText: "text-orange-700 dark:text-orange-400" },
-                  { key: "done", label: "Done / Completed", border: "border-emerald-500/20", colorText: "text-emerald-700 dark:text-emerald-400" }
+                  { key: "todo", label: "To Do Actions", border: "border-[var(--color-warning)]/20", colorText: "text-amber-700 dark:text-amber-400 font-extrabold" },
+                  { key: "in_progress", label: "In active flow", border: "border-cyan-500/20", colorText: "text-cyan-800 dark:text-cyan-300 font-extrabold" },
+                  { key: "waiting", label: "Waiting On Info", border: "border-orange-500/20", colorText: "text-orange-800 dark:text-orange-300 font-extrabold" },
+                  { key: "done", label: "Done / Completed", border: "border-emerald-500/20", colorText: "text-emerald-800 dark:text-emerald-300 font-extrabold" }
                 ].map(col => {
                   const itemsInCol = sortedAndFilteredTasks.filter(t => t.extendedStatus === col.key);
                   return (
@@ -1141,8 +1141,8 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       
                       {/* Column title descriptor */}
                       <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-border)]/70 mb-3">
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${col.colorText}`}>{col.label}</span>
-                        <span className="text-[10px] font-mono bg-[var(--color-surface-2)] text-[var(--color-text-muted)] px-1.5 py-0.5 rounded-md font-semibold font-mono">
+                        <span className={`text-[10px] uppercase tracking-wider ${col.colorText}`}>{col.label}</span>
+                        <span className="text-[10px] font-mono bg-[var(--color-surface-3)] text-[var(--color-text)] px-1.5 py-0.5 rounded-md font-bold">
                           {itemsInCol.length}
                         </span>
                       </div>
@@ -1158,11 +1158,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                               onClick={() => setSelectedTaskId(it.id)}
                               className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
                                 isSelected 
-                                  ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-primary)]/20" 
+                                  ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-calendar-selected-bg)]/45 shadow-md" 
                                   : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)]"
                               }`}
                             >
-                              <span className={`text-[11.5px] font-bold block leading-normal text-[var(--color-text)] truncate ${it.extendedStatus === "done" ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
+                              <span className={`text-[12.5px] font-extrabold block leading-normal text-[var(--color-text)] truncate ${it.extendedStatus === "done" ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
                                 {it.title}
                               </span>
 
@@ -1172,12 +1172,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                 </span>
 
                                 {it.dueDate && (
-                                  <span className="text-[8.5px] font-mono text-[var(--color-text-muted)]">{it.dueDate}</span>
+                                  <span className="text-[8.5px] font-mono text-[var(--color-text-muted)] font-bold">{it.dueDate}</span>
                                 )}
                               </div>
 
                               {it.clientName && (
-                                <div className="text-[9px] text-[var(--color-primary)] font-semibold mt-1.5 truncate">
+                                <div className="text-[9.5px] text-[var(--color-calendar-selected-bg)] dark:text-amber-400 font-extrabold mt-1.5 truncate">
                                   File: {it.clientName}
                                 </div>
                               )}
@@ -1209,13 +1209,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       onClick={() => setSelectedTaskId(tk.id)}
                       className={`p-4 rounded-2xl border flex flex-col text-left transition-all cursor-pointer ${
                         isSelected 
-                          ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-primary)]/25" 
+                          ? "bg-[var(--color-surface-2)] border-[var(--color-border)] ring-1 ring-[var(--color-calendar-selected-bg)]/45" 
                           : "bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-[var(--color-border)]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3 border-b border-[var(--color-border)]/70 pb-2.5 mb-2.5 select-none">
                         <div>
-                          <span className={`text-[11.5px] font-black block leading-snug text-[var(--color-text)]/90 ${isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
+                          <span className={`text-[13px] font-black block leading-snug text-[var(--color-text)] ${isCompleted ? "line-through text-[var(--color-text-faint)] font-normal" : ""}`}>
                             {tk.title}
                           </span>
                           <span className={`inline-flex items-center gap-1.5 text-[8.5px] font-black uppercase px-2 py-0.5 rounded border mt-1.5 ${scheme.lightBg} ${scheme.text} ${scheme.border}`}>
@@ -1223,7 +1223,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                           </span>
                         </div>
 
-                        <span className="text-[10px] font-mono bg-[var(--color-surface-2)] text-[var(--color-text-muted)] px-1.5 py-0.5 rounded font-black font-sans shrink-0">
+                        <span className="text-[10px] font-mono bg-[var(--color-surface-3)] text-[var(--color-text)] px-2 py-0.5 rounded-md font-bold shrink-0">
                           {doneSubs}/{subs.length} Items
                         </span>
                       </div>
@@ -1247,14 +1247,14 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                   setSelectedTaskId(tk.id);
                                   handleToggleSubtask(sb.id);
                                 }}
-                                className="w-full flex items-center gap-2 px-2.5 py-2.5 bg-[var(--color-surface-2)]/60 hover:bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/70 rounded-xl text-left text-[11px] font-semibold text-[var(--color-text)] transition-colors"
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl text-left text-xs font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-3)]/60 transition-colors cursor-pointer"
                               >
                                 {sb.done ? (
                                   <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                                 ) : (
-                                  <div className="w-4 h-4 border border-white/25 rounded-md shrink-0" />
+                                  <div className="w-4 h-4 border border-slate-400 dark:border-white/35 rounded-md shrink-0 shadow-sm" />
                                 )}
-                                <span className={sb.done ? "line-through text-[var(--color-text-faint)]" : "text-[var(--color-text)]"}>
+                                <span className={sb.done ? "line-through text-[var(--color-text-faint)] font-normal" : "text-[var(--color-text)] font-extrabold"}>
                                   {sb.title}
                                 </span>
                               </button>
@@ -1700,7 +1700,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                     placeholder="e.g., Gather 90-day statements, draft Scotia mortgage package"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]/20 font-bold"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40 font-bold"
                   />
                 </div>
 
@@ -1818,7 +1818,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                       type="checkbox"
                       checked={newCalendarSync}
                       onChange={(e) => setNewCalendarSync(e.target.checked)}
-                      className="h-3.5 w-3.5 accent-[var(--color-primary)] rounded cursor-pointer"
+                      className="h-3.5 w-3.5 accent-[var(--color-calendar-selected-bg)] rounded cursor-pointer"
                     />
                   </div>
                   <p className="text-[9px] text-[var(--color-text-muted)] leading-relaxed">
@@ -1849,7 +1849,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                     placeholder="Provide specific notes regarding document verification criteria, or instructions..."
                     value={newNotes}
                     onChange={(e) => setNewNotes(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-primary)]/30"
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] placeholder-[var(--color-text-faint)]/50 focus:outline-none focus:border-[var(--color-calendar-selected-bg)]/40"
                   />
                 </div>
 
@@ -1858,15 +1858,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsAddingTask(false)}
-                    className="px-4 py-2 border border-[var(--color-border)]/70 hover:border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold transition-all"
+                    className="px-4 py-2 border border-[var(--color-border)]/70 hover:border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-[var(--color-primary)] hover:opacity-90 text-black font-black text-xs rounded-xl transition-all flex items-center gap-1 shadow-lg"
+                    className="px-5 py-2 bg-[var(--color-calendar-selected-bg)] hover:opacity-90 text-[var(--color-calendar-selected-text)] font-black text-xs rounded-xl transition-all flex items-center gap-1 shadow-lg cursor-pointer"
                   >
-                    <Check className="w-3.5 h-3.5" /> Book Action Task
+                    <Check className="w-3.5 h-3.5 text-[var(--color-calendar-selected-text)]" /> Book Action Task
                   </button>
                 </div>
 

@@ -181,7 +181,7 @@ export default function App() {
   const [compBody, setCompBody] = useState<string>("");
 
   // Active channel in Direct/Announcements chat
-  const [activeChannel, setActiveChannel] = useState<string>("general");
+  const [activeChannel, setActiveChannel] = useState<string>("dm_wayne");
   const [linkedChatClientId, setLinkedChatClientId] = useState<string | null>(null);
 
   // Document Vault State Storage

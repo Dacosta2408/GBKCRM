@@ -152,6 +152,13 @@ const MORTGAGE_PREPARED_TEMPLATES = [
   }
 ];
 
+// Module-level in-memory cache for EmailView state preservation across component mounts
+let inMemoryGmailLoggedIn = false;
+let inMemoryGmailLoginEmail = "";
+let inMemoryGmailSignature = "";
+let inMemoryGmailDrafts: string | null = null;
+let inMemoryGmailArchive: string | null = null;
+
 export const EmailView: React.FC<EmailViewProps> = ({
   emailsState,
   setEmailsState,
@@ -172,14 +179,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
 }) => {
   // ── AUTH & SECTIONS STATES ──
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return !!(currentUser?.emailPassword || localStorage.getItem("gbk_gmail_loggedin") === "true");
+    return !!(currentUser?.emailPassword || inMemoryGmailLoggedIn);
   });
   const [loginEmail, setLoginEmail] = useState<string>(() => {
-    return currentUser?.email || localStorage.getItem("gbk_gmail_login_email") || "david.acosta@gbkfinancial.ca";
+    return currentUser?.email || inMemoryGmailLoginEmail || "david.acosta@gbkfinancial.ca";
   });
 
   useEffect(() => {
-    setIsLoggedIn(!!currentUser?.emailPassword || localStorage.getItem("gbk_gmail_loggedin") === "true");
+    setIsLoggedIn(!!currentUser?.emailPassword || inMemoryGmailLoggedIn);
     setLoginEmail(currentUser?.email || "david.acosta@gbkfinancial.ca");
   }, [currentUser]);
 
@@ -189,15 +196,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [mailboxScope, setMailboxScope] = useState<string>("personal"); // "personal" or shared address
   const [signatureText, setSignatureText] = useState<string>(() => {
-    return localStorage.getItem("gbk_gmail_signature") || 
+    return inMemoryGmailSignature || 
       `Regards,\n\n${currentUser.first} ${currentUser.last}\nSenior Mortgage Advisor, GBK Financial\nPhone: ${currentUser.phone || "(416) 555-0105"}\nWeb: gbkfinancial.ca`;
   });
   const [showSignatureEdit, setShowSignatureEdit] = useState<boolean>(false);
 
   // Draft / Custom folder pools (internal simulation)
   const [draftsList, setDraftsList] = useState<Email[]>(() => {
-    const saved = localStorage.getItem("gbk_gmail_drafts");
-    return saved ? JSON.parse(saved) : [
+    return inMemoryGmailDrafts ? JSON.parse(inMemoryGmailDrafts) : [
       {
         id: "dr-1",
         to: "James Reid (TD BDM)",
@@ -212,16 +218,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
   });
 
   const [archivedList, setArchivedList] = useState<Email[]>(() => {
-    const saved = localStorage.getItem("gbk_gmail_archive");
-    return saved ? JSON.parse(saved) : [];
+    return inMemoryGmailArchive ? JSON.parse(inMemoryGmailArchive) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem("gbk_gmail_drafts", JSON.stringify(draftsList));
+    inMemoryGmailDrafts = JSON.stringify(draftsList);
   }, [draftsList]);
 
   useEffect(() => {
-    localStorage.setItem("gbk_gmail_archive", JSON.stringify(archivedList));
+    inMemoryGmailArchive = JSON.stringify(archivedList);
   }, [archivedList]);
 
   // ── WIZARD DIALOG STATES (TASK/EVENT CREATION OVERLAYS) ──
@@ -251,30 +256,51 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
   // ── GOOGLE AUTH CONNECT WORKFLOW ──
   const handleGoogleLogin = () => {
-    setIsLoggingIn(true);
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      setIsLoggedIn(true);
-      localStorage.setItem("gbk_gmail_loggedin", "true");
-      localStorage.setItem("gbk_gmail_login_email", loginEmail);
-      showToast("Signed in securely to Google Workspace!", "success");
-      if (logActivity) logActivity("Connected Google Workspace Gmail account", loginEmail);
-    }, 1200);
+    const metaEnv = (import.meta as any).env || {};
+    const clientId = metaEnv.VITE_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID";
+    const redirectUri = metaEnv.VITE_GOOGLE_REDIRECT_URI || "YOUR_REDIRECT";
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/gmail.readonly+https://www.googleapis.com/auth/gmail.send&access_type=offline`;
+    
+    inMemoryGmailLoggedIn = true;
+    inMemoryGmailLoginEmail = loginEmail;
+    setIsLoggedIn(true);
+
+    window.open(authUrl, "_blank");
+
+    if (logActivity) {
+      logActivity("Initiated Google Workspace OAuth2 flow", loginEmail);
+    }
   };
 
   const handleGoogleLogout = () => {
     const confirmed = window.confirm("Are you sure you want to disconnect your Google Workspace account?");
     if (!confirmed) return;
     setIsLoggedIn(false);
-    localStorage.removeItem("gbk_gmail_loggedin");
+    inMemoryGmailLoggedIn = false;
+    inMemoryGmailLoginEmail = "";
     showToast("Disconnected from Google Mail Servers.", "success");
     if (logActivity) logActivity("Disconnected Workspace Google Identity", loginEmail);
   };
 
   const handleSaveSignature = () => {
-    localStorage.setItem("gbk_gmail_signature", signatureText);
+    inMemoryGmailSignature = signatureText;
     setShowSignatureEdit(false);
     showToast("Broker signature saved successfully!", "success");
+  };
+
+  const openReplyCompose = (email: Email) => {
+    setIsComposeOpen(true);
+    setSelectedClientLink(email.clientId || "");
+    setComposeTo(email.from || "");
+    setComposeToEmail(email.fromEmail || "");
+    const baseSubject = email.subject || "";
+    setComposeSubject(baseSubject.startsWith("Re:") ? baseSubject : `Re: ${baseSubject}`);
+    const quoted = email.body || email.preview || "";
+    setComposeBody(
+      `Hi ${email.from || ""},\n\n` +
+      `\n\n--- Original message ---\nFrom: ${email.from} <${email.fromEmail}>\nSubject: ${email.subject}\n\n${quoted}`
+    );
+    setIsScheduled(false);
   };
 
   // ── CONSTRUCT ACTIVE DIRECTORY ──
@@ -817,14 +843,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
             </h2>
             <p className="text-[10px] text-[var(--color-text-muted)]">
               {isLoggedIn 
-                ? `Connected: ${loginEmail} (All communications auto-synced with GSUITE API)`
-                : "Secure local offline database mode. Connect Workspace for real Gmail transfers."}
+                ? `Connected: ${loginEmail} (SMTP ready via smtp.gmail.com:587)`
+                : "Sandbox preview mode. Configure Gmail SMTP or OAuth to send real mail."}
             </p>
           </div>
         </div>
 
         {/* Auth Connector Action */}
-        <div className="flex items-center gap-2">
+        <div className="shrink-0">
           {isLoggedIn ? (
             <div className="flex items-center gap-3 bg-[var(--color-surface-2)] px-3 py-1.5 border border-[var(--color-border)] rounded-lg">
               <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center font-bold text-[10px] text-white">
@@ -840,12 +866,12 @@ export const EmailView: React.FC<EmailViewProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center md:items-end gap-1.5">
               {/* BRANDED GOOGLE BUTTON */}
               <button 
                 onClick={handleGoogleLogin}
                 disabled={isLoggingIn}
-                className="gsi-material-button bg-white text-black px-3.5 py-1.5 text-xs rounded-lg font-bold flex items-center gap-2 hover:bg-neutral-100 transition-all select-none disabled:opacity-40"
+                className="gsi-material-button bg-white text-black px-3.5 py-1.5 text-xs rounded-lg font-bold flex items-center gap-2 hover:bg-neutral-100 transition-all select-none disabled:opacity-40 cursor-pointer"
               >
                 <div className="w-3.5 h-3.5 shrink-0">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style={{ display: 'block' }}>
@@ -857,6 +883,12 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 </div>
                 {isLoggingIn ? "Syncing..." : "Connect Workspace"}
               </button>
+              <p className="text-[9px] text-[var(--color-text-faint)] mt-1">
+                Requires Google OAuth or SMTP app password setup.
+              </p>
+              <p className="text-[9.5px] text-[var(--color-text-muted)] text-center md:text-right max-w-[280px] font-medium leading-normal animate-fade-in">
+                You will be redirected to Google to authorize GBK Financial access to your Gmail inbox.
+              </p>
             </div>
           )}
         </div>
@@ -904,21 +936,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
             );
           })}
 
-          {/* Quick-Match Active client lists matching inbox */}
-          <div className="mt-4 border-t border-[var(--color-border)] pt-3">
-            <span className="block text-[9px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] mb-2 px-1">Pipeline Auto-Matched</span>
-            {clients.slice(0, 3).map(c => (
-              <button
-                key={c.id}
-                onClick={() => onOpenClient && onOpenClient(c.id)}
-                className="w-full text-left px-2 py-1 text-[10px] text-[var(--color-text-muted)] hover:text-red-400 truncate transition-all flex items-center gap-1.5 cursor-pointer"
-                title={`${c.first} ${c.last}`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400/80"></span>
-                <span className="truncate">{c.first} {c.last}</span>
-              </button>
-            ))}
-          </div>
+
 
           {/* Pre-Automated Mortgage Email Templates Accelerator */}
           <div className="mt-4 border-t border-[var(--color-border)] pt-3">
@@ -1070,7 +1088,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   ) : (
                     <>
                       <button 
-                        onClick={() => handleComposeWithTemplate()}
+                        onClick={() => selectedEmail && openReplyCompose(selectedEmail)}
                         className="px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 rounded text-[10px] font-bold text-red-400 flex items-center gap-1 cursor-pointer"
                       >
                         <Reply className="w-3 h-3" /> Reply
@@ -1081,6 +1099,25 @@ export const EmailView: React.FC<EmailViewProps> = ({
                         title="Archive communication log"
                       >
                         <Trash2 className="w-3 h-3" /> Archive
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!selectedEmail) return;
+                          setEmailsState(prev => {
+                            const key = activeFolder as keyof typeof prev;
+                            if (!key || !prev[key]) return prev;
+                            return {
+                              ...prev,
+                              [key]: prev[key].map(item =>
+                                item.id === selectedEmail.id ? { ...item, unread: true } : item
+                              )
+                            };
+                          });
+                          setSelectedEmail({ ...selectedEmail, unread: true });
+                        }}
+                        className="px-2 py-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded text-[10px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center gap-1 cursor-pointer"
+                      >
+                        <MailOpen className="w-3 h-3" /> Mark unread
                       </button>
                     </>
                   )}
@@ -1260,6 +1297,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
             <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-4 border-b border-[var(--color-border)] pb-2.5 flex items-center gap-1.5 shrink-0">
               <Send className="w-4 h-4 text-red-500" /> New Outbound Mortgage Correspondence
             </h3>
+
+            <div className="mb-2 flex items-center justify-between gap-3 shrink-0">
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider">
+                From
+              </span>
+              <span className="text-[10px] font-mono text-[var(--color-text)] bg-[var(--color-surface-2)] px-2 py-1 rounded border border-[var(--color-border)]">
+                {loginEmail}
+              </span>
+            </div>
 
             <form onSubmit={handleSendComposeCommit} className="flex-grow overflow-y-auto flex flex-col gap-3.5 pr-1">
               
