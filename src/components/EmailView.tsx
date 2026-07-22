@@ -1,6 +1,3 @@
-// NOTE: SHARED_MAILBOX_PRESETS are demo-only and do NOT map to real Gmail inboxes.
-// Live Gmail integration will use actual messages retrieved via API/SMTP instead.
-
 import React, { useState, useEffect } from "react";
 import { 
   Mail, Star, Send, FileText, Trash2, ArrowLeft, RefreshCw, MailOpen, 
@@ -30,10 +27,6 @@ interface EmailViewProps {
   docVault?: Record<string, any>;
   setDocVault?: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
-
-// ── SHARED MAILBOX PRESETS FOR REFERENCE ──
-// Removed from runtime as requested.
-
 
 const MORTGAGE_PREPARED_TEMPLATES = [
   {
@@ -116,28 +109,48 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [confirmModal, setConfirmModal] = useState<ConfirmModalConfig | null>(null);
 
   // ── AUTH & SECTIONS STATES ──
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem("gbk_gmail_loggedin") === "true";
-  });
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem("gbk_gmail_loggedin") === "true");
-    setLoginEmail(currentUser?.email || "david.acosta@gbkfinancial.ca");
-  }, [currentUser]);
   const [loginEmail, setLoginEmail] = useState<string>(() => {
     return currentUser?.email || inMemoryGmailLoginEmail || "david.acosta@gbkfinancial.ca";
   });
 
-  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const [smtpHost, setSmtpHost] = useState<string>("smtp.gmail.com");
+  const [smtpPort, setSmtpPort] = useState<string>("587");
+  const [smtpUsername, setSmtpUsername] = useState<string>(loginEmail || "");
+  const [smtpPassword, setSmtpPassword] = useState<string>("");
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    const savedFlag = localStorage.getItem("gbk_gmail_smtp_configured") === "true";
+    return savedFlag;
+  });
+
+  useEffect(() => {
+    const savedFlag = localStorage.getItem("gbk_gmail_smtp_configured") === "true";
+    setIsLoggedIn(savedFlag);
+    const uEmail = currentUser?.email || "david.acosta@gbkfinancial.ca";
+    setLoginEmail(uEmail);
+    setSmtpUsername(uEmail || smtpUsername || "");
+  }, [currentUser]);
+
+  useEffect(() => {
+    const savedHost = localStorage.getItem("gbk_gmail_smtp_host");
+    const savedPort = localStorage.getItem("gbk_gmail_smtp_port");
+    const savedUser = localStorage.getItem("gbk_gmail_smtp_username");
+    const savedConfigured = localStorage.getItem("gbk_gmail_smtp_configured") === "true";
+    if (savedHost) setSmtpHost(savedHost);
+    if (savedPort) setSmtpPort(savedPort);
+    if (savedUser) setSmtpUsername(savedUser);
+    setIsLoggedIn(savedConfigured);
+  }, []);
+
   const [activeFolder, setActiveFolder] = useState<string>("inbox");
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [mailboxScope, setMailboxScope] = useState<string>("personal"); // "personal" or shared address
+  const [mailboxScope, setMailboxScope] = useState<string>("personal");
   const [signatureText, setSignatureText] = useState<string>(() => {
     return inMemoryGmailSignature || 
       `Regards,\n\n${currentUser.first} ${currentUser.last}\nSenior Mortgage Advisor, GBK Financial\nPhone: ${currentUser.phone || "(416) 555-0105"}\nWeb: gbkfinancial.ca`;
   });
   const [showSignatureEdit, setShowSignatureEdit] = useState<boolean>(false);
-  const [showSmtpConfig, setShowSmtpConfig] = useState<boolean>(false);
 
   // Draft / Custom folder pools (internal simulation)
   const [draftsList, setDraftsList] = useState<Email[]>(() => {
@@ -223,112 +236,35 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [scheduleSendTime, setScheduleSendTime] = useState<string>("");
   const [isScheduled, setIsScheduled] = useState<boolean>(false);
 
-  // ── SMTP LOCAL STATES ──
-  const [emailHost, setEmailHost] = useState<string>(() => currentUser?.emailHost || "");
-  const [emailPort, setEmailPort] = useState<string>(() => currentUser?.emailPort || "");
-  const [emailUsername, setEmailUsername] = useState<string>(() => currentUser?.emailUsername || currentUser?.email || "");
-  const [emailPassword, setEmailPassword] = useState<string>(() => currentUser?.emailPassword || "");
-
-  useEffect(() => {
-    if (currentUser) {
-      if (currentUser.emailHost !== undefined) setEmailHost(currentUser.emailHost || "");
-      if (currentUser.emailPort !== undefined) setEmailPort(currentUser.emailPort || "");
-      if (currentUser.emailUsername !== undefined) setEmailUsername(currentUser.emailUsername || currentUser.email || "");
-      if (currentUser.emailPassword !== undefined) setEmailPassword(currentUser.emailPassword || "");
-    }
-  }, [currentUser]);
-
-  const updateSmtpHost = (val: string) => {
-    setEmailHost(val);
-    if (currentUser) {
-      currentUser.emailHost = val;
-    }
-  };
-
-  const updateSmtpPort = (val: string) => {
-    setEmailPort(val);
-    if (currentUser) {
-      currentUser.emailPort = val;
-    }
-  };
-
-  const updateSmtpUsername = (val: string) => {
-    setEmailUsername(val);
-    if (currentUser) {
-      currentUser.emailUsername = val;
-    }
-  };
-
-  const updateSmtpPassword = (val: string) => {
-    setEmailPassword(val);
-    if (currentUser) {
-      currentUser.emailPassword = val;
-    }
-  };
-
-  // ── GOOGLE AUTH CONNECT WORKFLOW ──
+  // ── GMAIL SMTP CONNECT & DISCONNECT WORKFLOW ──
   const handleGoogleLogin = () => {
-    setIsLoggingIn(true);
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      const emailToUse = loginEmail || currentUser?.email || "VDacosta247@gmail.com";
-      setLoginEmail(emailToUse);
-      setIsLoggedIn(true);
-      localStorage.setItem("gbk_gmail_loggedin", "true");
-      localStorage.setItem("gbk_gmail_user", emailToUse);
-      inMemoryGmailLoggedIn = true;
-      inMemoryGmailLoginEmail = emailToUse;
-
-      const metaEnv = (import.meta as any).env || {};
-      const clientId = metaEnv.VITE_GOOGLE_CLIENT_ID;
-      if (clientId) {
-        const redirectUri = metaEnv.VITE_GOOGLE_REDIRECT_URI || window.location.origin;
-        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/gmail.readonly+https://www.googleapis.com/auth/gmail.send&access_type=offline`;
-        window.open(authUrl, "_blank");
-      }
-
-      showToast(`Connected to Gmail (${emailToUse})`, "success", "📧");
-      if (logActivity) {
-        logActivity("Connected Google Workspace Gmail account", emailToUse);
-      }
-    }, 300);
+    if (!smtpHost || !smtpPort || !smtpUsername || !smtpPassword) {
+      showToast("Please fill SMTP host, port, Gmail address, and app password/token before saving.", "error");
+      return;
+    }
+    localStorage.setItem("gbk_gmail_smtp_host", smtpHost);
+    localStorage.setItem("gbk_gmail_smtp_port", smtpPort);
+    localStorage.setItem("gbk_gmail_smtp_username", smtpUsername);
+    localStorage.setItem("gbk_gmail_smtp_password_placeholder", smtpPassword ? "set" : "");
+    localStorage.setItem("gbk_gmail_smtp_configured", "true");
+    setIsLoggedIn(true);
+    showToast("Gmail SMTP settings saved successfully!", "success");
+    if (logActivity) {
+      logActivity("Configured Gmail SMTP settings", smtpUsername);
+    }
   };
 
   const handleGoogleLogout = () => {
-    setConfirmModal({
-      title: "Disconnect Google Workspace",
-      message: "Are you sure you want to disconnect your Google Workspace account?",
-      confirmText: "Disconnect",
-      confirmVariant: "danger",
-      onConfirm: () => {
-        setIsLoggedIn(false);
-        localStorage.removeItem("gbk_gmail_loggedin");
-        localStorage.removeItem("gbk_gmail_user");
-        inMemoryGmailLoggedIn = false;
-        inMemoryGmailLoginEmail = "";
-        showToast("Disconnected from Google Mail Servers.", "success");
-        if (logActivity) logActivity("Disconnected Workspace Google Identity", loginEmail);
-      }
-    });
-  };
-
-  const handleSmtpLogin = () => {
-    if (!emailHost || !emailUsername || !emailPassword) {
-      showToast("Please fill in SMTP Host, Username, and Password.", "error");
-      return;
-    }
-    localStorage.setItem("gbk_gmail_loggedin", "true");
-    localStorage.setItem("gbk_gmail_user", emailUsername);
-    setIsLoggedIn(true);
-    setLoginEmail(emailUsername);
-    if (currentUser) {
-      currentUser.emailHost = emailHost;
-      currentUser.emailPort = emailPort || "587";
-      currentUser.emailUsername = emailUsername;
-      currentUser.emailPassword = emailPassword;
-    }
-    showToast(`Successfully connected via SMTP as ${emailUsername}`, "success", "🔐");
-    if (logActivity) logActivity("Connected custom SMTP configuration", emailUsername);
+    const confirmed = window.confirm("Clear Gmail SMTP settings and disconnect?");
+    if (!confirmed) return;
+    setIsLoggedIn(false);
+    localStorage.removeItem("gbk_gmail_smtp_configured");
+    localStorage.removeItem("gbk_gmail_smtp_host");
+    localStorage.removeItem("gbk_gmail_smtp_port");
+    localStorage.removeItem("gbk_gmail_smtp_username");
+    localStorage.removeItem("gbk_gmail_smtp_password_placeholder");
+    showToast("Gmail SMTP settings removed.", "success");
+    if (logActivity) logActivity("Cleared Gmail SMTP settings", smtpUsername);
   };
 
   // STAR / UNSTAR EMAIL TOGGLE
@@ -783,15 +719,15 @@ export const EmailView: React.FC<EmailViewProps> = ({
   }, [selectedClientLink, composeSubject]);
 
   const handleRetrySend = async (email: Email) => {
-    if (!bridgeOnline) {
-      showToast("Cannot retry send: Z Drive Bridge is currently offline.", "error");
+    const host = smtpHost;
+    const port = smtpPort;
+    const username = smtpUsername;
+    const password = smtpPassword;
+
+    if (!host || !port || !username || !password) {
+      showToast("Cannot send: Gmail SMTP settings are incomplete. Please configure host, port, username, and app password.", "error");
       return;
     }
-
-    const host = currentUser?.emailHost || "smtp.gmail.com";
-    const port = currentUser?.emailPort || "587";
-    const username = currentUser?.emailUsername || currentUser?.email || "";
-    const password = currentUser?.emailPassword || "";
 
     showToast("Retrying email dispatch via SMTP...", "info");
     const success = await sendEmail({
@@ -799,7 +735,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
       subject: email.subject || "",
       body: email.body || "",
       fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
-      fromEmail: email.fromEmail || loginEmail,
+      fromEmail: smtpUsername || loginEmail,
       host,
       port,
       username,
@@ -825,7 +761,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
       setSelectedEmail(null);
       if (logActivity) logActivity(`Dispatched queued email via SMTP retry`, email.subject);
     } else {
-      showToast("Retry failed. Check SMTP settings or bridge server status.", "error");
+      showToast("Retry failed. Check SMTP settings or connection status.", "error");
     }
   };
 
@@ -880,11 +816,21 @@ export const EmailView: React.FC<EmailViewProps> = ({
       return;
     }
 
+    const host = smtpHost;
+    const port = smtpPort;
+    const username = smtpUsername;
+    const password = smtpPassword;
+
+    if (!host || !port || !username || !password) {
+      showToast("Cannot send: Gmail SMTP settings are incomplete. Please configure host, port, username, and app password.", "error");
+      return;
+    }
+
     const newEmailId = "mail_" + Date.now();
     const newMailRecord: Email = {
       id: newEmailId,
       from: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
-      fromEmail: loginEmail,
+      fromEmail: smtpUsername || loginEmail,
       to: composeTo || composeToEmail,
       toEmail: composeToEmail,
       subject: composeSubject,
@@ -913,73 +859,31 @@ export const EmailView: React.FC<EmailViewProps> = ({
       if (logActivity) logActivity(`Scheduled automated outreach email queue`, composeSubject);
       setIsComposeOpen(false);
     } else {
-      if (bridgeOnline) {
-        const host = emailHost || currentUser?.emailHost;
-        const port = emailPort || currentUser?.emailPort;
-        const username = emailUsername || currentUser?.emailUsername || currentUser?.email;
-        const password = emailPassword || currentUser?.emailPassword;
+      showToast("Sending email via secure SMTP...", "info");
+      const success = await sendEmail({
+        to: composeToEmail,
+        subject: composeSubject,
+        body: composeBody,
+        fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
+        fromEmail: smtpUsername || loginEmail,
+        host,
+        port,
+        username,
+        password
+      });
 
-        if (!host || !port || !username || !password) {
-          showToast("SMTP not configured. Please set host, port, username, and app password.", "error");
-          return;
-        }
-
-        showToast("Sending email via secure SMTP...", "info");
-        const success = await sendEmail({
-          to: composeToEmail,
-          subject: composeSubject,
-          body: composeBody,
-          fromName: `${currentUser?.first || "David"} ${currentUser?.last || "Acosta"}`,
-          fromEmail: loginEmail,
-          host,
-          port,
-          username,
-          password
-        });
-
-        if (success) {
-          setEmailsState(prev => ({
-            ...prev,
-            sent: [newMailRecord, ...prev.sent]
-          }));
-
-          // AUTO-LOG OPT-IN Option: Automatically add email contents to Client Dossier Note immediately on outbound
-          if (selectedClientLink && setClients) {
-            setClients(prev => prev.map(c => {
-              if (c.id === selectedClientLink) {
-                const currentSummary = c.aiSummary || "";
-                const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser.first} ${currentUser.last} via ${loginEmail}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
-                return {
-                  ...c,
-                  aiSummary: `${currentSummary}${formattedLog}`,
-                  updatedAt: new Date().toISOString()
-                };
-              }
-              return c;
-            }));
-            showToast(`Dispatched! Message logged to ${composeTo}'s CRM Dossier file!`, "success", "🚀");
-          } else {
-            showToast("Email dispatched successfully!", "success", "🚀");
-          }
-
-          if (logActivity) logActivity(`Dispatched outbound email template`, composeSubject);
-          setIsComposeOpen(false);
-        } else {
-          showToast("Failed to send email via SMTP. Check SMTP configurations or connection.", "error");
-        }
-      } else {
-        // Bridge server offline fallback - let's simulate successful dispatch so the Email section works fully in the UI preview!
-        showToast("SMTP simulated send (bridge offline) - outbound email dispatched!", "success", "🚀");
+      if (success) {
         setEmailsState(prev => ({
           ...prev,
           sent: [newMailRecord, ...prev.sent]
         }));
 
+        // AUTO-LOG OPT-IN Option: Automatically add email contents to Client Dossier Note immediately on outbound
         if (selectedClientLink && setClients) {
           setClients(prev => prev.map(c => {
             if (c.id === selectedClientLink) {
               const currentSummary = c.aiSummary || "";
-              const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser?.first || "David"} ${currentUser?.last || "Acosta"} via ${loginEmail}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
+              const formattedLog = `\n\n------- COMM LINK RECORDED (${new Date().toLocaleString("en-CA")}) -------\nDirection: OUTBOUND EMAIL\nSent By: ${currentUser?.first || "David"} ${currentUser?.last || "Acosta"} via ${smtpUsername || loginEmail}\nTo: ${newMailRecord.to} <${newMailRecord.toEmail}>\nSubject: ${newMailRecord.subject}\nBody Segment:\n${newMailRecord.body}\n--------------------------------------------`;
               return {
                 ...c,
                 aiSummary: `${currentSummary}${formattedLog}`,
@@ -993,8 +897,10 @@ export const EmailView: React.FC<EmailViewProps> = ({
           showToast("Email dispatched successfully!", "success", "🚀");
         }
 
-        if (logActivity) logActivity(`Dispatched outbound email (sandbox)`, composeSubject);
+        if (logActivity) logActivity(`Dispatched outbound email template`, composeSubject);
         setIsComposeOpen(false);
+      } else {
+        showToast("Failed to send email via SMTP. Check SMTP configurations or connection.", "error");
       }
     }
   };
@@ -1030,13 +936,6 @@ export const EmailView: React.FC<EmailViewProps> = ({
     });
   };
 
-  // SEED ADDITIONAL SAMPLE WORKSPACE LOGINS
-  const demoAccounts = [
-    "david.acosta@gbkfinancial.ca",
-    "greg.brown@gbkfinancial.ca",
-    "mortgages@gbkfinancial.ca"
-  ];
-
   const applyTemplate = (templateBody: string, client?: Client, signature?: string) => {
     let body = templateBody;
     if (client) {
@@ -1058,31 +957,31 @@ export const EmailView: React.FC<EmailViewProps> = ({
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)]">
       
-      {/* ── SIMPLE EMAIL CONNECTION HEADER ── */}
-      <div className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl mb-4 shrink-0 shadow-md">
+      {/* ── GMAIL SMTP CONNECTION HEADER ── */}
+      <div className="p-3.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl mb-4 shrink-0 shadow-md">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-red-600/10 border border-red-500/20 flex items-center justify-center shrink-0">
-              <Mail className="w-4 h-4 text-red-500" />
+            <div className="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center shrink-0">
+              <Mail className="w-5 h-5 text-red-500" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xs font-bold tracking-tight text-[var(--color-text)]">Email Connection & Workspace Sync</h2>
+                <h2 className="text-xs font-bold tracking-tight text-[var(--color-text)]">Email Center (Gmail)</h2>
                 {isLoggedIn ? (
                   <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    CONNECTED
+                    SMTP CONFIGURED
                   </span>
                 ) : (
                   <span className="bg-amber-500/15 text-amber-400 border border-amber-500/20 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    NOT CONNECTED
+                    SMTP NOT CONFIGURED
                   </span>
                 )}
               </div>
               <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
                 {isLoggedIn 
-                  ? `Active Gmail / Workspace: ${loginEmail}` 
-                  : "Sign in with Google Workspace or configure SMTP credentials below to connect your inbox."}
+                  ? `Connected: ${smtpUsername || loginEmail} (Using configured Gmail SMTP settings)` 
+                  : "Preview mode. Configure Gmail SMTP to send real emails."}
               </p>
             </div>
           </div>
@@ -1091,7 +990,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
             {isLoggedIn ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-2.5 py-1 rounded-lg border border-[var(--color-border)] max-w-[220px] truncate">
-                  {loginEmail}
+                  {smtpUsername || loginEmail}
                 </span>
                 <button
                   type="button"
@@ -1104,88 +1003,78 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={isLoggingIn}
-                  className="bg-white hover:bg-neutral-100 text-black font-bold px-3 py-1.5 text-xs rounded-lg flex items-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-                >
-                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  </svg>
-                  {isLoggingIn ? "Connecting..." : "Google Sign-In"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowSmtpConfig(prev => !prev)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] rounded-lg border border-[var(--color-border)] transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  <Sliders className="w-3.5 h-3.5" />
-                  {showSmtpConfig ? "Hide SMTP" : "SMTP Setup"}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-4 rounded-lg text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Save Gmail SMTP Settings
+              </button>
             )}
           </div>
         </div>
 
-        {/* Collapsible SMTP Configuration Drawer */}
-        {!isLoggedIn && showSmtpConfig && (
-          <div className="mt-3 pt-3 border-t border-[var(--color-border)] animate-fade-in">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-              <div>
-                <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">SMTP Host</label>
-                <input
-                  placeholder="smtp.gmail.com"
-                  value={emailHost}
-                  onChange={e => updateSmtpHost(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">Port</label>
-                <input
-                  placeholder="587"
-                  value={emailPort}
-                  onChange={e => updateSmtpPort(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">Username / Email</label>
-                <input
-                  placeholder="you@domain.com"
-                  value={emailUsername}
-                  onChange={e => updateSmtpUsername(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">App Password / Key</label>
-                <input
-                  type="password"
-                  placeholder="App password"
-                  value={emailPassword}
-                  onChange={e => updateSmtpPassword(e.target.value)}
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
-                />
-              </div>
+        {/* Visible Gmail SMTP Configuration Fields */}
+        <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Gmail SMTP Configuration
+            </span>
+            <span className="text-[9px] text-[var(--color-text-faint)] font-mono">
+              Use a 16-character Gmail App Password (myaccount.google.com/apppasswords)
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div>
+              <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">SMTP Host</label>
+              <input
+                placeholder="smtp.gmail.com"
+                value={smtpHost}
+                onChange={e => setSmtpHost(e.target.value)}
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+              />
             </div>
-            <div className="flex justify-end mt-2.5">
-              <button
-                type="button"
-                onClick={handleSmtpLogin}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-4 rounded-lg text-xs transition-all cursor-pointer shadow-sm"
-              >
-                Connect & Save SMTP
-              </button>
+            <div>
+              <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">Port</label>
+              <input
+                placeholder="587"
+                value={smtpPort}
+                onChange={e => setSmtpPort(e.target.value)}
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">Gmail Address (Username)</label>
+              <input
+                placeholder="david.acosta@gbkfinancial.ca"
+                value={smtpUsername}
+                onChange={e => setSmtpUsername(e.target.value)}
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">Gmail App Password / Token</label>
+              <input
+                type="password"
+                placeholder="16-character App Password"
+                value={smtpPassword}
+                onChange={e => setSmtpPassword(e.target.value)}
+                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+              />
             </div>
           </div>
-        )}
+          <div className="flex justify-end mt-2.5">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-4 rounded-lg text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Save Gmail SMTP Settings
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ── CENTRAL TWO-COLUMN CONTAINER ── */}
@@ -1534,7 +1423,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-[var(--color-text)]">{selectedEmail.from || "Greg Brown"}</h4>
-                      <p className="text-[10px] text-[var(--color-text-muted)]">{selectedEmail.fromEmail || "info@gbkfinancial.ca"}</p>
+                      <p className="text-[10px] text-[var(--color-text-muted)]">{selectedEmail.fromEmail || loginEmail || "VDacosta247@gmail.com"}</p>
                     </div>
                   </div>
                   
@@ -1744,7 +1633,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
                       type="email" 
                       value={composeBcc}
                       onChange={(e) => setComposeBcc(e.target.value)}
-                      placeholder="E.g. records@gbkfinancial.ca"
+                      placeholder="E.g. archive@example.com"
                       className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none"
                     />
                   </div>
