@@ -169,44 +169,7 @@ export const DEFAULT_MESSAGES: Record<string, any[]> = {
 };
 
 export const DEFAULT_EMAILS: { inbox: Email[]; sent: Email[]; scheduled: Email[]; queued: Email[] } = {
-  inbox: [
-    {
-      id: 'ie1',
-      from: 'Sarah Thompson',
-      fromEmail: 'sarah.t@email.com',
-      subject: 'Re: Pre-approval documents - Sarah Thompson',
-      preview: "Hi Greg, I've attached my T4, NOA, and last 3 pay stubs as requested. Let me know if you need any other assets!",
-      body: "Hi team,\n\nI have attached my T4, Notice of Assessment, and last three pay stubs as requested for our mortgage pre-approval.\n\nWe also managed to transfer the down payment funds into our chequing account and will send the 90-day transactions tomorrow morning.\n\nReally appreciate your help with this!\n\nBest,\nSarah Thompson",
-      time: '9:14 AM',
-      date: 'Today',
-      unread: true,
-      clientMatch: 'Thompson'
-    },
-    {
-      id: 'ie2',
-      from: 'TD BDM — James Reid',
-      fromEmail: 'james.reid@td.com',
-      subject: 'Martinez File ID #29104 - Conditional Appraisal Received',
-      preview: 'Good morning, the appraisal came back at value of $685,000. Outstanding item cleared. Commitment attached.',
-      body: "Hi Greg,\n\nGood news — the appraisal on the Martinez file came back right at purchase value ($685,000). Outstanding collateral risk is now cleared. \n\nPlease see the conditional commitment letter attached. Once we get the signed agreement and employee verification, we can move this to firm.\n\nCheers,\nJames Reid\nBusiness Development Manager, TD",
-      time: '8:02 AM',
-      date: 'Today',
-      unread: true,
-      clientMatch: 'Martinez'
-    },
-    {
-      id: 'ie3',
-      from: 'David Chen',
-      fromEmail: 'dchen@email.com',
-      subject: 'Renewal options next month',
-      preview: 'My mortgage is up for renewal with RBC and I want to see if you can find me a better fixed rate...',
-      body: "Hi there,\n\nMy current RBC mortgage is maturing next month and they sent me a renewal letter with a rate of 5.65%. It seems high.\n\nWanted to check what rates your monoline lenders are offering for a A-Lender 5-year fixed and if we should refinance to pay down some line of credit debt.\n\nTalk soon,\nDavid Chen",
-      time: 'Yesterday',
-      date: 'Yesterday',
-      unread: false,
-      clientMatch: 'Chen'
-    }
-  ],
+  inbox: [],
   sent: [],
   scheduled: [],
   queued: []

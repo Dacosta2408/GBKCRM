@@ -134,6 +134,7 @@ export interface Email {
   clientMatch?: string | null;
   scheduledFor?: string;
   clientId?: string;
+  starred?: boolean;
 }
 
 export interface EmailTemplate {
