@@ -396,6 +396,9 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [composeBody, setComposeBody] = useState<string>("");
   const [composeAttachments, setComposeAttachments] = useState<Array<{ name: string; size: string }>>([]);
   const [selectedClientLink, setSelectedClientLink] = useState<string>("");
+  const [clientSearchQuery, setClientSearchQuery] = useState<string>("");
+  const [showClientDropdown, setShowClientDropdown] = useState<boolean>(false);
+  const [composePriority, setComposePriority] = useState<"urgent" | "normal" | "low">("normal");
   const [scheduleSendTime, setScheduleSendTime] = useState<string>("");
   const [isScheduled, setIsScheduled] = useState<boolean>(false);
 
@@ -1845,10 +1848,10 @@ export const EmailView: React.FC<EmailViewProps> = ({
       {/* ── COMPOSE EMAIL DIALOG MODAL OVERLAY (GMAIL PARITY) ── */}
       {isComposeOpen && (
         <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md z-50 flex items-center justify-center p-4 select-none">
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-xl p-5 shadow-2xl relative flex flex-col max-h-[92vh]">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-4xl p-5 shadow-2xl relative flex flex-col max-h-[92vh]">
             <button 
               onClick={() => setIsComposeOpen(false)} 
-              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-bold p-1 hover:bg-[var(--color-surface-2)] rounded text-xs cursor-pointer"
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] font-bold p-1 hover:bg-[var(--color-surface-2)] rounded text-xs cursor-pointer z-10"
             >
               ✕
             </button>
@@ -1857,33 +1860,169 @@ export const EmailView: React.FC<EmailViewProps> = ({
               <Send className="w-4 h-4 text-red-500" /> New Outbound Message
             </h3>
 
-            <div className="mb-2 flex items-center justify-between gap-3 shrink-0">
-              <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-semibold">
-                From Account
-              </span>
-              <span className="text-[10px] font-mono text-[var(--color-text)] bg-[var(--color-surface-2)] px-2.5 py-1 rounded-lg border border-[var(--color-border)]">
-                {loginEmail}
-              </span>
-            </div>
-
-            <form onSubmit={handleSendComposeCommit} className="flex-grow overflow-y-auto flex flex-col gap-3 pr-1">
+            <form onSubmit={handleSendComposeCommit} className="flex-grow overflow-y-auto grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4 min-h-0 pr-1">
               
-              {/* Linked Borrower & Templates */}
-              <div className="grid grid-cols-2 gap-2.5 shrink-0">
-                <div>
-                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Link CRM Client (Optional)</label>
-                  <select 
-                    value={selectedClientLink}
-                    onChange={(e) => setSelectedClientLink(e.target.value)}
-                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none"
-                  >
-                    <option value="">-- Do Not Link Client --</option>
-                    {clients.map(cl => (
-                      <option key={cl.id} value={cl.id}>{cl.first} {cl.last} ({cl.email})</option>
-                    ))}
-                  </select>
+              {/* LEFT COLUMN: METADATA FIELDS */}
+              <div className="flex flex-col gap-3">
+                
+                {/* From Account */}
+                <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[var(--color-surface-2)]/50 border border-[var(--color-border)]">
+                  <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
+                    From Account
+                  </span>
+                  <span className="text-[10px] font-mono text-[var(--color-text)] font-semibold truncate max-w-[180px]">
+                    {loginEmail}
+                  </span>
                 </div>
 
+                {/* CRM Client Search Combobox */}
+                <div className="relative">
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">
+                    Link CRM Client (Optional)
+                  </label>
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={clientSearchQuery || (clients.find(c => c.id === selectedClientLink) ? `${clients.find(c => c.id === selectedClientLink)?.first} ${clients.find(c => c.id === selectedClientLink)?.last}` : "")}
+                      onChange={(e) => {
+                        setClientSearchQuery(e.target.value);
+                        setShowClientDropdown(true);
+                      }}
+                      onFocus={() => setShowClientDropdown(true)}
+                      placeholder="Search client by name or email..."
+                      className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/50 pr-7"
+                    />
+                    {(clientSearchQuery || selectedClientLink) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedClientLink("");
+                          setClientSearchQuery("");
+                          setShowClientDropdown(false);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-xs font-bold p-0.5"
+                        title="Clear client selection"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Combobox Dropdown */}
+                  {showClientDropdown && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowClientDropdown(false)} 
+                      />
+                      <div className="absolute left-0 right-0 top-full mt-1 max-h-40 overflow-y-auto bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 divide-y divide-[var(--color-border)]/50">
+                        {clients
+                          .filter(cl => {
+                            const q = clientSearchQuery.toLowerCase().trim();
+                            if (!q) return true;
+                            return (
+                              cl.first.toLowerCase().includes(q) ||
+                              cl.last.toLowerCase().includes(q) ||
+                              cl.email.toLowerCase().includes(q)
+                            );
+                          })
+                          .map(cl => (
+                            <div 
+                              key={cl.id}
+                              onClick={() => {
+                                setSelectedClientLink(cl.id);
+                                setClientSearchQuery(`${cl.first} ${cl.last}`);
+                                setShowClientDropdown(false);
+                                if (!composeTo) setComposeTo(`${cl.first} ${cl.last}`);
+                                if (!composeToEmail) setComposeToEmail(cl.email);
+                              }}
+                              className="p-2 hover:bg-[var(--color-surface-2)] cursor-pointer text-xs flex items-center justify-between transition-colors"
+                            >
+                              <div>
+                                <div className="font-semibold text-[var(--color-text)]">{cl.first} {cl.last}</div>
+                                <div className="text-[10px] text-[var(--color-text-muted)]">{cl.email}</div>
+                              </div>
+                              {selectedClientLink === cl.id && (
+                                <span className="text-[10px] text-emerald-400 font-bold">Linked</span>
+                              )}
+                            </div>
+                          ))}
+                        {clients.filter(cl => {
+                          const q = clientSearchQuery.toLowerCase().trim();
+                          if (!q) return true;
+                          return (
+                            cl.first.toLowerCase().includes(q) ||
+                            cl.last.toLowerCase().includes(q) ||
+                            cl.email.toLowerCase().includes(q)
+                          );
+                        }).length === 0 && (
+                          <div className="p-2.5 text-xs text-[var(--color-text-muted)] italic">
+                            No matching clients found
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Linked Badge */}
+                  {selectedClientLink && (
+                    <div className="mt-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                      <span>✅ Linked:</span>
+                      <span>
+                        {clients.find(c => c.id === selectedClientLink)
+                          ? `${clients.find(c => c.id === selectedClientLink)?.first} ${clients.find(c => c.id === selectedClientLink)?.last}`
+                          : selectedClientLink}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Priority Flag Selector */}
+                <div>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">
+                    Priority Urgency
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setComposePriority("urgent")}
+                      className={`flex-1 py-1 px-2 text-xs rounded-lg border flex items-center justify-center gap-1 font-bold transition-all cursor-pointer ${
+                        composePriority === "urgent"
+                          ? "bg-red-500/20 text-red-400 border-red-500/50 shadow-sm"
+                          : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"
+                      }`}
+                      title="Urgent Priority"
+                    >
+                      🔴 <span className="text-[10px]">Urgent</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setComposePriority("normal")}
+                      className={`flex-1 py-1 px-2 text-xs rounded-lg border flex items-center justify-center gap-1 font-bold transition-all cursor-pointer ${
+                        composePriority === "normal"
+                          ? "bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-sm"
+                          : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"
+                      }`}
+                      title="Normal Priority"
+                    >
+                      🟡 <span className="text-[10px]">Normal</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setComposePriority("low")}
+                      className={`flex-1 py-1 px-2 text-xs rounded-lg border flex items-center justify-center gap-1 font-bold transition-all cursor-pointer ${
+                        composePriority === "low"
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-sm"
+                          : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-3)]"
+                      }`}
+                      title="Low Priority"
+                    >
+                      🟢 <span className="text-[10px]">Low</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Fast Response Template */}
                 <div>
                   <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Fast Response Template</label>
                   <select 
@@ -1896,98 +2035,127 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     ))}
                   </select>
                 </div>
-              </div>
 
-              {/* Recipient Coordinates & Cc/Bcc toggles */}
-              <div className="flex flex-col gap-2 shrink-0 bg-[var(--color-surface-2)]/30 p-2.5 rounded-xl border border-[var(--color-border)]">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1 grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">To Name</label>
-                      <input 
-                        type="text" 
-                        value={composeTo}
-                        onChange={(e) => setComposeTo(e.target.value)}
-                        placeholder="E.g. David Martinez"
-                        className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">To Email *</label>
-                      <input 
-                        type="email" 
-                        value={composeToEmail}
-                        onChange={(e) => setComposeToEmail(e.target.value)}
-                        required
-                        placeholder="E.g. borrower@example.com"
-                        className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none"
-                      />
+                {/* Recipient Coordinates & Cc/Bcc toggles */}
+                <div className="flex flex-col gap-2 shrink-0 bg-[var(--color-surface-2)]/30 p-2.5 rounded-xl border border-[var(--color-border)]">
+                  {/* Header row: label + Cc/Bcc toggles */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider">Recipients</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowCc(!showCc)}
+                        className={`px-2 py-1 text-[10px] font-bold rounded transition-colors cursor-pointer border ${showCc ? "bg-red-600/10 text-red-400 border-red-500/20" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] border-transparent"}`}
+                      >
+                        Cc
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowBcc(!showBcc)}
+                        className={`px-2 py-1 text-[10px] font-bold rounded transition-colors cursor-pointer border ${showBcc ? "bg-red-600/10 text-red-400 border-red-500/20" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] border-transparent"}`}
+                      >
+                        Bcc
+                      </button>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-1 pt-3 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setShowCc(!showCc)}
-                      className={`px-2 py-1 text-[10px] font-bold rounded transition-colors cursor-pointer border ${showCc ? "bg-red-600/10 text-red-400 border-red-500/20" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] border-transparent"}`}
-                    >
-                      Cc
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowBcc(!showBcc)}
-                      className={`px-2 py-1 text-[10px] font-bold rounded transition-colors cursor-pointer border ${showBcc ? "bg-red-600/10 text-red-400 border-red-500/20" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] border-transparent"}`}
-                    >
-                      Bcc
-                    </button>
+                  {/* To Name - full width */}
+                  <div>
+                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">To Name</label>
+                    <input
+                      type="text"
+                      value={composeTo}
+                      onChange={(e) => setComposeTo(e.target.value)}
+                      placeholder="E.g. David Martinez"
+                      className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                    />
                   </div>
+                  {/* To Email - full width */}
+                  <div>
+                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">To Email *</label>
+                    <input
+                      type="email"
+                      value={composeToEmail}
+                      onChange={(e) => setComposeToEmail(e.target.value)}
+                      required
+                      placeholder="E.g. borrower@example.com"
+                      className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                    />
+                  </div>
+                  {/* Optional Cc input */}
+                  {showCc && (
+                    <div className="animate-fade-in">
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">Cc Email</label>
+                      <input
+                        type="email"
+                        value={composeCc}
+                        onChange={(e) => setComposeCc(e.target.value)}
+                        placeholder="E.g. lawyer@realestatellp.com"
+                        className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                      />
+                    </div>
+                  )}
+                  {/* Optional Bcc input */}
+                  {showBcc && (
+                    <div className="animate-fade-in">
+                      <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">Bcc Email</label>
+                      <input
+                        type="email"
+                        value={composeBcc}
+                        onChange={(e) => setComposeBcc(e.target.value)}
+                        placeholder="E.g. archive@example.com"
+                        className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* Optional Cc input */}
-                {showCc && (
-                  <div className="animate-fade-in">
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">Cc Email</label>
-                    <input 
-                      type="email" 
-                      value={composeCc}
-                      onChange={(e) => setComposeCc(e.target.value)}
-                      placeholder="E.g. lawyer@realestatellp.com"
-                      className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none"
-                    />
-                  </div>
-                )}
+                {/* Subject */}
+                <div>
+                  <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">Subject Title *</label>
+                  <input 
+                    type="text" 
+                    value={composeSubject}
+                    onChange={(e) => setComposeSubject(e.target.value)}
+                    required
+                    placeholder="Subject title..."
+                    className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
+                  />
+                </div>
 
-                {/* Optional Bcc input */}
-                {showBcc && (
-                  <div className="animate-fade-in">
-                    <label className="block text-[9px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5 tracking-wider">Bcc Email</label>
-                    <input 
-                      type="email" 
-                      value={composeBcc}
-                      onChange={(e) => setComposeBcc(e.target.value)}
-                      placeholder="E.g. archive@example.com"
-                      className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none"
-                    />
+                {/* Campaign Schedule Toggle */}
+                <div className="p-2.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        id="scheduleToggle" 
+                        checked={isScheduled} 
+                        onChange={(e) => setIsScheduled(e.target.checked)}
+                        className="rounded text-red-500 bg-[var(--color-surface)] border-[var(--color-border)]/15 cursor-pointer"
+                      />
+                      <label htmlFor="scheduleToggle" className="text-xs font-semibold text-[var(--color-text-muted)] cursor-pointer select-none flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" /> Schedule Delivery
+                      </label>
+                    </div>
                   </div>
-                )}
+
+                  {isScheduled && (
+                    <input 
+                      type="datetime-local" 
+                      value={scheduleSendTime}
+                      onChange={(e) => setScheduleSendTime(e.target.value)}
+                      className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded px-2 py-1 text-[10px] text-[var(--color-text)] focus:outline-none font-mono"
+                    />
+                  )}
+                </div>
+
               </div>
 
-              {/* Subject */}
-              <div className="shrink-0">
-                <input 
-                  type="text" 
-                  value={composeSubject}
-                  onChange={(e) => setComposeSubject(e.target.value)}
-                  required
-                  placeholder="Subject title..."
-                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
-                />
-              </div>
-
-              {/* Body & Rich Actions Toolbar */}
-              <div className="flex-grow flex flex-col min-h-0 relative border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-surface-2)]/30">
+              {/* RIGHT COLUMN: FULL-HEIGHT MESSAGE BODY & ACTIONS */}
+              <div className="flex flex-col gap-2 min-h-[380px] h-full border border-[var(--color-border)] rounded-xl p-3 bg-[var(--color-surface-2)]/30">
+                
                 {/* Rich Toolbar */}
-                <div className="flex items-center justify-between p-2 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs">
+                <div className="flex items-center justify-between p-2 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/60 text-xs rounded-t-lg shrink-0">
                   <div className="flex items-center gap-1 text-[var(--color-text-muted)]">
                     <label className="px-2 py-1 hover:bg-[var(--color-surface-3)] rounded hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1 text-[10px] font-medium" title="Attach file">
                       <Paperclip className="w-3.5 h-3.5 text-red-400" /> Attach
@@ -2018,7 +2186,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
                 {/* AI Write Instruction Popup */}
                 {showAiWritePopup && (
-                  <div className="p-2.5 bg-amber-500/10 border-b border-[var(--color-border)] flex flex-col gap-2 text-xs select-none">
+                  <div className="p-2.5 bg-amber-500/10 border-b border-[var(--color-border)] flex flex-col gap-2 text-xs select-none rounded-lg shrink-0">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-amber-300 text-[10px] uppercase tracking-wider flex items-center gap-1">
                         <Sparkles className="w-3.5 h-3.5 text-amber-400" /> AI Email Writer Prompt
@@ -2068,18 +2236,18 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   </div>
                 )}
 
+                {/* Textarea expanding to fill available vertical space */}
                 <textarea 
                   value={composeBody}
                   onChange={(e) => setComposeBody(e.target.value)}
                   required
-                  rows={8}
-                  placeholder="Write message here..."
-                  className="w-full flex-grow bg-transparent p-3 text-xs text-[var(--color-text)] focus:outline-none font-sans leading-relaxed resize-none h-44"
+                  placeholder="Write message body here..."
+                  className="w-full flex-grow min-h-[320px] bg-transparent p-3 text-xs text-[var(--color-text)] focus:outline-none font-sans leading-relaxed resize-none border border-[var(--color-border)]/60 rounded-lg bg-[var(--color-surface)]/40"
                 />
 
                 {/* Attachments chips display */}
                 {composeAttachments.length > 0 && (
-                  <div className="p-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] flex flex-wrap gap-1.5">
+                  <div className="p-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] flex flex-wrap gap-1.5 rounded-b-lg shrink-0">
                     {composeAttachments.map((att, i) => (
                       <span key={i} className="inline-flex items-center gap-1 bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[10px] text-[var(--color-text)] px-2 py-0.5 rounded-full font-mono">
                         <Paperclip className="w-3 h-3 text-emerald-400" />
@@ -2089,61 +2257,43 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     ))}
                   </div>
                 )}
-              </div>
 
-              {/* Campaign Schedule Toggle */}
-              <div className="p-2.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl shrink-0 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="scheduleToggle" 
-                    checked={isScheduled} 
-                    onChange={(e) => setIsScheduled(e.target.checked)}
-                    className="rounded text-red-500 bg-[var(--color-surface)] border-[var(--color-border)]/15 cursor-pointer"
-                  />
-                  <label htmlFor="scheduleToggle" className="text-xs font-semibold text-[var(--color-text-muted)] cursor-pointer select-none flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-400" /> Schedule Delivery
-                  </label>
+                {/* Live Word / Character Counter */}
+                <div className="flex justify-end items-center text-[9px] text-[var(--color-text-muted)] font-mono px-1 shrink-0">
+                  Words: {composeBody.trim() ? composeBody.trim().split(/\s+/).length : 0} | Chars: {composeBody.length}
                 </div>
 
-                {isScheduled && (
-                  <input 
-                    type="datetime-local" 
-                    value={scheduleSendTime}
-                    onChange={(e) => setScheduleSendTime(e.target.value)}
-                    className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded px-2 py-1 text-[10px] text-[var(--color-text)] focus:outline-none font-mono"
-                  />
-                )}
-              </div>
-
-              {/* Submit triggers */}
-              <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)] shrink-0 select-none">
-                <button
-                  type="button"
-                  onClick={() => setIsComposeOpen(false)}
-                  className="p-2 text-[var(--color-text-muted)] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
-                  title="Discard draft"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    onClick={handleSaveDraft}
-                    className="px-3.5 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
+                {/* Action Buttons Bar at bottom of right column */}
+                <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border)] mt-auto select-none shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsComposeOpen(false)}
+                    className="p-2 text-[var(--color-text-muted)] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                    title="Discard draft"
                   >
-                    Save Draft
+                    <Trash2 className="w-4 h-4" />
                   </button>
-                  <button 
-                    type="submit" 
-                    className="px-5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-red-950/20 cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5" /> 
-                    {isScheduled ? "Queue Delivery" : "Send Message"}
-                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button 
+                      type="button" 
+                      onClick={handleSaveDraft}
+                      className="px-3.5 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all cursor-pointer"
+                    >
+                      Save Draft
+                    </button>
+                    <button 
+                      type="submit" 
+                      className="px-5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-red-950/20 cursor-pointer"
+                    >
+                      <Send className="w-3.5 h-3.5" /> 
+                      {isScheduled ? "Queue Delivery" : "Send Message"}
+                    </button>
+                  </div>
                 </div>
+
               </div>
+
             </form>
           </div>
         </div>
