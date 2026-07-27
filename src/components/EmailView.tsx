@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { GoogleGenAI } from "@google/genai";
 import { 
   Mail, Star, Send, FileText, Trash2, ArrowLeft, RefreshCw, MailOpen, 
   User, CheckCircle2, AlertCircle, Plus, Calendar, Clock, Lock, 
@@ -26,6 +27,7 @@ interface EmailViewProps {
   logActivity?: (action: string, target?: string) => void;
   docVault?: Record<string, any>;
   setDocVault?: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  bridgeOnline?: boolean;
 }
 
 const MORTGAGE_PREPARED_TEMPLATES = [
@@ -118,6 +120,50 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [smtpUsername, setSmtpUsername] = useState<string>(loginEmail || "");
   const [smtpPassword, setSmtpPassword] = useState<string>("");
 
+  const autoDetectSmtpSettings = (email: string) => {
+    if (!email || !email.includes("@")) return;
+    const parts = email.split("@");
+    const domain = parts[1]?.toLowerCase().trim();
+    if (!domain) return;
+
+    let host = "";
+    let port = "587";
+
+    if (domain === "gmail.com" || domain === "googlemail.com") {
+      host = "smtp.gmail.com";
+      port = "587";
+    } else if (domain === "outlook.com" || domain === "hotmail.com" || domain === "live.com" || domain === "msn.com" || domain === "office365.com") {
+      host = "smtp.office365.com";
+      port = "587";
+    } else if (domain === "yahoo.com" || domain === "yahoo.ca" || domain === "ymail.com") {
+      host = "smtp.mail.yahoo.com";
+      port = "587";
+    } else if (domain === "icloud.com" || domain === "me.com" || domain === "mac.com") {
+      host = "smtp.mail.me.com";
+      port = "587";
+    } else if (domain === "aol.com") {
+      host = "smtp.aol.com";
+      port = "587";
+    } else if (domain === "zoho.com") {
+      host = "smtp.zoho.com";
+      port = "587";
+    } else if (domain === "mail.com") {
+      host = "smtp.mail.com";
+      port = "587";
+    }
+
+    if (host) {
+      setSmtpHost(host);
+      setSmtpPort(port);
+    }
+  };
+
+  const handleSmtpUsernameChange = (val: string) => {
+    setSmtpUsername(val);
+    setLoginEmail(val);
+    autoDetectSmtpSettings(val);
+  };
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     const savedFlag = localStorage.getItem("gbk_gmail_smtp_configured") === "true";
     return savedFlag;
@@ -144,6 +190,176 @@ export const EmailView: React.FC<EmailViewProps> = ({
 
   const [activeFolder, setActiveFolder] = useState<string>("inbox");
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+
+  // ── AI SUMMARIZE STATES & HANDLER ──
+  const [summaryText, setSummaryText] = useState<string>("");
+  const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [showSummaryPanel, setShowSummaryPanel] = useState<boolean>(false);
+
+  useEffect(() => {
+    setSummaryText("");
+    setSummaryError(null);
+    setShowSummaryPanel(false);
+  }, [selectedEmail?.id]);
+
+  const handleSummarizeEmail = async () => {
+    if (!selectedEmail) return;
+    const emailText = selectedEmail.body || selectedEmail.preview || "";
+    if (!emailText.trim()) {
+      showToast("Selected email has no content to summarize.", "info");
+      return;
+    }
+
+    setIsSummarizing(true);
+    setShowSummaryPanel(true);
+    setSummaryText("");
+    setSummaryError(null);
+
+    try {
+      const promptText = `Summarize this email in 2–3 sentences for a mortgage broker CRM.\n\nEmail Content:\n${emailText}`;
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== "undefined" ? process.env.VITE_GEMINI_API_KEY : "");
+
+      let responseText = "";
+
+      if (apiKey && apiKey.trim() !== "" && apiKey !== "undefined") {
+        const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: promptText
+        });
+        responseText = response.text || "";
+      } else {
+        // Fallback to server route if client VITE_GEMINI_API_KEY is not set
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: promptText,
+            history: []
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to generate AI summary");
+        responseText = data.reply || "";
+      }
+
+      if (!responseText.trim()) {
+        throw new Error("Empty summary received from Gemini API.");
+      }
+
+      setSummaryText(responseText.trim());
+    } catch (err: any) {
+      console.error("AI Summarize error:", err);
+      setSummaryError(err.message || "Failed to generate AI summary.");
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
+  // ── SMART REPLIES STATES & HANDLERS ──
+  const [smartReplies, setSmartReplies] = useState<string[]>([]);
+  const [isGeneratingSmartReplies, setIsGeneratingSmartReplies] = useState<boolean>(false);
+  const [smartRepliesError, setSmartRepliesError] = useState<string | null>(null);
+
+  const handleFetchSmartReplies = async (targetEmail?: Email) => {
+    const emailToUse = targetEmail || selectedEmail;
+    if (!emailToUse) return;
+    const bodyText = emailToUse.body || emailToUse.preview || "";
+    if (!bodyText.trim()) return;
+
+    setIsGeneratingSmartReplies(true);
+    setSmartRepliesError(null);
+
+    try {
+      const promptText = `Suggest 3 short professional reply options for a mortgage broker. Return as JSON array of strings.\n\nEmail Content:\n${bodyText}`;
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== "undefined" ? process.env.VITE_GEMINI_API_KEY : "");
+
+      let responseText = "";
+
+      if (apiKey && apiKey.trim() !== "" && apiKey !== "undefined") {
+        const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: promptText
+        });
+        responseText = response.text || "";
+      } else {
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: promptText,
+            history: []
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch smart replies");
+        responseText = data.reply || "";
+      }
+
+      let cleaned = responseText.trim();
+      if (cleaned.startsWith("```")) {
+        cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+      }
+
+      let parsed: string[] = [];
+      try {
+        const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        } else {
+          parsed = JSON.parse(cleaned);
+        }
+      } catch (pErr) {
+        parsed = cleaned
+          .split("\n")
+          .map(line => line.replace(/^[0-9+\-*."'\s]+/, "").trim())
+          .filter(Boolean)
+          .slice(0, 3);
+      }
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setSmartReplies(parsed.slice(0, 3));
+      } else {
+        throw new Error("Could not parse smart replies array");
+      }
+    } catch (err: any) {
+      console.error("Smart replies error:", err);
+      setSmartRepliesError("Failed to generate smart replies");
+      setSmartReplies([
+        "Thank you for sending this over. I'm reviewing the details now and will get back to you shortly.",
+        "Got it! I've updated your file in our system and will let you know if anything else is needed.",
+        "Thanks! Let's schedule a brief phone call to discuss the next steps."
+      ]);
+    } finally {
+      setIsGeneratingSmartReplies(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedEmail) {
+      setSmartReplies([]);
+      handleFetchSmartReplies(selectedEmail);
+    }
+  }, [selectedEmail?.id]);
+
+  const handleSelectSmartReply = (replyText: string) => {
+    if (!selectedEmail) return;
+    const recipientEmail = selectedEmail.fromEmail || loginEmail || "VDacosta247@gmail.com";
+    const recipientName = selectedEmail.from || recipientEmail;
+
+    setComposeTo(recipientName);
+    setComposeToEmail(recipientEmail);
+    const origSubj = selectedEmail.subject || "Inquiry";
+    setComposeSubject(origSubj.toLowerCase().startsWith("re:") ? origSubj : `Re: ${origSubj}`);
+    setComposeBody(replyText);
+    if (selectedEmail.clientId) {
+      setSelectedClientLink(selectedEmail.clientId);
+    }
+    setIsComposeOpen(true);
+    showToast("Smart reply loaded into Compose modal!", "info");
+  };
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [mailboxScope, setMailboxScope] = useState<string>("personal");
   const [signatureText, setSignatureText] = useState<string>(() => {
@@ -217,7 +433,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [isEventWizardOpen, setIsEventWizardOpen] = useState<boolean>(false);
   const [eventWizardTitle, setEventWizardTitle] = useState<string>("");
   const [eventWizardDate, setEventWizardDate] = useState<string>(new Date(Date.now() + 172800000).toISOString().split("T")[0]);
-  const [eventWizardTime, setEventWizardTime] = useState<string>("10:00 AM");
+  const [eventWizardTime, setEventWizardTime] = useState<string>("10:00");
   const [eventWizardType, setEventWizardType] = useState<"client" | "meeting" | "lender" | "personal">("client");
   const [eventWizardNotes, setEventWizardNotes] = useState<string>("");
 
@@ -235,6 +451,61 @@ export const EmailView: React.FC<EmailViewProps> = ({
   const [selectedClientLink, setSelectedClientLink] = useState<string>("");
   const [scheduleSendTime, setScheduleSendTime] = useState<string>("");
   const [isScheduled, setIsScheduled] = useState<boolean>(false);
+
+  // ── AI WRITE STATES & HANDLER ──
+  const [showAiWritePopup, setShowAiWritePopup] = useState<boolean>(false);
+  const [aiWriteInstruction, setAiWriteInstruction] = useState<string>("");
+  const [isGeneratingAiWrite, setIsGeneratingAiWrite] = useState<boolean>(false);
+  const [aiWriteError, setAiWriteError] = useState<string | null>(null);
+
+  const handleAiWriteSubmit = async () => {
+    if (!aiWriteInstruction.trim()) return;
+    setIsGeneratingAiWrite(true);
+    setAiWriteError(null);
+
+    const currentUserName = currentUser?.name || currentUser?.displayName || (currentUser?.first ? `${currentUser.first} ${currentUser.last || ''}`.trim() : "") || "David Acosta";
+    const promptText = `Write a professional mortgage broker email based on this instruction: ${aiWriteInstruction.trim()}. Sign off as ${currentUserName}, GBK Financial.`;
+
+    try {
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== "undefined" ? process.env.VITE_GEMINI_API_KEY : "");
+      let generatedText = "";
+
+      if (apiKey && apiKey.trim() !== "" && apiKey !== "undefined") {
+        const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: promptText
+        });
+        generatedText = response.text || "";
+      } else {
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: promptText,
+            history: []
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to generate email content");
+        generatedText = data.reply || "";
+      }
+
+      if (!generatedText.trim()) {
+        throw new Error("No response generated from Gemini API.");
+      }
+
+      setComposeBody(generatedText.trim());
+      setShowAiWritePopup(false);
+      setAiWriteInstruction("");
+      showToast("AI email draft generated and inserted!", "success");
+    } catch (err: any) {
+      console.error("AI Write error:", err);
+      setAiWriteError(err.message || "Failed to generate AI email text");
+    } finally {
+      setIsGeneratingAiWrite(false);
+    }
+  };
 
   // ── GMAIL SMTP CONNECT & DISCONNECT WORKFLOW ──
   const handleGoogleLogin = () => {
@@ -538,10 +809,72 @@ export const EmailView: React.FC<EmailViewProps> = ({
   };
 
   // TRIGGER CREATE TASK Popover
-  const handleOpenTaskWizard = () => {
+  const handleOpenTaskWizard = async () => {
     if (!selectedEmail) return;
-    setTaskWizardTitle(`Follow up on: ${selectedEmail.subject}`);
+
+    const fallbackTitle = `Follow up on: ${selectedEmail.subject}`;
+    setTaskWizardTitle(fallbackTitle);
+    setTaskWizardPriority("high");
     setTaskWizardNotes(`Transposed from Email received from ${selectedEmail.from} (${selectedEmail.fromEmail}):\n\n"${selectedEmail.preview || selectedEmail.body?.substring(0, 300)}"`);
+
+    const emailBody = selectedEmail.body || selectedEmail.preview || "";
+
+    if (emailBody.trim()) {
+      try {
+        const promptText = `Extract the main action item and urgency (high/medium/low) from this email: ${emailBody}. Return JSON: {title, priority}.`;
+        const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== "undefined" ? process.env.VITE_GEMINI_API_KEY : "");
+
+        let responseText = "";
+
+        if (apiKey && apiKey.trim() !== "" && apiKey !== "undefined") {
+          const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: promptText
+          });
+          responseText = response.text || "";
+        } else {
+          const res = await fetch("/api/ai/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: promptText,
+              history: []
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to extract task details");
+          responseText = data.reply || "";
+        }
+
+        let cleaned = responseText.trim();
+        if (cleaned.startsWith("```")) {
+          cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+        }
+
+        let parsed: { title?: string; priority?: string } = {};
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        } else if (cleaned) {
+          parsed = JSON.parse(cleaned);
+        }
+
+        if (parsed.title && typeof parsed.title === "string" && parsed.title.trim()) {
+          setTaskWizardTitle(parsed.title.trim());
+        }
+
+        if (parsed.priority && typeof parsed.priority === "string") {
+          const normPriority = parsed.priority.toLowerCase().trim();
+          if (normPriority === "high" || normPriority === "medium" || normPriority === "low") {
+            setTaskWizardPriority(normPriority as "high" | "medium" | "low");
+          }
+        }
+      } catch (err) {
+        console.error("AI task extraction error:", err);
+      }
+    }
+
     setIsTaskWizardOpen(true);
   };
 
@@ -580,11 +913,90 @@ export const EmailView: React.FC<EmailViewProps> = ({
     }
   };
 
-  // TRIGGER EVENT MEETING POPUP
-  const handleOpenEventWizard = () => {
+  // TRIGGER EVENT MEETING POPUP WITH AI EXTRACTION
+  const handleOpenEventWizard = async () => {
     if (!selectedEmail) return;
-    setEventWizardTitle(`Meeting with ${selectedEmail.from}`);
+
+    // Set fallback defaults
+    const fallbackTitle = `Meeting with ${selectedEmail.from}`;
+    const fallbackDate = new Date(Date.now() + 172800000).toISOString().split("T")[0];
+    const fallbackTime = "10:00";
+
+    setEventWizardTitle(fallbackTitle);
+    setEventWizardDate(fallbackDate);
+    setEventWizardTime(fallbackTime);
     setEventWizardNotes(`Inbound Callback request stemming from:\n"${selectedEmail.subject}"`);
+
+    const emailBody = selectedEmail.body || selectedEmail.preview || "";
+
+    if (emailBody.trim()) {
+      try {
+        const promptText = `Extract meeting date, time, and title from this email: ${emailBody}. Return JSON: {title, date (YYYY-MM-DD), time (HH:MM)}.`;
+        const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== "undefined" ? process.env.VITE_GEMINI_API_KEY : "");
+
+        let responseText = "";
+
+        if (apiKey && apiKey.trim() !== "" && apiKey !== "undefined") {
+          const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: promptText
+          });
+          responseText = response.text || "";
+        } else {
+          const res = await fetch("/api/ai/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: promptText,
+              history: []
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to extract meeting details");
+          responseText = data.reply || "";
+        }
+
+        let cleaned = responseText.trim();
+        if (cleaned.startsWith("```")) {
+          cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+        }
+
+        let parsed: { title?: string; date?: string; time?: string } = {};
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        } else if (cleaned) {
+          parsed = JSON.parse(cleaned);
+        }
+
+        let hasDetails = false;
+        if (parsed.title && typeof parsed.title === "string" && parsed.title.trim()) {
+          setEventWizardTitle(parsed.title.trim());
+          hasDetails = true;
+        }
+        if (parsed.date && typeof parsed.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.date.trim())) {
+          setEventWizardDate(parsed.date.trim());
+          hasDetails = true;
+        }
+        if (parsed.time && typeof parsed.time === "string" && parsed.time.trim()) {
+          let timeVal = parsed.time.trim();
+          if (/^\d{1,2}:\d{2}$/.test(timeVal)) {
+            const [h, m] = timeVal.split(":");
+            timeVal = `${h.padStart(2, "0")}:${m}`;
+          }
+          setEventWizardTime(timeVal);
+          hasDetails = true;
+        }
+
+        if (hasDetails) {
+          showToast("AI detected meeting details", "success");
+        }
+      } catch (err) {
+        console.error("AI meeting extraction error:", err);
+      }
+    }
+
     setIsEventWizardOpen(true);
   };
 
@@ -1025,6 +1437,14 @@ export const EmailView: React.FC<EmailViewProps> = ({
               Use a 16-character Gmail App Password (myaccount.google.com/apppasswords)
             </span>
           </div>
+
+          {isLoggedIn && !smtpPassword && (
+            <div className="mb-2.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-md text-amber-400 text-[11px] flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>App password required each session for security — please re-enter to enable sending.</span>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
             <div>
               <label className="text-[10px] text-[var(--color-text-muted)] font-medium mb-1 block">SMTP Host</label>
@@ -1049,7 +1469,7 @@ export const EmailView: React.FC<EmailViewProps> = ({
               <input
                 placeholder="david.acosta@gbkfinancial.ca"
                 value={smtpUsername}
-                onChange={e => setSmtpUsername(e.target.value)}
+                onChange={e => handleSmtpUsernameChange(e.target.value)}
                 className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded px-2.5 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-red-500/50"
               />
             </div>
@@ -1330,17 +1750,17 @@ export const EmailView: React.FC<EmailViewProps> = ({
                       <button
                         onClick={() => {
                           if (!selectedEmail) return;
-                          setEmailsState(prev => {
-                            const key = activeFolder as keyof typeof prev;
-                            if (!key || !prev[key]) return prev;
-                            return {
-                              ...prev,
-                              [key]: prev[key].map(item =>
-                                item.id === selectedEmail.id ? { ...item, unread: true } : item
-                              )
-                            };
-                          });
-                          setSelectedEmail({ ...selectedEmail, unread: true });
+                          const updateArr = (arr: Email[]) => (arr || []).map(item => item.id === selectedEmail.id ? { ...item, unread: true } : item);
+                          setEmailsState(prev => ({
+                            inbox: updateArr(prev.inbox),
+                            sent: updateArr(prev.sent),
+                            scheduled: updateArr(prev.scheduled),
+                            queued: updateArr(prev.queued || [])
+                          }));
+                          setDraftsList(updateArr);
+                          setArchivedList(updateArr);
+                          setTrashList(updateArr);
+                          setSelectedEmail(prev => prev ? { ...prev, unread: true } : null);
                         }}
                         className="px-2 py-1 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] border border-[var(--color-border)] rounded text-[10px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] flex items-center gap-1 cursor-pointer"
                       >
@@ -1407,6 +1827,20 @@ export const EmailView: React.FC<EmailViewProps> = ({
                       <MessageSquare className="w-3.5 h-3.5 text-teal-400" /> Mobile SMS
                     </button>
                   )}
+
+                  {/* Action 6: AI Summarize */}
+                  <button 
+                    onClick={handleSummarizeEmail}
+                    disabled={isSummarizing}
+                    className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1.5 rounded text-[10px] font-bold flex items-center gap-1.5 shadow-md shadow-black/30 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isSummarizing ? (
+                      <RefreshCw className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    )}
+                    AI Summarize
+                  </button>
                 </div>
               </div>
 
@@ -1438,63 +1872,143 @@ export const EmailView: React.FC<EmailViewProps> = ({
                   {selectedEmail.body || selectedEmail.preview || "No transcript content."}
                 </div>
 
-                {/* ── ATTACHMENTS VAULT SECTION ── */}
-                {selectedEmail.clientMatch ? (
-                  <div className="mt-6 border-t border-[var(--color-border)] pt-4 select-none">
-                    <span className="block text-[10px] uppercase font-bold tracking-wider text-red-400 mb-3 flex items-center gap-1">
-                      <Paperclip className="w-3.5 h-3.5" /> Extracted Secure Email Attachments ({selectedEmail.clientMatch === "Thompson" ? "2 Files" : "1 File"})
-                    </span>
-
-                    {/* MOCK SENDER SPECIFIC FILES EXTRAPOLATION */}
-                    {selectedEmail.clientMatch === "Thompson" && (
-                      <div className="flex flex-col gap-2">
-                        {[
-                          { id: "paystubs", label: "Borrower_Paystubs_3_Months.pdf", size: "1.4 MB", extCode: "paystubs" },
-                          { id: "t4_current", label: "CRA_T4_NoticeOfAssessment_Sarah.pdf", size: "870 KB", extCode: "noa_current" }
-                        ].map((doc) => {
-                          const isAlreadyMapped = docVault[activeMatchedClient?.id || ""]?.[doc.extCode]?.status === "received";
-                          return (
-                            <div key={doc.id} className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
-                              <div className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
-                                <div>
-                                  <div className="text-xs font-semibold text-[var(--color-text)]">{doc.label}</div>
-                                  <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5 font-mono">Secured Vault Stream • {doc.size}</div>
-                                </div>
-                              </div>
-
-                              <button 
-                                onClick={() => handleSaveAttachmentToVault(doc.label, activeMatchedClient?.id || "c_smith", doc.extCode)}
-                                className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border transition-all cursor-pointer ${isAlreadyMapped ? "bg-emerald-950/20 text-emerald-400 border-emerald-900" : "bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border-[var(--color-accent)]/20 text-[var(--color-accent)]"}`}
-                              >
-                                {isAlreadyMapped ? "✓ Imported & Mapped in CRM" : "📁 Save to CRM Dossier"}
-                              </button>
-                            </div>
-                          );
-                        })}
+                {/* ── COLLAPSIBLE AI SUMMARY PANEL ── */}
+                {showSummaryPanel && (
+                  <div className="mt-3 p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl transition-all select-none">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-500/20">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                        <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>AI Email Summary</span>
                       </div>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => setShowSummaryPanel(false)}
+                        className="text-[10px] text-amber-400/80 hover:text-amber-300 font-semibold px-2 py-0.5 rounded hover:bg-amber-500/20 transition-colors cursor-pointer"
+                      >
+                        Collapse
+                      </button>
+                    </div>
 
-                    {selectedEmail.clientMatch === "Martinez" && (
-                      <div className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <div>
-                            <div className="text-xs font-semibold text-[var(--color-text)]">Appraisal_Invoice_Payment_Receipt.pdf</div>
-                            <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5 font-mono">Receipt Archive • 345 KB</div>
-                          </div>
+                    {isSummarizing ? (
+                      <div className="flex items-center gap-2 text-xs text-amber-300/90 py-2">
+                        <RefreshCw className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
+                        <span>Generating summary for mortgage broker CRM...</span>
+                      </div>
+                    ) : summaryError ? (
+                      <div className="text-xs text-red-400 py-1 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+                        <div>
+                          <span>{summaryError}</span>
+                          <button
+                            onClick={handleSummarizeEmail}
+                            className="block mt-1 text-[10px] font-bold underline hover:text-red-300 cursor-pointer"
+                          >
+                            Retry
+                          </button>
                         </div>
-
-                        <button 
-                          onClick={() => handleSaveAttachmentToVault("Appraisal_Invoice_Payment_Receipt.pdf", activeMatchedClient?.id || "c_smith", "emp_letter")}
-                          className="bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/20 text-[var(--color-accent)] text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded cursor-pointer"
-                        >
-                          📁 Save to CRM Dossier
-                        </button>
                       </div>
+                    ) : summaryText ? (
+                      <p className="text-xs text-[var(--color-text)] leading-relaxed whitespace-pre-wrap select-text">
+                        {summaryText}
+                      </p>
+                    ) : null}
+                  </div>
+                )}
+
+                {/* ── SMART REPLIES ROW ── */}
+                <div className="mt-4 pt-3 border-t border-[var(--color-border)]/60 select-none">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Smart Replies
+                    </span>
+                    {isGeneratingSmartReplies && (
+                      <span className="text-[10px] text-amber-400/80 flex items-center gap-1 font-mono">
+                        <RefreshCw className="w-3 h-3 animate-spin" /> Generating AI replies...
+                      </span>
                     )}
                   </div>
-                ) : null}
+
+                  {isGeneratingSmartReplies ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {[1, 2, 3].map((n) => (
+                        <div key={n} className="h-16 bg-[var(--color-surface-2)]/50 rounded-xl border border-[var(--color-border)] animate-pulse p-2.5 flex flex-col justify-center gap-1.5">
+                          <div className="h-2.5 bg-amber-500/20 rounded w-3/4"></div>
+                          <div className="h-2 bg-[var(--color-text-muted)]/20 rounded w-1/2"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : smartReplies.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {smartReplies.map((reply, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSelectSmartReply(reply)}
+                          className="p-3 bg-[var(--color-surface-2)]/60 hover:bg-amber-500/10 border border-[var(--color-border)] hover:border-amber-500/40 rounded-xl text-left transition-all group cursor-pointer flex flex-col justify-between"
+                          title="Click to compose reply"
+                        >
+                          <p className="text-xs text-[var(--color-text)] group-hover:text-amber-200 line-clamp-3 leading-snug">
+                            "{reply}"
+                          </p>
+                          <div className="mt-2 text-[9px] font-bold uppercase tracking-wider text-amber-400/80 flex items-center gap-1 group-hover:text-amber-300">
+                            <span>Use Reply</span>
+                            <span className="text-[11px]">→</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleFetchSmartReplies()}
+                      className="text-xs text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1 underline cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" /> Generate Smart Replies
+                    </button>
+                  )}
+                </div>
+
+                {/* ── ATTACHMENTS VAULT SECTION ── */}
+                <div className="mt-6 border-t border-[var(--color-border)] pt-4 select-none">
+                  <span className="block text-[10px] uppercase font-bold tracking-wider text-red-400 mb-3 flex items-center gap-1">
+                    <Paperclip className="w-3.5 h-3.5" /> Extracted Secure Email Attachments ({selectedEmail.attachments?.length || 0} {selectedEmail.attachments?.length === 1 ? "File" : "Files"})
+                  </span>
+
+                  {selectedEmail.attachments && selectedEmail.attachments.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {selectedEmail.attachments.map((doc, idx) => {
+                        const fileLabel = doc.label || doc.name || doc.filename || `Attachment_${idx + 1}.pdf`;
+                        const fileSize = doc.size || "Secured Stream";
+                        const extCode = doc.extCode || doc.id || `doc_${idx}`;
+                        const targetClientId = activeMatchedClient?.id || selectedEmail.clientId || "c_smith";
+                        const isAlreadyMapped = docVault[targetClientId]?.[extCode]?.status === "received";
+
+                        return (
+                          <div key={doc.id || idx} className="p-3 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
+                              <div>
+                                <div className="text-xs font-semibold text-[var(--color-text)]">{fileLabel}</div>
+                                <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5 font-mono">Secured Vault Stream • {fileSize}</div>
+                              </div>
+                            </div>
+
+                            <button 
+                              onClick={() => handleSaveAttachmentToVault(fileLabel, targetClientId, extCode)}
+                              className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border transition-all cursor-pointer ${isAlreadyMapped ? "bg-emerald-950/20 text-emerald-400 border-emerald-900" : "bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border-[var(--color-accent)]/20 text-[var(--color-accent)]"}`}
+                            >
+                              {isAlreadyMapped ? "✓ Imported & Mapped in CRM" : "📁 Save to CRM Dossier"}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[var(--color-text-muted)] italic">
+                      No attachments detected in this message.
+                    </p>
+                  )}
+                </div>
 
               </div>
             </div>
@@ -1669,9 +2183,72 @@ export const EmailView: React.FC<EmailViewProps> = ({
                     >
                       <Sliders className="w-3.5 h-3.5 text-blue-400" /> Signature
                     </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setShowAiWritePopup(prev => !prev);
+                        setAiWriteError(null);
+                      }}
+                      className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded cursor-pointer flex items-center gap-1 text-[10px] font-bold transition-all" 
+                      title="AI Email Writer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> AI Write
+                    </button>
                   </div>
                   <span className="text-[9px] text-[var(--color-text-faint)] font-mono">Gmail Rich Composer</span>
                 </div>
+
+                {/* AI Write Instruction Popup */}
+                {showAiWritePopup && (
+                  <div className="p-2.5 bg-amber-500/10 border-b border-[var(--color-border)] flex flex-col gap-2 text-xs select-none">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-amber-300 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" /> AI Email Writer Prompt
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowAiWritePopup(false)}
+                        className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="E.g., Ask client for missing NOA documents..."
+                        value={aiWriteInstruction}
+                        onChange={(e) => setAiWriteInstruction(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAiWriteSubmit();
+                          }
+                        }}
+                        className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs text-[var(--color-text)] focus:outline-none focus:border-amber-500/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAiWriteSubmit}
+                        disabled={isGeneratingAiWrite || !aiWriteInstruction.trim()}
+                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer transition-all shrink-0"
+                      >
+                        {isGeneratingAiWrite ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Writing...
+                          </>
+                        ) : (
+                          "Generate"
+                        )}
+                      </button>
+                    </div>
+                    {aiWriteError && (
+                      <div className="text-[10px] text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {aiWriteError}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <textarea 
                   value={composeBody}
@@ -1888,11 +2465,10 @@ export const EmailView: React.FC<EmailViewProps> = ({
                 <div>
                   <label className="block text-[8px] text-[var(--color-text-muted)] uppercase font-bold mb-1 tracking-wider">Hour/Time</label>
                   <input 
-                    type="text" 
+                    type="time" 
                     className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs text-[var(--color-text)] focus:outline-none font-mono"
                     value={eventWizardTime}
                     onChange={(e) => setEventWizardTime(e.target.value)}
-                    placeholder="E.g. 10:00 AM"
                     required
                   />
                 </div>

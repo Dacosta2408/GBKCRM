@@ -135,6 +135,15 @@ export interface Email {
   scheduledFor?: string;
   clientId?: string;
   starred?: boolean;
+  attachments?: Array<{
+    id?: string;
+    label?: string;
+    name?: string;
+    filename?: string;
+    size?: string;
+    extCode?: string;
+    url?: string;
+  }>;
 }
 
 export interface EmailTemplate {
