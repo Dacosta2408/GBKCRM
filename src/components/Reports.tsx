@@ -206,14 +206,11 @@ export const Reports: React.FC<ReportsProps> = ({
 
   // Dynamic Agent Performance grid
   const agentPerformance = useMemo(() => {
-    const brokers = ["David Acosta", "Jeff Brown", "Broker Desk"];
-    return brokers.map(bName => {
-      const brokerClients = clients.filter(c => {
-        const cOwner = c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta";
-        return bName === "Broker Desk" 
-          ? (c.source && c.source.toLowerCase().includes("desk")) 
-          : cOwner === bName;
-      });
+    return userRoster.map(u => {
+      const fullName = `${u.first} ${u.last}`;
+      const brokerClients = clients.filter(c => 
+        c.assignedTo === fullName || c.retentionOwner === fullName
+      );
 
       const funded = brokerClients.filter(c => c.status === "funded");
       const active = brokerClients.filter(c => !["lead", "funded", "closed"].includes(c.status));
@@ -223,8 +220,8 @@ export const Reports: React.FC<ReportsProps> = ({
       const convRate = qualified.length > 0 ? Math.round((converted.length / qualified.length) * 100) : 0;
 
       return {
-        name: bName,
-        role: bName === "David Acosta" ? "Principal Broker / Owner" : bName === "Jeff Brown" ? "Senior Associate" : "General Inquiries",
+        name: fullName,
+        role: u.role,
         totalFiles: brokerClients.length,
         fundedCount: funded.length,
         fundedVolume: totalVolume,
@@ -232,7 +229,7 @@ export const Reports: React.FC<ReportsProps> = ({
         conversionRate: convRate
       };
     });
-  }, [clients]);
+  }, [clients, userRoster]);
 
   // Lender Usage breakdown
   const lenderUsage = useMemo(() => {
@@ -506,9 +503,14 @@ export const Reports: React.FC<ReportsProps> = ({
                 className="bg-transparent border-none text-[11px] text-[var(--color-text)] focus:outline-none font-bold"
               >
                 <option value="All" className="bg-[var(--color-bg)]">All GBK Agents</option>
-                <option value="David Acosta" className="bg-[var(--color-bg)]">David Acosta</option>
-                <option value="Jeff Brown" className="bg-[var(--color-bg)]">Jeff Brown</option>
-                <option value="Broker Desk" className="bg-[var(--color-bg)]">Broker Desk</option>
+                {userRoster.map(u => {
+                  const fullName = `${u.first} ${u.last}`;
+                  return (
+                    <option key={u.id || fullName} value={fullName} className="bg-[var(--color-bg)]">
+                      {fullName}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           ) : (

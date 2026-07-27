@@ -139,7 +139,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
   // Filter clients for compliance monitoring
   const clientComplianceList = useMemo(() => {
     return clients.filter(c => {
-      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : `${currentUser.first} ${currentUser.last}`);
+      const owner = c.retentionOwner || c.assignedTo || `${currentUser.first} ${currentUser.last}`;
       const matchesAgent = activeAgentFilter === "All" || owner.toLowerCase() === activeAgentFilter.toLowerCase();
       
       if (!matchesAgent) return false;
@@ -169,7 +169,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
     }[] = [];
 
     clients.forEach(c => {
-      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : `${currentUser.first} ${currentUser.last}`);
+      const owner = c.retentionOwner || c.assignedTo || `${currentUser.first} ${currentUser.last}`;
       const docStats = getClientDocStats(c.id);
 
       // Exception 1: In lender status but missing key documents
@@ -422,7 +422,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
   const handlePrintClientReport = (c: Client) => {
     const docStats = getClientDocStats(c.id);
     const clientDocs = docVault[c.id] || {};
-    const owner = c.retentionOwner || `${currentUser.first} ${currentUser.last}`;
+    const owner = c.retentionOwner || c.assignedTo || `${currentUser.first} ${currentUser.last}`;
     const printedBy = `${currentUser.first} ${currentUser.last}`;
     const printedAt = new Date().toLocaleString();
     // GDS/TDS Calculations
@@ -784,7 +784,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                   <tbody className="divide-y divide-[var(--color-border)]">
                     {clientComplianceList.map(c => {
                       const docStats = getClientDocStats(c.id);
-                      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
+                      const owner = c.retentionOwner || c.assignedTo || `${currentUser.first} ${currentUser.last}`;
                       const verifiedScore = Math.round((docStats.totalVerified / docStats.totalRequired) * 100);
 
                       let indexColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";

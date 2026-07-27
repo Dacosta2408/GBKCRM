@@ -34,6 +34,7 @@ export interface Client {
   appData?: Record<string, string>;
   aiSummary?: string;
   // Retention Fields (7.2)
+  assignedTo?: string;
   retentionOwner?: string;
   lastContactedDate?: string;
   nextFollowUpDate?: string;
