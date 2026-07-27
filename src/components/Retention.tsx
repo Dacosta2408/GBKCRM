@@ -747,7 +747,7 @@ export const Retention: React.FC<RetentionProps> = ({
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5" id="retention-client-grid">
             {filteredStreamClients.map((client) => {
-              const currentOwner = client.retentionOwner || client.agent || "David Acosta";
+              const currentOwner = client.retentionOwner || client.agent || `${currentUser.first} ${currentUser.last}`;
               
               // Anniversary year computation
               let yearsVal = 0;
@@ -935,7 +935,7 @@ export const Retention: React.FC<RetentionProps> = ({
               {outreachType === "outcome" && `Log Interaction Outcome: ${outreachClient.first} ${outreachClient.last}`}
             </h3>
             <p className="text-xs text-[var(--color-text-faint)] font-semibold mb-4 border-b border-[var(--color-border)] pb-3">
-              Target Profile: ID {outreachClient.id} • Assigned Owner: {outreachClient.retentionOwner || "David Acosta"}
+              Target Profile: ID {outreachClient.id} • Assigned Owner: {outreachClient.retentionOwner || `${currentUser.first} ${currentUser.last}`}
             </p>
 
             <div className="flex-1 overflow-y-auto pr-1 space-y-4 text-xs font-semibold">
@@ -1000,7 +1000,15 @@ export const Retention: React.FC<RetentionProps> = ({
                     />
                     <div className="flex justify-between text-[9px] text-[var(--color-text-faint)] mt-1">
                       <span>SMS character limit check (standard length)</span>
-                      <span>{customSms.length} chars</span>
+                      <span className={`font-mono font-bold ${
+                        customSms.length > 320 
+                          ? "text-red-400" 
+                          : customSms.length > 160 
+                            ? "text-amber-400" 
+                            : "text-emerald-400"
+                      }`}>
+                        {customSms.length} chars
+                      </span>
                     </div>
                   </div>
                 </>
@@ -1108,7 +1116,7 @@ export const Retention: React.FC<RetentionProps> = ({
               <CheckSquare className="h-5 w-5" /> Create Retention Follow-up Task
             </h3>
             <p className="text-[var(--color-text-faint)] mb-4 border-b border-[var(--color-border)] pb-2 font-semibold">
-              Client: {taskClient.first} {taskClient.last} • Assigned: {taskClient.retentionOwner || "David Acosta"}
+              Client: {taskClient.first} {taskClient.last} • Assigned: {taskClient.retentionOwner || `${currentUser.first} ${currentUser.last}`}
             </p>
 
             <div className="space-y-4">
