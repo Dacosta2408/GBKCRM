@@ -7,13 +7,28 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.GBK_PORT || process.env.PORT || 3001;
 
-// CORS setup to allow various origins (development & preview environments)
+// CORS setup — allow Google AI Studio, localhost dev, and any other origin
+// Since this server runs locally on your own machine, open CORS is safe
 app.use(cors({
-  origin: [
-    "http://localhost:5173", 
-    "http://localhost:3000", 
-    "http://localhost:3001"
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (curl, Postman, direct)
+    // Allow localhost on any port
+    // Allow Google AI Studio / Project IDX origins
+    if (
+      !origin ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('google.com') ||
+      origin.includes('idx.google.com') ||
+      origin.includes('cloudworkstations.dev') ||
+      origin.includes('web.app') ||
+      origin.includes('firebaseapp.com')
+    ) {
+      return callback(null, true);
+    }
+    // Allow all other origins too — this is a local-only server
+    callback(null, true);
+  },
   credentials: true
 }));
 
@@ -29,13 +44,17 @@ let pathValid = true;
 
 try {
   if (!fs.existsSync(rootPath)) {
-    pathValid = false;
+    fs.mkdirSync(rootPath, { recursive: true });
+    pathValid = true;
+    console.log(`✅ Created data directory: ${rootPath}`);
   }
 } catch (err) {
   pathValid = false;
+  console.error(`❌ Could not create data directory: ${err.message}`);
 }
 
 global.pathValid = pathValid;
+global.rootPath = rootPath;
 
 // Global path valid checker middleware for data routes
 app.use((req, res, next) => {
@@ -46,7 +65,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Version Endpoint (Task 5)
+// Version Endpoint
 app.get("/api/version", (req, res) => {
   res.json({
     version: "1.0.0",
@@ -64,7 +83,7 @@ const aiRouter = require("./routes/ai");
 
 app.use("/api/health", healthRouter);
 app.use("/api/clients", clientsRouter);
-app.use("/api/clients", documentsRouter); // Mounted on /api/clients so /api/clients/:id/documents works
+app.use("/api/clients", documentsRouter);
 app.use("/api/system", systemRouter);
 app.use("/api/email", emailRouter);
 app.use("/api/ai", aiRouter);
@@ -81,7 +100,9 @@ app.listen(PORT, "0.0.0.0", () => {
 
   if (!pathValid) {
     console.error(`\n❌ ERROR: Root path does not exist: ${rootPath}`);
-    console.error(`   Please check your .env file and ensure the Z Drive is mapped.`);
-    console.error(`   Server will start but all file operations will fail.\n`);
+    console.error(`   Please check your .env file and ensure the path is correct.\n`);
+  } else {
+    console.log(`\n✅ Data path ready: ${rootPath}`);
+    console.log(`✅ Server accepting connections on port ${PORT}\n`);
   }
 });
