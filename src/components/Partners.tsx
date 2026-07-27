@@ -160,6 +160,11 @@ export const Partners: React.FC<PartnersProps> = ({
   }, [partners, selectedPartnerId, filteredAndSortedPartners]);
 
   // Overall Statistics Panel Calculations
+  const customCategories = useMemo(() => {
+    const allTypes = partners.map(p => p.type).filter(Boolean);
+    return [...new Set(allTypes)].filter(t => !PARTNER_CATEGORIES.includes(t as any));
+  }, [partners]);
+
   const metricsSummary = useMemo(() => {
     const totalCount = partners.length;
     const preferredCount = partners.filter(p => p.isPreferred || p.status === "Preferred").length;
@@ -652,7 +657,8 @@ export const Partners: React.FC<PartnersProps> = ({
                   "Mortgage Agents / Brokers",
                   "Private Lenders",
                   "B Lenders",
-                  "Credit / Debt Specialists"
+                  "Credit / Debt Specialists",
+                  ...customCategories
                 ].includes(selectedCategory)
                   ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30 font-bold"
                   : "bg-[var(--color-surface)] border-[var(--color-border)]/70 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]"
@@ -665,7 +671,8 @@ export const Partners: React.FC<PartnersProps> = ({
                   "Mortgage Agents / Brokers",
                   "Private Lenders",
                   "B Lenders",
-                  "Credit / Debt Specialists"
+                  "Credit / Debt Specialists",
+                  ...customCategories
                 ].includes(selectedCategory) 
                   ? `More: ${selectedCategory}` 
                   : "More Categories"}
@@ -696,6 +703,27 @@ export const Partners: React.FC<PartnersProps> = ({
                     {cat}
                   </button>
                 ))}
+
+                {customCategories.length > 0 && (
+                  <>
+                    <div className="border-t border-[var(--color-border)]/50 my-1" />
+                    <p className="px-4 py-1 text-[10px] uppercase font-black text-[var(--color-text-faint)] tracking-wider">Custom</p>
+                    {customCategories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setSelectedCategory(cat);
+                          setMoreOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-[var(--color-surface-3)] ${
+                          selectedCategory === cat ? "text-[var(--color-accent)] font-bold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>

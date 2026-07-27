@@ -30,6 +30,8 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
   const [last, setLast] = useState("");
   const [company, setCompany] = useState("");
   const [type, setType] = useState<string>("Lawyers");
+  const [typeInput, setTypeInput] = useState("");
+  const [showTypeSuggestions, setShowTypeSuggestions] = useState(false);
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -51,6 +53,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
       setLast(editingPartner.last || "");
       setCompany(editingPartner.company || "");
       setType(editingPartner.type || "Lawyers");
+      setTypeInput(editingPartner.type || "Lawyers");
       setRole(editingPartner.role || "");
       setPhone(editingPartner.phone || "");
       setEmail(editingPartner.email || "");
@@ -69,6 +72,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
       setLast("");
       setCompany("");
       setType("Lawyers");
+      setTypeInput("Lawyers");
       setRole("");
       setPhone("");
       setEmail("");
@@ -84,6 +88,15 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
     }
     setSpecialtyInput("");
   }, [editingPartner, isOpen, currentUser]);
+
+  // Filtered categories for combobox
+  const filteredCategories = PARTNER_CATEGORIES.filter(cat => 
+    cat.toLowerCase().includes(typeInput.toLowerCase().trim())
+  );
+  const isExactCategoryMatch = PARTNER_CATEGORIES.some(cat => 
+    cat.toLowerCase() === typeInput.trim().toLowerCase()
+  );
+  const showCustomCategoryOption = typeInput.trim() !== "" && !isExactCategoryMatch;
 
   if (!isOpen) return null;
 
@@ -189,15 +202,52 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
               <label className="block text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-wider mb-1">
                 Profession Category
               </label>
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-2.5 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
-              >
-                {PARTNER_CATEGORIES.map(category => (
-                  <option key={category} value={category} className="bg-[var(--color-surface)]">{category}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={typeInput}
+                  onChange={(e) => {
+                    setTypeInput(e.target.value);
+                    setType(e.target.value);
+                  }}
+                  onFocus={() => setShowTypeSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowTypeSuggestions(false), 150)}
+                  placeholder="Select or type category..."
+                  className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/30 transition-all font-bold"
+                />
+                {showTypeSuggestions && (filteredCategories.length > 0 || showCustomCategoryOption) && (
+                  <div className="absolute z-50 w-full mt-1 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                    {filteredCategories.map(cat => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => {
+                          setTypeInput(cat);
+                          setType(cat);
+                          setShowTypeSuggestions(false);
+                        }}
+                        className="w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer"
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                    {showCustomCategoryOption && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setType(typeInput.trim());
+                          setTypeInput(typeInput.trim());
+                          setShowTypeSuggestions(false);
+                        }}
+                        className="w-full text-left px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-surface-3)] cursor-pointer border-t border-[var(--color-border)]/50"
+                      >
+                        + Add &quot;{typeInput}&quot; as new category
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              <p className="text-[10px] text-[var(--color-text-faint)] mt-1">Select from list or type a custom category</p>
             </div>
           </div>
 
