@@ -94,7 +94,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           ) 
         },
-        { id: "reports", label: "Reports", icon: BarChart3 },
+        ...((isOwner || currentUser.role === "Developer/Admin" || currentUser.role === "Admin")
+          ? [{ id: "reports", label: "Reports", icon: BarChart3 }]
+          : []),
         { id: "compliance", label: "Compliance", icon: ShieldCheck },
         { 
           id: "file_readiness", 

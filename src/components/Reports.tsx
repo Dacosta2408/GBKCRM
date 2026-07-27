@@ -56,14 +56,10 @@ export const Reports: React.FC<ReportsProps> = ({
 
     return clients.filter(c => {
       // 1. Agent Filter (Assigned broker or creator)
-      // Note: Since our Client database links via source or general ownership (which defaults to David Acosta),
-      // we check for referredBy or simple static matching. Let's make it match on assignedTo or default.
-      // In this CRM, client files are usually owned by either David Acosta or Jeff Brown. Let's match:
-      const clientOwner = c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta";
+      const clientOwner = c.assignedTo || c.source || "David Acosta";
       
       const matchesAgent = activeAgentFilter === "All" || 
-                           clientOwner.toLowerCase() === activeAgentFilter.toLowerCase() ||
-                           (c.source && c.source.toLowerCase().includes(activeAgentFilter.toLowerCase()));
+                           clientOwner.toLowerCase().includes(activeAgentFilter.toLowerCase());
 
       if (!matchesAgent) return false;
 
@@ -460,6 +456,16 @@ export const Reports: React.FC<ReportsProps> = ({
     }
   };
 
+  if (!["Developer/Admin", "Admin"].includes(currentUser.role)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-12">
+        <ShieldAlert className="h-12 w-12 text-red-400" />
+        <h2 className="text-base font-black uppercase tracking-widest text-[var(--color-text)]">Access Restricted</h2>
+        <p className="text-sm text-[var(--color-text-muted)] max-w-md">The Executive Intelligence Reports module is restricted to Admin and Developer roles only. Contact your brokerage administrator for access.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" id="reports-module-root">
       
@@ -607,7 +613,7 @@ export const Reports: React.FC<ReportsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" id="reports-charts-grid">
           
           {/* Trend: Funded Volume last 6 months */}
-          <div className="bg-[var(--color-surface)] border border-white/5 rounded-xl p-4 flex flex-col h-[300px]">
+          <div className="bg-[var(--color-surface)] border border-white/5 rounded-xl p-4 flex flex-col h-[340px]">
             <div className="flex justify-between items-center mb-4 shrink-0">
               <h3 className="text-xs font-black uppercase text-white/50 tracking-wider">6-Month Closed Volume Trends</h3>
               <span className="text-[9px] text-[var(--color-accent)] font-semibold bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/10 px-1.5 py-0.5 rounded">Lenders-Funded</span>
@@ -615,22 +621,22 @@ export const Reports: React.FC<ReportsProps> = ({
 
             <div className="flex-1 w-full relative min-h-[180px] flex items-end">
               {/* SVG Line & Bar Chart */}
-              <svg className="w-full h-full" viewBox="0 0 500 200">
+              <svg className="w-full h-full" viewBox="0 0 560 220">
                 {/* Horizontal gridlines */}
-                <line x1="40" y1="30" x2="480" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                <line x1="40" y1="80" x2="480" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                <line x1="40" y1="130" x2="480" y2="130" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                <line x1="40" y1="30" x2="530" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                <line x1="40" y1="80" x2="530" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                <line x1="40" y1="135" x2="530" y2="135" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                <line x1="40" y1="190" x2="530" y2="190" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
 
                 {/* Draw Columns and Line points */}
                 {monthlyFundedTrend.map((item, idx) => {
                   const maxVolume = Math.max(...monthlyFundedTrend.map(m => m.volume), 500000);
-                  const x = 55 + idx * 80;
+                  const x = 60 + idx * 75;
                   // Map volume to height
                   const barHeight = item.volume > 0 
-                    ? (item.volume / maxVolume) * 120 
+                    ? (item.volume / maxVolume) * 150 
                     : 0;
-                  const y = 170 - barHeight;
+                  const y = 190 - barHeight;
 
                   return (
                     <g key={idx}>
@@ -639,7 +645,7 @@ export const Reports: React.FC<ReportsProps> = ({
                         x={x - 12} 
                         y="30" 
                         width="24" 
-                        height="140" 
+                        height="160" 
                         fill="rgba(255,255,255,0.01)" 
                         rx="3"
                       />
@@ -673,7 +679,7 @@ export const Reports: React.FC<ReportsProps> = ({
                       {/* Month label under axis */}
                       <text 
                         x={x} 
-                        y="185" 
+                        y="210" 
                         textAnchor="middle" 
                         fill="rgba(255,255,255,0.4)" 
                         fontSize="8.5" 
