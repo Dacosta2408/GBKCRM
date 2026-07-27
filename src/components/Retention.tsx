@@ -6,6 +6,8 @@ import {
   Trash, Edit2, Check, X, ShieldAlert, Award, FileText, Sparkles
 } from "lucide-react";
 import { Client, Task, User as SystemUser } from "../types";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface RetentionProps {
   clients: Client[];
@@ -58,6 +60,7 @@ export const Retention: React.FC<RetentionProps> = ({
 }) => {
   const [activeStream, setActiveStream] = useState<StreamType>("birthdays");
   const [renewalTier, setRenewalTier] = useState<"2yr" | "1yr" | "6mo" | "4mo">("6mo");
+  const [sortOrder, setSortOrder] = useState<"soonest" | "last_contacted" | "mortgage_amount">("soonest");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAgent, setSelectedAgent] = useState<string>("All");
 
@@ -70,6 +73,33 @@ export const Retention: React.FC<RetentionProps> = ({
   const [compBody, setCompBody] = useState("");
   const [customSms, setCustomSms] = useState("");
 
+  // Snooze state
+  const [snoozeMenuClientId, setSnoozeMenuClientId] = useState<string | null>(null);
+
+  const handleSnooze = (client: Client, days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    const targetDate = d.toISOString().split("T")[0];
+
+    setClients(prev => prev.map(c => c.id === client.id ? { ...c, nextFollowUpDate: targetDate, updatedAt: new Date().toISOString() } : c));
+    showToast(`Snoozed — follow-up set for ${targetDate}`, "info");
+    setSnoozeMenuClientId(null);
+  };
+
+  const getTouchpointCount = (client: Client): number => {
+    let count = client.lastContactedDate ? 1 : 0;
+    if (client.retentionNotes) {
+      const match = client.retentionNotes.match(/\(?(\d+)\s*touchpoints?\)?/i);
+      if (match && match[1]) {
+        const parsed = parseInt(match[1], 10);
+        if (!isNaN(parsed)) {
+          count += parsed;
+        }
+      }
+    }
+    return count;
+  };
+
   // Outcome Logging States
   const [outcomeType, setOutcomeType] = useState<string>("contacted");
   const [outcomeNotes, setOutcomeNotes] = useState("");
@@ -80,6 +110,9 @@ export const Retention: React.FC<RetentionProps> = ({
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskPriority, setTaskPriority] = useState<"high" | "medium" | "low">("medium");
+
+  // Convert to Lead Confirmation modal state
+  const [convertConfirmClient, setConvertConfirmClient] = useState<Client | null>(null);
 
   // Check permissions: Owner/Admin see all, brokers see their own.
   const isPrivileged = useMemo(() => {
@@ -208,7 +241,7 @@ export const Retention: React.FC<RetentionProps> = ({
     };
   }, [activeAgentFilter]);
 
-  // Filter clients under the active stream by search + agent owner
+  // Filter clients under the active stream by search + agent owner & apply sort order
   const filteredStreamClients = useMemo(() => {
     let list: Client[] = [];
     if (activeStream === "birthdays") list = streamsData.birthdays;
@@ -216,7 +249,7 @@ export const Retention: React.FC<RetentionProps> = ({
     else if (activeStream === "anniversaries") list = streamsData.anniversaries;
     else if (activeStream === "reengage") list = streamsData.reengage;
 
-    return list.filter(c => {
+    const filtered = list.filter(c => {
       if (!matchesAgent(c)) return false;
 
       // Search term filter
@@ -228,7 +261,68 @@ export const Retention: React.FC<RetentionProps> = ({
         (c.lender && c.lender.toLowerCase().includes(s))
       );
     });
-  }, [activeStream, renewalTier, streamsData, searchTerm, matchesAgent]);
+
+    return [...filtered].sort((a, b) => {
+      if (sortOrder === "mortgage_amount") {
+        const amtA = Number(a.mtgamt || 0);
+        const amtB = Number(b.mtgamt || 0);
+        return amtB - amtA;
+      }
+
+      if (sortOrder === "last_contacted") {
+        const timeA = a.lastContactedDate ? new Date(a.lastContactedDate).getTime() : 0;
+        const timeB = b.lastContactedDate ? new Date(b.lastContactedDate).getTime() : 0;
+        return timeA - timeB;
+      }
+
+      // "soonest"
+      if (activeStream === "renewals") {
+        const matA = getMaturityDate(a)?.getTime() ?? Infinity;
+        const matB = getMaturityDate(b)?.getTime() ?? Infinity;
+        return matA - matB;
+      }
+
+      if (activeStream === "birthdays") {
+        const getBdayDiff = (c: Client) => {
+          if (!c.dob) return Infinity;
+          const now = new Date();
+          const dob = new Date(c.dob);
+          const nextBday = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+          let diff = Math.ceil((nextBday.getTime() - now.getTime()) / (24 * 3600000));
+          if (diff < -7) {
+            nextBday.setFullYear(now.getFullYear() + 1);
+            diff = Math.ceil((nextBday.getTime() - now.getTime()) / (24 * 3600000));
+          }
+          return diff;
+        };
+        return getBdayDiff(a) - getBdayDiff(b);
+      }
+
+      if (activeStream === "anniversaries") {
+        const getAnnivDiff = (c: Client) => {
+          if (!c.fundedDate) return Infinity;
+          const now = new Date();
+          const fDate = new Date(c.fundedDate);
+          const nextAnniv = new Date(now.getFullYear(), fDate.getMonth(), fDate.getDate());
+          let diff = Math.ceil((nextAnniv.getTime() - now.getTime()) / (24 * 3600000));
+          if (diff < 0) {
+            nextAnniv.setFullYear(now.getFullYear() + 1);
+            diff = Math.ceil((nextAnniv.getTime() - now.getTime()) / (24 * 3600000));
+          }
+          return diff;
+        };
+        return getAnnivDiff(a) - getAnnivDiff(b);
+      }
+
+      if (activeStream === "reengage") {
+        const timeA = new Date(a.lastContactedDate || a.updatedAt || a.createdAt || 0).getTime();
+        const timeB = new Date(b.lastContactedDate || b.updatedAt || b.createdAt || 0).getTime();
+        return timeA - timeB;
+      }
+
+      return 0;
+    });
+  }, [activeStream, renewalTier, streamsData, searchTerm, matchesAgent, sortOrder]);
 
   // Overall metric stats
   const metrics = useMemo(() => {
@@ -441,12 +535,14 @@ export const Retention: React.FC<RetentionProps> = ({
     setTaskClient(null);
   };
 
-  // Convert retention item into new Lead/Active file
+  // Convert retention item into new Lead/Active file - opens modal
   const handleConvertToLead = (client: Client) => {
-    // We clone the client's record as a brand new lead file to preserve history
-    const isConfirmed = window.confirm(`Convert ${client.first} ${client.last} to a new active mortgage lead? This clones their general profile into an active 'lead' file while preserving their historic closed/funded mortgage records.`);
-    
-    if (!isConfirmed) return;
+    setConvertConfirmClient(client);
+  };
+
+  const handleConfirmConvert = () => {
+    if (!convertConfirmClient) return;
+    const client = convertConfirmClient;
 
     const clonedLead: Client = {
       ...client,
@@ -477,6 +573,151 @@ export const Retention: React.FC<RetentionProps> = ({
 
     setClients([clonedLead, ...updatedClients]);
     showToast(`Success! Generated new active CRM Lead file for ${client.first} ${client.last}!`, "success");
+    setConvertConfirmClient(null);
+  };
+
+  // Export PDF Report function
+  const handleExportPDF = () => {
+    if (filteredStreamClients.length === 0) {
+      showToast("No retention records available to export.", "warning");
+      return;
+    }
+
+    try {
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const todayStr = new Date().toISOString().split("T")[0];
+      const currentUserFull = `${currentUser.first} ${currentUser.last}`;
+
+      let streamTitle = "Birthdays";
+      if (activeStream === "renewals") streamTitle = `Renewals (${renewalTier} Tier)`;
+      else if (activeStream === "anniversaries") streamTitle = "Anniversaries";
+      else if (activeStream === "reengage") streamTitle = "Re-engage";
+
+      // Report Header
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(30, 41, 59);
+      doc.text("GBK Financial — CRM Client Retention Report", 14, 15);
+
+      doc.setFontSize(10.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Active Stream: ${streamTitle}`, 14, 21.5);
+
+      // Metadata Block
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+
+      const metaLine1 = `Generated: ${todayStr}   |   Generated By: ${currentUserFull}   |   Selected Owner: ${activeAgentFilter || "All"}`;
+      const metaLine2 = `Search Term: ${searchTerm.trim() || "None"}${activeStream === "renewals" ? `   |   Renewal Tier: ${renewalTier}` : ""}   |   Total Targets: ${filteredStreamClients.length}`;
+
+      doc.text(metaLine1, 14, 27);
+      doc.text(metaLine2, 14, 31.5);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.line(14, 34.5, 283, 34.5);
+
+      // Table Columns (exact requested order)
+      const tableColumns = [
+        "Client Name",
+        "Status",
+        "Owner",
+        "Email",
+        "Cell",
+        "Address",
+        "Lender",
+        "Mortgage Amount",
+        "Maturity Date",
+        "Mortgage Term",
+        "Last Contacted",
+        "Next Follow-up",
+        "Outcome",
+        "Notes"
+      ];
+
+      // Table Rows
+      const tableRows = filteredStreamClients.map(client => {
+        const owner = client.retentionOwner || client.agent || currentUserFull;
+        const matDate = getMaturityDate(client);
+        const formattedMatDate = matDate ? matDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A";
+        const mtgAmtStr = client.mtgamt ? `$${Number(client.mtgamt).toLocaleString()}` : "N/A";
+        const mtgTermStr = client.mortgageTerm ? `${client.mortgageTerm}-Yr Term` : "N/A";
+
+        return [
+          `${client.first} ${client.last}`,
+          client.status || "N/A",
+          owner,
+          client.email || "N/A",
+          client.cell || "N/A",
+          client.addr || "N/A",
+          client.lender || "N/A",
+          mtgAmtStr,
+          formattedMatDate,
+          mtgTermStr,
+          client.lastContactedDate || "N/A",
+          client.nextFollowUpDate || "N/A",
+          client.retentionOutcome || "None",
+          client.retentionNotes || ""
+        ];
+      });
+
+      autoTable(doc, {
+        head: [tableColumns],
+        body: tableRows,
+        startY: 38,
+        styles: {
+          fontSize: 6.5,
+          cellPadding: 1.5,
+          overflow: "linebreak",
+          textColor: [51, 65, 85]
+        },
+        headStyles: {
+          fillColor: [30, 41, 59],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+          fontSize: 7
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252]
+        },
+        columnStyles: {
+          0: { cellWidth: 20 }, // Client Name
+          1: { cellWidth: 12 }, // Status
+          2: { cellWidth: 18 }, // Owner
+          3: { cellWidth: 22 }, // Email
+          4: { cellWidth: 16 }, // Cell
+          5: { cellWidth: 22 }, // Address
+          6: { cellWidth: 16 }, // Lender
+          7: { cellWidth: 18 }, // Mortgage Amount
+          8: { cellWidth: 16 }, // Maturity Date
+          9: { cellWidth: 15 }, // Mortgage Term
+          10: { cellWidth: 15 }, // Last Contacted
+          11: { cellWidth: 16 }, // Next Follow-up
+          12: { cellWidth: 18 }, // Outcome
+          13: { cellWidth: "auto" } // Notes
+        },
+        margin: { top: 15, right: 14, bottom: 15, left: 14 }
+      });
+
+      // Footers
+      const totalPages = (doc as any).internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        doc.text(`Page ${i} of ${totalPages}`, 283 - 14, 202, { align: "right" });
+        doc.text("GBK Financial CRM — Confidential Client Retention Report", 14, 202);
+      }
+
+      const filename = `GBK_Retention_${activeStream}_${todayStr}.pdf`;
+      doc.save(filename);
+
+      showToast("Retention PDF report generated successfully.", "success");
+    } catch (err) {
+      console.error("Failed to generate retention PDF:", err);
+      showToast("Failed to generate PDF report.", "error");
+    }
   };
 
   // Fast email sender simulation
@@ -702,8 +943,30 @@ export const Retention: React.FC<RetentionProps> = ({
                 {activeStream === "reengage" && "Ensure no client goes quiet. Rekindle relationships with personalized market updates."}
               </span>
             </div>
-            <div className="shrink-0 bg-[var(--color-accent)]/10 px-3 py-1 rounded-full text-[10px] font-black text-[var(--color-accent)] border border-[var(--color-accent)]/20">
-              {filteredStreamClients.length} targets identified
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                onClick={handleExportPDF}
+                className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] flex items-center gap-1.5 cursor-pointer shadow-sm"
+                title="Export Filtered Retention Records as PDF Report"
+              >
+                <FileText className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Export PDF
+              </button>
+
+              <div className="flex items-center gap-1.5 bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-xs">
+                <span className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-wider">Sort:</span>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as "soonest" | "last_contacted" | "mortgage_amount")}
+                  className="bg-transparent text-xs text-[var(--color-text)] font-bold focus:outline-none cursor-pointer"
+                >
+                  <option value="soonest" className="bg-[var(--color-bg)]">Soonest</option>
+                  <option value="last_contacted" className="bg-[var(--color-bg)]">Last Contacted</option>
+                  <option value="mortgage_amount" className="bg-[var(--color-bg)]">Mortgage Amount</option>
+                </select>
+              </div>
+              <div className="shrink-0 bg-[var(--color-accent)]/10 px-3 py-1.5 rounded-full text-[10px] font-black text-[var(--color-accent)] border border-[var(--color-accent)]/20">
+                {filteredStreamClients.length} targets identified
+              </div>
             </div>
           </div>
 
@@ -765,13 +1028,27 @@ export const Retention: React.FC<RetentionProps> = ({
                   {/* Card upper row */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-black text-[var(--color-text)] hover:text-[var(--color-accent)] transition-all cursor-pointer">
                           {client.first} {client.last}
                         </span>
                         <span className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[8px] font-black uppercase px-2 py-0.5 rounded border border-[var(--color-border)]">
                           {client.status.toUpperCase()}
                         </span>
+                        {activeStream === "renewals" && (() => {
+                          const matDate = getMaturityDate(client);
+                          if (!matDate) return null;
+                          const diffMs = matDate.getTime() - new Date().getTime();
+                          const diffDays = Math.ceil(diffMs / (24 * 3600000));
+                          if (diffDays <= 120) {
+                            return (
+                              <span className="bg-red-500/15 text-red-400 border border-red-500/30 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                                🔴 Urgent
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                       <span className="text-[10px] text-[var(--color-text-faint)] font-semibold block mt-1">{client.addr || "No registered address"}</span>
                     </div>
@@ -786,10 +1063,32 @@ export const Retention: React.FC<RetentionProps> = ({
                         const matDate = getMaturityDate(client);
                         const dateStr = matDate ? matDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A";
                         const isComputed = !client.maturityDate && !!client.fundedDate;
+                        
+                        let diffDays = 0;
+                        let chipClass = "text-red-400 bg-red-500/10 border-red-500/20";
+                        if (matDate) {
+                          const diffMs = matDate.getTime() - new Date().getTime();
+                          diffDays = Math.ceil(diffMs / (24 * 3600000));
+                          if (diffDays > 365) {
+                            chipClass = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+                          } else if (diffDays >= 181) {
+                            chipClass = "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+                          } else if (diffDays >= 121) {
+                            chipClass = "text-orange-400 bg-orange-400/10 border-orange-400/20";
+                          } else {
+                            chipClass = "text-red-400 bg-red-500/10 border-red-500/20";
+                          }
+                        }
+
                         return (
-                          <div className="bg-[#6fa3b8]/15 border border-[#6fa3b8]/30 text-[#6fa3b8] text-[10px] font-black px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                          <div className="bg-[#6fa3b8]/15 border border-[#6fa3b8]/30 text-[#6fa3b8] text-[10px] font-black px-2.5 py-1 rounded-full uppercase flex items-center gap-1.5">
                             <span>Maturity: {dateStr}</span>
                             {isComputed && <span className="text-[8px] opacity-80 font-semibold">(Computed)</span>}
+                            {matDate && (
+                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${chipClass}`}>
+                                {diffDays} days
+                              </span>
+                            )}
                           </div>
                         );
                       })()}
@@ -817,8 +1116,14 @@ export const Retention: React.FC<RetentionProps> = ({
                       <span className="text-[var(--color-text)] block mt-0.5">${(Number(client.mtgamt || 0)).toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-bold block">Client Contact</span>
-                      <span className="text-[var(--color-text)] block mt-0.5 text-[10px] truncate">{client.email}</span>
+                      <span className="text-[9px] text-[var(--color-text-faint)] uppercase font-bold block">
+                        {activeStream === "renewals" ? "Mortgage Term" : "Client Contact"}
+                      </span>
+                      <span className="text-[var(--color-text)] block mt-0.5 text-[10px] truncate">
+                        {activeStream === "renewals"
+                          ? (client.mortgageTerm ? (client.mortgageTerm.toLowerCase().includes("term") ? client.mortgageTerm : client.mortgageTerm.toLowerCase().includes("-yr") ? `${client.mortgageTerm} Term` : `${client.mortgageTerm}-Yr Term`) : "5-Yr (Est.)")
+                          : client.email}
+                      </span>
                     </div>
                   </div>
 
@@ -840,10 +1145,20 @@ export const Retention: React.FC<RetentionProps> = ({
                     </div>
 
                     {/* Follow up status indicators */}
-                    <div className="flex flex-wrap gap-2.5 text-[10px] font-black uppercase text-[var(--color-text-faint)]">
-                      <div>
-                        <span className="text-[var(--color-text-faint)]/60 mr-1">Last Touch:</span>
-                        <span className="text-[var(--color-text-muted)] font-mono">{client.lastContactedDate || "None Logged"}</span>
+                    <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-black uppercase text-[var(--color-text-faint)]">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <div>
+                          <span className="text-[var(--color-text-faint)]/60 mr-1">Last Touch:</span>
+                          <span className="text-[var(--color-text-muted)] font-mono">{client.lastContactedDate || "None Logged"}</span>
+                        </div>
+                        {(() => {
+                          const tpCount = getTouchpointCount(client);
+                          return (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold border border-[var(--color-border)] text-[var(--color-text-faint)] bg-[var(--color-surface-2)]/60 normal-case">
+                              {tpCount === 0 ? "No touchpoints yet" : `${tpCount} touchpoint${tpCount === 1 ? "" : "s"}`}
+                            </span>
+                          );
+                        })()}
                       </div>
                       <div>
                         <span className="text-[var(--color-text-faint)]/60 mr-1">Next Call:</span>
@@ -866,21 +1181,21 @@ export const Retention: React.FC<RetentionProps> = ({
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => handleOpenOutreach(client, "email")}
-                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)]"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)] cursor-pointer"
                         title="Send Email Campaign"
                       >
                         <Mail className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Email
                       </button>
                       <button 
                         onClick={() => handleOpenOutreach(client, "sms")}
-                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)]"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-border)] cursor-pointer"
                         title="Send SMS check-in"
                       >
                         <MessageSquare className="h-3.5 w-3.5 text-[#6fa3b8]" /> SMS
                       </button>
                       <button 
                         onClick={() => handleOpenOutreach(client, "outcome")}
-                        className="p-2 bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-accent)]/20"
+                        className="p-2 bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)] rounded-lg transition-all flex items-center gap-1 text-[11px] font-black uppercase border border-[var(--color-accent)]/20 cursor-pointer"
                         title="Log Outreach Action"
                       >
                         <CheckCircle className="h-3.5 w-3.5" /> Log Outcome
@@ -889,9 +1204,35 @@ export const Retention: React.FC<RetentionProps> = ({
 
                     {/* Process / Scheduler triggers */}
                     <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <button
+                          onClick={() => setSnoozeMenuClientId(snoozeMenuClientId === client.id ? null : client.id)}
+                          className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] rounded-lg transition-all text-[11px] font-black uppercase border border-[var(--color-border)] flex items-center gap-1 cursor-pointer"
+                          title="Snooze Follow-up"
+                        >
+                          <Clock className="h-3.5 w-3.5 text-blue-400" /> Snooze
+                        </button>
+                        {snoozeMenuClientId === client.id && (
+                          <div className="absolute right-0 sm:left-0 sm:right-auto bottom-full mb-1 z-30 w-32 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl p-1 flex flex-col gap-0.5 text-xs">
+                            <div className="text-[9px] font-black uppercase text-[var(--color-text-faint)] px-2 py-1 border-b border-[var(--color-border)]/50">
+                              Snooze Follow-up
+                            </div>
+                            {[7, 14, 30].map(days => (
+                              <button
+                                key={days}
+                                onClick={() => handleSnooze(client, days)}
+                                className="w-full text-left px-2 py-1.5 hover:bg-[var(--color-surface-2)] text-[var(--color-text)] font-bold rounded transition-colors cursor-pointer text-xs"
+                              >
+                                {days} days
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
                       <button
                         onClick={() => handleOpenTaskCreation(client)}
-                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] rounded-lg transition-all text-[11px] font-black uppercase border border-[var(--color-border)] flex items-center gap-1"
+                        className="p-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text-muted)] rounded-lg transition-all text-[11px] font-black uppercase border border-[var(--color-border)] flex items-center gap-1 cursor-pointer"
                       >
                         <Plus className="h-3.5 w-3.5 text-amber-500" /> Create Task
                       </button>
@@ -899,7 +1240,7 @@ export const Retention: React.FC<RetentionProps> = ({
                       {(activeStream === "renewals" || activeStream === "reengage" || activeStream === "anniversaries") && (
                         <button
                           onClick={() => handleConvertToLead(client)}
-                          className="px-3 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black font-black rounded-lg transition-all text-[11px] font-black uppercase flex items-center gap-1"
+                          className="px-3 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black font-black rounded-lg transition-all text-[11px] font-black uppercase flex items-center gap-1 cursor-pointer"
                         >
                           <UserPlus className="h-3.5 w-3.5" /> Convert to Lead
                         </button>
@@ -1159,15 +1500,77 @@ export const Retention: React.FC<RetentionProps> = ({
             <div className="border-t border-[var(--color-border)] mt-5 pt-4 flex justify-end gap-3">
               <button
                 onClick={() => setTaskClient(null)}
-                className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)]"
+                className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveTask}
-                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black rounded-lg text-xs font-black uppercase transition-all"
+                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black rounded-lg text-xs font-black uppercase transition-all cursor-pointer"
               >
                 Schedule Task
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Convert to Active Lead Confirmation Modal */}
+      {convertConfirmClient && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in" id="convert-lead-modal-overlay">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-6 relative flex flex-col text-xs font-semibold shadow-xl">
+            
+            {/* Close */}
+            <button 
+              onClick={() => setConvertConfirmClient(null)}
+              className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2 mb-2">
+              <UserPlus className="h-5 w-5" /> Convert to Active Lead
+            </h3>
+            <p className="text-[var(--color-text-faint)] mb-4 border-b border-[var(--color-border)] pb-3 font-semibold text-[11px] leading-relaxed">
+              This action clones the historic client profile into a new active mortgage lead file while preserving their original funded and closed records.
+            </p>
+
+            <div className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-xl p-3.5 space-y-2.5 mb-4">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--color-text-faint)] font-bold uppercase text-[9px]">Client Profile</span>
+                <span className="text-[var(--color-text)] font-black">{convertConfirmClient.first} {convertConfirmClient.last}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--color-text-faint)] font-bold uppercase text-[9px]">Current Status</span>
+                <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/30">
+                  {convertConfirmClient.status}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--color-text-faint)] font-bold uppercase text-[9px]">Current Lender</span>
+                <span className="text-[var(--color-text-muted)] font-semibold">{convertConfirmClient.lender || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--color-text-faint)] font-bold uppercase text-[9px]">Mortgage Amount</span>
+                <span className="text-[var(--color-text)] font-mono font-bold">
+                  {convertConfirmClient.mtgamt ? `$${Number(convertConfirmClient.mtgamt).toLocaleString()}` : "N/A"}
+                </span>
+              </div>
+            </div>
+
+            <div className="border-t border-[var(--color-border)] pt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setConvertConfirmClient(null)}
+                className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmConvert}
+                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black rounded-lg text-xs font-black uppercase transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="h-3.5 w-3.5" /> Confirm — Convert
               </button>
             </div>
 
