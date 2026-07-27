@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   ShieldCheck, ShieldAlert, FileText, Clock, Search, Filter, 
   Download, Eye, Edit3, Lock, CheckCircle, AlertTriangle, 
@@ -58,11 +58,18 @@ export const Compliance: React.FC<ComplianceProps> = ({
   // Timeline filters
   const [timelineSearch, setTimelineSearch] = useState("");
   const [timelineActionFilter, setTimelineActionFilter] = useState("All");
+  const [timelinePage, setTimelinePage] = useState(1);
+  const LOGS_PER_PAGE = 50;
+
+  useEffect(() => {
+    setTimelinePage(1);
+  }, [timelineSearch, timelineActionFilter]);
 
   // Selection states for detail modals
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
   const [newComplianceNote, setNewComplianceNote] = useState("");
+  const [snoozedExceptions, setSnoozedExceptions] = useState<string[]>([]);
 
   // Check permissions: Owner/Admin see all, brokers see their own.
   const isPrivileged = useMemo(() => {
@@ -132,7 +139,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
   // Filter clients for compliance monitoring
   const clientComplianceList = useMemo(() => {
     return clients.filter(c => {
-      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
+      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : `${currentUser.first} ${currentUser.last}`);
       const matchesAgent = activeAgentFilter === "All" || owner.toLowerCase() === activeAgentFilter.toLowerCase();
       
       if (!matchesAgent) return false;
@@ -146,7 +153,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
         (c.status && c.status.toLowerCase().includes(s))
       );
     });
-  }, [clients, activeAgentFilter, searchTerm]);
+  }, [clients, activeAgentFilter, searchTerm, currentUser]);
 
   // Expose exceptions radar
   const complianceExceptions = useMemo(() => {
@@ -162,7 +169,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
     }[] = [];
 
     clients.forEach(c => {
-      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
+      const owner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : `${currentUser.first} ${currentUser.last}`);
       const docStats = getClientDocStats(c.id);
 
       // Exception 1: In lender status but missing key documents
@@ -236,8 +243,8 @@ export const Compliance: React.FC<ComplianceProps> = ({
       }
     });
 
-    return anomalies;
-  }, [clients, docVault]);
+    return anomalies.filter(an => !snoozedExceptions.includes(`${an.clientId}-${an.type}`));
+  }, [clients, docVault, currentUser, snoozedExceptions]);
 
   // Overall metric calculations
   const metrics = useMemo(() => {
@@ -411,6 +418,190 @@ export const Compliance: React.FC<ComplianceProps> = ({
       return matchesSearch;
     });
   }, [auditLogs, timelineSearch, timelineActionFilter]);
+
+  const handlePrintClientReport = (c: Client) => {
+    const docStats = getClientDocStats(c.id);
+    const clientDocs = docVault[c.id] || {};
+    const owner = c.retentionOwner || `${currentUser.first} ${currentUser.last}`;
+    const printedBy = `${currentUser.first} ${currentUser.last}`;
+    const printedAt = new Date().toLocaleString();
+    // GDS/TDS Calculations
+    const income = Number(c.income || 0);
+    const debts = Number(c.debts || 0);
+    const mtgamt = Number(c.mtgamt || 0);
+    const monthlyIncome = income / 12;
+    const estMonthlyPayment = mtgamt * 0.005;
+    const gds = monthlyIncome > 0 ? ((estMonthlyPayment + Number(c.heat || 0) + Number(c.condo || 0) + Number(c.tax || 0) / 12) / monthlyIncome * 100).toFixed(1) : "N/A";
+    const tds = monthlyIncome > 0 ? ((estMonthlyPayment + debts / 12 + Number(c.heat || 0) + Number(c.condo || 0) + Number(c.tax || 0) / 12) / monthlyIncome * 100).toFixed(1) : "N/A";
+    const gdsColor = Number(gds) < 32 ? "#22c55e" : Number(gds) < 39 ? "#f59e0b" : "#ef4444";
+    const tdsColor = Number(tds) < 44 ? "#22c55e" : Number(tds) < 50 ? "#f59e0b" : "#ef4444";
+    // Document checklist rows
+    const docRows = REQUIRED_DOC_TYPES.map(doc => {
+      const state = clientDocs[doc.id] || { status: "required" };
+      const statusLabel = state.status === "verified" ? "★ VERIFIED" : state.status === "received" ? "✓ RECEIVED" : state.status === "na" ? "N/A" : "⚠ REQUIRED";
+      const statusColor = state.status === "verified" ? "#22c55e" : state.status === "received" ? "#3b82f6" : state.status === "na" ? "#6b7280" : "#ef4444";
+      return `<tr style="border-bottom:1px solid #e5e7eb">
+        <td style="padding:6px 8px;font-size:11px;color:#374151">${doc.label}</td>
+        <td style="padding:6px 8px;font-size:11px;font-weight:700;color:${statusColor}">${statusLabel}</td>
+        <td style="padding:6px 8px;font-size:10px;color:#6b7280">${state.path || "—"}</td>
+      </tr>`;
+    }).join("");
+    // AI confirmation status
+    const aiStatus = c.aiSummary
+      ? (c.appData?.aiConfirmed === "true"
+          ? `✓ Confirmed by ${c.appData?.aiConfirmedBy || "Broker"} on ${new Date(c.appData?.aiConfirmedAt || "").toLocaleDateString()}`
+          : "⚠ Awaiting Human Broker Confirmation")
+      : "No AI Summary on File";
+    // Compliance certification status
+    const certStatus = c.appData?.complianceCertified === "true"
+      ? `✓ Certified by ${c.appData?.complianceCertifiedBy || "Broker"} on ${new Date(c.appData?.complianceCertifiedAt || "").toLocaleDateString()}`
+      : "Not Yet Certified";
+    // calcSnapshot data if available
+    const snap = c.calcSnapshot;
+    const snapSection = snap ? `
+      <div style="margin-top:20px">
+        <h3 style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#1f2937;border-bottom:2px solid #e5e7eb;padding-bottom:6px;margin-bottom:10px">📊 Calculator Snapshot (Saved ${new Date(snap.savedAt).toLocaleDateString()})</h3>
+        <table style="width:100%;font-size:11px;border-collapse:collapse">
+          ${snap.stressTest ? `<tr><td style="padding:4px 8px;color:#6b7280">Stress Test Max Mortgage</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">$${snap.stressTest.maxQualifiedMortgage?.toLocaleString()}</td><td style="padding:4px 8px;color:#6b7280">Est. Payment @ Contract Rate</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">$${snap.stressTest.estPaymentAtContract?.toLocaleString()}/mo</td></tr>` : ""}
+          ${snap.gdsTds ? `<tr><td style="padding:4px 8px;color:#6b7280">GDS (Calculator)</td><td style="padding:4px 8px;font-weight:700;color:${snap.gdsTds.gds < 32 ? "#22c55e" : "#ef4444"}">${snap.gdsTds.gds?.toFixed(1)}%</td><td style="padding:4px 8px;color:#6b7280">TDS (Calculator)</td><td style="padding:4px 8px;font-weight:700;color:${snap.gdsTds.tds < 44 ? "#22c55e" : "#ef4444"}">${snap.gdsTds.tds?.toFixed(1)}%</td></tr>` : ""}
+          ${snap.cmhc ? `<tr><td style="padding:4px 8px;color:#6b7280">CMHC Premium</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">$${snap.cmhc.premiumAmount?.toLocaleString()} (${snap.cmhc.premiumPct}%)</td><td style="padding:4px 8px;color:#6b7280">LTV Ratio</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">${snap.cmhc.ltvRatio?.toFixed(1)}%</td></tr>` : ""}
+          ${snap.paymentCalc ? `<tr><td style="padding:4px 8px;color:#6b7280">Monthly Payment</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">$${snap.paymentCalc.monthly?.toLocaleString()}</td><td style="padding:4px 8px;color:#6b7280">Total Interest</td><td style="padding:4px 8px;font-weight:700;color:#1f2937">$${snap.paymentCalc.totalInterest?.toLocaleString()}</td></tr>` : ""}
+        </table>
+      </div>` : "";
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Compliance Report — ${c.first} ${c.last}</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; background: #fff; padding: 32px; font-size: 12px; }
+      @media print {
+        body { padding: 16px; }
+        .no-print { display: none !important; }
+        @page { margin: 1.5cm; size: A4 portrait; }
+      }
+      .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1f2937; padding-bottom:16px; margin-bottom:24px; }
+      .logo { font-size:18px; font-weight:900; letter-spacing:-.5px; color:#1f2937; }
+      .logo span { color:#0d9488; }
+      .report-title { font-size:11px; color:#6b7280; margin-top:4px; }
+      .meta { text-align:right; font-size:10px; color:#6b7280; line-height:1.7; }
+      .section { margin-bottom:24px; }
+      h3 { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1f2937; border-bottom:2px solid #e5e7eb; padding-bottom:6px; margin-bottom:10px; }
+      table { width:100%; border-collapse:collapse; }
+      td, th { padding:6px 8px; vertical-align:top; }
+      th { font-size:10px; text-transform:uppercase; color:#6b7280; font-weight:700; background:#f9fafb; text-align:left; }
+      .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+      .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+      .kpi { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
+      .kpi-label { font-size:9px; text-transform:uppercase; font-weight:700; color:#6b7280; margin-bottom:4px; }
+      .kpi-value { font-size:16px; font-weight:900; color:#1f2937; }
+      .status-badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; background:#f3f4f6; color:#374151; }
+      .notes-box { background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:12px; font-size:11px; line-height:1.7; color:#374151; white-space:pre-wrap; min-height:60px; }
+      .footer { margin-top:32px; border-top:1px solid #e5e7eb; padding-top:12px; font-size:9px; color:#9ca3af; display:flex; justify-content:space-between; }
+      .print-btn { position:fixed; top:20px; right:20px; background:#0d9488; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer; }
+    </style></head><body>
+    <button class="print-btn no-print" onclick="window.print()">🖨 Print / Save PDF</button>
+    <div class="header">
+      <div>
+        <div class="logo">GBK <span>Financial</span></div>
+        <div class="report-title">Client Compliance & Underwriting Report</div>
+        <div style="margin-top:8px"><span class="status-badge">${c.status.toUpperCase()}</span>${c.appData?.complianceCertified === "true" ? ' <span class="status-badge" style="background:#dcfce7;color:#15803d">✓ COMPLIANCE CERTIFIED</span>' : ''}</div>
+      </div>
+      <div class="meta">
+        <div><strong>Printed By:</strong> ${printedBy}</div>
+        <div><strong>Print Date:</strong> ${printedAt}</div>
+        <div><strong>Assigned Broker:</strong> ${owner}</div>
+        <div><strong>Client ID:</strong> ${c.id}</div>
+      </div>
+    </div>
+    <!-- KPI Strip -->
+    <div class="section grid-4">
+      <div class="kpi"><div class="kpi-label">Docs Received</div><div class="kpi-value">${docStats.totalReceived}/${docStats.totalRequired}</div></div>
+      <div class="kpi"><div class="kpi-label">Docs Verified</div><div class="kpi-value">${docStats.totalVerified}/${docStats.totalRequired}</div></div>
+      <div class="kpi"><div class="kpi-label">GDS (Est.)</div><div class="kpi-value" style="color:${gdsColor}">${gds}%</div></div>
+      <div class="kpi"><div class="kpi-label">TDS (Est.)</div><div class="kpi-value" style="color:${tdsColor}">${tds}%</div></div>
+    </div>
+    <div class="grid-2">
+      <!-- Personal & KYC -->
+      <div class="section">
+        <h3>👤 Borrower Profile & KYC</h3>
+        <table>
+          <tr><td style="color:#6b7280;width:45%">Full Name</td><td><strong>${c.first} ${c.last}</strong></td></tr>
+          <tr><td style="color:#6b7280">Date of Birth</td><td>${c.dob || "Not Provided"}</td></tr>
+          <tr><td style="color:#6b7280">Marital Status</td><td>${c.marital || "Not Specified"}</td></tr>
+          <tr><td style="color:#6b7280">Dependants</td><td>${c.dep ?? "0"}</td></tr>
+          <tr><td style="color:#6b7280">Email</td><td>${c.email || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Cell Phone</td><td>${c.cell || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Address</td><td>${c.addr || "Not Provided"}</td></tr>
+          <tr><td style="color:#6b7280">SIN (Masked)</td><td style="font-weight:700;color:#b45309">${formatSinValue(c.sin)}</td></tr>
+          <tr><td style="color:#6b7280">Co-Applicant</td><td>${c.co || "None"}</td></tr>
+          ${c.coEmail ? `<tr><td style="color:#6b7280">Co-Applicant Email</td><td>${c.coEmail}</td></tr>` : ""}
+          <tr><td style="color:#6b7280">Referred By</td><td>${c.referredBy || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Lead Source</td><td>${c.source || "—"}</td></tr>
+        </table>
+      </div>
+      <!-- Financial Profile -->
+      <div class="section">
+        <h3>💰 Financial & Property Details</h3>
+        <table>
+          <tr><td style="color:#6b7280;width:45%">Employment Type</td><td>${c.emptype || "Not Specified"}</td></tr>
+          <tr><td style="color:#6b7280">Primary Income</td><td><strong>$${Number(c.income || 0).toLocaleString()}/yr</strong></td></tr>
+          <tr><td style="color:#6b7280">Co-Applicant Income</td><td>$${Number(c.coIncome || 0).toLocaleString()}/yr</td></tr>
+          <tr><td style="color:#6b7280">Monthly Debts</td><td>$${Number(c.debts || 0).toLocaleString()}/mo</td></tr>
+          <tr><td style="color:#6b7280">Beacon Score</td><td>${c.beacon || "Not Provided"}</td></tr>
+          <tr><td style="color:#6b7280">Property Value</td><td>$${Number(c.propval || 0).toLocaleString()}</td></tr>
+          <tr><td style="color:#6b7280">Mortgage Amount</td><td>$${Number(c.mtgamt || 0).toLocaleString()}</td></tr>
+          <tr><td style="color:#6b7280">Property Type</td><td>${c.proptype || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Tenure</td><td>${c.tenure || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Property Taxes</td><td>$${Number(c.tax || 0).toLocaleString()}/yr</td></tr>
+          <tr><td style="color:#6b7280">Heating Costs</td><td>$${Number(c.heat || 0).toLocaleString()}/mo</td></tr>
+          <tr><td style="color:#6b7280">Condo Fees</td><td>$${Number(c.condo || 0).toLocaleString()}/mo</td></tr>
+          <tr><td style="color:#6b7280">Assigned Lender</td><td><strong>${c.lender || "Not Assigned"}</strong></td></tr>
+          <tr><td style="color:#6b7280">Mortgage Term</td><td>${c.mortgageTerm ? c.mortgageTerm + " Year(s)" : "—"}</td></tr>
+          <tr><td style="color:#6b7280">Maturity Date</td><td>${c.maturityDate || "—"}</td></tr>
+          <tr><td style="color:#6b7280">Funded Date</td><td>${c.fundedDate || "—"}</td></tr>
+        </table>
+      </div>
+    </div>
+    <!-- Document Checklist -->
+    <div class="section">
+      <h3>📁 Required Document Checklist</h3>
+      <table>
+        <thead><tr><th>Document</th><th>Status</th><th>File / Notes</th></tr></thead>
+        <tbody>${docRows}</tbody>
+      </table>
+    </div>
+    <!-- AI Summary & Certification -->
+    <div class="grid-2">
+      <div class="section">
+        <h3>🤖 AI Intake Report Status</h3>
+        <div class="notes-box" style="min-height:80px">${c.aiSummary ? `<div style="font-style:italic;color:#374151;margin-bottom:8px">"${c.aiSummary}"</div><div style="font-size:10px;color:#6b7280">${aiStatus}</div>` : "No AI Summary on file."}</div>
+      </div>
+      <div class="section">
+        <h3>✅ Compliance Certification</h3>
+        <div class="notes-box" style="min-height:80px">
+          <div style="font-weight:700;color:${c.appData?.complianceCertified === "true" ? "#15803d" : "#b45309"}">${certStatus}</div>
+          <div style="margin-top:8px;font-size:10px;color:#6b7280">File Cleanliness: ${docStats.percent}% (${docStats.totalReceived}/${docStats.totalRequired} docs received, ${docStats.totalVerified} verified)</div>
+        </div>
+      </div>
+    </div>
+    ${snapSection}
+    <!-- Compliance Notes -->
+    <div class="section">
+      <h3>📝 Auditor Notes & Compliance Decisions</h3>
+      <div class="notes-box">${c.retentionNotes || "No compliance notes recorded for this client."}</div>
+    </div>
+    <div class="footer">
+      <div>GBK Financial CRM — Confidential. For internal broker use only. Do not distribute without authorization.</div>
+      <div>Generated: ${printedAt} | By: ${printedBy}</div>
+    </div>
+    </body></html>`;
+    const win = window.open("", "_blank", "width=900,height=1100");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    }
+    const logItem = { user: printedBy, action: "Generated Compliance Print Report", target: `${c.first} ${c.last}`, time: new Date().toISOString() };
+    setAuditLogs(prev => [logItem, ...prev]);
+    showToast(`Print report opened for ${c.first} ${c.last}.`, "info");
+  };
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden font-sans" id="compliance-module-root">
@@ -618,6 +809,13 @@ export const Compliance: React.FC<ComplianceProps> = ({
                               <span className="bg-[var(--color-surface-2)] text-[var(--color-text-muted)] text-[9px] font-black uppercase px-2 py-0.5 rounded border border-[var(--color-border)]">
                                 {c.status.toUpperCase()}
                               </span>
+                              {c.appData?.complianceCertified === "true" && (
+                                <div className="mt-1">
+                                  <span className="text-emerald-400 bg-emerald-500/10 text-[9px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/20 inline-block">
+                                    ✓ Certified
+                                  </span>
+                                </div>
+                              )}
                             </td>
                             <td className="p-4">
                               <div className="text-[var(--color-text)]">${Number(c.income || 0).toLocaleString()}/yr</div>
@@ -639,7 +837,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                             <td className="p-4 text-right">
                               <button
                                 onClick={() => setSelectedClient(selectedClient?.id === c.id ? null : c)}
-                                className="px-3 py-1.5 bg-[var(--color-accent-subtle)] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border-accent)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
+                                className="px-3 py-1.5 bg-[var(--color-primary)/10] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer"
                               >
                                 {selectedClient?.id === c.id ? "Close Audit" : "Audit File"}
                               </button>
@@ -708,11 +906,51 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                           <span className="text-[var(--color-text)] font-mono">{c.dob || "Not Entered"}</span>
                                         </div>
                                         {c.co && (
-                                          <div className="flex justify-between">
+                                          <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
                                             <span className="text-[var(--color-text-muted)]">Co-Signer Added:</span>
                                             <span className="text-[var(--color-accent)] truncate max-w-[120px]">{c.co}</span>
                                           </div>
                                         )}
+                                        {(() => {
+                                          const mtgamtNum = Number(c.mtgamt || 0);
+                                          const incomeNum = Number(c.income || 0);
+                                          const debtsNum = Number(c.debts || 0);
+                                          const monthlyIncome = incomeNum > 0 ? incomeNum / 12 : 0;
+                                          const monthlyPayment = mtgamtNum * 0.005;
+                                          const gdsVal = monthlyIncome > 0 ? (monthlyPayment / monthlyIncome) * 100 : null;
+                                          const tdsVal = monthlyIncome > 0 ? ((monthlyPayment + (debtsNum / 12)) / monthlyIncome) * 100 : null;
+
+                                          const getGdsColor = (val: number | null) => {
+                                            if (val === null) return "text-[var(--color-text-muted)]";
+                                            if (val < 32) return "text-emerald-400";
+                                            if (val <= 39) return "text-amber-400";
+                                            return "text-red-400";
+                                          };
+
+                                          const getTdsColor = (val: number | null) => {
+                                            if (val === null) return "text-[var(--color-text-muted)]";
+                                            if (val < 44) return "text-emerald-400";
+                                            if (val <= 50) return "text-amber-400";
+                                            return "text-red-400";
+                                          };
+
+                                          return (
+                                            <>
+                                              <div className="flex justify-between border-b border-[var(--color-border)] pb-1.5">
+                                                <span className="text-[var(--color-text-muted)]">Estimated GDS Ratio:</span>
+                                                <span className={`font-mono font-bold ${getGdsColor(gdsVal)}`}>
+                                                  {gdsVal !== null ? `${gdsVal.toFixed(1)}%` : "N/A"}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                <span className="text-[var(--color-text-muted)]">Estimated TDS Ratio:</span>
+                                                <span className={`font-mono font-bold ${getTdsColor(tdsVal)}`}>
+                                                  {tdsVal !== null ? `${tdsVal.toFixed(1)}%` : "N/A"}
+                                                </span>
+                                              </div>
+                                            </>
+                                          );
+                                        })()}
                                       </div>
                                     </div>
 
@@ -766,9 +1004,12 @@ export const Compliance: React.FC<ComplianceProps> = ({
                                     </div>
 
                                     <div className="flex gap-2 mt-4">
+                                      <button onClick={() => handlePrintClientReport(c)} className="flex-1 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 rounded-lg text-[10px] font-black uppercase border border-blue-500/20 transition-all cursor-pointer">
+                                        🖨 Print Report
+                                      </button>
                                       <button
                                         onClick={handleAddComplianceNote}
-                                        className="flex-1 py-2 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] rounded-lg text-[10px] font-black uppercase border border-[var(--color-border)] transition-all cursor-pointer"
+                                        className="flex-1 py-2 bg-[var(--color-surface-offset)] hover:bg-[var(--color-surface-offset)]/80 text-[var(--color-text)] rounded-lg text-[10px] font-black uppercase border border-[var(--color-border)] transition-all cursor-pointer"
                                       >
                                         Log Auditor Note
                                       </button>
@@ -849,7 +1090,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                   if (ex.severity === "low") badge = "bg-purple-500/10 text-purple-300 border-purple-500/20";
 
                   return (
-                    <div key={index} className="bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] rounded-2xl p-5 flex flex-col justify-between transition-all">
+                    <div key={index} className="bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-border)] rounded-2xl p-5 flex flex-col justify-between transition-all">
                       <div>
                         <div className="flex justify-between items-start gap-4">
                           <div>
@@ -876,6 +1117,25 @@ export const Compliance: React.FC<ComplianceProps> = ({
                       <div className="border-t border-[var(--color-border)] pt-3 flex justify-end gap-2">
                         <button
                           onClick={() => {
+                            const key = `${ex.clientId}-${ex.type}`;
+                            setSnoozedExceptions(prev => [...prev, key]);
+                            setAuditLogs(prev => [
+                              {
+                                user: `${currentUser.first} ${currentUser.last}`,
+                                action: `Snoozed exception (${ex.type}) 7 days`,
+                                target: ex.clientName,
+                                time: new Date().toISOString()
+                              },
+                              ...prev
+                            ]);
+                            showToast(`Snoozed exception for ${ex.clientName} for 7 days.`, "info");
+                          }}
+                          className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-offset)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          <Clock className="h-3 w-3" /> Snooze 7 Days
+                        </button>
+                        <button
+                          onClick={() => {
                             // Find the client object
                             const found = clients.find(cl => cl.id === ex.clientId);
                             if (found) {
@@ -884,7 +1144,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                               showToast(`Loaded auditing desk for ${found.first}!`, "info");
                             }
                           }}
-                          className="px-3 py-1.5 bg-[var(--color-accent-subtle)] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border-accent)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 bg-[var(--color-primary)/10] hover:bg-[var(--color-accent)]/20 border border-[var(--color-border)] text-[var(--color-accent)] rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1 cursor-pointer"
                         >
                           Audit Document Checklist <ArrowRight className="h-3 w-3" />
                         </button>
@@ -932,7 +1192,7 @@ export const Compliance: React.FC<ComplianceProps> = ({
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all border cursor-pointer ${
                         timelineActionFilter === btn.id 
                           ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)] border-[var(--color-accent)]" 
-                          : "bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border-[var(--color-border)]"
+                          : "bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-offset)] text-[var(--color-text)] border-[var(--color-border)]"
                       }`}
                     >
                       {btn.label}
@@ -960,46 +1220,59 @@ export const Compliance: React.FC<ComplianceProps> = ({
                   No logged entries match your search criteria.
                 </div>
               ) : (
-                <div className="relative border-l border-[var(--color-border)] ml-3 pl-6 space-y-6">
-                  {filteredAuditLogs.map((log, index) => {
-                    let isSensitive = 
-                      log.action.toLowerCase().includes("sin") || 
-                      log.action.toLowerCase().includes("export") ||
-                      log.action.toLowerCase().includes("credentials") ||
-                      log.action.toLowerCase().includes("locked") ||
-                      log.action.toLowerCase().includes("unlock");
+                <>
+                  <div className="relative border-l border-[var(--color-border)] ml-3 pl-6 space-y-6">
+                    {filteredAuditLogs.slice(0, timelinePage * LOGS_PER_PAGE).map((log, index) => {
+                      let isSensitive = 
+                        log.action.toLowerCase().includes("sin") || 
+                        log.action.toLowerCase().includes("export") ||
+                        log.action.toLowerCase().includes("credentials") ||
+                        log.action.toLowerCase().includes("locked") ||
+                        log.action.toLowerCase().includes("unlock");
 
-                    return (
-                      <div key={index} className="relative group">
-                        {/* Bullet */}
-                        <div className={`absolute -left-[30px] top-1 w-3 h-3 rounded-full border-2 bg-[var(--color-bg)] group-hover:scale-125 transition-transform ${
-                          isSensitive ? "border-amber-400" : "border-[var(--color-accent)]"
-                        }`} />
-                        
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
-                          <div className="text-xs">
-                            <span className="text-[var(--color-text)] font-black">{log.user}</span>
-                            <span className="text-[var(--color-text-muted)] mx-1.5">performed</span>
-                            <span className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded ${
-                              isSensitive ? "text-amber-500 bg-amber-500/10" : "text-[var(--color-text)] bg-[var(--color-surface-2)]"
-                            }`}>
-                              {log.action}
+                      return (
+                        <div key={index} className="relative group">
+                          {/* Bullet */}
+                          <div className={`absolute -left-[30px] top-1 w-3 h-3 rounded-full border-2 bg-[var(--color-bg)] group-hover:scale-125 transition-transform ${
+                            isSensitive ? "border-amber-400" : "border-[var(--color-accent)]"
+                          }`} />
+                          
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+                            <div className="text-xs">
+                              <span className="text-[var(--color-text)] font-black">{log.user}</span>
+                              <span className="text-[var(--color-text-muted)] mx-1.5">performed</span>
+                              <span className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded ${
+                                isSensitive ? "text-amber-500 bg-amber-500/10" : "text-[var(--color-text)] bg-[var(--color-surface-2)]"
+                              }`}>
+                                {log.action}
+                              </span>
+                              {log.target && (
+                                <>
+                                  <span className="text-[var(--color-text-muted)] mx-1.5">on</span>
+                                  <span className="text-[var(--color-text)] font-semibold">{log.target}</span>
+                                </>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-[var(--color-text-muted)] font-mono">
+                              {new Date(log.time).toLocaleString()}
                             </span>
-                            {log.target && (
-                              <>
-                                <span className="text-[var(--color-text-muted)] mx-1.5">on</span>
-                                <span className="text-[var(--color-text)] font-semibold">{log.target}</span>
-                              </>
-                            )}
                           </div>
-                          <span className="text-[10px] text-[var(--color-text-muted)] font-mono">
-                            {new Date(log.time).toLocaleString()}
-                          </span>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+
+                  {filteredAuditLogs.length > timelinePage * LOGS_PER_PAGE && (
+                    <div className="pt-4 text-center border-t border-[var(--color-border)]/50">
+                      <button
+                        onClick={() => setTimelinePage(prev => prev + 1)}
+                        className="px-4 py-2 bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-offset)] border border-[var(--color-border)] text-[var(--color-text)] font-black text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                      >
+                        Load More
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -1041,11 +1314,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
                       onClick={() => {
                         const nextVal = !sessionAutoLock;
                         setAutoLockEnabled(nextVal);
-                        localStorage.setItem("gbk_sec_autolock", String(nextVal));
                         showToast(`Session auto-lock ${nextVal ? "enabled" : "disabled"}.`, "info");
                       }}
                       className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none cursor-pointer ${
-                        sessionAutoLock ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-3)]"
+                        sessionAutoLock ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-offset)]"
                       }`}
                     >
                       <div className={`bg-[var(--color-surface)] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
@@ -1066,7 +1338,6 @@ export const Compliance: React.FC<ComplianceProps> = ({
                         onChange={(e) => {
                           const val = Number(e.target.value);
                           setAutoLockMinutes(val);
-                          localStorage.setItem("gbk_sec_idle_min", String(val));
                           showToast(`Lockstation idle threshold updated to ${val} minutes.`, "info");
                         }}
                         className="bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)] font-black text-xs p-2 rounded focus:outline-none focus:border-[var(--color-accent)]"
@@ -1090,11 +1361,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
                       onClick={() => {
                         const nextVal = !auditLoggingEnabled;
                         setAuditLogEnabled(nextVal);
-                        localStorage.setItem("gbk_sec_audit", String(nextVal));
                         showToast(`Process audit log pipeline ${nextVal ? "active" : "dormant"}.`, "info");
                       }}
                       className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-200 focus:outline-none cursor-pointer ${
-                        auditLoggingEnabled ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-3)]"
+                        auditLoggingEnabled ? "bg-[var(--color-accent)]" : "bg-[var(--color-surface-offset)]"
                       }`}
                     >
                       <div className={`bg-[var(--color-surface)] w-4.5 h-4.5 rounded-full transition-transform duration-200 transform ${
@@ -1160,10 +1430,10 @@ export const Compliance: React.FC<ComplianceProps> = ({
 
       </div>
 
-      {/* Export CSV Audit Log Modal */}
+      {/* Export Confirmation Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-[var(--glass-bg)] backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in" id="export-overlay">
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-xl p-6 relative flex flex-col text-xs font-semibold">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-full max-w-md p-6 relative flex flex-col text-xs font-semibold shadow-2xl">
             <button 
               onClick={() => setShowExportModal(false)}
               className="absolute right-4 top-4 text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-pointer"
@@ -1171,28 +1441,33 @@ export const Compliance: React.FC<ComplianceProps> = ({
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-2 mb-2">
-              <FileSpreadsheet className="h-5 w-5 text-[var(--color-accent)]" /> Export Compliance Audit CSV Text
+            <h3 className="text-base font-black uppercase tracking-wider text-[var(--color-text)] flex items-center gap-2 mb-2">
+              <FileSpreadsheet className="h-5 w-5 text-[var(--color-accent)]" /> Export Audit Records
             </h3>
-            <p className="text-xs text-[var(--color-text-muted)] font-semibold mb-4 border-b border-[var(--color-border)] pb-3">
-              Copy and compile the following standardized audit logs format to meet FSRA license compliance checks or backups.
+            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-6">
+              This will download all audit log entries as a CSV file.
             </p>
 
-            <textarea 
-              rows={12}
-              readOnly
-              value={generateCsvReport()}
-              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] p-3.5 rounded-lg font-mono text-[10px] leading-relaxed focus:outline-none"
-              onClick={(e) => (e.target as HTMLTextAreaElement).select()}
-            />
-
-            <div className="border-t border-[var(--color-border)] mt-5 pt-4 flex justify-end gap-3 shrink-0">
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="px-4 py-2 bg-[var(--color-surface-offset)] hover:bg-[var(--color-surface-offset)]/80 text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] cursor-pointer"
+              >
+                Cancel
+              </button>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(generateCsvReport());
-                  showToast("CSV data copied to system clipboard!", "success");
-                  
-                  // Log export action
+                  const csvData = generateCsvReport();
+                  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.setAttribute("href", url);
+                  link.setAttribute("download", "gbk-audit-log.csv");
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+
                   const logItem = {
                     user: `${currentUser.first} ${currentUser.last}`,
                     action: "Exported Compliance Audit Log CSV",
@@ -1202,16 +1477,11 @@ export const Compliance: React.FC<ComplianceProps> = ({
                   setAuditLogs(prev => [logItem, ...prev]);
 
                   setShowExportModal(false);
+                  showToast("Audit log exported successfully.", "success");
                 }}
-                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] rounded-lg text-xs font-black uppercase flex items-center gap-1.5 transition-all cursor-pointer"
+                className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-text-inverse)] rounded-lg text-xs font-black uppercase transition-all cursor-pointer shadow-md"
               >
-                Copy to Clipboard
-              </button>
-              <button
-                onClick={() => setShowExportModal(false)}
-                className="px-4 py-2 bg-[var(--color-surface-3)] hover:bg-[var(--color-surface-3)]/80 text-[var(--color-text)] rounded-lg text-xs font-bold transition-all border border-[var(--color-border)] cursor-pointer"
-              >
-                Close
+                Confirm
               </button>
             </div>
           </div>
