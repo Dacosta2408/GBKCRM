@@ -700,7 +700,341 @@ export const Retention: React.FC<RetentionProps> = ({
         margin: { top: 15, right: 14, bottom: 15, left: 14 }
       });
 
-      // Footers
+      // --- Client Detail Appendix Section ---
+      const _finalY = (doc as any).lastAutoTable?.finalY || 100;
+      
+      // Start appendix on a new page after main table
+      doc.addPage();
+      let currentY = 15;
+
+      // Appendix Section Header (top of first appendix page)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(30, 41, 59);
+      doc.text("Client Detail Appendix", 14, currentY);
+
+      doc.setFontSize(8.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text("Detailed Individual Client Records, Contract Details & Retention History Notes", 14, currentY + 5);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY + 8, 283, currentY + 8);
+
+      currentY += 14;
+
+      filteredStreamClients.forEach((client, idx) => {
+        const owner = client.retentionOwner || client.agent || currentUserFull;
+        const matDate = getMaturityDate(client);
+        const formattedMatDate = matDate ? matDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A";
+        const mtgAmtStr = client.mtgamt ? `$${Number(client.mtgamt).toLocaleString()}` : "N/A";
+        const mtgTermStr = client.mortgageTerm ? `${client.mortgageTerm}-Yr Term` : "N/A";
+
+        let renewalNotifiedStr = "No";
+        if (client.renewalNotified) {
+          const rDate = new Date(client.renewalNotified);
+          renewalNotifiedStr = !isNaN(rDate.getTime()) ? rDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : client.renewalNotified;
+        }
+
+        let birthdayAckStr = "No";
+        if (client.birthdayAcknowledged) {
+          birthdayAckStr = `Yes (${client.birthdayAcknowledged})`;
+        }
+
+        const items = [
+          { label: "Client Name", val: `${client.first} ${client.last}` },
+          { label: "CRM Status", val: client.status || "N/A" },
+          { label: "Retention Owner", val: owner },
+          { label: "Email", val: client.email || "N/A" },
+          { label: "Cell", val: client.cell || "N/A" },
+          { label: "Address", val: client.addr || "N/A" },
+          { label: "Lender", val: client.lender || "N/A" },
+          { label: "Mortgage Amount", val: mtgAmtStr },
+          { label: "Maturity Date", val: formattedMatDate },
+          { label: "Mortgage Term", val: mtgTermStr },
+          { label: "Last Contacted", val: client.lastContactedDate || "N/A" },
+          { label: "Next Follow-up", val: client.nextFollowUpDate || "N/A" },
+          { label: "Retention Outcome", val: client.retentionOutcome || "None" },
+          { label: "Renewal Notified", val: renewalNotifiedStr },
+          { label: "Birthday Acknowledged", val: birthdayAckStr }
+        ];
+
+        // Stream-Specific Insight calculation helper
+        const getStreamSpecificInsights = (c: Client) => {
+          const now = new Date();
+          const insightItems: { label: string; val: string }[] = [];
+
+          if (activeStream === "renewals") {
+            const mDate = getMaturityDate(c);
+            let daysRemainingStr = "N/A";
+            let tierStr = "Outside Active Renewal Window";
+
+            if (mDate) {
+              const diffMs = mDate.getTime() - now.getTime();
+              const diffDays = Math.ceil(diffMs / (24 * 3600000));
+              daysRemainingStr = `${diffDays} days`;
+
+              if (diffDays >= 0 && diffDays <= 120) tierStr = "4-Month Tier";
+              else if (diffDays >= 121 && diffDays <= 180) tierStr = "6-Month Tier";
+              else if (diffDays >= 181 && diffDays <= 365) tierStr = "1-Year Tier";
+              else if (diffDays >= 366 && diffDays <= 730) tierStr = "2-Year Tier";
+            }
+
+            let matSource = "N/A";
+            if (c.maturityDate) {
+              matSource = "Recorded Maturity Date";
+            } else if (c.fundedDate) {
+              matSource = "Computed from Funded Date + Mortgage Term";
+            }
+
+            let renNotifiedStr = "No";
+            if (c.renewalNotified) {
+              const rDate = new Date(c.renewalNotified);
+              renNotifiedStr = !isNaN(rDate.getTime()) ? rDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : String(c.renewalNotified);
+            }
+
+            const mtgAmt = Number(c.mtgamt || 0);
+            let revPriority = "Unspecified";
+            if (mtgAmt >= 750000) revPriority = "High Balance Opportunity";
+            else if (mtgAmt >= 400000) revPriority = "Standard Balance Review";
+            else if (mtgAmt > 0) revPriority = "Routine Renewal Review";
+
+            insightItems.push(
+              { label: "Renewal Tier", val: tierStr },
+              { label: "Days Remaining", val: daysRemainingStr },
+              { label: "Maturity Source", val: matSource },
+              { label: "Renewal Notified", val: renNotifiedStr },
+              { label: "Revenue Priority", val: revPriority }
+            );
+          } else if (activeStream === "birthdays") {
+            let upcomingBdayStr = "N/A";
+            let bdayStatus = "Outside Active Birthday Window";
+
+            if (c.dob) {
+              const bday = new Date(c.dob);
+              if (!isNaN(bday.getTime())) {
+                const thisYearBday = new Date(now.getFullYear(), bday.getMonth(), bday.getDate());
+                let diffDays = Math.ceil((thisYearBday.getTime() - now.getTime()) / (24 * 3600000));
+                let targetBday = thisYearBday;
+
+                if (diffDays < -7) {
+                  targetBday = new Date(now.getFullYear() + 1, bday.getMonth(), bday.getDate());
+                  diffDays = Math.ceil((targetBday.getTime() - now.getTime()) / (24 * 3600000));
+                }
+
+                upcomingBdayStr = targetBday.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+                if (diffDays <= 0 && diffDays >= -7) {
+                  bdayStatus = "Recently Passed";
+                } else if (diffDays >= 0 && diffDays <= 30) {
+                  bdayStatus = "Upcoming";
+                }
+              }
+            }
+
+            insightItems.push(
+              { label: "Upcoming Birthday", val: upcomingBdayStr },
+              { label: "Birthday Window Status", val: bdayStatus },
+              { label: "Birthday Acknowledged", val: c.birthdayAcknowledged || "No" },
+              { label: "Relationship Touchpoint Purpose", val: "Goodwill / Personal Client Retention" }
+            );
+          } else if (activeStream === "anniversaries") {
+            let yearsStr = "N/A";
+            let upcomingAnnStr = "N/A";
+            let annStatus = "Outside Active Anniversary Window";
+            let equityRev = "N/A";
+
+            if (c.fundedDate) {
+              const fDate = new Date(c.fundedDate);
+              if (!isNaN(fDate.getTime())) {
+                const rawYears = now.getFullYear() - fDate.getFullYear();
+                const years = Math.max(1, rawYears);
+                yearsStr = `${years} Year${years === 1 ? "" : "s"}`;
+
+                const thisYearAnn = new Date(now.getFullYear(), fDate.getMonth(), fDate.getDate());
+                let diffDays = Math.ceil((thisYearAnn.getTime() - now.getTime()) / (24 * 3600000));
+                let targetAnn = thisYearAnn;
+
+                if (diffDays < -7) {
+                  targetAnn = new Date(now.getFullYear() + 1, fDate.getMonth(), fDate.getDate());
+                  diffDays = Math.ceil((targetAnn.getTime() - now.getTime()) / (24 * 3600000));
+                }
+
+                upcomingAnnStr = targetAnn.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+                if (diffDays <= 0 && diffDays >= -7) {
+                  annStatus = "Recently Passed";
+                } else if (diffDays >= 0 && diffDays <= 30) {
+                  annStatus = "Upcoming";
+                }
+
+                if (years >= 3) equityRev = "Strong Review Opportunity";
+                else if (years === 2) equityRev = "Moderate Review Opportunity";
+                else if (years === 1) equityRev = "Early Relationship Check-In";
+              }
+            }
+
+            insightItems.push(
+              { label: "Years Since Funding", val: yearsStr },
+              { label: "Upcoming Anniversary Date", val: upcomingAnnStr },
+              { label: "Anniversary Window Status", val: annStatus },
+              { label: "Equity Review Opportunity", val: equityRev }
+            );
+          } else if (activeStream === "reengage") {
+            let daysSinceStr = "N/A";
+            let reengageStatus = "N/A";
+            let urgency = "N/A";
+
+            const lastTouchStr = c.lastContactedDate || c.updatedAt || c.createdAt;
+            if (lastTouchStr) {
+              const lastTouch = new Date(lastTouchStr);
+              if (!isNaN(lastTouch.getTime())) {
+                const diffDays = Math.ceil((now.getTime() - lastTouch.getTime()) / (24 * 3600000));
+                daysSinceStr = `${diffDays} days`;
+
+                if (diffDays >= 180) {
+                  reengageStatus = "Dormant";
+                  urgency = "Immediate Outreach Recommended";
+                } else if (diffDays >= 120) {
+                  reengageStatus = "Cold";
+                  urgency = "High Priority";
+                } else if (diffDays >= 90) {
+                  reengageStatus = "Cooling";
+                  urgency = "Standard Reconnect";
+                } else {
+                  reengageStatus = "Active";
+                  urgency = "Low Priority";
+                }
+              }
+            }
+
+            insightItems.push(
+              { label: "Days Since Last Contact", val: daysSinceStr },
+              { label: "Re-engagement Status", val: reengageStatus },
+              { label: "Follow-up Urgency", val: urgency },
+              { label: "Relationship Recovery Goal", val: "Rebuild engagement and surface new financing opportunities" }
+            );
+          }
+
+          return insightItems;
+        };
+
+        const insightItems = getStreamSpecificInsights(client);
+
+        const notesText = client.retentionNotes || "No retention notes logged.";
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        const wrappedNotes = doc.splitTextToSize(notesText, 269);
+        const notesHeight = wrappedNotes.length * 3.2;
+
+        const baseGridHeight = Math.ceil(items.length / 3) * 4.2;
+        const insightGridHeight = insightItems.length > 0 ? (7 + Math.ceil(insightItems.length / 3) * 4.2) : 0;
+        const estimatedBlockHeight = 8 + baseGridHeight + insightGridHeight + 5 + notesHeight + 8;
+
+        if (currentY + estimatedBlockHeight > 190) {
+          doc.addPage();
+          currentY = 16;
+        }
+
+        // Client full name subsection heading
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 41, 59);
+        doc.text(`${idx + 1}. ${client.first} ${client.last}`, 14, currentY);
+
+        currentY += 2;
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineWidth(0.3);
+        doc.line(14, currentY, 283, currentY);
+        currentY += 4.5;
+
+        // Render label/value grid (3 columns across 269mm)
+        const colWidth = 87;
+        const colGap = 3;
+        const rowHeight = 4.2;
+        const startYGrid = currentY;
+
+        items.forEach((item, itemIdx) => {
+          const colIdx = itemIdx % 3;
+          const rowIdx = Math.floor(itemIdx / 3);
+          const x = 14 + colIdx * (colWidth + colGap);
+          const y = startYGrid + rowIdx * rowHeight;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(7);
+          doc.setTextColor(71, 85, 105);
+          doc.text(`${item.label}:`, x, y);
+
+          const labelWidth = doc.getTextWidth(`${item.label}: `);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(7);
+          doc.setTextColor(30, 41, 59);
+          doc.text(String(item.val), x + labelWidth + 0.5, y);
+        });
+
+        const totalGridRows = Math.ceil(items.length / 3);
+        currentY = startYGrid + totalGridRows * rowHeight + 2;
+
+        // Stream-Specific Insight Subsection
+        if (insightItems.length > 0) {
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.2);
+          doc.line(14, currentY, 283, currentY);
+          currentY += 3.5;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(7.5);
+          doc.setTextColor(71, 85, 105);
+          doc.text("Stream-Specific Insight", 14, currentY);
+          currentY += 4;
+
+          const startYInsightGrid = currentY;
+
+          insightItems.forEach((item, itemIdx) => {
+            const colIdx = itemIdx % 3;
+            const rowIdx = Math.floor(itemIdx / 3);
+            const x = 14 + colIdx * (colWidth + colGap);
+            const y = startYInsightGrid + rowIdx * rowHeight;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(7);
+            doc.setTextColor(71, 85, 105);
+            doc.text(`${item.label}:`, x, y);
+
+            const labelWidth = doc.getTextWidth(`${item.label}: `);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.setTextColor(30, 41, 59);
+            
+            const valStr = String(item.val);
+            doc.text(valStr, x + labelWidth + 0.5, y);
+          });
+
+          const totalInsightRows = Math.ceil(insightItems.length / 3);
+          currentY = startYInsightGrid + totalInsightRows * rowHeight + 2.5;
+        }
+
+        // Retention Notes Section
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(71, 85, 105);
+        doc.text("Retention Notes:", 14, currentY);
+        currentY += 3.5;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(51, 65, 85);
+        doc.text(wrappedNotes, 14, currentY);
+        currentY += notesHeight + 6;
+
+        // Divider between client blocks
+        doc.setDrawColor(241, 245, 249);
+        doc.setLineWidth(0.2);
+        doc.line(14, currentY - 3, 283, currentY - 3);
+      });
+
+      // Footers across all pages
       const totalPages = (doc as any).internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);

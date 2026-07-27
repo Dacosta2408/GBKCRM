@@ -3,19 +3,22 @@ import {
   Star, Phone, Mail, Globe, MapPin, User, ArrowRight, Award, Trash2, Edit3 
 } from "lucide-react";
 import { ExtendedPartner } from "./constants";
+import { Client } from "../../types";
 
 interface PartnerListProps {
   partners: ExtendedPartner[];
+  clients?: Client[];
   selectedPartnerId: string | null;
   onSelectPartner: (id: string) => void;
   onTogglePreferred: (id: string, e: React.MouseEvent) => void;
   onDeletePartner: (id: string, e: React.MouseEvent) => void;
   onEditPartner: (partner: ExtendedPartner, e: React.MouseEvent) => void;
-  onQuickEmail: (email: string, e: React.MouseEvent) => void;
+  onQuickEmail: (email: string) => void;
 }
 
 export const PartnerList: React.FC<PartnerListProps> = ({
   partners,
+  clients = [],
   selectedPartnerId,
   onSelectPartner,
   onTogglePreferred,
@@ -51,6 +54,8 @@ export const PartnerList: React.FC<PartnerListProps> = ({
               <th className="py-3 px-4">Phone / Contact</th>
               <th className="py-3 px-4">Email</th>
               <th className="py-3 px-4 text-center">Status</th>
+              <th className="py-3 px-4 text-center">Health</th>
+              <th className="py-3 px-4 text-center">Referrals</th>
               <th className="py-3 px-4">Relationship Owner</th>
               <th className="py-3 px-4 text-right w-24">Actions</th>
             </tr>
@@ -58,6 +63,15 @@ export const PartnerList: React.FC<PartnerListProps> = ({
           <tbody className="divide-y divide-[var(--color-border)]/50">
             {partners.map((partner) => {
               const isSelected = selectedPartnerId === partner.id;
+
+              // Calculate referral count
+              const partnerFullName = `${partner.first} ${partner.last}`.trim().toLowerCase();
+              const partnerIdLower = partner.id.trim().toLowerCase();
+              const referralCount = clients.filter((c) => {
+                if (!c.referredBy) return false;
+                const ref = c.referredBy.trim().toLowerCase();
+                return ref === partnerIdLower || ref === partnerFullName;
+              }).length;
               
               // Map status badge colors
               let statusColorClass = "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]";
@@ -70,6 +84,32 @@ export const PartnerList: React.FC<PartnerListProps> = ({
               } else if (partner.status === "Inactive") {
                 statusColorClass = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
               }
+
+              // Map health score pill colors
+              const healthScore = partner.healthScore ?? 0;
+              let healthColorClass = "bg-rose-500/15 text-rose-400 border border-rose-500/30";
+              if (healthScore >= 90) {
+                healthColorClass = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
+              } else if (healthScore >= 70) {
+                healthColorClass = "bg-amber-500/15 text-amber-400 border border-amber-500/30";
+              }
+
+              // Check if nextTouchDate is in the past (overdue)
+              const isOverdue = (() => {
+                if (!partner.nextTouchDate) return false;
+                const parts = partner.nextTouchDate.split("T")[0].split("-");
+                let touchDay: Date;
+                if (parts.length === 3) {
+                  touchDay = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                } else {
+                  const d = new Date(partner.nextTouchDate);
+                  if (isNaN(d.getTime())) return false;
+                  touchDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                }
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return touchDay < today;
+              })();
 
               return (
                 <tr
@@ -101,7 +141,14 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                         {partner.first[0]}{partner.last[0]}
                       </div>
                       <div className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
-                        {partner.first} {partner.last}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span>{partner.first} {partner.last}</span>
+                          {isOverdue && (
+                            <span className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[9px] font-extrabold px-1.5 py-0.2 rounded inline-flex items-center gap-0.5 whitespace-nowrap" title={`Next touch date (${partner.nextTouchDate}) is overdue`}>
+                              ⚠ Overdue
+                            </span>
+                          )}
+                        </div>
                         {partner.role && (
                           <span className="block text-[9px] text-[var(--color-text-faint)] font-medium">
                             {partner.role}
@@ -140,7 +187,7 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                   <td className="py-3 px-4">
                     {partner.email ? (
                       <button
-                        onClick={(e) => onQuickEmail(partner.email!, e)}
+                        onClick={(e) => { e.stopPropagation(); onQuickEmail(partner.email!); }}
                         className="text-[#6fa3b8] hover:text-[var(--color-accent)] hover:underline font-medium block truncate max-w-[140px]"
                         title="Send outreach email"
                       >
@@ -156,6 +203,26 @@ export const PartnerList: React.FC<PartnerListProps> = ({
                     <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${statusColorClass}`}>
                       {partner.status || "Active"}
                     </span>
+                  </td>
+
+                  {/* Health */}
+                  <td className="py-3 px-4 text-center">
+                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full inline-block ${healthColorClass}`}>
+                      {healthScore}%
+                    </span>
+                  </td>
+
+                  {/* Referrals */}
+                  <td className="py-3 px-4 text-center">
+                    {referralCount > 0 ? (
+                      <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded-full inline-block">
+                        {referralCount}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--color-text-faint)]/40 font-mono text-[10px]">
+                        0
+                      </span>
+                    )}
                   </td>
 
                   {/* Relationship Owner */}

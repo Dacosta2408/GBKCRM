@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { 
-  Star, Phone, Mail, Globe, MapPin, User, Calendar, Plus, MessageCircle, 
+  Star, Phone, Mail, Globe, MapPin, User, Users, Calendar, Plus, MessageCircle, 
   Activity, Award, FileText, CheckCircle, Clock, Trash2, Edit3, Heart, Send, Sparkles
 } from "lucide-react";
 import { ExtendedPartner } from "./constants";
-import { PartnerTimelineEntry, User as RosterUser } from "../../types";
+import { Client, PartnerTimelineEntry, User as RosterUser } from "../../types";
 
 interface PartnerDetailProps {
   partner: ExtendedPartner;
+  clients?: Client[];
   userRoster: RosterUser[];
   currentUser: RosterUser;
   onUpdatePartnerField: (id: string, updates: Partial<ExtendedPartner>) => void;
@@ -21,6 +22,7 @@ interface PartnerDetailProps {
 
 export const PartnerDetail: React.FC<PartnerDetailProps> = ({
   partner,
+  clients = [],
   userRoster,
   currentUser,
   onUpdatePartnerField,
@@ -31,6 +33,14 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
   onOpenComposeEmail,
   showToast
 }) => {
+  // Filter referred clients
+  const partnerFullName = `${partner.first} ${partner.last}`.trim().toLowerCase();
+  const partnerIdLower = partner.id.trim().toLowerCase();
+  const referredClients = (clients || []).filter((client) => {
+    if (!client.referredBy) return false;
+    const ref = client.referredBy.trim().toLowerCase();
+    return ref === partnerIdLower || ref === partnerFullName;
+  });
   // Timeline interaction log states
   const [logType, setLogType] = useState<PartnerTimelineEntry["type"]>("call");
   const [logNotes, setLogNotes] = useState("");
@@ -46,6 +56,9 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
 
   // Custom Tag input state
   const [customTag, setCustomTag] = useState("");
+
+  // Inline delete confirmation state
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Submit Timeline Logging
   const handleAddLog = (e: React.FormEvent) => {
@@ -257,6 +270,20 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               <span className="text-[var(--color-text-faint)] font-medium">Relationship Owner</span>
               <span className="text-emerald-400 font-semibold">{partner.assignedOwner || "David Acosta"}</span>
             </div>
+
+            <div className="flex justify-between items-center border-t border-[var(--color-border)]/30 pt-3">
+              <span className="text-[var(--color-text-faint)] font-medium">Last Contacted</span>
+              <span className="font-semibold text-[var(--color-text)]">
+                {partner.lastTouchDate
+                  ? (() => {
+                      const d = new Date(partner.lastTouchDate);
+                      return !isNaN(d.getTime())
+                        ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        : partner.lastTouchDate;
+                    })()
+                  : "Not recorded"}
+              </span>
+            </div>
           </div>
 
           {/* Preferred toggle flag */}
@@ -283,17 +310,33 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
           >
             <Edit3 className="w-3.5 h-3.5" /> Modify Profile
           </button>
-          <button
-            onClick={() => {
-              if (confirm(`Are you sure you want to delete ${partner.first} ${partner.last}?`)) {
-                onDeletePartner(partner.id);
-              }
-            }}
-            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/10 text-xs font-black uppercase px-4 rounded-lg flex items-center justify-center transition-all"
-            title="Delete partner"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setConfirmDelete(false);
+                  onDeletePartner(partner.id);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase px-3 py-2.5 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+              >
+                Confirm Delete
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] text-[var(--color-text)] border border-[var(--color-border)]/70 text-xs font-bold uppercase px-3 py-2.5 rounded-lg transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/10 text-xs font-black uppercase px-4 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+              title="Delete partner"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
       </div>
@@ -534,7 +577,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
             </span>
           </div>
 
-          <div className="space-y-4.5 max-h-[360px] overflow-y-auto pr-1">
+          <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
             {(partner.timeline || []).map((entry, index) => {
               // Icon selector
               let iconElement = <MessageCircle className="w-3.5 h-3.5 text-[var(--color-text-faint)]" />;
@@ -572,6 +615,56 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
           </div>
         </div>
 
+      </div>
+
+      {/* Referred Clients Section */}
+      <div className="xl:col-span-3 bg-[var(--color-surface)] border border-[var(--color-border)]/70 rounded-xl p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-[var(--color-border)]/50 pb-2.5">
+          <div className="flex items-center gap-2">
+            <Users className="w-4.5 h-4.5 text-[var(--color-accent)]" />
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Referred Clients</h4>
+          </div>
+          <span className="text-[10px] bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]/50 font-bold px-2.5 py-0.5 rounded-full">
+            {referredClients.length} {referredClients.length === 1 ? 'Client' : 'Clients'}
+          </span>
+        </div>
+
+        {referredClients.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {referredClients.map((client) => {
+              let statusClass = "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border-[var(--color-border)]/50";
+              if (client.status === 'funded' || client.status === 'approved') {
+                statusClass = "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
+              } else if (client.status === 'working' || client.status === 'conditional' || client.status === 'lender') {
+                statusClass = "bg-amber-500/15 text-amber-400 border-amber-500/30";
+              } else if (client.status === 'lead' || client.status === 'open') {
+                statusClass = "bg-sky-500/15 text-sky-400 border-sky-500/30";
+              }
+
+              return (
+                <div key={client.id} className="bg-[var(--color-surface-2)] border border-[var(--color-border)]/60 rounded-lg p-3 flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-[var(--color-text)] truncate">
+                      {client.first} {client.last}
+                    </p>
+                    {client.email && (
+                      <p className="text-[10px] text-[var(--color-text-faint)] truncate font-mono mt-0.5">
+                        {client.email}
+                      </p>
+                    )}
+                  </div>
+                  <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusClass}`}>
+                    {client.status}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-xs italic text-[var(--color-text-faint)] py-2">
+            No clients currently linked to this partner as referrals.
+          </p>
+        )}
       </div>
 
     </div>

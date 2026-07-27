@@ -105,6 +105,9 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
     e.preventDefault();
     if (!first.trim() || !last.trim()) return;
 
+    // Sanitize website domain
+    const sanitizedWebsite = website.trim().replace(/^(https?:\/\/)?(www\.)?/i, "");
+
     onSavePartner({
       id: editingPartner?.id, // undefined means add new
       first: first.trim(),
@@ -114,7 +117,7 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({
       role: role.trim() || undefined,
       phone: phone.trim() || undefined,
       email: email.trim() || undefined,
-      website: website.trim() || undefined,
+      website: sanitizedWebsite || undefined,
       address: address.trim() || undefined,
       city,
       assignedOwner,

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { 
   Users, Plus, MapPin, Award, CheckCircle, Search, Filter, ShieldAlert,
-  ArrowRight, Mail, Phone, ExternalLink, Calendar, Star, LayoutDashboard, Database, RefreshCw, ArrowUpDown
+  ArrowRight, Mail, Phone, ExternalLink, Calendar, Star, LayoutDashboard, Database, RefreshCw, ArrowUpDown, FileText
 } from "lucide-react";
 import { Partner, Client, Task, User, PartnerTimelineEntry } from "../types";
 
@@ -311,6 +311,271 @@ export const Partners: React.FC<PartnersProps> = ({
     setTasks(prev => [newTask, ...prev]);
   };
 
+  // Helper for escaping HTML strings
+  const escapeHtml = (str: string): string => {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+  // Export PDF functionality
+  const handleExportPDF = () => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      showToast("Unable to open print window. Please allow popups.", "error");
+      return;
+    }
+
+    // Active filters summary
+    const filterParts: string[] = [];
+    if (selectedCategory && selectedCategory !== "All") filterParts.push(`Category: ${selectedCategory}`);
+    if (selectedStatus && selectedStatus !== "All") filterParts.push(`Status: ${selectedStatus}`);
+    if (selectedCity && selectedCity !== "All") filterParts.push(`City: ${selectedCity}`);
+    if (preferredOnly) filterParts.push("Preferred Only");
+    if (searchTerm.trim()) filterParts.push(`Search: "${searchTerm.trim()}"`);
+
+    const activeFiltersText = filterParts.length > 0 ? filterParts.join(" | ") : "All Partners";
+    const generatedDate = new Date().toLocaleDateString("en-CA");
+
+    const cardsHtml = filteredAndSortedPartners.map((p) => {
+      // Most recent timeline entry
+      let recentTimelineText = "No activity logged";
+      if (p.timeline && p.timeline.length > 0) {
+        const sortedTimeline = [...p.timeline].sort((a, b) => {
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+        });
+        const latest = sortedTimeline[0];
+        recentTimelineText = `${latest.date || "Date unrecorded"} — ${latest.text || ""}`;
+      }
+
+      const tagsText = p.referralTags && p.referralTags.length > 0 ? p.referralTags.join(", ") : "None";
+
+      return `
+        <div class="partner-card">
+          <div class="card-header">
+            <div>
+              <div class="partner-name">${escapeHtml(p.first || "")} ${escapeHtml(p.last || "")}</div>
+              <div class="partner-company">${escapeHtml(p.company || "Independent")}${p.role ? ` • ${escapeHtml(p.role)}` : ""}</div>
+            </div>
+            <span class="status-badge">${escapeHtml(p.status || "Active")}</span>
+          </div>
+
+          <div class="card-grid">
+            <div><span class="label">Category:</span> ${escapeHtml(p.type || "General")}</div>
+            <div><span class="label">Status:</span> ${escapeHtml(p.status || "Active")}</div>
+            <div><span class="label">City:</span> ${escapeHtml(p.city || "Ontario")}</div>
+            <div><span class="label">Phone:</span> ${escapeHtml(p.phone || "N/A")}</div>
+            <div><span class="label">Email:</span> ${escapeHtml(p.email || "N/A")}</div>
+            <div><span class="label">Website:</span> ${escapeHtml(p.website || "N/A")}</div>
+            <div><span class="label">Health Score:</span> ${p.healthScore ?? 0}%</div>
+            <div><span class="label">Assigned Owner:</span> ${escapeHtml(p.assignedOwner || "David Acosta")}</div>
+          </div>
+
+          <div><span class="label">Referral Tags:</span> ${escapeHtml(tagsText)}</div>
+
+          <div class="card-notes"><span class="label">Notes:</span> ${escapeHtml(p.notes || "None")}</div>
+
+          <div class="card-timeline"><span class="label">Most Recent Activity:</span> ${escapeHtml(recentTimelineText)}</div>
+        </div>
+      `;
+    }).join("");
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Partner Network Directory — GBK Financial</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm;
+      @bottom-center {
+        content: "GBK Financial — Confidential";
+        font-size: 8pt;
+        color: #666;
+        font-family: Arial, sans-serif;
+      }
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, system-ui, -apple-system, sans-serif;
+      background-color: #ffffff;
+      color: #111111;
+      margin: 0;
+      padding: 16px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .header {
+      border-bottom: 2px solid #222;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #000;
+      text-transform: uppercase;
+    }
+    .report-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #333;
+      margin-top: 2px;
+    }
+    .meta-info {
+      text-align: right;
+      font-size: 10px;
+      color: #555;
+    }
+    .meta-info div {
+      margin-bottom: 2px;
+    }
+    .summary-bar {
+      background: #f5f5f7;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      font-size: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .partners-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .partner-card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px;
+      background: #ffffff;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 6px;
+    }
+    .partner-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #111;
+    }
+    .partner-company {
+      font-size: 10px;
+      color: #555;
+      font-weight: 600;
+    }
+    .status-badge {
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: #f0f0f0;
+      color: #333;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px 8px;
+      font-size: 9.5px;
+    }
+    .label {
+      font-weight: 700;
+      color: #555;
+    }
+    .card-notes {
+      font-size: 9px;
+      color: #444;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+    .card-timeline {
+      font-size: 9px;
+      color: #555;
+      border-top: 1px dashed #eee;
+      padding-top: 4px;
+    }
+    .print-footer {
+      text-align: center;
+      font-size: 8pt;
+      color: #666;
+      margin-top: 24px;
+      border-top: 1px solid #eee;
+      padding-top: 8px;
+    }
+    @media print {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="logo">GBK Financial</div>
+      <div class="report-title">Partner Network Directory</div>
+    </div>
+    <div class="meta-info">
+      <div><strong>Date:</strong> ${generatedDate}</div>
+      <div><strong>Total Partners:</strong> ${filteredAndSortedPartners.length}</div>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div><strong>Active Filters:</strong> ${escapeHtml(activeFiltersText)}</div>
+    <div><strong>Count:</strong> ${filteredAndSortedPartners.length} Record${filteredAndSortedPartners.length === 1 ? '' : 's'}</div>
+  </div>
+
+  <div class="partners-grid">
+    ${cardsHtml}
+  </div>
+
+  <div class="print-footer">
+    GBK Financial — Confidential
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 300);
+    };
+  </script>
+</body>
+</html>`;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden select-none" id="partner-network-workspace">
       
@@ -328,12 +593,22 @@ export const Partners: React.FC<PartnersProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={handleAddPartner}
-            className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all self-start sm:self-auto"
-          >
-            <Plus className="w-4 h-4 stroke-[3]" /> Add Strategic Partner
-          </button>
+          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            <button
+              onClick={handleExportPDF}
+              className="bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-accent)]/50 text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              title="Export Partner Network Directory as PDF"
+            >
+              <FileText className="w-4 h-4 text-[var(--color-accent)]" /> Export PDF
+            </button>
+
+            <button
+              onClick={handleAddPartner}
+              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-black text-xs font-black uppercase px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" /> Add Strategic Partner
+            </button>
+          </div>
         </div>
 
         {/* 1. Category Tab Navigation Bar */}
@@ -556,6 +831,7 @@ export const Partners: React.FC<PartnersProps> = ({
           ) : (
             <PartnerList
               partners={filteredAndSortedPartners}
+              clients={clients}
               selectedPartnerId={selectedPartner?.id || null}
               onSelectPartner={setSelectedPartnerId}
               onTogglePreferred={handleTogglePreferred}
@@ -586,6 +862,7 @@ export const Partners: React.FC<PartnersProps> = ({
 
             <PartnerDetail
               partner={selectedPartner}
+              clients={clients}
               userRoster={userRoster}
               currentUser={currentUser}
               onUpdatePartnerField={(id, updates) => {
