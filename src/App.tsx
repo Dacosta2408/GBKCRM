@@ -1284,6 +1284,7 @@ export default function App() {
               docVault={docVault}
               setDocVault={setDocVault}
               bridgeOnline={bridgeOnline}
+              onNavigateSettings={() => setActiveTab("settings")}
             />
           )}
 

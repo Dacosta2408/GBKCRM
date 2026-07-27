@@ -31,7 +31,7 @@ export const Settings: React.FC<SettingsProps> = ({
   bridgeOnline
 }) => {
   // Navigation tabs
-  type SettingsTab = "profile" | "notifications" | "security" | "preferences" | "team" | "permissions" | "defaults";
+  type SettingsTab = "profile" | "notifications" | "security" | "preferences" | "email" | "team" | "permissions" | "defaults";
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 
   // --- 1. PROFILE STATE ---
@@ -207,6 +207,103 @@ export const Settings: React.FC<SettingsProps> = ({
     localStorage.setItem("gbk_pref_time_format", prefTimeFormat);
     
     showToast("Personal workspace defaults updated!", "success", "⚙️");
+  };
+
+  // --- 5B. EMAIL & SMTP CONFIGURATION STATE ---
+  const [smtpHost, setSmtpHost] = useState<string>(() => localStorage.getItem("gbk_gmail_smtp_host") || "smtp.gmail.com");
+  const [smtpPort, setSmtpPort] = useState<string>(() => localStorage.getItem("gbk_gmail_smtp_port") || "587");
+  const [smtpUsername, setSmtpUsername] = useState<string>(() => localStorage.getItem("gbk_gmail_smtp_username") || currentUser.email || "");
+  const [smtpPassword, setSmtpPassword] = useState<string>(() => localStorage.getItem("gbk_gmail_smtp_password") || "");
+  const [isSmtpConfigured, setIsSmtpConfigured] = useState<boolean>(() => localStorage.getItem("gbk_gmail_smtp_configured") === "true");
+
+  useEffect(() => {
+    const savedHost = localStorage.getItem("gbk_gmail_smtp_host");
+    const savedPort = localStorage.getItem("gbk_gmail_smtp_port");
+    const savedUser = localStorage.getItem("gbk_gmail_smtp_username");
+    const savedPass = localStorage.getItem("gbk_gmail_smtp_password");
+    const savedConfigured = localStorage.getItem("gbk_gmail_smtp_configured") === "true";
+
+    if (savedHost) setSmtpHost(savedHost);
+    if (savedPort) setSmtpPort(savedPort);
+    if (savedUser) setSmtpUsername(savedUser);
+    if (savedPass) setSmtpPassword(savedPass);
+    setIsSmtpConfigured(savedConfigured);
+  }, [currentUser]);
+
+  const autoDetectSmtpSettings = (email: string) => {
+    if (!email || !email.includes("@")) return;
+    const parts = email.split("@");
+    const domain = parts[1]?.toLowerCase().trim();
+    if (!domain) return;
+
+    let host = "";
+    let port = "587";
+
+    if (domain === "gmail.com" || domain === "googlemail.com") {
+      host = "smtp.gmail.com";
+      port = "587";
+    } else if (domain === "outlook.com" || domain === "hotmail.com" || domain === "live.com" || domain === "msn.com" || domain === "office365.com") {
+      host = "smtp.office365.com";
+      port = "587";
+    } else if (domain === "yahoo.com" || domain === "yahoo.ca" || domain === "ymail.com") {
+      host = "smtp.mail.yahoo.com";
+      port = "587";
+    } else if (domain === "icloud.com" || domain === "me.com" || domain === "mac.com") {
+      host = "smtp.mail.me.com";
+      port = "587";
+    } else if (domain === "aol.com") {
+      host = "smtp.aol.com";
+      port = "587";
+    } else if (domain === "zoho.com") {
+      host = "smtp.zoho.com";
+      port = "587";
+    } else if (domain === "mail.com") {
+      host = "smtp.mail.com";
+      port = "587";
+    }
+
+    if (host) {
+      setSmtpHost(host);
+      setSmtpPort(port);
+    }
+  };
+
+  const handleSmtpUsernameChange = (val: string) => {
+    setSmtpUsername(val);
+    autoDetectSmtpSettings(val);
+  };
+
+  const handleSaveSmtpSettings = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!smtpHost || !smtpPort || !smtpUsername) {
+      showToast("SMTP Host, Port, and Gmail Address are required.", "error");
+      return;
+    }
+
+    localStorage.setItem("gbk_gmail_smtp_host", smtpHost);
+    localStorage.setItem("gbk_gmail_smtp_port", smtpPort);
+    localStorage.setItem("gbk_gmail_smtp_username", smtpUsername);
+    localStorage.setItem("gbk_gmail_smtp_password_placeholder", smtpPassword ? "set" : "");
+    if (smtpPassword) {
+      localStorage.setItem("gbk_gmail_smtp_password", smtpPassword);
+    }
+    localStorage.setItem("gbk_gmail_smtp_configured", "true");
+    setIsSmtpConfigured(true);
+
+    showToast("Gmail SMTP settings saved successfully!", "success", "✉️");
+  };
+
+  const handleClearSmtpSettings = () => {
+    localStorage.removeItem("gbk_gmail_smtp_configured");
+    localStorage.removeItem("gbk_gmail_smtp_host");
+    localStorage.removeItem("gbk_gmail_smtp_port");
+    localStorage.removeItem("gbk_gmail_smtp_username");
+    localStorage.removeItem("gbk_gmail_smtp_password_placeholder");
+    localStorage.removeItem("gbk_gmail_smtp_password");
+
+    setIsSmtpConfigured(false);
+    setSmtpPassword("");
+    showToast("Gmail SMTP settings disconnected and cleared.", "info", "🧹");
   };
 
   // --- 6. TEAM MANAGEMENT (ADMINS/MANAGERS ONLY) ---
@@ -545,6 +642,15 @@ export const Settings: React.FC<SettingsProps> = ({
             }`}
           >
             <Sliders className="w-4 h-4" /> Personal Preferences
+          </button>
+
+          <button
+            onClick={() => setActiveTab("email")}
+            className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-3 ${
+              activeTab === "email" ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]/50"
+            }`}
+          >
+            <Mail className="w-4 h-4" /> Email &amp; SMTP
           </button>
 
           {isAdminOrManager && (
@@ -1097,6 +1203,118 @@ export const Settings: React.FC<SettingsProps> = ({
                     Save Personal Preferences
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: EMAIL & SMTP CONFIGURATION */}
+          {(activeTab === "email" || activeTab === "preferences") && (
+            <div className={`max-w-2xl space-y-6 ${activeTab === "preferences" ? "mt-6" : ""}`}>
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm space-y-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider">
+                        Email &amp; SMTP Configuration
+                      </h3>
+                      {isSmtpConfigured ? (
+                        <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          SMTP Active
+                        </span>
+                      ) : (
+                        <span className="bg-amber-500/15 text-amber-400 border border-amber-500/20 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          Not Configured
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[var(--color-text-muted)] mt-1">
+                      Configure outbound Gmail / custom SMTP parameters for sending transactional customer emails and notices directly.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSaveSmtpSettings} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">
+                        Gmail Address (Username)
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="e.g. david.acosta@gbkfinancial.ca"
+                        value={smtpUsername}
+                        onChange={(e) => handleSmtpUsernameChange(e.target.value)}
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40"
+                      />
+                      <span className="text-[9px] text-[var(--color-text-faint)] mt-1 block">
+                        Auto-detects host and port based on your domain.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">
+                        Gmail App Password / Token
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="16-character App Password"
+                        value={smtpPassword}
+                        onChange={(e) => setSmtpPassword(e.target.value)}
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 font-mono"
+                      />
+                      <span className="text-[9px] text-[var(--color-text-faint)] mt-1 block">
+                        Generated via Google Account &gt; Security &gt; App Passwords.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">
+                        SMTP Host
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="smtp.gmail.com"
+                        value={smtpHost}
+                        onChange={(e) => setSmtpHost(e.target.value)}
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">
+                        SMTP Port
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="587"
+                        value={smtpPort}
+                        onChange={(e) => setSmtpPort(e.target.value)}
+                        className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)]/70 rounded-lg px-3 py-2 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]/40 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleClearSmtpSettings}
+                      className="w-full sm:w-auto px-4 py-2 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg border border-red-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Disconnect / Clear SMTP
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Save Gmail SMTP Settings
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
