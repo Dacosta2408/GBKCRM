@@ -39,6 +39,9 @@ export interface Client {
   nextFollowUpDate?: string;
   retentionOutcome?: string;
   retentionNotes?: string;
+  mortgageTerm?: string;          // e.g. "1", "2", "3", "5" (years as a string)
+  renewalNotified?: string;       // ISO date string — last time a renewal outreach was logged
+  birthdayAcknowledged?: string;  // ISO year-string e.g. "2026" — tracks if birthday was acknowledged this calendar year
   agent?: string;
   type?: string;
   purchasePrice?: string | number;

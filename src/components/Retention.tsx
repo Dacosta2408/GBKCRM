@@ -27,6 +27,26 @@ interface RetentionTemplate {
   body: string;
 }
 
+export const getMaturityDate = (c: Client): Date | null => {
+  if (c.maturityDate) {
+    const d = new Date(c.maturityDate);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (c.fundedDate) {
+    const fDate = new Date(c.fundedDate);
+    if (isNaN(fDate.getTime())) return null;
+    let termYears = 5;
+    if (c.mortgageTerm) {
+      const parsed = parseInt(c.mortgageTerm, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        termYears = parsed;
+      }
+    }
+    return new Date(fDate.getTime() + termYears * 365 * 24 * 3600000);
+  }
+  return null;
+};
+
 export const Retention: React.FC<RetentionProps> = ({
   clients,
   setClients,
@@ -37,6 +57,7 @@ export const Retention: React.FC<RetentionProps> = ({
   showToast
 }) => {
   const [activeStream, setActiveStream] = useState<StreamType>("birthdays");
+  const [renewalTier, setRenewalTier] = useState<"2yr" | "1yr" | "6mo" | "4mo">("6mo");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAgent, setSelectedAgent] = useState<string>("All");
 
@@ -76,9 +97,11 @@ export const Retention: React.FC<RetentionProps> = ({
   const streamsData = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
+    const currentYearStr = String(currentYear);
 
-    // 1. Birthdays (next 30 days or passed in last 7 days)
+    // 1. Birthdays (next 30 days or passed in last 7 days; exclude if acknowledged this year)
     const birthdays = clients.filter(c => {
+      if (c.birthdayAcknowledged === currentYearStr) return false;
       if (!c.dob) return false;
       const dobDate = new Date(c.dob);
       const bMonth = dobDate.getMonth();
@@ -96,25 +119,35 @@ export const Retention: React.FC<RetentionProps> = ({
       return diffDays >= -7 && diffDays <= 30;
     });
 
-    // 2. Renewals (approaching maturity within 6 months)
-    const renewals = clients.filter(c => {
-      // Typically funded/closed status
-      if (c.status !== "funded" && c.status !== "closed") return false;
-      
-      let matDate: Date | null = null;
-      if (c.maturityDate) {
-        matDate = new Date(c.maturityDate);
-      } else if (c.fundedDate) {
-        // Assume 5 years from funded Date
-        const fDate = new Date(c.fundedDate);
-        matDate = new Date(fDate.getFullYear() + 5, fDate.getMonth(), fDate.getDate());
-      }
+    // 2. Renewals categorized into 4 tiers (funded/closed status only)
+    const renewals2yr: Client[] = [];
+    const renewals1yr: Client[] = [];
+    const renewals6mo: Client[] = [];
+    const renewals4mo: Client[] = [];
+    const renewalsAll: Client[] = [];
 
-      if (!matDate) return false;
-      
+    clients.forEach(c => {
+      const statusLower = (c.status || "").toLowerCase();
+      if (statusLower !== "funded" && statusLower !== "closed") return;
+
+      const matDate = getMaturityDate(c);
+      if (!matDate) return;
+
       const diffMs = matDate.getTime() - now.getTime();
       const diffDays = Math.ceil(diffMs / (24 * 3600000));
-      return diffDays >= 0 && diffDays <= 180; // 6 months
+
+      if (diffDays >= 0 && diffDays <= 730) {
+        renewalsAll.push(c);
+        if (diffDays >= 366 && diffDays <= 730) {
+          renewals2yr.push(c);
+        } else if (diffDays >= 181 && diffDays <= 365) {
+          renewals1yr.push(c);
+        } else if (diffDays >= 121 && diffDays <= 180) {
+          renewals6mo.push(c);
+        } else if (diffDays >= 0 && diffDays <= 120) {
+          renewals4mo.push(c);
+        }
+      }
     });
 
     // 3. Funding Anniversaries (within 30 days)
@@ -146,25 +179,45 @@ export const Retention: React.FC<RetentionProps> = ({
       return diffDays >= 90;
     });
 
-    return { birthdays, renewals, anniversaries, reengage };
+    return {
+      birthdays,
+      renewals: {
+        "2yr": renewals2yr,
+        "1yr": renewals1yr,
+        "6mo": renewals6mo,
+        "4mo": renewals4mo,
+        all: renewalsAll
+      },
+      anniversaries,
+      reengage
+    };
   }, [clients]);
+
+  // Match owner by checking BOTH retentionOwner and agent fields
+  const matchesAgent = useMemo(() => {
+    return (c: Client) => {
+      if (activeAgentFilter === "All") return true;
+      const target = activeAgentFilter.toLowerCase();
+      const owner = c.retentionOwner ? c.retentionOwner.toLowerCase() : "";
+      const ag = c.agent ? c.agent.toLowerCase() : "";
+      if (owner === target || ag === target) return true;
+      if (!c.retentionOwner && !c.agent && c.source && c.source.toLowerCase().includes(target)) {
+        return true;
+      }
+      return false;
+    };
+  }, [activeAgentFilter]);
 
   // Filter clients under the active stream by search + agent owner
   const filteredStreamClients = useMemo(() => {
     let list: Client[] = [];
     if (activeStream === "birthdays") list = streamsData.birthdays;
-    else if (activeStream === "renewals") list = streamsData.renewals;
+    else if (activeStream === "renewals") list = streamsData.renewals[renewalTier];
     else if (activeStream === "anniversaries") list = streamsData.anniversaries;
     else if (activeStream === "reengage") list = streamsData.reengage;
 
     return list.filter(c => {
-      // Agent filter
-      const clientOwner = c.retentionOwner || (c.source && c.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
-      const matchesAgent = activeAgentFilter === "All" || 
-                           clientOwner.toLowerCase() === activeAgentFilter.toLowerCase() ||
-                           (c.source && c.source.toLowerCase().includes(activeAgentFilter.toLowerCase()));
-
-      if (!matchesAgent) return false;
+      if (!matchesAgent(c)) return false;
 
       // Search term filter
       const s = searchTerm.toLowerCase();
@@ -175,7 +228,7 @@ export const Retention: React.FC<RetentionProps> = ({
         (c.lender && c.lender.toLowerCase().includes(s))
       );
     });
-  }, [activeStream, streamsData, searchTerm, activeAgentFilter]);
+  }, [activeStream, renewalTier, streamsData, searchTerm, matchesAgent]);
 
   // Overall metric stats
   const metrics = useMemo(() => {
@@ -185,7 +238,7 @@ export const Retention: React.FC<RetentionProps> = ({
     
     return {
       totalBirthdays: streamsData.birthdays.length,
-      totalRenewals: streamsData.renewals.length,
+      totalRenewals: streamsData.renewals.all.length,
       totalAnniversaries: streamsData.anniversaries.length,
       totalReengage: streamsData.reengage.length,
       outreachCompletionRate: rate
@@ -196,13 +249,34 @@ export const Retention: React.FC<RetentionProps> = ({
   const getTemplates = (type: StreamType, client: Client): { email: RetentionTemplate; sms: RetentionTemplate } => {
     const signature = `${currentUser.first} ${currentUser.last}`;
     const lenderName = client.lender || "your lender";
-    const mtgValStr = client.mtgamt ? `$${Number(client.mtgamt).toLocaleString()}` : "$350,000";
     
     // Anniversary calculations
     let yearsFunded = 1;
     if (client.fundedDate) {
       yearsFunded = new Date().getFullYear() - new Date(client.fundedDate).getFullYear();
       if (yearsFunded <= 0) yearsFunded = 1;
+    }
+
+    let renewalSubject = "6-Month Renewal Advisory — Let's Plan Your Next Term";
+    let renewalTimeframeText = "approximately 6 months";
+    let renewalTemplateName = "6-Month Renewal Advisory";
+
+    if (renewalTier === "4mo") {
+      renewalSubject = "Action Required: Your Mortgage Renews in Under 4 Months";
+      renewalTimeframeText = "under 4 months";
+      renewalTemplateName = "4-Month Renewal Advisory";
+    } else if (renewalTier === "6mo") {
+      renewalSubject = "6-Month Renewal Advisory — Let's Plan Your Next Term";
+      renewalTimeframeText = "approximately 6 months";
+      renewalTemplateName = "6-Month Renewal Advisory";
+    } else if (renewalTier === "1yr") {
+      renewalSubject = "Early Planning — Your Mortgage Renewal Is 1 Year Away";
+      renewalTimeframeText = "approximately 1 year";
+      renewalTemplateName = "1-Year Renewal Advisory";
+    } else if (renewalTier === "2yr") {
+      renewalSubject = "Long-Range Check-In — Renewal Horizon 2 Years Out";
+      renewalTimeframeText = "approximately 2 years";
+      renewalTemplateName = "2-Year Renewal Advisory";
     }
 
     const templatesMap: Record<StreamType, { email: RetentionTemplate; sms: RetentionTemplate }> = {
@@ -223,17 +297,17 @@ export const Retention: React.FC<RetentionProps> = ({
       },
       renewals: {
         email: {
-          id: "temp_ren_email",
-          name: "6-Month Renewal Advisory",
+          id: `temp_ren_${renewalTier}_email`,
+          name: renewalTemplateName,
           type: "email",
-          subject: `Mortgage Renewal Advisory: Clear Savings Ahead for ${client.first}`,
-          body: `Hi ${client.first},\n\nI hope everything is going wonderfully with your home. I'm reaching out proactively because your mortgage with ${lenderName} is approaching its maturity and renewal window in approximately 6 months.\n\nTypically, lenders send automated renewal packages with standard retail interest rates, hoping you'll sign without checking other options. At GBK Financial, we have direct access to over 50 prime, alternative, and private underwriting panels. By planning early, we can lock in maximum savings and protect your household budget from unnecessary expenses.\n\nLet's schedule a brief 10-minute strategy call this week to review your current rate, explore optimization opportunities, or discuss equity options. Here's my direct line. When works best for you?\n\nWarm regards,\n\n${signature}\nOntario Mortgage Broker, GBK Financial`
+          subject: renewalSubject,
+          body: `Hi ${client.first},\n\nI hope everything is going wonderfully with your home. I'm reaching out proactively because your mortgage with ${lenderName} is approaching its maturity and renewal window in ${renewalTimeframeText}.\n\nTypically, lenders send automated renewal packages with standard retail interest rates, hoping you'll sign without checking other options. At GBK Financial, we have direct access to over 50 prime, alternative, and private underwriting panels. By planning early, we can lock in maximum savings and protect your household budget from unnecessary expenses.\n\nLet's schedule a brief 10-minute strategy call this week to review your current rate, explore optimization opportunities, or discuss equity options. Here's my direct line. When works best for you?\n\nWarm regards,\n\n${signature}\nOntario Mortgage Broker, GBK Financial`
         },
         sms: {
-          id: "temp_ren_sms",
+          id: `temp_ren_${renewalTier}_sms`,
           name: "SMS Renewal Warning",
           type: "sms",
-          body: `Hi ${client.first}, your mortgage with ${lenderName} is renewing soon! Don't sign the bank's automatic package without shopping around. Let's find you the best market rates. When's a good time for a quick call? - ${signature}, GBK`
+          body: `Hi ${client.first}, your mortgage with ${lenderName} is renewing in ${renewalTimeframeText}! Don't sign the bank's automatic package without shopping around. Let's find you the best market rates. When's a good time for a quick call? - ${signature}, GBK`
         }
       },
       anniversaries: {
@@ -295,10 +369,11 @@ export const Retention: React.FC<RetentionProps> = ({
     if (!outreachClient) return;
 
     const todayStr = new Date().toISOString().split("T")[0];
+    const currentYearStr = String(new Date().getFullYear());
 
     const updatedClients = clients.map(c => {
       if (c.id === outreachClient.id) {
-        return {
+        const updated: Client = {
           ...c,
           lastContactedDate: todayStr,
           nextFollowUpDate: nextFollowUp || c.nextFollowUpDate,
@@ -306,6 +381,12 @@ export const Retention: React.FC<RetentionProps> = ({
           retentionNotes: outcomeNotes || c.retentionNotes,
           updatedAt: new Date().toISOString()
         };
+        if (activeStream === "renewals") {
+          updated.renewalNotified = todayStr;
+        } else if (activeStream === "birthdays") {
+          updated.birthdayAcknowledged = currentYearStr;
+        }
+        return updated;
       }
       return c;
     });
@@ -404,15 +485,23 @@ export const Retention: React.FC<RetentionProps> = ({
 
     // Simulate sending email (adds notes to the client)
     const todayStr = new Date().toISOString().split("T")[0];
+    const currentYearStr = String(new Date().getFullYear());
+
     const updatedClients = clients.map(c => {
       if (c.id === outreachClient.id) {
-        return {
+        const updated: Client = {
           ...c,
           lastContactedDate: todayStr,
           retentionOutcome: "contacted",
           retentionNotes: `Sent Retention Email: "${compSubject}"`,
           updatedAt: new Date().toISOString()
         };
+        if (activeStream === "renewals") {
+          updated.renewalNotified = todayStr;
+        } else if (activeStream === "birthdays") {
+          updated.birthdayAcknowledged = currentYearStr;
+        }
+        return updated;
       }
       return c;
     });
@@ -429,15 +518,23 @@ export const Retention: React.FC<RetentionProps> = ({
     if (!outreachClient) return;
 
     const todayStr = new Date().toISOString().split("T")[0];
+    const currentYearStr = String(new Date().getFullYear());
+
     const updatedClients = clients.map(c => {
       if (c.id === outreachClient.id) {
-        return {
+        const updated: Client = {
           ...c,
           lastContactedDate: todayStr,
           retentionOutcome: "contacted",
           retentionNotes: `Sent SMS Outreach: "${customSms.slice(0, 40)}..."`,
           updatedAt: new Date().toISOString()
         };
+        if (activeStream === "renewals") {
+          updated.renewalNotified = todayStr;
+        } else if (activeStream === "birthdays") {
+          updated.birthdayAcknowledged = currentYearStr;
+        }
+        return updated;
       }
       return c;
     });
@@ -537,7 +634,7 @@ export const Retention: React.FC<RetentionProps> = ({
           }`}
         >
           <div className="flex justify-between items-center text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-all">
-            <span className="text-[9px] uppercase font-black tracking-wider">Renewals (6m)</span>
+            <span className="text-[9px] uppercase font-black tracking-wider">Renewals (730d)</span>
             <span className="text-[#6fa3b8] font-bold text-xs">🔄</span>
           </div>
           <span className="text-lg font-black block mt-1 text-[var(--color-text)]">{metrics.totalRenewals}</span>
@@ -588,25 +685,56 @@ export const Retention: React.FC<RetentionProps> = ({
       {/* Main Stream Content Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         
-        {/* Stream Banner description */}
-        <div className="bg-[var(--color-surface-2)]/45 border border-[var(--color-border)] rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="text-xs">
-            <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">
-              {activeStream === "birthdays" && "🎂 Client Birthday Nurture Engine"}
-              {activeStream === "renewals" && "🔄 6-Month Mortgage Renewal Defense Pipeline"}
-              {activeStream === "anniversaries" && "🎉 Mortgage Funding Anniversary Touchpoints"}
-              {activeStream === "reengage" && "⏰ Long-Time Cold Relationship Recovery Radar"}
-            </span>
-            <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
-              {activeStream === "birthdays" && "Nurturing professional goodwill. Send birthdays warm check-ins without pressure."}
-              {activeStream === "renewals" && "Defend funded clients before retail lenders lock them into high-rate default renewals."}
-              {activeStream === "anniversaries" && "Identify strategic mortgage equity adjustments, GDS/TDS health reviews or property appreciation metrics."}
-              {activeStream === "reengage" && "Ensure no client goes quiet. Rekindle relationships with personalized market updates."}
-            </span>
+        {/* Stream Banner description & Sub-tier controls */}
+        <div className="bg-[var(--color-surface-2)]/45 border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="text-xs">
+              <span className="text-[var(--color-accent)] font-black uppercase tracking-wider block">
+                {activeStream === "birthdays" && "🎂 Client Birthday Nurture Engine"}
+                {activeStream === "renewals" && `🔄 Mortgage Renewal Defense Pipeline — ${renewalTier === "4mo" ? "4-Month Tier" : renewalTier === "6mo" ? "6-Month Tier" : renewalTier === "1yr" ? "1-Year Tier" : "2-Year Tier"}`}
+                {activeStream === "anniversaries" && "🎉 Mortgage Funding Anniversary Touchpoints"}
+                {activeStream === "reengage" && "⏰ Long-Time Cold Relationship Recovery Radar"}
+              </span>
+              <span className="text-[var(--color-text-muted)] block mt-0.5 font-semibold">
+                {activeStream === "birthdays" && "Nurturing professional goodwill. Send birthdays warm check-ins without pressure."}
+                {activeStream === "renewals" && "Defend funded clients before retail lenders lock them into high-rate default renewals."}
+                {activeStream === "anniversaries" && "Identify strategic mortgage equity adjustments, GDS/TDS health reviews or property appreciation metrics."}
+                {activeStream === "reengage" && "Ensure no client goes quiet. Rekindle relationships with personalized market updates."}
+              </span>
+            </div>
+            <div className="shrink-0 bg-[var(--color-accent)]/10 px-3 py-1 rounded-full text-[10px] font-black text-[var(--color-accent)] border border-[var(--color-accent)]/20">
+              {filteredStreamClients.length} targets identified
+            </div>
           </div>
-          <div className="shrink-0 bg-[var(--color-accent)]/10 px-3 py-1 rounded-full text-[10px] font-black text-[var(--color-accent)] border border-[var(--color-accent)]/20">
-            {filteredStreamClients.length} targets identified
-          </div>
+
+          {/* Renewal Sub-tier Tab Row */}
+          {activeStream === "renewals" && (
+            <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-[var(--color-border)]/50">
+              <span className="text-[10px] text-[var(--color-text-muted)] font-black uppercase tracking-wider mr-1">Renewal Horizon Tiers:</span>
+              {(["2yr", "1yr", "6mo", "4mo"] as const).map(tier => {
+                const labels: Record<string, string> = { "2yr": "2 Yr", "1yr": "1 Yr", "6mo": "6 Mo", "4mo": "4 Mo" };
+                const isActive = renewalTier === tier;
+                const count = streamsData.renewals[tier].filter(matchesAgent).length;
+                return (
+                  <button
+                    key={tier}
+                    type="button"
+                    onClick={() => setRenewalTier(tier)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      isActive
+                        ? "bg-[var(--color-accent)] text-black font-black shadow-sm"
+                        : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-3)] hover:text-[var(--color-text)] border border-[var(--color-border)]"
+                    }`}
+                  >
+                    <span>{labels[tier]}</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${isActive ? "bg-black/20 text-black font-black" : "bg-[var(--color-surface)] text-[var(--color-text-muted)] border border-[var(--color-border)]"}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Targets List */}
@@ -619,7 +747,7 @@ export const Retention: React.FC<RetentionProps> = ({
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5" id="retention-client-grid">
             {filteredStreamClients.map((client) => {
-              const currentOwner = client.retentionOwner || (client.source && client.source.toLowerCase().includes("brown") ? "Jeff Brown" : "David Acosta");
+              const currentOwner = client.retentionOwner || client.agent || "David Acosta";
               
               // Anniversary year computation
               let yearsVal = 0;
@@ -654,11 +782,17 @@ export const Retention: React.FC<RetentionProps> = ({
                           Birthday: {client.dob ? new Date(client.dob).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "N/A"}
                         </div>
                       )}
-                      {activeStream === "renewals" && (
-                        <div className="bg-[#6fa3b8]/15 border border-[#6fa3b8]/30 text-[#6fa3b8] text-[10px] font-black px-2.5 py-1 rounded-full uppercase">
-                          Maturity: {client.maturityDate ? new Date(client.maturityDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "5-Yr Default"}
-                        </div>
-                      )}
+                      {activeStream === "renewals" && (() => {
+                        const matDate = getMaturityDate(client);
+                        const dateStr = matDate ? matDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A";
+                        const isComputed = !client.maturityDate && !!client.fundedDate;
+                        return (
+                          <div className="bg-[#6fa3b8]/15 border border-[#6fa3b8]/30 text-[#6fa3b8] text-[10px] font-black px-2.5 py-1 rounded-full uppercase flex items-center gap-1">
+                            <span>Maturity: {dateStr}</span>
+                            {isComputed && <span className="text-[8px] opacity-80 font-semibold">(Computed)</span>}
+                          </div>
+                        );
+                      })()}
                       {activeStream === "anniversaries" && (
                         <div className="bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">
                           Anniversary: {yearsVal} Year{yearsVal > 1 ? "s" : ""}
